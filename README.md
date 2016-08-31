@@ -1,7 +1,7 @@
 # Onecard-Game-Test
 Using my LoadData class..
 
-
+	
 	# Onecard Data and Event.
 	
 	# Info
@@ -72,7 +72,7 @@ Using my LoadData class..
 	{
 		id = 7
 		# Action
-		$call = { id = 6 /Info/CARDNUM } 
+		$call = { id = 6 n = /Info/CARDNUM } 
 	}
 	
 	# PutCard
@@ -109,7 +109,7 @@ Using my LoadData class..
 	# Main
 	Main =
 	{
-		$start_id = 0
+		$call = { id = 0 }
 	
 		# $on = { id = ERROR }
 		# $on = { id = CONSOLE }
@@ -118,4 +118,3 @@ Using my LoadData class..
 	# Event : Evemt1 -> Event2 -> Event3 -> Event4
 	#					-> Event2 or Event5 or Event1 or Event(for Error)?
 	#
-
