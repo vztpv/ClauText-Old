@@ -14,7 +14,7 @@ Using my LoadData class..
 		# No
 		id=1
 		# Action
-		$if = { $EQ = { /TUrn/dir true }  
+		$if = { $EQ = { /TUrn/dir true }  # $condition = {cond = { ~ } yes = { ~ } no = { ~ } } #?? 
 			$assign = { /Turn/now { $add = { $modular = { /Turn/now /Turn/n } 1 } } } 
 		}	
 		$else = { # if else link problem? - depth?, depth max setting?
