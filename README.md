@@ -35,7 +35,7 @@ Using my LoadData class..
 	}
 	Event = {
 		id = 3
-		$call { id = 101 i = 0 } # using stack? + 몇번쨰까찌 했는가?
+		$call = { id = 101 i = 0 } # using stack? + 몇번쨰까찌 했는가?
 		# insert joker
 		$insert = { /Card/ = {sha = -1 num = -1  isBlackJoker = yes isColorJoker = no } }
 		$insert = { /Card/ = {sha = -2 num = -2  isBlackJoker = no isColorJooker = yes } }
