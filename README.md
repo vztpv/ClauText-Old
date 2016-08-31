@@ -42,8 +42,6 @@ Using my LoadData class..
 	}
 	
 	# CardList - RandomShuffle!
-		# make
-		# shuffle. O(N) 
 	Event =
 	{
 		id = 4
