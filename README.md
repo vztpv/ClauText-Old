@@ -10,6 +10,17 @@ Using my LoadData class..
 	# Turn
 	Turn = { dir=true start=1 end=4 n=4 now=4 }
 	
+	# Event = {
+	#       id = ~
+	#       condition A
+	#	$assign = { ~ }
+	# }
+	# Evnet = {
+	#	id = ~
+	#	condition !A
+	#	$assign = { ~ }
+	# }
+	
 	Event = {
 		# No
 		id=1
