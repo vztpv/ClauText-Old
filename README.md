@@ -1,7 +1,7 @@
 # Onecard-Game-Test
 Using my LoadData class..
 
-	
+
 	# Onecard Data and Event.
 	
 	# Info
@@ -93,6 +93,9 @@ Using my LoadData class..
 	# Computer
 	
 	
+	# Print
+	
+	
 	# Total?
 	Event =
 	{
@@ -114,4 +117,5 @@ Using my LoadData class..
 	
 	# Event : Evemt1 -> Event2 -> Event3 -> Event4
 	#					-> Event2 or Event5 or Event1 or Event(for Error)?
-	
+	#
+
