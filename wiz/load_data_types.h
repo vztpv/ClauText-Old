@@ -8,7 +8,7 @@
 using namespace std;
 
 #include <wiz/newArrays.h>
-#include <wiz/dictionary.h>
+//#include <wiz/dictionary.h>
 //#include <wiz/binary_search.h>
 #include <wiz/load_data_utility.h>
 
@@ -197,7 +197,7 @@ namespace wiz {
 				return *this;
 			}
 		private:
-			void Reset(const UserType& ut) { /// UT ÀüÃ¼¸¦ º¹»çÇÑ´Ù.
+			void Reset(const UserType& ut) { /// UT Ã€Ã¼ÃƒÂ¼Â¸Â¦ ÂºÂ¹Â»Ã§Ã‡Ã‘Â´Ã™.
 			//	userTypeList_sortFlagA = ut.userTypeList_sortFlagA;
 				//userTypeList_sortFlagB = ut.userTypeList_sortFlagB;
 
@@ -252,7 +252,7 @@ namespace wiz {
 				for (int i = 0; i < ilist.size(); ++i) {
 					if (ilist[i] == 1 ) { count++; }
 					if (count == idx + 1) {
-						// iºÎÅÍ left shift!and resize!
+						// iÂºÃŽÃ…Ã left shift!and resize!
 						for (int k = i+1; k < ilist.size(); ++k) {
 							ilist[k - 1] = std::move(ilist[k]);
 						}
