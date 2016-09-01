@@ -12,10 +12,10 @@
 		id=1
 		# Action
 		$if = { $condition = { $EQ = { /Turn/dir true } } 
-			$then = { $assign = { /Turn/now { $add = { $modular = { /Turn/now /Turn/n } 1 } } } }
+			$then = { $assign = { /Turn/now value = { $add = { $modular = { /Turn/now /Turn/n } 1 } } } }
 		}	
 		$else = { # if else link problem? - depth?, depth max setting?
-			$assign = { /Turn/now { $add = { $modular = { $add = { /Turn/now $add = { /Turn/n -2 } } Turn/n}}}}
+			$assign = { /Turn/now value = { $add = { $modular = { $add = { /Turn/now $add = { /Turn/n -2 } } Turn/n}}}}
 		}		
 	}
 	
@@ -24,7 +24,7 @@
 		id = 101
 		$parameter = { i } #
 		# Action  cf) Card                 <-------------------- 
-		$insert = { /Card/ = { sha = { $divide ={$parameter.i 13} } num = { $modular={$parameter.i 13} } # no ???
+		$insert = { /Card/  value = { sha = { $divide ={$parameter.i 13} } num = { $modular={$parameter.i 13} } # no ???
 							isBlackJoker = no isColorJoker = no } }
 		$if = { $condition = { $COMP< = { $parameter.i $multiple = { 13 4 }  } }
 			$then = { $call = { id = 101 i = { $add = { $parameter.i 1  } } } }
@@ -34,8 +34,8 @@
 		id = 3
 		$call = { id = 101 i = 0 } # using stack? + 몇번쨰까찌 했는가?
 		# insert joker
-		$insert = { /Card/ = {sha = -1 num = -1  isBlackJoker = yes isColorJoker = no } }
-		$insert = { /Card/ = {sha = -2 num = -2  isBlackJoker = no isColorJooker = yes } }
+		$insert = { /Card/ value = {sha = -1 num = -1  isBlackJoker = yes isColorJoker = no } }
+		$insert = { /Card/ value = {sha = -2 num = -2  isBlackJoker = no isColorJooker = yes } }
 	}
 	
 	# CardList - RandomShuffle!
@@ -44,7 +44,7 @@
 		id = 4
 		$parameter = { i }
 		# Action
-		$insert = { /CardList/ = { $parameter.i } }
+		$insert = { /CardList/ value = { $parameter.i } }
 		$if = { $condition = { $COMP< = { $parameter.i /Info/CARDNUM  } }
 			$then = { $call = { id = 4 i = { $add = { $parameter.i 1 } } } }
 		}            
@@ -60,7 +60,7 @@
 		id = 6
 		$parameter = { n }
 		# Action
-		$swap = { /CardList/ $rand={ 0, $add={$parameter.n-1} } $add={$parameter.n-1} }
+		$swap = { /CardList/ value = $rand = { 0, $add={$parameter.n -1} } value = $add={$parameter.n -1} }
 		$if = { $condition = { $COMP> = { $parameter.n 0 } }
 			$then = { $call = { id = 6 n = { $add={ $parameter.n -1 } } } }
 		} 
