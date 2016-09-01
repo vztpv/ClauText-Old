@@ -60,7 +60,7 @@
 		id = 6
 		$parameter = { n }
 		# Action
-		$swap = { /CardList/ $rand{ 0, $add={$parameter.n-1} } $add={$parameter.n-1} }
+		$swap = { /CardList/ $rand={ 0, $add={$parameter.n-1} } $add={$parameter.n-1} }
 		$if = { $condition = { $COMP> = { $parameter.n 0 } }
 			$then = { $call = { id = 6 n = { $add={ $parameter.n -1 } } } }
 		} 
