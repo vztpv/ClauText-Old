@@ -26,7 +26,7 @@
 		# Action  cf) Card                 <-------------------- 
 		$insert = { /Card/ = { sha = { $divide ={$parameter.i 13} } num = { $modular={$parameter.i 13} } # no ???
 							isBlackJoker = no isColorJoker = no } }
-		$if = { $condition = { $COMP< = { $multiple = { 13 4 }  } }
+		$if = { $condition = { $COMP< = { $parameter.i $multiple = { 13 4 }  } }
 			$then = { $call = { id = 101 i = { $add = { $parameter.i 1  } } } }
 		}
 	}
