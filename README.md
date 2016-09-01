@@ -1,4 +1,5 @@
 	
+	
 	# Onecard Data and Event.
 	
 	# Info
@@ -15,7 +16,7 @@
 			$then = { $assign = { /Turn/now value = { $add = { $modular = { /Turn/now /Turn/n } 1 } } } }
 		}	
 		$else = { # if else link problem? - depth?, depth max setting?
-			$assign = { /Turn/now value = { $add = { $modular = { $add = { /Turn/now $add = { /Turn/n -2 } } /Turn/n}}}}
+			$then = { $assign = { /Turn/now value = { $add = { $modular = { $add = { /Turn/now $add = { /Turn/n -2 } } /Turn/n} } } } }
 		}		
 	}
 	
@@ -81,6 +82,9 @@
 	# AttackPoint
 	
 	
+	# ChangeSha
+	
+	
 	# State
 	
 	
@@ -90,7 +94,10 @@
 	# Computer
 	
 	
-	# Print
+	# Print Card
+	
+	
+	# Print Card List
 	
 	
 	# Total?
