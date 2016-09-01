@@ -15,7 +15,7 @@
 			$then = { $assign = { /Turn/now value = { $add = { $modular = { /Turn/now /Turn/n } 1 } } } }
 		}	
 		$else = { # if else link problem? - depth?, depth max setting?
-			$assign = { /Turn/now value = { $add = { $modular = { $add = { /Turn/now $add = { /Turn/n -2 } } Turn/n}}}}
+			$assign = { /Turn/now value = { $add = { $modular = { $add = { /Turn/now $add = { /Turn/n -2 } } /Turn/n}}}}
 		}		
 	}
 	
