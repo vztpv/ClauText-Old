@@ -26,8 +26,10 @@ public:
 	vector<pair<string, string>> parameters;
 	string id; //
 	wiz::ArrayStack<string> conditionStack;
+	int depth;
+	int num; // num of statements? for if, else statements.
 public:	
-	EventInfo() : eventUT(NULL), nowUT(NULL)
+	EventInfo() : eventUT(NULL), nowUT(NULL), depth(0), num(0)
 	{
 
 	}
@@ -532,6 +534,7 @@ string ToBool(wiz::load_data::UserType& global, const vector<pair<string,string>
 	return operandStack[0];
 }
 
+// todo -  vector< pair<string, string> > ??
 
 int main(void)
 {
@@ -594,10 +597,10 @@ int main(void)
 		}
 		
 		cout << "idx " << info.userType_idx << " stack depth " << eventStack.size() << " info.id " << info.id << endl;
-		
+		cout << "depth " << info.depth << endl;
 		for (int i = eventStack.top().userType_idx; i < events[no].Get(0)->GetUserTypeListSize(); ++i) {
 			wiz::load_data::UserType* val = events[no].Get(0)->GetUserTypeList(i).Get(0);
-			int depth = 1; // ??
+			int state = 0;
 			while (true) {
 				//cout << val->GetName() << endl;
 				if ("$call" == val->GetName()) {
@@ -636,6 +639,14 @@ int main(void)
 					pass = true;
 					break;            
 				}
+				else if ("$assign" == val->GetName())
+				{
+					// to do..
+				}
+				else if ("$insert" == val->GetName())
+				{
+					// to do..
+				}
 				else if ("$if" == val->GetName()) // ToDo!!
 				{
 					string temp = val->GetUserTypeList(0).Get(0)->ToString();
@@ -646,8 +657,10 @@ int main(void)
 					if ("TRUE" == temp)
 					{
 						eventStack.top().nowUT = val->GetUserTypeList(1).Get(0);
-						val = eventStack.top().nowUT->GetUserTypeList(0).Get(0);
-						depth++;
+						val = eventStack.top().nowUT->GetUserTypeList(0).Get(0); // + break!
+						eventStack.top().num = 1;
+						state = 1;
+						eventStack.top().depth++;
 					}
 					else if ("FALSE" == temp)
 					{
@@ -658,11 +671,45 @@ int main(void)
 					{
 						// debug..
 						cout << "Error Debug : " << temp << endl;
+						return -1;
+					}
+				}
+				else if ("$else" == val->GetName())
+				{
+					// if가 바로 앞에 나와야한다. - later?
+					//
+					if (!eventStack.top().conditionStack.empty() && "FALSE" == eventStack.top().conditionStack.top())
+					{
+						eventStack.top().nowUT = val->GetUserTypeList(0).Get(0);
+						val = eventStack.top().nowUT->GetUserTypeList(0).Get(0);
+						eventStack.top().num = 1;
+						state = 2;
+						eventStack.top().depth--;
+					}
+					else
+					{
 						break;
 					}
 				}
 				else {
-					break;
+					if (state == 1 || state == 2)
+					{
+						if (eventStack.top().num < eventStack.top().nowUT->GetUserTypeListSize())
+						{
+							val = eventStack.top().nowUT->GetUserTypeList(eventStack.top().num).Get(0);
+							eventStack.top().num++;
+						}
+						else
+						{
+							eventStack.top().depth = std::max(0, eventStack.top().depth - 1);
+							state = 0;
+							break;
+						}
+					}
+					else {
+						eventStack.top().depth = std::max(0, eventStack.top().depth - 1);
+						break;
+					}
 				}
 			}
 			if (pass) { break; }
