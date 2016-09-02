@@ -1,4 +1,4 @@
-		`
+	
 	
 	# Onecard Data and Event.
 	
@@ -106,8 +106,15 @@
 		id = 0	
 		
 		#Action
-		$call = { id = 3 }
-		$call = { id = 7 }
+		$if = { $condition = { FALSE } 
+			$then = {  } 
+		}
+		$else = { 
+			$then = {
+				$call = { id = 3 }
+				$call = { id = 7 }
+			}
+		}
 	}
 	
 	# Main
