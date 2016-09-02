@@ -613,7 +613,7 @@ int main(void)
 			}
 
 			while (true) {
-				//cout << val->GetName() << endl;
+				cout << val->GetName() << endl;
 				if ("$call" == val->GetName()) {
 					cout << "$call " << val->GetItem("id")[0].Get(0) << endl;
 					info.id = val->GetItem("id")[0].Get(0);
@@ -724,16 +724,18 @@ int main(void)
 					}
 					else
 					{
+						eventStack.top().userType_idx.top()++;
 						break;
 					}
 				}
-				else {
+				//else 
+				{
 					if (eventStack.top().state == 1 || eventStack.top().state == 2) // it is in "$if", "$else" statments..
 					{
 						if (eventStack.top().userType_idx.top() < eventStack.top().nowUT.top()->GetUserTypeListSize())
 						{
 							val = eventStack.top().nowUT.top()->GetUserTypeList(eventStack.top().userType_idx.top()).Get(0);
-							eventStack.top().userType_idx.top()++;
+							//eventStack.top().userType_idx.top()++;
 						}
 						else
 						{
@@ -744,13 +746,13 @@ int main(void)
 							if (eventStack.top().nowUT.size() < 1)
 							{
 								eventStack.top().state = 0;
-								eventStack.top().userType_idx.top()++;
+								//eventStack.top().userType_idx.top()++;
 							}
 							break;
 						}
 					}
 					else {
-						eventStack.top().userType_idx.top()++;
+						//eventStack.top().userType_idx.top()++;
 						break;
 					}
 				}
