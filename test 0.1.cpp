@@ -2,6 +2,7 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
+//#define ARRAYS_DEBUG
 #include <iostream>
 #include <vector>
 #include <list>
@@ -28,7 +29,7 @@ public:
 	wiz::ArrayStack<string> conditionStack;
 	wiz::ArrayStack<int> num; // num of statements? for if, else statements.
 public:	
-	EventInfo() : eventUT(NULL), nowUT(NULL), num(0)
+	EventInfo() : eventUT(NULL)
 	{
 
 	}
