@@ -113,6 +113,7 @@
 			$then = {
 				$call = { id = 3 }
 				$call = { id = 7 }
+				$call = { id = 5 } # why??
 			}
 		}
 	}
