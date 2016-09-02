@@ -113,7 +113,12 @@
 			$then = {
 				$call = { id = 3 }
 				$call = { id = 7 }
-				$call = { id = 5 } # why??
+				$call = { id = 5 }
+				$if = { $condition = { FALSE } 
+					$then = {
+						$call = { id = 5 } # why??
+					}
+				}
 			}
 		}
 	}
