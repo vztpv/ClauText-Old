@@ -70,7 +70,7 @@
 	{
 		id = 7
 		# Action
-		$call = { id = 6 n = 54 }  # cf) /info/cardNum
+		$call = { id = 6 n = /Info/CARDNUM }  # cf) /info/cardNum
 	}
 	
 	# PutCard
