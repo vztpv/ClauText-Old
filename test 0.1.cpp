@@ -517,7 +517,12 @@ string ToBool(wiz::load_data::UserType& global, const vector<pair<string,string>
 	while (tokenizer.hasMoreTokens()) {
 		tokenVec.push_back(tokenizer.nextToken());
 	}
-
+	if (tokenVec.size() == 1) {
+		if ('/' == tokenVec[0][0])
+		{
+			tokenVec[0] = Find(&global, tokenVec[0]);
+		}
+	}
 	for (int i = tokenVec.size() - 1; i >= 0; --i)
 	{
 		if ('$' != tokenVec[i][0] || wiz::String::startsWith( tokenVec[i], "$parameter.")) {
@@ -613,23 +618,34 @@ int main(void)
 					}
 					info.conditionStack.clear();
 
-					/// 순서가 다를 수 있다??
+					//
 					if (info.id != eventStack.top().id) {
 						for (int j = 0; j < val->GetItemListSize(); ++j) {
-							info.parameters.push_back(make_pair(val->GetItemList(j).GetName(), val->GetItemList(j).Get(0)));
+							if (val->GetItemListSize() > 0) {
+								string temp = ToBool(global, info.parameters, val->GetItemList(j).Get(0));
+								info.parameters.push_back(make_pair(val->GetItemList(j).GetName(), temp));
+							}
+						}
+						for (int j = 0; j < val->GetUserTypeListSize(); ++j) {
+							if (val->GetUserTypeListSize() > 0) {
+								string temp = ToBool(global, info.parameters, val->GetUserTypeList(j).Get(0)->ToString());
+								info.parameters.push_back(make_pair(val->GetUserTypeList(j).GetName(), temp));
+							}
 						}
 					}
 					else {
 						if (val->GetUserTypeListSize() > 0) {
-							string temp = ToBool(global, info.parameters, val->GetUserTypeList(0).Get(0)->ToString());
-							for (int j = 0; j < info.parameters.size(); ++j)
-							{
-								if (info.parameters[j].first == val->GetUserTypeList(0).GetName())
+							for (int j = 0; j < val->GetUserTypeListSize(); ++j) {
+								string temp = ToBool(global, info.parameters, val->GetUserTypeList(j).Get(0)->ToString());
+								for (int k = 0; k < info.parameters.size(); ++k)
 								{
-									info.parameters[j].second = temp;
+									if (info.parameters[k].first == val->GetUserTypeList(j).GetName())
+									{
+										info.parameters[k].second = temp;
+									}
 								}
+								// debug // cout << temp << endl;
 							}
-							cout << temp << endl;
 						}
 						eventStack.pop();
 					}
