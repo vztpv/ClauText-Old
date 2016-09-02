@@ -1,9 +1,9 @@
-	
+		`
 	
 	# Onecard Data and Event.
 	
 	# Info
-	Info = { CARDNUM = 54 } #
+	Info = { CARDNUM = 52 } # cardnum - no count two joker card!
 	
 	# Turn
 	Turn = { dir=true start=1 end=4 n=4 now=4 }
@@ -27,7 +27,7 @@
 		# Action  cf) Card                 <-------------------- 
 		$insert = { /Card/  value = { sha = { $divide ={$parameter.i 13} } num = { $modular={$parameter.i 13} } # no ???
 							isBlackJoker = no isColorJoker = no } }
-		$if = { $condition = { $COMP< = { $parameter.i $multiple = { 13 4 }  } }
+		$if = { $condition = { $COMP< = { $parameter.i /Info/CARDNUM  } }
 			$then = { $call = { id = 101 i = { $add = { $parameter.i 1  } } } }
 		}
 	}
@@ -70,7 +70,7 @@
 	{
 		id = 7
 		# Action
-		$call = { id = 6 n = /Info/CARDNUM }  # cf) /info/cardNum
+		$call = { id = 6 n = { $add = { 2 /Info/CARDNUM } } }  # cf) /info/cardNum
 	}
 	
 	# PutCard
