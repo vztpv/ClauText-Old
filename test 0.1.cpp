@@ -20,16 +20,15 @@ class EventInfo
 {
 public:
 	wiz::load_data::UserType* eventUT;
-	wiz::load_data::UserType* nowUT; //
+	wiz::ArrayStack< wiz::load_data::UserType* > nowUT; //
 	int item_idx;
 	int userType_idx;
 	vector<pair<string, string>> parameters;
 	string id; //
 	wiz::ArrayStack<string> conditionStack;
-	int depth;
-	int num; // num of statements? for if, else statements.
+	wiz::ArrayStack<int> num; // num of statements? for if, else statements.
 public:	
-	EventInfo() : eventUT(NULL), nowUT(NULL), depth(0), num(0)
+	EventInfo() : eventUT(NULL), nowUT(NULL), num(0)
 	{
 
 	}
@@ -564,7 +563,7 @@ int main(void)
 	{
 		EventInfo info;
 		info.eventUT = Main;
-		info.nowUT = NULL;
+		//info.nowUT = NULL;
 		info.item_idx = 0;
 		info.userType_idx = 0;
 		info.parameters.push_back(
@@ -597,7 +596,7 @@ int main(void)
 		}
 		
 		cout << "idx " << info.userType_idx << " stack depth " << eventStack.size() << " info.id " << info.id << endl;
-		cout << "depth " << info.depth << endl;
+		
 		for (int i = eventStack.top().userType_idx; i < events[no].Get(0)->GetUserTypeListSize(); ++i) {
 			wiz::load_data::UserType* val = events[no].Get(0)->GetUserTypeList(i).Get(0);
 			int state = 0;
@@ -607,7 +606,7 @@ int main(void)
 					cout << "$call " << val->GetItem("id")[0].Get(0) << endl;
 					info.id = val->GetItem("id")[0].Get(0);
 					info.eventUT = events[no].Get(0);
-					info.nowUT = NULL;
+					//info.nowUT = NULL;
 					info.userType_idx = 0;
 					if (info.id != eventStack.top().id) {
 						info.parameters.clear();
@@ -642,25 +641,25 @@ int main(void)
 				else if ("$assign" == val->GetName())
 				{
 					// to do..
+					break;
 				}
 				else if ("$insert" == val->GetName())
 				{
 					// to do..
+					break;
 				}
 				else if ("$if" == val->GetName()) // ToDo!!
 				{
 					string temp = val->GetUserTypeList(0).Get(0)->ToString();
 					temp = ToBool(global, eventStack.top().parameters, temp);
-					//cout << temp << endl;
+			
 					eventStack.top().conditionStack.push(temp);
-
 					if ("TRUE" == temp)
 					{
-						eventStack.top().nowUT = val->GetUserTypeList(1).Get(0);
-						val = eventStack.top().nowUT->GetUserTypeList(0).Get(0); // + break!
-						eventStack.top().num = 1;
+						eventStack.top().nowUT.push( val->GetUserTypeList(1).Get(0) );
+						val = eventStack.top().nowUT.top()->GetUserTypeList(0).Get(0); // empty chk?
+						eventStack.top().num.push(1);
 						state = 1;
-						eventStack.top().depth++;
 					}
 					else if ("FALSE" == temp)
 					{
@@ -680,11 +679,10 @@ int main(void)
 					//
 					if (!eventStack.top().conditionStack.empty() && "FALSE" == eventStack.top().conditionStack.top())
 					{
-						eventStack.top().nowUT = val->GetUserTypeList(0).Get(0);
-						val = eventStack.top().nowUT->GetUserTypeList(0).Get(0);
-						eventStack.top().num = 1;
+						eventStack.top().nowUT.push(val->GetUserTypeList(0).Get(0));
+						val = eventStack.top().nowUT.top()->GetUserTypeList(0).Get(0); // empty chk?
+						eventStack.top().num.push(1);
 						state = 2;
-						eventStack.top().depth--;
 					}
 					else
 					{
@@ -692,22 +690,26 @@ int main(void)
 					}
 				}
 				else {
-					if (state == 1 || state == 2)
+					if (state == 1 || state == 2) // it is in "$if", "$else" statments..
 					{
-						if (eventStack.top().num < eventStack.top().nowUT->GetUserTypeListSize())
+						if (eventStack.top().num.top() < eventStack.top().nowUT.top()->GetUserTypeListSize())
 						{
-							val = eventStack.top().nowUT->GetUserTypeList(eventStack.top().num).Get(0);
-							eventStack.top().num++;
+							val = eventStack.top().nowUT.top()->GetUserTypeList(eventStack.top().num.top()).Get(0);
+							eventStack.top().num.top()++;
 						}
 						else
 						{
-							eventStack.top().depth = std::max(0, eventStack.top().depth - 1);
-							state = 0;
+							eventStack.top().nowUT.pop();
+							eventStack.top().num.pop();
+
+							if (eventStack.top().num.empty())
+							{
+								state = 0;
+							}
 							break;
 						}
 					}
 					else {
-						eventStack.top().depth = std::max(0, eventStack.top().depth - 1);
 						break;
 					}
 				}
