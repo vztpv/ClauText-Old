@@ -594,6 +594,7 @@ int main(void)
 
 		const int no = convert[str];
 		bool pass = false;
+		int state = 0;
 
 		if (info.userType_idx.size() == 1 && info.userType_idx[0] >= events[no].Get(0)->GetUserTypeListSize())
 		{
@@ -698,6 +699,7 @@ int main(void)
 						val = eventStack.top().nowUT.top()->GetUserTypeList(0).Get(0); // empty chk?
 						eventStack.top().userType_idx.push(0);
 						eventStack.top().state = 1;
+						state = 1;
 					}
 					else if ("FALSE" == temp)
 					{
@@ -721,6 +723,7 @@ int main(void)
 						val = eventStack.top().nowUT.top()->GetUserTypeList(0).Get(0); // empty chk?
 						eventStack.top().userType_idx.push(0);
 						eventStack.top().state = 2;
+						state = 2;
 					}
 					else
 					{
@@ -728,13 +731,15 @@ int main(void)
 						break;
 					}
 				}
+
 				//else 
 				{
-					if (eventStack.top().state == 1 || eventStack.top().state == 2) // it is in "$if", "$else" statments..
+					///if (eventStack.top().state == 1 || eventStack.top().state == 2) // it is in "$if", "$else" statments..
+					if( eventStack.top().state == 1 || eventStack.top().state == 2 )
 					{
 						if (eventStack.top().userType_idx.top() < eventStack.top().nowUT.top()->GetUserTypeListSize())
 						{
-							val = eventStack.top().nowUT.top()->GetUserTypeList(eventStack.top().userType_idx.top()).Get(0);
+ 							val = eventStack.top().nowUT.top()->GetUserTypeList(eventStack.top().userType_idx.top()).Get(0);
 							//eventStack.top().userType_idx.top()++;
 						}
 						else
@@ -746,13 +751,14 @@ int main(void)
 							if (eventStack.top().nowUT.size() < 1)
 							{
 								eventStack.top().state = 0;
-								//eventStack.top().userType_idx.top()++;
+								state = 0;
 							}
+							eventStack.top().userType_idx.top()++;
 							break;
 						}
 					}
 					else {
-						//eventStack.top().userType_idx.top()++;
+						eventStack.top().userType_idx.top()++;
 						break;
 					}
 				}
