@@ -60,6 +60,18 @@ string Find(wiz::load_data::UserType* ut, const string& str)
 	return wiz::load_data::UserType::Find(ut,
 		wiz::String::substring(str, 0, idx)).second[0]->GetItem(wiz::String::substring(str, idx + 1))[0].Get(0);
 }
+// to do - rename!
+pair<string, string> Find2(wiz::load_data::UserType* ut, const string& str)
+{
+	int idx = -1;
+	for (int i = str.size() - 1; i >= 0; --i) {
+		if ('/' == str[i]) {
+			idx = i;
+			break;
+		}
+	}
+	return{ wiz::String::substring(str, 0, idx), wiz::String::substring(str,idx + 1) };
+}
 string reverse(string str) { /// to std::reverse ?
 	std::reverse(str.begin(), str.end());
 	return str;
@@ -538,7 +550,45 @@ string ToBool(wiz::load_data::UserType& global, const vector<pair<string, string
 
 	return operandStack[0];
 }
+wiz::ArrayStack<string> ToBool2(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& temp)
+{
+	wiz::ArrayStack<string> operandStack; // 피연산자
+	wiz::ArrayStack<string> operatorStack; // 연산자
 
+	wiz::StringTokenizer tokenizer(temp, { " ", "\n", "\t", "\r", "{", "=", "}" });
+	vector<string> tokenVec;
+
+	while (tokenizer.hasMoreTokens()) {
+		tokenVec.push_back(tokenizer.nextToken());
+	}
+	if (tokenVec.size() == 2) {
+		/// chk!!
+		if ('/' == tokenVec[1][0])
+		{
+			tokenVec[1] = Find(&global, tokenVec[1]);
+		}
+		else {
+			string temp = FindParameters(parameters, tokenVec[1]);
+			if (!temp.empty()) { tokenVec[1] = temp; }
+		}
+		operandStack.push(tokenVec[1]);
+		operandStack.push(tokenVec[0]);
+		return operandStack;
+	}
+	for (int i = tokenVec.size() - 1; i >= 0; --i)
+	{
+		if ('$' != tokenVec[i][0] || wiz::String::startsWith(tokenVec[i], "$parameter.")) {
+			operandStack.push(tokenVec[i]);
+		}
+		else
+		{
+			operatorStack.push(tokenVec[i]);
+			operation(global, parameters, tokenVec[i], operandStack);
+		}
+	}
+
+	return operandStack;
+}
 // todo -  vector< pair<string, string> > ??
 
 int main(void)
@@ -614,7 +664,7 @@ int main(void)
 			}
 
 			while (true) {
-				cout << val->GetName() << endl;
+				cout << val->GetName() << " id " << eventStack.top().id << endl;
 				if ("$call" == val->GetName()) {
 					cout << "$call " << val->GetItem("id")[0].Get(0) << endl;
 					info.id = val->GetItem("id")[0].Get(0);
@@ -640,6 +690,8 @@ int main(void)
 								info.parameters.push_back(make_pair(val->GetUserTypeList(j).GetName(), temp));
 							}
 						}
+
+						eventStack.top().userType_idx.top()++;
 					}
 					else {
 						if (val->GetUserTypeListSize() > 0) {
@@ -658,7 +710,7 @@ int main(void)
 						}
 						eventStack.pop();
 					}
-					eventStack.top().userType_idx.top()++;
+					
 					eventStack.push(info);
 					pass = true;
 					break;
@@ -666,18 +718,52 @@ int main(void)
 				else if ("$assign" == val->GetName())
 				{
 					// to do..
+					pair<string, string> dir = Find2( &global, val->GetItemList(0).Get(0) );
+					string data = ToBool(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString());
+					wiz::load_data::LoadData::SetData(global, dir.first, dir.second, data, "TRUE");
+
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$insert" == val->GetName())
 				{
-					// to do..
+					// to do.. //    /dir~
+					string dir = string(val->GetItemList(0).Get(0).c_str()+1);
+					string value = val->GetUserTypeList(0).Get(0)->ToString();
+					wiz::ArrayStack<string> value2 = ToBool2(global, eventStack.top().parameters, value);
+					wiz::load_data::UserType ut, ut2;
+
+					ut.Remove();
+					ut.SetName(dir);
+					if (!wiz::load_data::LoadData::ExistItem(global, dir, dir + "_count", "TRUE"))
+					{
+						ut2.SetName("0");
+						global.AddUserTypeItem(wiz::load_data::UserType(dir));
+						wiz::load_data::LoadData::AddData(global, dir, dir + "_count = 0", "TRUE");
+					}
+					else
+					{
+						string temp = global.GetUserTypeItem(dir)[0].Get(0)->GetItem(dir + "_count")[0].Get(0);
+						ut2.SetName(wiz::toStr( atoi(temp.c_str()) + 1));
+						wiz::load_data::LoadData::SetData(global, dir, dir + "_count", ut2.GetName(), "TRUE");
+					}
+					
+					while (!value2.empty())
+					{
+						auto x = value2.pop();
+						auto y = value2.pop();
+						ut2.AddItem(x, y);
+					}
+
+					ut.AddUserTypeItem(ut2);
+					wiz::load_data::LoadData::AddData(global, dir, ut.ToString(), "TRUE");
+
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$swap" == val->GetName())
 				{
-					// to do..
+					// to do..	
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
@@ -766,6 +852,6 @@ int main(void)
 		}
 	}
 
-
+	cout << global << endl;
 	return 0;
 }
