@@ -25,18 +25,19 @@ Event = {
 	id = 101
 	$parameter = { i } #
 	# Action  cf) Card                 <-------------------- 
-	$insert = { /Card/  value = { sha = { $divide ={$parameter.i 13} } num = { $modular={$parameter.i 13} } # no ???
-						isBlackJoker = no isColorJoker = no } }
 	$if = { $condition = { $COMP< = { $parameter.i /Info/CARDNUM  } }
-		$then = { $call = { id = 101 i = { $add = { $parameter.i 1  } } } }
+		$then = {	$insert = { /Card  value = { sha = { $divide ={$parameter.i 13} } num = { $modular={$parameter.i 13} } # no ???
+						isBlackJoker = no isColorJoker = no } } 
+					$call = { id = 101 i = { $add = { $parameter.i 1  } } }
+		}
 	}
 }
 Event = {
 	id = 3
 	$call = { id = 101 i = 0 } # using stack? + 몇번쨰까찌 했는가?
 	# insert joker
-	$insert = { /Card/ value = {sha = -1 num = -1  isBlackJoker = yes isColorJoker = no } }
-	$insert = { /Card/ value = {sha = -2 num = -2  isBlackJoker = no isColorJooker = yes } }
+	$insert = { /Card value = {sha = -1 num = -1  isBlackJoker = yes isColorJoker = no } }
+	$insert = { /Card value = {sha = -2 num = -2  isBlackJoker = no isColorJooker = yes } }
 }
 
 # CardList - RandomShuffle!
@@ -45,9 +46,10 @@ Event =
 	id = 4
 	$parameter = { i }
 	# Action
-	$insert = { /CardList/ value = { $parameter.i } }
-	$if = { $condition = { $COMP< = { $parameter.i /Info/CARDNUM  } }
-		$then = { $call = { id = 4 i = { $add = { $parameter.i 1 } } } }
+	
+	$if = { $condition = { $COMP< = { $parameter.i $add= { 2 /Info/CARDNUM  } } } 
+		$then = {	$insert = { /CardList value = { no = { $parameter.i }  } }
+					$call = { id = 4 i = { $add = { $parameter.i 1 } } } }
 	}            
 }
 Event = 
@@ -61,7 +63,7 @@ Event =
 	id = 6
 	$parameter = { n }
 	# Action
-	$swap = { /CardList/ value = $rand = { 0, $add={$parameter.n -1} } value = $add={$parameter.n -1} }
+	$swap = { /CardList value = $rand = { 0, $add={$parameter.n -1} } value = $add={$parameter.n -1} }
 	$if = { $condition = { $COMP> = { $parameter.n 0 } }
 		$then = { $call = { id = 6 n = { $add={ $parameter.n -1 } } } }
 	} 
@@ -114,13 +116,9 @@ Event =
 			$call = { id = 3 }
 			$call = { id = 7 }
 			$call = { id = 5 }
-			$if = { $condition = { FALSE } 
-				$then = {
-					$call = { id = 5 } # why??
-				}
-			}
 		}
 	}
+	$call = { id = 1 }
 }
 
 # Main
