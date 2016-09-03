@@ -63,9 +63,11 @@
 		id = 6
 		$parameter = { n }
 		# Action
-		$swap = { /CardList value = $rand = { 0, $add={$parameter.n -1} } value = $add={$parameter.n -1} }
 		$if = { $condition = { $COMP> = { $parameter.n 0 } }
-			$then = { $call = { id = 6 n = { $add={ $parameter.n -1 } } } }
+			$then = {
+				$swap = { /CardList value = { $rand = { 0 $add={$parameter.n -1} } } value = { $add={$parameter.n -1} } } 
+				$call = { id = 6 n = { $add={ $parameter.n -1 } } } 
+			}
 		} 
 	}
 	Event =
@@ -114,8 +116,8 @@
 		$else = { 
 			$then = {
 				$call = { id = 3 }
-				$call = { id = 7 }
 				$call = { id = 5 }
+				$call = { id = 7 }
 			}
 		}
 		$call = { id = 1 }
