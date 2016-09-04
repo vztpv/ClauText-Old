@@ -90,7 +90,8 @@
 		# Action
 		$if = { $condition = { $COMP< = { $parameter.i /Info/PLAYER_NUM } }
 			$then = {
-				$insert2 = { /PlayerCardList/$parameter.i value = { no = { $rand ={ 0 53 } } } }
+				$insert2 = { /PlayerCardList/$parameter.i value = { $rand ={ 0 53 }  } }
+				$insert2 = { /PlayerCardList/$parameter.i value = { $rand ={ 0 53 }  } }
 				$call = { id = 12 i = { $add={ $parameter.i 1 } } } 
 			}
 		} 
@@ -135,6 +136,7 @@
 		$if = { condition = { $COMP< = { $parameter.i /Info/PLAYER_NUM } }
 			$then = {
 				$insert = { /PlayerCardList value = {  }  }
+				#$make = { /PlayerCarList/$parameter.i } # ??
 				$call = { id = 9 i = { $add = { $parameter.i 1 } } }
 			}
 		}
