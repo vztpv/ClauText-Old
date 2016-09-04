@@ -167,6 +167,8 @@
 				$call = { id = 7 }
 				$call = { id = 8 }
 				$call = { id = 11 }
+				#$remove = { /PlayerCardList/0 }
+				#$remove2 =  { /PlayerCardList/0 }
 			}
 		}
 		$call = { id = 1 }
