@@ -3,10 +3,10 @@
 # Onecard Data and Event.
 
 # Info
-Info = { CARDNUM = 52 } # cardnum - no count two joker card!
+Info = { CARDNUM = 52 PLAYER_NUM = 4 } # cardnum - no count two joker card!
 
 # Turn
-Turn = { dir=true start=1 end=4 n=4 now=4 }
+Turn = { dir=true start=1 end=4 n=4 now=4 } # 초기화 Event 따로??
 
 Event = {
 	# No
@@ -35,7 +35,7 @@ Event = {
 Event = {
 	id = 3
 	$call = { id = 101 i = 0 } # using stack? + 몇번쨰까찌 했는가?
-	# insert joker
+	# insert two joker
 	$insert = { /Card value = {sha = -1 num = -1  isBlackJoker = yes isColorJoker = no } }
 	$insert = { /Card value = {sha = -2 num = -2  isBlackJoker = no isColorJooker = yes } }
 }
@@ -77,6 +77,25 @@ Event =
 	$call = { id = 6 n = { $add = { 2 /Info/CARDNUM } } }  # cf) /info/cardNum
 }
 
+# First Card Distribution
+Event = 
+{
+	id = 11
+	$call = { id = 12 i = 0 }
+}
+Event =
+{
+	id = 12
+	$parameter = { i }
+	# Action
+	$if = { $condition = { $COMP< = { $parameter.i /Info/PLAYER_NUM } }
+		$then = {
+			$insert2 = { /PlayerCardList/$parameter.i value = { no = { $rand ={ 0 53 } } } }
+			$call = { id = 12 i = { $add={ $parameter.i 1 } } } 
+		}
+	} 
+
+}
 # PutCard
 
 
@@ -92,8 +111,34 @@ Event =
 # State
 
 
-# Person # cf) inheritance?
 
+# Player(common)
+
+
+
+# Person # cf) inheritance?
+#PlayerCardList =
+#{
+#}
+
+Event =
+{
+	id = 8
+	# inital playerCardList?
+	$call = { id = 9  i = 0 }
+}
+Event =
+{
+	id = 9
+	$parameter = { i }
+	
+	$if = { condition = { $COMP< = { $parameter.i /Info/PLAYER_NUM } }
+		$then = {
+			$insert = { /PlayerCardList value = {  }  }
+			$call = { id = 9 i = { $add = { $parameter.i 1 } } }
+		}
+	}
+}
 
 # Computer
 
@@ -118,6 +163,8 @@ Event =
 			$call = { id = 3 }
 			$call = { id = 5 }
 			$call = { id = 7 }
+			$call = { id = 8 }
+			$call = { id = 11 }
 		}
 	}
 	$call = { id = 1 }
