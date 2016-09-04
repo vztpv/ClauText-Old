@@ -536,7 +536,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 	}
 }
 
-// todo - rename!
+// todo - rename! ToBool ~ ToBool4
 string ToBool(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& temp)
 {
 	wiz::ArrayStack<string> operandStack; // 피연산자
@@ -607,7 +607,93 @@ wiz::ArrayStack<string> ToBool2(wiz::load_data::UserType& global, const vector<p
 
 	return operandStack;
 }
-// todo -  vector< pair<string, string> > ??
+string ToBool3(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& temp)
+{
+	wiz::StringTokenizer tokenizer(temp, "/" );
+	vector<string> tokenVec;
+	string result;
+
+	while (tokenizer.hasMoreTokens()) {
+		tokenVec.push_back(tokenizer.nextToken());
+	}
+
+	for (int i = 0; i < tokenVec.size(); ++i)
+	{
+		result = result + "/";
+		if (wiz::String::startsWith(tokenVec[i], "$parameter.")) {
+			string temp = FindParameters(parameters, tokenVec[i]);
+			if (!temp.empty()) { tokenVec[i] = temp; }
+		}
+		result = result + tokenVec[i];
+	}
+
+	return result;
+}
+string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& temp)
+{
+	wiz::StringTokenizer tokenizer(temp, { " ", "\n", "\t", "\r", "{", "=", "}" });
+	vector<string> tokenVec;
+	string result = temp;
+	wiz::load_data::UserType ut;
+
+	while (tokenizer.hasMoreTokens()) {
+		tokenVec.push_back(tokenizer.nextToken());
+	}
+
+	for (int i = tokenVec.size() - 1; i >= 0; --i)
+	{
+		string before = tokenVec[i];
+		if ('/' == tokenVec[i][0])
+		{
+			tokenVec[i] = Find(&global, tokenVec[i]);
+			wiz::String::replace(temp, before, tokenVec[i]);
+		}
+		else if (wiz::String::startsWith(tokenVec[i], "$parameter.")) {
+			string temp = FindParameters(parameters, tokenVec[i]);
+			if (!temp.empty()) { 
+				tokenVec[i] = temp; 
+				wiz::String::replace(temp, before, tokenVec[i]);
+			}
+		}
+	}
+	
+	wiz::load_data::LoadData::LoadDataFromString(result, ut);	
+	wiz::ArrayStack<int> depthStack;
+	wiz::ArrayStack<wiz::load_data::UserType*> utStack;
+	depthStack.push(0);
+	utStack.push(&ut);
+
+	while (!depthStack.empty())
+	{
+		if (depthStack.top() >= utStack.top()->GetUserTypeListSize())
+		{
+			depthStack.pop();
+			utStack.pop();
+			continue;
+		}
+		wiz::load_data::UserType* temp = utStack.top()->GetUserTypeList(depthStack.top()).Get(0);
+		if (temp->GetName()[0] == '$') // not $parameter.~
+		{
+			string value = ToBool(global, parameters, temp->GetName() + " = { " + temp->ToString() + " } ");
+			string tempName = utStack.top()->GetName();
+
+			utStack.top()->RemoveUserTypeList(depthStack.top());
+			wiz::load_data::LoadData::AddData(*(utStack.top()), string(""), value, "TRUE");
+
+			depthStack.top()++;
+		}
+		else
+		{
+			depthStack.top()++;
+			depthStack.push(0);
+			utStack.push(temp);
+		}
+	}
+	
+	result = ut.ToString();
+	return result;
+}
+
 
 int main(void)
 {
@@ -751,7 +837,7 @@ int main(void)
 					wiz::ArrayStack<string> value2 = ToBool2(global, eventStack.top().parameters, value);
 					wiz::load_data::UserType ut, ut2;
 
-					ut.Remove();
+					ut.Remove();// removal?
 					ut.SetName(dir);
 					if (!wiz::load_data::LoadData::ExistItem(global, dir, dir + "_count", "TRUE"))
 					{
@@ -781,7 +867,13 @@ int main(void)
 				}
 				else if ("$insert2" == val->GetName())
 				{
-					// to do..
+					string dir = string(val->GetItemList(0).Get(0).c_str() + 1);
+					string value = val->GetUserTypeList(0).Get(0)->ToString();
+					dir = ToBool3(global, eventStack.top().parameters, dir);
+					value = ToBool4(global, eventStack.top().parameters, value);
+					
+					wiz::load_data::LoadData::AddData(global, dir, value, "TRUE");
+					
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
@@ -799,16 +891,16 @@ int main(void)
 
 					value1 = ToBool(global, eventStack.top().parameters, value1);
 					value2 = ToBool(global, eventStack.top().parameters, value2);
+					if (value1 != value2) {
+						long long x = atoll(value1.c_str());
+						long long y = atoll(value2.c_str());
 
-					long long x = atoll(value1.c_str());
-					long long y = atoll(value2.c_str());
+						string temp = global.GetUserTypeItem(dir)[0].Get(0)->GetUserTypeList(x).Get(0)->ToString();
+						string temp2 = global.GetUserTypeItem(dir)[0].Get(0)->GetUserTypeList(y).Get(0)->ToString();
 
-					string temp = global.GetUserTypeItem(dir)[0].Get(0)->GetUserTypeList(x).Get(0)->ToString();
-					string temp2 = global.GetUserTypeItem(dir)[0].Get(0)->GetUserTypeList(y).Get(0)->ToString();
-					if (temp != temp2) {
 						global.GetUserTypeItem(dir)[0].Get(0)->GetUserTypeList(x).Get(0)->Remove();
 						global.GetUserTypeItem(dir)[0].Get(0)->GetUserTypeList(y).Get(0)->Remove();
-					
+
 						wiz::load_data::LoadData::AddData(global, dir + "/" + value1, temp2, "TRUE");
 						wiz::load_data::LoadData::AddData(global, dir + "/" + value2, temp, "TRUE");
 					}
