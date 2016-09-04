@@ -121,19 +121,19 @@ namespace wiz {
 				arr = move( ta.arr );
 				return *this;
 			}
-			string ToString()const
+			/*string ToString()const
 			{
 				string temp;
 
 				for (int i = 0; i < size(); ++i) {
-					temp = temp + arr[i];
+					temp = temp + arr[i].ToString();
 					if (i != size() - 1) {
 						temp = temp + "/";
 					}
 				}
 
 				return temp;
-			}
+			} */
 		};
 
 		class UserType : public Type {
@@ -197,7 +197,7 @@ namespace wiz {
 				return *this;
 			}
 		private:
-			void Reset(const UserType& ut) { /// UT Ã€Ã¼ÃƒÂ¼Â¸Â¦ ÂºÂ¹Â»Ã§Ã‡Ã‘Â´Ã™.
+			void Reset(const UserType& ut) { /// UT ÀüÃ¼¸¦ º¹»çÇÑ´Ù.
 			//	userTypeList_sortFlagA = ut.userTypeList_sortFlagA;
 				//userTypeList_sortFlagB = ut.userTypeList_sortFlagB;
 
@@ -252,8 +252,29 @@ namespace wiz {
 				for (int i = 0; i < ilist.size(); ++i) {
 					if (ilist[i] == 1 ) { count++; }
 					if (count == idx + 1) {
-						// iÂºÃŽÃ…Ã left shift!and resize!
+						// iºÎÅÍ left shift!and resize!
 						for (int k = i+1; k < ilist.size(); ++k) {
+							ilist[k - 1] = std::move(ilist[k]);
+						}
+						ilist.resize(ilist.size() - 1);
+						break;
+					}
+				}
+			}
+			void RemoveUserTypeList(const int idx)
+			{
+				// left shift start idx, to end, at itemList. and resize!
+				for (int i = idx + 1; i < GetItemListSize(); ++i) {
+					userTypeList[i - 1] = std::move(userTypeList[i]);
+				}
+				userTypeList.resize(userTypeList.size() - 1);
+				//  ilist left shift and resize - count itemType!
+				int count = 0;
+				for (int i = 0; i < ilist.size(); ++i) {
+					if (ilist[i] == 2) { count++; }
+					if (count == idx + 1) {
+						// iºÎÅÍ left shift!and resize!
+						for (int k = i + 1; k < ilist.size(); ++k) {
 							ilist[k - 1] = std::move(ilist[k]);
 						}
 						ilist.resize(ilist.size() - 1);
@@ -679,6 +700,7 @@ namespace wiz {
 				}
 				return temp;
 			}
+			
 			friend ostream& operator<<(ostream& stream, const UserType& ut)
 			{
 				int itemListCount = 0;

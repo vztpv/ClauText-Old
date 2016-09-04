@@ -717,6 +717,7 @@ namespace wiz {
 					}
 				}
 			}
+
 			static void SearchUserType(UserType& global, vector<string>& positionVec, const string& var, const string& nowPosition,
 				UserType* ut, const string& condition)
 			{
@@ -1504,6 +1505,33 @@ namespace wiz {
 				}
 				return 0 != count;
 			}
+			
+			static bool ExistItem(UserType& global, const string& position, const string& varName, const string& condition) // ??
+			{
+				int count = 0;
+				string _var = varName;
+				if (_var == " ") { _var = ""; }
+
+				auto finded = UserType::Find(&global, position);
+				if (finded.first) {
+					for (int i = 0; i < finded.second.size(); ++i) {
+						if (false == condition.empty()) {
+							Condition cond(condition, finded.second[i], &global);
+
+							while (cond.Next());
+
+							if (cond.Now().size() != 1 || "TRUE" != cond.Now()[0])
+							{
+								//	std::cout << cond.Now()[0] << endl;
+								continue;
+							}
+						}
+						count = count + (finded.second[i]->GetItem(_var).size());
+					}
+				}
+				return 0 != count;
+			}
+
 			static bool ChkData(UserType& global)
 			{
 				return UserType::ChkData(&global);
