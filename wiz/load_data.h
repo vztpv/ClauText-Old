@@ -1505,7 +1505,29 @@ namespace wiz {
 				}
 				return 0 != count;
 			}
-			
+			static bool ExistUserType(UserType& global, const string& position, const string& condition) // ??
+			{
+				int count = 0;
+
+				auto finded = UserType::Find(&global, position);
+				if (finded.first) {
+					for (int i = 0; i < finded.second.size(); ++i) {
+						if (false == condition.empty()) {
+							Condition cond(condition, finded.second[i], &global);
+
+							while (cond.Next());
+
+							if (cond.Now().size() != 1 || "TRUE" != cond.Now()[0])
+							{
+								//	std::cout << cond.Now()[0] << endl;
+								continue;
+							}
+						}
+						count = count + (finded.second[i]->GetUserTypeListSize());
+					}
+				}
+				return 0 != count;
+			}
 			static bool ExistItem(UserType& global, const string& position, const string& varName, const string& condition) // ??
 			{
 				int count = 0;
