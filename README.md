@@ -12,23 +12,26 @@
 		# No
 		id=1
 		# Action
-		$if = { $condition = { $EQ = { /Turn/dir true } } 
+		$if = { $condition = { $EQ = { /Turn/dir true } }
 			$then = { $assign = { /Turn/now value = { $add = { $modular = { /Turn/now /Turn/n } 1 } } } }
-		}	
+		}
 		$else = { # if else link problem? - depth?, depth max setting?
 			$then = { $assign = { /Turn/now value = { $add = { $modular = { $add = { /Turn/now $add = { /Turn/n -2 } } /Turn/n} } } } }
-		}		
+		}
 	}
 	
 	# Card
 	Event = {
 		id = 101
 		$parameter = { i } #
-		# Action  cf) Card                 <-------------------- 
+		# Action  cf) Card                 <--------------------
 		$if = { $condition = { $COMP< = { $parameter.i /Info/CARDNUM  } }
-			$then = {	$insert = { /Card  value = { sha = { $divide ={$parameter.i 13} } num = { $modular={$parameter.i 13} } # no ???
-							isBlackJoker = no isColorJoker = no } } 
-						$call = { id = 101 i = { $add = { $parameter.i 1  } } }
+			$then = {
+					$make = { /Card }
+					$make = { /Card/$parameter.i }
+					$insert2 = { dir = { /Card/$parameter.i } value = { sha = { $divide ={$parameter.i 13} } num = { $modular={$parameter.i 13} } # no ???
+						isBlackJoker = no isColorJoker = no } }
+					$call = { id = 101 i = { $add = { $parameter.i 1  } } }
 			}
 		}
 	}
@@ -36,8 +39,10 @@
 		id = 3
 		$call = { id = 101 i = 0 } # using stack? + 몇번쨰까찌 했는가?
 		# insert two joker
-		$insert = { /Card value = {sha = -1 num = -1  isBlackJoker = yes isColorJoker = no } }
-		$insert = { /Card value = {sha = -2 num = -2  isBlackJoker = no isColorJooker = yes } }
+		$make = { $concat = { /Card $concat = { / /Info/CARDNUM } } }
+		$make = { $concat = { /Card $concat = { / $add = { /Info/CARDNUM 1 } } } } 
+		$insert2 = { dir = { $concat = { /Card $concat = { / /Info/CARDNUM } } } value = {sha = -1 num = -1  isBlackJoker = yes isColorJoker = no } }
+		$insert2 = { dir = { $concat = { /Card $concat = { / $add = { /Info/CARDNUM 1 } } } }  value = {sha = -2 num = -2  isBlackJoker = no isColorJooker = yes } }
 	}
 	
 	# CardList - RandomShuffle!
@@ -46,29 +51,29 @@
 		id = 4
 		$parameter = { i }
 		# Action
-		
-		$if = { $condition = { $COMP< = { $parameter.i $add= { 2 /Info/CARDNUM  } } } 
+	
+		$if = { $condition = { $COMP< = { $parameter.i $add= { 2 /Info/CARDNUM  } } }
 			$then = {	$insert = { /CardList value = { no = { $parameter.i }  } }
 						$call = { id = 4 i = { $add = { $parameter.i 1 } } } }
-		}            
+		}
 	}
-	Event = 
+	Event =
 	{
 		id = 5
 		# Action
 		$call = { id = 4 i = 0 }
 	}
-	Event = 
+	Event =
 	{
 		id = 6
 		$parameter = { n }
 		# Action
 		$if = { $condition = { $COMP> = { $parameter.n 0 } }
 			$then = {
-				$swap = { /CardList value = { $rand = { 0 $add={$parameter.n -1} } } value = { $add={$parameter.n -1} } } 
-				$call = { id = 6 n = { $add={ $parameter.n -1 } } } 
+				$swap = { /CardList value = { $rand = { 0 $add={$parameter.n -1} } } value = { $add={$parameter.n -1} } }
+				$call = { id = 6 n = { $add={ $parameter.n -1 } } }
 			}
-		} 
+		}
 	}
 	Event =
 	{
@@ -78,7 +83,7 @@
 	}
 	
 	# First Card Distribution
-	Event = 
+	Event =
 	{
 		id = 11
 		$call = { id = 12 i = 0 }
@@ -90,11 +95,11 @@
 		# Action
 		$if = { $condition = { $COMP< = { $parameter.i /Info/PLAYER_NUM } }
 			$then = {
-				$insert2 = { /PlayerCardList/$parameter.i value = { $rand ={ 0 53 }  } }
-				$insert2 = { /PlayerCardList/$parameter.i value = { $rand ={ 0 53 }  } }
-				$call = { id = 12 i = { $add={ $parameter.i 1 } } } 
+				$insert2 = { dir = { /PlayerCardList/$parameter.i } value = { $rand ={ 0 53 }  } }
+				$insert2 = { dir = { /PlayerCardList/$parameter.i } value = { $rand ={ 0 53 }  } }
+				$call = { id = 12 i = { $add={ $parameter.i 1 } } }
 			}
-		} 
+		}
 	
 	}
 	# PutCard
@@ -132,7 +137,7 @@
 	{
 		id = 9
 		$parameter = { i }
-		
+	
 		$if = { condition = { $COMP< = { $parameter.i /Info/PLAYER_NUM } }
 			$then = {
 				$insert = { /PlayerCardList value = {  }  }
@@ -154,21 +159,21 @@
 	# Total?
 	Event =
 	{
-		id = 0	
-		
+		id = 0
+	
 		#Action
-		$if = { $condition = { FALSE } 
-			$then = {  } 
+		$if = { $condition = { FALSE }
+			$then = {  }
 		}
-		$else = { 
+		$else = {
 			$then = {
 				$call = { id = 3 }
 				$call = { id = 5 }
 				$call = { id = 7 }
 				$call = { id = 8 }
 				$call = { id = 11 }
-				#$remove = { /PlayerCardList/0 }
-				#$remove2 =  { /PlayerCardList/0 }
+				##$remove = { /PlayerCardList/0 }
+				##$remove2 =  { /PlayerCardList/0 }
 			}
 		}
 		$call = { id = 1 }
