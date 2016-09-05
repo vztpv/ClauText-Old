@@ -861,7 +861,10 @@ int main(void)
 					info.eventUT = events[no].Get(0);
 					info.userType_idx.clear();
 					info.userType_idx.push(0);
+					
+					EventInfo info2;
 					if (info.id != eventStack.top().id) {
+						info2 = info;
 						info.parameters.clear();
 					}
 					info.conditionStack.clear();
@@ -870,13 +873,13 @@ int main(void)
 					if (info.id != eventStack.top().id) {
 						for (int j = 0; j < val->GetItemListSize(); ++j) {
 							if (val->GetItemListSize() > 0) {
-								string temp = ToBool(global, info.parameters, val->GetItemList(j).Get(0));
+								string temp = ToBool(global, info2.parameters, val->GetItemList(j).Get(0));
 								info.parameters.push_back(make_pair(val->GetItemList(j).GetName(), temp));
 							}
 						}
 						for (int j = 0; j < val->GetUserTypeListSize(); ++j) {
 							if (val->GetUserTypeListSize() > 0) {
-								string temp = ToBool(global, info.parameters, val->GetUserTypeList(j).Get(0)->ToString());
+								string temp = ToBool(global, info2.parameters, val->GetUserTypeList(j).Get(0)->ToString());
 								info.parameters.push_back(make_pair(val->GetUserTypeList(j).GetName(), temp));
 							}
 						}
@@ -884,6 +887,20 @@ int main(void)
 						eventStack.top().userType_idx.top()++;
 					}
 					else {
+						if (val->GetItemListSize() > 0) {
+							for (int j = 0; j < val->GetItemListSize(); ++j) {
+								string temp = ToBool(global, info.parameters, val->GetItemList(j).Get(0));
+								for (int k = 0; k < info.parameters.size(); ++k)
+								{
+									if (info.parameters[k].first == val->GetItemList(j).GetName())
+									{
+										info.parameters[k].second = temp;
+									}
+								}
+								// debug 
+								//cout << temp << endl;
+							}
+						}
 						if (val->GetUserTypeListSize() > 0) {
 							for (int j = 0; j < val->GetUserTypeListSize(); ++j) {
 								string temp = ToBool(global, info.parameters, val->GetUserTypeList(j).Get(0)->ToString());
