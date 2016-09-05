@@ -479,6 +479,12 @@ namespace wiz {
 
 				return -1 != index;
 			}
+			/// add set Data?
+			bool SetItem(const int var_idx, const string& value) {
+				itemList[var_idx].Set(0, value);
+				return true;
+			}
+
 			vector<TypeArray<UserType*>> GetUserTypeItem(const string& name) const { /// chk...
 				vector<TypeArray<UserType*>> temp;
 
