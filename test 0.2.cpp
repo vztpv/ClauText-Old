@@ -574,7 +574,6 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		}
 		
 		if (x.empty()) { x = "."; }
-		
 
 		wiz::load_data::UserType* ut = NULL;
 		auto finded = wiz::load_data::UserType::Find(&global, x);
@@ -586,7 +585,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 	}
 	else if ("$link" == str)
 	{
-		//
+		// to do...
 	}
 }
 
@@ -1059,8 +1058,8 @@ int main(void)
 						string temp = wiz::load_data::UserType::Find(&global, dir).second[0]->GetItemList(x).Get(0);
 						string temp2 = wiz::load_data::UserType::Find(&global, dir).second[0]->GetItemList(y).Get(0);
 						
-						wiz::load_data::LoadData::SetData(global, dir + "/" + value1, temp2, "TRUE");
-						wiz::load_data::LoadData::SetData(global, dir + "/" + value2, temp, "TRUE");
+						wiz::load_data::LoadData::SetData(global, dir, x, temp2, "TRUE");
+						wiz::load_data::LoadData::SetData(global, dir, y, temp, "TRUE");
 					}
 
 					eventStack.top().userType_idx.top()++;
