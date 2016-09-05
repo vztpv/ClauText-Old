@@ -587,6 +587,22 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 	{
 		// to do...
 	}
+	else if ("$get" == str)
+	{
+		string x = operandStack.pop();
+
+		if ('/' == x[0])
+		{
+			x = Find(&global, x);
+		}
+		{
+			string temp = FindParameters(parameters, x);
+			if (!temp.empty()) { x = temp; }
+		}
+
+		operandStack.push(x);
+	}
+
 }
 
 // todo - rename! ToBool ~ ToBool4
@@ -668,7 +684,7 @@ wiz::ArrayStack<string> ToBool2(wiz::load_data::UserType& global, const vector<p
 }
 string ToBool3(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& temp)
 {
-	wiz::StringTokenizer tokenizer( temp, vector<string>{ "/" } );
+	wiz::StringTokenizer tokenizer(temp, vector<string>{ "/" });
 	vector<string> tokenVec;
 	string result;
 
@@ -683,8 +699,8 @@ string ToBool3(wiz::load_data::UserType& global, const vector<pair<string, strin
 			int last = -1;
 			for (int j = 0; j < tokenVec[i].size(); ++j)
 			{
-				if (tokenVec[i][j] == ' ' ) {
-					last = j-1;
+				if (tokenVec[i][j] == ' ') {
+					last = j - 1;
 					break;
 				}
 			}
@@ -693,7 +709,7 @@ string ToBool3(wiz::load_data::UserType& global, const vector<pair<string, strin
 				string temp = FindParameters(parameters, wiz::String::substring(tokenVec[i], 0, last));
 
 				if (!temp.empty()) {
-					tokenVec[i] = temp + wiz::String::substring(tokenVec[i], last + 1);
+					tokenVec[i] = temp;
 				}
 			}
 			else
@@ -707,10 +723,61 @@ string ToBool3(wiz::load_data::UserType& global, const vector<pair<string, strin
 }
 string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& temp)
 {
-	wiz::StringTokenizer tokenizer(temp, { " ", "\n", "\t", "\r", "{", "=", "}" });
-	vector<string> tokenVec;
 	string result = temp;
+	wiz::ArrayStack<string> resultStack;
 	wiz::load_data::UserType ut;
+	
+	
+	result = ToBool3(global, parameters, result);
+	result = string(result.c_str() + 1);
+
+	{ // convert $parameter.~ -> value
+		wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r", "{", "=", "}" });
+		vector<string> tokenVec;
+		//string result = temp;
+		wiz::load_data::UserType ut;
+
+		while (tokenizer.hasMoreTokens()) {
+			tokenVec.push_back(tokenizer.nextToken());
+		}
+
+		for (int i = tokenVec.size() - 1; i >= 0; --i)
+		{
+			string before = tokenVec[i];
+			if ('/' == tokenVec[i][0])
+			{
+				string _temp = Find(&global, tokenVec[i]);
+				if ("" != _temp) {
+					tokenVec[i] = _temp;
+					result = wiz::String::replace(result, before, tokenVec[i]);
+				}
+			}
+			else if (wiz::String::startsWith(tokenVec[i], "$parameter.")) {
+				string temp = FindParameters(parameters, tokenVec[i]);
+				if (!temp.empty()) {
+					tokenVec[i] = temp;
+					result = wiz::String::replace(result, before, tokenVec[i]);
+				}
+			}
+		}
+
+	}
+	// space!
+	wiz::load_data::LoadData::LoadDataFromString(result, ut);
+	result = ut.ToString(); // chk space? option?
+	if (result.empty()) { return result; }
+	result.pop_back();// 여백제거.
+	// chk?
+	if (ut.GetUserTypeListSize() == 0)
+	{
+		return result;
+	}
+	//!
+	wiz::ArrayStack<string> operandStack; // 피연산자
+	wiz::ArrayStack<string> operatorStack; // 연산자
+
+	wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" });
+	vector<string> tokenVec;
 
 	while (tokenizer.hasMoreTokens()) {
 		tokenVec.push_back(tokenizer.nextToken());
@@ -718,63 +785,64 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 	for (int i = tokenVec.size() - 1; i >= 0; --i)
 	{
-		string before = tokenVec[i];
-		if ('/' == tokenVec[i][0])
+		if ('/' == tokenVec[i][0] && tokenVec[i].size() > 1)
 		{
-			string _temp = Find(&global, tokenVec[i]);
-			if ("" != _temp) {
-				tokenVec[i] = _temp;
-				result = wiz::String::replace(result, before, tokenVec[i]);
+			string temp = Find(&global, tokenVec[i]); 
+			if (!temp.empty()) {
+				tokenVec[i] = temp;
 			}
 		}
-		else if (wiz::String::startsWith(tokenVec[i], "$parameter.")) {
-			string temp = FindParameters(parameters, tokenVec[i]);
-			if (!temp.empty()) { 
-				tokenVec[i] = temp; 
-				result = wiz::String::replace(result, before, tokenVec[i]);
-			}
-		}
-	}
-	
-	wiz::load_data::LoadData::LoadDataFromString(result, ut);	
-	wiz::ArrayStack<int> depthStack;
-	wiz::ArrayStack<wiz::load_data::UserType*> utStack;
-	depthStack.push(0);
-	utStack.push(&ut);
 
-	while (!depthStack.empty())
-	{
-		if (depthStack.top() >= utStack.top()->GetUserTypeListSize())
-		{
-			depthStack.pop();
-			utStack.pop();
-			continue;
-		}
-		wiz::load_data::UserType* temp = utStack.top()->GetUserTypeList(depthStack.top()).Get(0);
-		if (temp->GetName()[0] == '$') // not $parameter.~
-		{
-			string value = ToBool(global, parameters, temp->GetName() + " = { " + temp->ToString() + " } ");
-			string tempName = utStack.top()->GetName();
-
-			utStack.top()->RemoveUserTypeList(depthStack.top());
-			wiz::load_data::LoadData::AddData(*(utStack.top()), string(""), value, "TRUE");
-
-			depthStack.top()++;
+		if ('$' != tokenVec[i][0]) {
+			operandStack.push(tokenVec[i]);
 		}
 		else
 		{
-			depthStack.top()++;
-			depthStack.push(0);
-			utStack.push(temp);
+			operandStack.pop();
+			operandStack.pop();
+			operatorStack.push(tokenVec[i]);
+			operation(global, parameters, tokenVec[i], operandStack);
+			operandStack[operandStack.size() - 2] = operandStack[operandStack.size() - 1];
+			operandStack.pop();
 		}
 	}
-	
-	result = ut.ToString();
 
-	/// chk!!
-	if (!ut.empty()) {
-		result.pop_back();
+	// ex) A = { B = 1 C = { 3 } } D = { E }
+	// =>  A = { B = 1 C = 3  }  D = E
+
+	result = "";
+	int count = 0;
+	vector<string> strVec;
+	
+	for (int i = operandStack.size()-1; i >= 0; --i)
+	{
+		if (operandStack[i] == "}") {
+			count++;
+			if (count == 2)
+			{
+				count = 0;
+				string temp = strVec.back();
+				strVec.pop_back();
+				strVec.pop_back();
+				strVec.push_back(temp);
+				continue;
+			}
+		}
+		else if (operandStack[i] == "{") {
+			count = 0;
+		}
+		else {
+			count++;
+		}
+		strVec.push_back(operandStack[i]);
 	}
+
+	result = "";
+	for (int i = 0; i < strVec.size(); ++i) {
+		if (i != 0) { result = result + " "; }
+		result = result + strVec[i];
+	}
+
 	return result;
 }
 
@@ -858,6 +926,10 @@ int main(void)
 				if ("$call" == val->GetName()) {
 					cout << "$call " << val->GetItem("id")[0].Get(0) << endl;
 					info.id = val->GetItem("id")[0].Get(0);
+					if (info.id == "100")
+					{
+						cout << "chk" << endl;
+					}
 					info.eventUT = events[no].Get(0);
 					info.userType_idx.clear();
 					info.userType_idx.push(0);
@@ -873,13 +945,13 @@ int main(void)
 					if (info.id != eventStack.top().id) {
 						for (int j = 0; j < val->GetItemListSize(); ++j) {
 							if (val->GetItemListSize() > 0) {
-								string temp = ToBool(global, info2.parameters, val->GetItemList(j).Get(0));
+								string temp = ToBool4(global, info2.parameters, val->GetItemList(j).Get(0));
 								info.parameters.push_back(make_pair(val->GetItemList(j).GetName(), temp));
 							}
 						}
 						for (int j = 0; j < val->GetUserTypeListSize(); ++j) {
 							if (val->GetUserTypeListSize() > 0) {
-								string temp = ToBool(global, info2.parameters, val->GetUserTypeList(j).Get(0)->ToString());
+								string temp = ToBool4(global, info2.parameters, val->GetUserTypeList(j).Get(0)->ToString());
 								info.parameters.push_back(make_pair(val->GetUserTypeList(j).GetName(), temp));
 							}
 						}
@@ -889,7 +961,7 @@ int main(void)
 					else {
 						if (val->GetItemListSize() > 0) {
 							for (int j = 0; j < val->GetItemListSize(); ++j) {
-								string temp = ToBool(global, info.parameters, val->GetItemList(j).Get(0));
+								string temp = ToBool4(global, info.parameters, val->GetItemList(j).Get(0));
 								for (int k = 0; k < info.parameters.size(); ++k)
 								{
 									if (info.parameters[k].first == val->GetItemList(j).GetName())
@@ -903,7 +975,7 @@ int main(void)
 						}
 						if (val->GetUserTypeListSize() > 0) {
 							for (int j = 0; j < val->GetUserTypeListSize(); ++j) {
-								string temp = ToBool(global, info.parameters, val->GetUserTypeList(j).Get(0)->ToString());
+								string temp = ToBool4(global, info.parameters, val->GetUserTypeList(j).Get(0)->ToString());
 								for (int k = 0; k < info.parameters.size(); ++k)
 								{
 									if (info.parameters[k].first == val->GetUserTypeList(j).GetName())
@@ -986,7 +1058,7 @@ int main(void)
 					value = string(value.c_str() + 1);
 					value = ToBool4(global, eventStack.top().parameters, value);
 					
-					wiz::load_data::LoadData::AddData(global, dir, value, "TRUE");
+ 					wiz::load_data::LoadData::AddData(global, dir, value, "TRUE");
 					
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1084,7 +1156,41 @@ int main(void)
 				}
 				else if ("$print" == val->GetName())
 				{
-					// to do
+					if (val->GetItemListSize() == 1 && val->GetUserTypeListSize() == 0)
+					{
+						string item = val->GetItemList(0).Get(0);
+						string data = ToBool4(global, eventStack.top().parameters, item);
+						
+						if (item[0] == '\"' && item.back() == '\"')
+						{
+							data = item;
+						}
+						if (data == "\"\n\"") { // miss
+							cout << endl;
+						}
+						else {
+							cout << data;
+						}
+					}
+					else
+					{
+						string start = val->GetUserTypeList(0).Get(0)->ToString();
+						string last = val->GetUserTypeList(1).Get(0)->ToString();
+						
+						start = ToBool4(global, eventStack.top().parameters, start);
+						last = ToBool4(global, eventStack.top().parameters, last);
+
+						string listName = val->GetItemList(0).Get(0);
+						long long _start = atoll(start.c_str());
+						long long _last  = atoll(last.c_str());
+						wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, listName).second[0];
+						for (int i = _start; i <= _last; ++i)
+						{
+							if (i != _start) { cout << " "; }
+							cout << ut->GetItemList(i).Get(0);
+						}
+					}
+
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
@@ -1103,7 +1209,7 @@ int main(void)
 				else if ("$if" == val->GetName()) // ToDo!!
 				{
 					string temp = val->GetUserTypeList(0).Get(0)->ToString();
-					temp = ToBool(global, eventStack.top().parameters, temp);
+					temp = ToBool4(global, eventStack.top().parameters, temp);
 
 					eventStack.top().conditionStack.push(temp);
 					if ("TRUE" == temp)
