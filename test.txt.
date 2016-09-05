@@ -103,7 +103,7 @@ Event =
 	# Action
 	$if = { $condition = { $COMP< = { $parameter.i /Info/PLAYER_NUM } }
 		$then = {
-			$call = { id = 13 i = 0 }
+			$call = { id = 13 i = 0 j = $parameter.i }
 			$call = { id = 12 i = { $add={ $parameter.i 1 } } }
 		}
 	}
@@ -111,13 +111,13 @@ Event =
 Event = 
 {
 	id = 13
-	$parameter = { i }
+	$parameter = { i j }
 	#Action
 	$if = { $condition = { $COMP< = { $parameter.i /Info/FIRST_CARD_NUM } }
 		$then = {
-			$insert2 = { dir = { /PlayerCardList/$parameter.i }  value = { $pop_back = { /CardList } } } 
+			$insert2 = { dir = { /PlayerCardList/$parameter.j }  value = { $pop_back = { /CardList } } } 
 																		# back ( item, not useType! )
-			$call = { id = 13 i = { $add = { $parameter.i 1 } } }
+			$call = { id = 13 i = { $add = { $parameter.i 1 } j = $parameter.j } }
 		}
 	}	
 }
@@ -143,9 +143,7 @@ Event =
 
 
 # Person # cf) inheritance?
-#PlayerCardList =
-#{
-#}
+
 
 Event =
 {
@@ -164,7 +162,6 @@ Event =
 				$then = { $make = { /PlayerCardList } }
 			}
 			$make = { /PlayerCardList/$parameter.i }
-			$insert2 = { dir = { /PlayerCardList/$parameter.i } value = {  }  }
 			$call = { id = 9 i = { $add = { $parameter.i 1 } } }
 		}
 	}
