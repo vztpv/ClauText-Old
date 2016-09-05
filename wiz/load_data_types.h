@@ -778,11 +778,12 @@ namespace wiz {
 
 				return chk;
 			}
-			/// find userType! not itemList!
+			// find userType! not itemList!,// this has bug??
 			static std::pair<bool, vector< UserType*> > Find(UserType* global, const string& position) /// option, option_offset
 			{
 				vector< UserType* > temp;
 				if (position.empty()) { temp.push_back(global); return{ true, temp }; }
+				if (position == ".") { temp.push_back(global); return{ true, temp }; }
 				//if (position == "..") { temp.push_back(global->GetParent());  return{ global->GetParent() != NULL, temp }; }
 
 				StringTokenizer tokenizer(position, "/");
