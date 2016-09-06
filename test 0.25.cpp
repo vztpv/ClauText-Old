@@ -232,25 +232,6 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		x = operandStack.pop();
 		y = operandStack.pop();
 
-		if ('/' == x[0])
-		{
-			string temp = Find(&global, x); if(!temp.empty()) { x = temp; }
-		}
-
-		{
-			string temp = FindParameters(parameters, x);
-			if (!temp.empty()) { x = temp; }
-		}
-
-		if ('/' == y[0])
-		{
-			string temp = Find(&global, y); if(!temp.empty()) { y = temp; }
-		}
-		{
-			string temp = FindParameters(parameters, y);
-			if (!temp.empty()) { y = temp; }
-		}
-
 		if (x == y) {
 			operandStack.push("TRUE");
 		}
@@ -264,24 +245,6 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		x = operandStack.pop();
 		y = operandStack.pop();
 
-		if ('/' == x[0])
-		{
-			string temp = Find(&global, x); if(!temp.empty()) { x = temp; }
-		}
-		{
-			string temp = FindParameters(parameters, x);
-			if (!temp.empty()) { x = temp; }
-		}
-
-		if ('/' == y[0])
-		{
-			string temp = Find(&global, y); if(!temp.empty()) { y = temp; }
-		}
-		{
-			string temp = FindParameters(parameters, y);
-			if (!temp.empty()) { y = temp; }
-		}
-
 		if (x != y) {
 			operandStack.push("TRUE");
 		}
@@ -294,24 +257,6 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		string x, y;
 		x = operandStack.pop();
 		y = operandStack.pop();
-
-		if ('/' == x[0])
-		{
-			string temp = Find(&global, x); if(!temp.empty()) { x = temp; }
-		}
-		{
-			string temp = FindParameters(parameters, x);
-			if (!temp.empty()) { x = temp; }
-		}
-
-		if ('/' == y[0])
-		{
-			string temp = Find(&global, y); if(!temp.empty()) { y = temp; }
-		}
-		{
-			string temp = FindParameters(parameters, y);
-			if (!temp.empty()) { y = temp; }
-		}
 
 		if (Compare(x, y) == "< 0") {
 			operandStack.push("TRUE");
@@ -327,24 +272,6 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		x = operandStack.pop();
 		y = operandStack.pop();
 
-		if ('/' == x[0])
-		{
-			string temp = Find(&global, x); if(!temp.empty()) { x = temp; }
-		}
-		{
-			string temp = FindParameters(parameters, x);
-			if (!temp.empty()) { x = temp; }
-		}
-
-		if ('/' == y[0])
-		{
-			string temp = Find(&global, y); if(!temp.empty()) { y = temp; }
-		}
-		{
-			string temp = FindParameters(parameters, y);
-			if (!temp.empty()) { y = temp; }
-		}
-
 		if (Compare(x, y) == "> 0") {
 			operandStack.push("TRUE");
 		}
@@ -359,24 +286,6 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		x = operandStack.pop();
 		y = operandStack.pop();
 
-		if ('/' == x[0])
-		{
-			string temp = Find(&global, x); if(!temp.empty()) { x = temp; }
-		}
-		{
-			string temp = FindParameters(parameters, x);
-			if (!temp.empty()) { x = temp; }
-		}
-
-		if ('/' == y[0])
-		{
-			string temp = Find(&global, y); if(!temp.empty()) { y = temp; }
-		}
-		{
-			string temp = FindParameters(parameters, y);
-			if (!temp.empty()) { y = temp; }
-		}
-
 		if (Compare(x, y) == "< 0" || Compare(x, y) == "== 0") {
 			operandStack.push("TRUE");
 		}
@@ -390,24 +299,6 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		string x, y;
 		x = operandStack.pop();
 		y = operandStack.pop();
-
-		if ('/' == x[0])
-		{
-			string temp = Find(&global, x); if(!temp.empty()) { x = temp; }
-		}
-		{
-			string temp = FindParameters(parameters, x);
-			if (!temp.empty()) { x = temp; }
-		}
-
-		if ('/' == y[0])
-		{
-			string temp = Find(&global, y); if(!temp.empty()) { y = temp; }
-		}
-		{
-			string temp = FindParameters(parameters, y);
-			if (!temp.empty()) { y = temp; }
-		}
 
 		if (Compare(x, y) == "> 0" || Compare(x, y) == "== 0") {
 			operandStack.push("TRUE");
@@ -437,23 +328,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		x = operandStack.pop();
 		y = operandStack.pop();
 
-		if ('/' == x[0])
-		{
-			string temp = Find(&global, x); if(!temp.empty()) { x = temp; }
-		}
-		{
-			string temp = FindParameters(parameters, x);
-			if (!temp.empty()) { x = temp; }
-		}
 
-		if ('/' == y[0])
-		{
-			string temp = Find(&global, y); if(!temp.empty()) { y = temp; }
-		}
-		{
-			string temp = FindParameters(parameters, y);
-			if (!temp.empty()) { y = temp; }
-		}
 
 		if (GetType(x) == GetType(y) && (GetType(y) == "INTEGER")) { /// only integer? -> BigInteger?
 			operandStack.push(wiz::toStr(atoll(x.c_str()) * atoll(y.c_str())));
@@ -469,24 +344,6 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		x = operandStack.pop();
 		y = operandStack.pop();
 
-		if ('/' == x[0])
-		{
-			string temp = Find(&global, x); if(!temp.empty()) { x = temp; }
-		}
-		{
-			string temp = FindParameters(parameters, x);
-			if (!temp.empty()) { x = temp; }
-		}
-
-		if ('/' == y[0])
-		{
-			string temp = Find(&global, y); if(!temp.empty()) { y = temp; }
-		}
-		{
-			string temp = FindParameters(parameters, y);
-			if (!temp.empty()) { y = temp; }
-		}
-
 		if (GetType(x) == GetType(y) && (GetType(y) == "INTEGER")) { /// only integer? -> BigInteger?
 			operandStack.push(wiz::toStr(atoll(x.c_str()) / atoll(y.c_str())));
 		}
@@ -501,24 +358,6 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		x = operandStack.pop();
 		y = operandStack.pop();
 
-		if ('/' == x[0])
-		{
-			string temp = Find(&global, x); if(!temp.empty()) { x = temp; }
-		}
-		{
-			string temp = FindParameters(parameters, x);
-			if (!temp.empty()) { x = temp; }
-		}
-
-		if ('/' == y[0])
-		{
-			string temp = Find(&global, y); if(!temp.empty()) { y = temp; }
-		}
-		{
-			string temp = FindParameters(parameters, y);
-			if (!temp.empty()) { y = temp; }
-		}
-
 		if (GetType(x) == GetType(y) && (GetType(y) == "INTEGER")) { /// only integer? -> BigInteger?
 			operandStack.push(wiz::toStr(atoll(x.c_str()) % atoll(y.c_str())));
 		}
@@ -532,6 +371,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		string x, y;
 		x = operandStack.pop();
 		y = operandStack.pop();
+
 		if (GetType(x) == GetType(y) && (GetType(y) == "INTEGER")) { /// only integer? -> BigInteger?
 			long long _x = atoll(x.c_str());
 			long long _y = atoll(y.c_str());
@@ -983,7 +823,10 @@ int main(void)
 				if ("$call" == val->GetName()) {
 				//cout << "$call " << val->GetItem("id")[0].Get(0) << endl;
 					info.id = val->GetItem("id")[0].Get(0);
-
+					//if (info.id == "100")
+					//{
+					//	cout << "chk" << endl;
+					//}
 					info.eventUT = events[no].Get(0);
 					info.userType_idx.clear();
 					info.userType_idx.push(0);
