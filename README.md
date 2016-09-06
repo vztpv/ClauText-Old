@@ -58,8 +58,8 @@
 			sha_image = { ♤ ◆ ♥ ♧ }
 			sha_name = { spade dia heart clover }
 		}
-		blackJoker = ☆
-		colorJoker = ★
+		blackJoker = { ☆ }
+		colorJoker = { ★ }
 	}
 	Event = 
 	{
@@ -70,10 +70,10 @@
 	
 		#Action
 		$if = { $condition = { $EQ = { yes $parameter.isBlackJoker } }
-			$then = { $print = { dir = { /CardStringImage/blackJoker } } } 
+			$then = { $print = { value= { /CardStringImage/blackJoker } } } 
 		}
 		$if = { $condition = { $EQ = { yes $parameter.isColorJoker } }
-			$then = { $print = { dir = { /CardStringImage/colorJoker } } } 
+			$then = { $print = { value = { /CardStringImage/colorJoker } } } 
 		}
 		$if = { $condition = { $COMP< = { -1 $parameter.num } }
 			$then = { 
@@ -242,7 +242,7 @@
 					sha = { $get = { $concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /sha } } }
 					num = { $get = { $concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /num } } }
 					isBlackJoker = { $get = { $concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /isBlackJoker } } } 
-							}
+				}
 				$print = { value = { "/" } }		
 				$call = {
 					id = 51
