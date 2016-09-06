@@ -221,6 +221,7 @@ inline string FindParameters(const vector<pair<string, string>>& parameters, con
 	return "";
 }
 //need to renewal. add $AND $OR $NOT
+/// remove /, parameter chk!!
 void operation(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& str, wiz::ArrayStack<string>& operandStack)
 {
 	if (!operandStack.empty() && operandStack.top() == "ERROR") { return; }
@@ -233,7 +234,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if ('/' == x[0])
 		{
-			x = Find(&global, x);
+			string temp = Find(&global, x); if(!temp.empty()) { x = temp; }
 		}
 
 		{
@@ -243,7 +244,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if ('/' == y[0])
 		{
-			y = Find(&global, y);
+			string temp = Find(&global, y); if(!temp.empty()) { y = temp; }
 		}
 		{
 			string temp = FindParameters(parameters, y);
@@ -265,7 +266,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if ('/' == x[0])
 		{
-			x = Find(&global, x);
+			string temp = Find(&global, x); if(!temp.empty()) { x = temp; }
 		}
 		{
 			string temp = FindParameters(parameters, x);
@@ -274,7 +275,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if ('/' == y[0])
 		{
-			y = Find(&global, y);
+			string temp = Find(&global, y); if(!temp.empty()) { y = temp; }
 		}
 		{
 			string temp = FindParameters(parameters, y);
@@ -296,7 +297,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if ('/' == x[0])
 		{
-			x = Find(&global, x);
+			string temp = Find(&global, x); if(!temp.empty()) { x = temp; }
 		}
 		{
 			string temp = FindParameters(parameters, x);
@@ -305,7 +306,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if ('/' == y[0])
 		{
-			y = Find(&global, y);
+			string temp = Find(&global, y); if(!temp.empty()) { y = temp; }
 		}
 		{
 			string temp = FindParameters(parameters, y);
@@ -328,7 +329,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if ('/' == x[0])
 		{
-			x = Find(&global, x);
+			string temp = Find(&global, x); if(!temp.empty()) { x = temp; }
 		}
 		{
 			string temp = FindParameters(parameters, x);
@@ -337,7 +338,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if ('/' == y[0])
 		{
-			y = Find(&global, y);
+			string temp = Find(&global, y); if(!temp.empty()) { y = temp; }
 		}
 		{
 			string temp = FindParameters(parameters, y);
@@ -360,7 +361,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if ('/' == x[0])
 		{
-			x = Find(&global, x);
+			string temp = Find(&global, x); if(!temp.empty()) { x = temp; }
 		}
 		{
 			string temp = FindParameters(parameters, x);
@@ -369,7 +370,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if ('/' == y[0])
 		{
-			y = Find(&global, y);
+			string temp = Find(&global, y); if(!temp.empty()) { y = temp; }
 		}
 		{
 			string temp = FindParameters(parameters, y);
@@ -392,7 +393,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if ('/' == x[0])
 		{
-			x = Find(&global, x);
+			string temp = Find(&global, x); if(!temp.empty()) { x = temp; }
 		}
 		{
 			string temp = FindParameters(parameters, x);
@@ -401,7 +402,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if ('/' == y[0])
 		{
-			y = Find(&global, y);
+			string temp = Find(&global, y); if(!temp.empty()) { y = temp; }
 		}
 		{
 			string temp = FindParameters(parameters, y);
@@ -438,7 +439,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if ('/' == x[0])
 		{
-			x = Find(&global, x);
+			string temp = Find(&global, x); if(!temp.empty()) { x = temp; }
 		}
 		{
 			string temp = FindParameters(parameters, x);
@@ -447,7 +448,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if ('/' == y[0])
 		{
-			y = Find(&global, y);
+			string temp = Find(&global, y); if(!temp.empty()) { y = temp; }
 		}
 		{
 			string temp = FindParameters(parameters, y);
@@ -470,7 +471,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if ('/' == x[0])
 		{
-			x = Find(&global, x);
+			string temp = Find(&global, x); if(!temp.empty()) { x = temp; }
 		}
 		{
 			string temp = FindParameters(parameters, x);
@@ -479,7 +480,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if ('/' == y[0])
 		{
-			y = Find(&global, y);
+			string temp = Find(&global, y); if(!temp.empty()) { y = temp; }
 		}
 		{
 			string temp = FindParameters(parameters, y);
@@ -502,7 +503,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if ('/' == x[0])
 		{
-			x = Find(&global, x);
+			string temp = Find(&global, x); if(!temp.empty()) { x = temp; }
 		}
 		{
 			string temp = FindParameters(parameters, x);
@@ -511,7 +512,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if ('/' == y[0])
 		{
-			y = Find(&global, y);
+			string temp = Find(&global, y); if(!temp.empty()) { y = temp; }
 		}
 		{
 			string temp = FindParameters(parameters, y);
@@ -593,7 +594,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if ('/' == x[0])
 		{
-			x = Find(&global, x);
+			string temp = Find(&global, x); if(!temp.empty()) { x = temp; }
 		}
 		{
 			string temp = FindParameters(parameters, x);
@@ -638,7 +639,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 	}
 }
 
-// todo - rename! ToBool ~ ToBool4
+// todo - rename! ToBool ~ ToBool4- test!!
 string ToBool(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& temp)
 {
 	wiz::ArrayStack<string> operandStack; // 피연산자
@@ -767,12 +768,22 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 	result = ToBool3(global, parameters, result);
 	result = string(result.c_str() + 1);
 
-	{ // convert $parameter.~ -> value
-		wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r", "{", "=", "}" });
-		vector<string> tokenVec;
-		//string result = temp;
-		wiz::load_data::UserType ut;
+	wiz::load_data::LoadData::LoadDataFromString(result, ut);
+	result = ut.ToString();
+	if (result.empty()) { return result; }
+	result.pop_back();// 여백제거.
+					  // chk?
+	if (ut.GetUserTypeListSize() == 0) /// chk?
+	{
+		return result;
+	}
 
+	{ // chk..
+		wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r", "{", "=", "}" });
+		wiz::StringTokenizer tokenizer2(result, { " ", "\n", "\t", "\r" });
+		vector<string> tokenVec;
+		vector<string> tokenVec2;
+		
 		while (tokenizer.hasMoreTokens()) {
 			tokenVec.push_back(tokenizer.nextToken());
 		}
@@ -785,30 +796,40 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 				string _temp = Find(&global, tokenVec[i]);
 				if ("" != _temp) {
 					tokenVec[i] = _temp;
-					result = wiz::String::replace(result, before, tokenVec[i]);
 				}
 			}
 			else if (wiz::String::startsWith(tokenVec[i], "$parameter.")) {
-				string temp = FindParameters(parameters, tokenVec[i]);
-				if (!temp.empty()) {
-					tokenVec[i] = temp;
-					result = wiz::String::replace(result, before, tokenVec[i]);
+				string _temp = FindParameters(parameters, tokenVec[i]);
+				if (!_temp.empty()) {
+					tokenVec[i] = _temp;
 				}
 			}
 		}
 
+		while (tokenizer2.hasMoreTokens()) {
+			tokenVec2.push_back(tokenizer2.nextToken());
+		}
+
+		result = "";
+
+		int j = tokenVec.size();
+		for (int i = tokenVec2.size() - 1; i >= 0; --i) {
+			if (tokenVec2[i] == "{" || tokenVec2[i] == "}" || tokenVec2[i] == "=") {
+				continue;
+			}
+			else {
+				--j;
+				tokenVec2[i] = tokenVec[j];
+			}
+		}
+
+		for (int i = 0; i < tokenVec2.size(); ++i) {
+			if (i != 0) { result = result + " "; }
+			result = result + tokenVec2[i];
+		}
 	}
-	// space!
-	wiz::load_data::LoadData::LoadDataFromString(result, ut);
-	result = ut.ToString(); // chk space? option?
-	if (result.empty()) { return result; }
-	result.pop_back();// 여백제거.
-	// chk?
-	if (ut.GetUserTypeListSize() == 0)
-	{
-		return result;
-	}
-	//!
+
+	//
 	wiz::ArrayStack<string> operandStack; // 피연산자
 	wiz::ArrayStack<string> operatorStack; // 연산자
 
@@ -846,7 +867,7 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 	// ex) A = { B = 1 C = { 3 } } D = { E }
 	// =>  A = { B = 1 C = 3  }  D = E
 
-	result = "";
+	//result = "";
 	int count = 0;
 	vector<string> strVec;
 	
@@ -963,11 +984,6 @@ int main(void)
 				//cout << "$call " << val->GetItem("id")[0].Get(0) << endl;
 					info.id = val->GetItem("id")[0].Get(0);
 
-					if (info.id == "51")
-					{
-						cout << "chk" << endl;
-					}
-
 					info.eventUT = events[no].Get(0);
 					info.userType_idx.clear();
 					info.userType_idx.push(0);
@@ -1035,7 +1051,7 @@ int main(void)
 				else if ("$assign" == val->GetName())
 				{
 					pair<string, string> dir = Find2( &global, val->GetItemList(0).Get(0) );
-					string data = ToBool(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString());
+					string data = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString());
 					wiz::load_data::LoadData::SetData(global, dir.first, dir.second, data, "TRUE");
 
 					eventStack.top().userType_idx.top()++;
@@ -1081,19 +1097,19 @@ int main(void)
 					string value = val->GetUserTypeList(1).Get(0)->ToString();
 					string dir;
 					if (val->GetUserTypeList(0).Get(0)->GetItemListSize() > 0) {
-						dir = string(val->GetUserTypeList(0).Get(0)->GetItemList(0).Get(0).c_str() + 1);
-						dir = ToBool3(global, eventStack.top().parameters, dir);
-						dir = string(dir.c_str() + 1);
+						dir = val->GetUserTypeList(0).Get(0)->GetItemList(0).Get(0);
+						dir = "/" + ToBool4(global, eventStack.top().parameters, dir);
+						//dir = string(dir.c_str() + 1);
 					}
 					else ///val->Ge
 					{
 						dir = string(val->GetUserTypeList(0).Get(0)->ToString());
-						dir = ToBool4(global, eventStack.top().parameters, dir);
+						dir = "/" + ToBool4(global, eventStack.top().parameters, dir);
 					//	dir = ToBool(global, eventStack.top().parameters, dir);
 					}
 
-					value = ToBool3(global, eventStack.top().parameters, value);
-					value = string(value.c_str() + 1);
+					//value = ToBool3(global, eventStack.top().parameters, value);
+					//value = string(value.c_str() + 1);
 					value = ToBool4(global, eventStack.top().parameters, value);
 					
  					wiz::load_data::LoadData::AddData(global, dir, value, "TRUE");
@@ -1106,13 +1122,13 @@ int main(void)
 					string dir;
 					//string var = string(val->GetItemList(1).Get(0).c_str() + 1);
 					if (val->GetItemListSize() > 0) {
-						dir = string(val->GetItemList(0).Get(0).c_str() + 1);
-						dir = ToBool3(global, eventStack.top().parameters, dir);
+						dir = val->GetItemList(0).Get(0);
+						dir = "/" + ToBool4(global, eventStack.top().parameters, dir);
 					}
 					else
 					{
 						dir = string(val->ToString());
-						dir = ToBool4(global, eventStack.top().parameters, dir);
+						dir = "/" +  ToBool4(global, eventStack.top().parameters, dir);
 					//	dir = ToBool(global, eventStack.top().parameters, dir);
 					}
 
