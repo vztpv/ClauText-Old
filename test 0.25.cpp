@@ -572,7 +572,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 				break;
 			}
 		}
-		
+
 		if (x.empty()) { x = "."; }
 
 		wiz::load_data::UserType* ut = NULL;
@@ -602,7 +602,22 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		operandStack.push(x);
 	}
+	else if ("$size" == str)
+	{
+		string x = operandStack.pop();
 
+		if ('/' == x[0])
+		{
+			wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, x).second[0];
+			x = wiz::toStr(ut->GetItemListSize());
+		}
+		else
+		{
+			x = "FALSE";
+		}
+	
+		operandStack.push(x);
+	}
 }
 
 // todo - rename! ToBool ~ ToBool4
@@ -699,7 +714,7 @@ string ToBool3(wiz::load_data::UserType& global, const vector<pair<string, strin
 			int last = -1;
 			for (int j = 0; j < tokenVec[i].size(); ++j)
 			{
-				if (tokenVec[i][j] == ' ') {
+				if (tokenVec[i][j] == ' ' || tokenVec[i][j] == '{' || tokenVec[i][j] == '}' || tokenVec[i][j] == '=') {
 					last = j - 1;
 					break;
 				}
@@ -709,12 +724,15 @@ string ToBool3(wiz::load_data::UserType& global, const vector<pair<string, strin
 				string temp = FindParameters(parameters, wiz::String::substring(tokenVec[i], 0, last));
 
 				if (!temp.empty()) {
-					tokenVec[i] = temp;
+					tokenVec[i] = wiz::String::replace(tokenVec[i], wiz::String::substring(tokenVec[i], 0, last), temp);
 				}
 			}
 			else
 			{
-				tokenVec[i] = FindParameters(parameters, tokenVec[i]);
+				string temp = FindParameters(parameters, tokenVec[i]);
+				if (!temp.empty()) {
+					tokenVec[i] = temp;
+				}
 			}
 		}
 		result = result + tokenVec[i];
@@ -924,12 +942,14 @@ int main(void)
 			while (true) {
 				cout << val->GetName() << " id " << eventStack.top().id << endl;
 				if ("$call" == val->GetName()) {
-					cout << "$call " << val->GetItem("id")[0].Get(0) << endl;
+				cout << "$call " << val->GetItem("id")[0].Get(0) << endl;
 					info.id = val->GetItem("id")[0].Get(0);
-					if (info.id == "100")
+
+					if (info.id == "51")
 					{
 						cout << "chk" << endl;
 					}
+
 					info.eventUT = events[no].Get(0);
 					info.userType_idx.clear();
 					info.userType_idx.push(0);
@@ -1163,9 +1183,10 @@ int main(void)
 						
 						if (item[0] == '\"' && item.back() == '\"')
 						{
+							item = wiz::String::substring(item, 1, item.size() - 2);
 							data = item;
 						}
-						if (data == "\"\n\"") { // miss
+						if (data == "\"\\n\"") { // miss
 							cout << endl;
 						}
 						else {
