@@ -44,7 +44,7 @@
 		$make = { $concat = { /Card $concat = { / /Info/CARDNUM } } }
 		$make = { $concat = { /Card $concat = { / $add = { /Info/CARDNUM 1 } } } } 
 		$insert2 = { dir = { $concat = { /Card $concat = { / /Info/CARDNUM } } } value = {sha = -1 num = -1  isBlackJoker = yes isColorJoker = no } }
-		$insert2 = { dir = { $concat = { /Card $concat = { / $add = { /Info/CARDNUM 1 } } } }  value = {sha = -2 num = -2  isBlackJoker = no isColorJooker = yes } }
+		$insert2 = { dir = { $concat = { /Card $concat = { / $add = { /Info/CARDNUM 1 } } } }  value = {sha = -2 num = -2  isBlackJoker = no isColorJoker = yes } }
 	}
 	# Card String Image
 	##"♤","◆","♥","♧",  "☆","★"
@@ -66,19 +66,19 @@
 		// $name?
 		id = 100
 	
-		$parameter = { sha num isBlackJoker isColorJoker }
+		$parameter = { sha isColorJoker isBlackJoker num }
 	
 		#Action
 		$if = { $condition = { $EQ = { yes $parameter.isBlackJoker } }
-			$then = { $print = { /CardStringImage/blackJoker } }
+			$then = { $print = { dir = { /CardStringImage/blackJoker } } } 
 		}
 		$if = { $condition = { $EQ = { yes $parameter.isColorJoker } }
-			$then = { $print = { /CardStringImage/colorJoker } }
+			$then = { $print = { dir = { /CardStringImage/colorJoker } } } 
 		}
 		$if = { $condition = { $COMP< = { -1 $parameter.num } }
 			$then = { 
-				$print = { /CardStringImage/sha/sha_image start = { $parameter.sha } last = { $parameter.sha } }
-				$print = { /CardStringImage/num start = { $parameter.num } last = { $parameter.num } }
+				$print = { dir = { /CardStringImage/sha/sha_image } start = { $parameter.sha } last = { $parameter.sha } }
+				$print = { dir = { /CardStringImage/num } start = { $parameter.num } last = { $parameter.num } }
 			}
 		}
 	}
@@ -94,7 +94,6 @@
 				$if = { $condition = { $EQ = { $parameter.i 0 } }
 					$then = { $make = { /CardList } }
 				}		
-				#$make = { /CardList/$parameter.i }
 				$insert2 = { dir = { /CardList } value = { $parameter.i } }
 				$call = { id = 4 i = { $add = { $parameter.i 1 } } }
 			}
@@ -222,7 +221,7 @@
 					i = $parameter.i
 					j = 0
 				}
-				$print = { "\n" }		
+				$print = { value = { \n } }		
 				$call = {
 					id = 50
 					i = { $add= { $parameter.i 1 } }
@@ -239,12 +238,12 @@
 			$then = {
 				$call = { 
 					id = 100
+					isColorJoker = { $get = { $concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /isColorJoker } } } 
 					sha = { $get = { $concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /sha } } }
 					num = { $get = { $concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /num } } }
 					isBlackJoker = { $get = { $concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /isBlackJoker } } } 
-					isColorJoker = { $get = { $concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /isColorJoker } } } 
-				}
-				$print = { "\n" }		
+							}
+				$print = { value = { "/" } }		
 				$call = {
 					id = 51
 					i = $parameter.i
