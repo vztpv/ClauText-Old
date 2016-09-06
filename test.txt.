@@ -151,14 +151,7 @@ Event =
 	$if = { $condition = { $COMP< = { $parameter.i /Info/FIRST_CARD_NUM } }
 		$then = {
 			$insert2 = { dir = { /PlayerCardList/$parameter.j }  value = { $pop_back = { /CardList } } } 
-			$call = { 
-				id = 100 
-				sha = { $get = { $concat = { $concat = { /Card $concat = { / /PlayerCardList/$parameter.j/ } } /sha } } }
-				num = { $get = { $concat = { $concat = { /Card $concat = { / /PlayerCardList/$parameter.j/ } } /num } } }
-				isBlackJoker = { $get = { $concat = { $concat = { /Card $concat = { / /PlayerCardList/$parameter.j/ } } /isBlackJoker } } }
-				isColorJoker = { $get = { $concat = { $concat = { /Card $concat = { / /PlayerCardList/$parameter.j/ } } /isColorJoker } } }
-			}
-			$print = { "\n" }															# back ( item, not useType! )
+																		# back ( item, not useType! )
 			$call = { id = 13 i = { $add = { $parameter.i 1 } } j = $parameter.j }
 		}
 	}	
@@ -180,13 +173,15 @@ Event =
 
 
 
-# Player(common)
-
-
-
 # Person # cf) inheritance?
 
 
+
+# Computer
+
+
+
+# Player(common)
 Event =
 {
 	id = 8
@@ -209,15 +204,55 @@ Event =
 	}
 }
 
-# Computer
 
 
 # Print Card
 
 
 # Print Card List
+Event = 
+{
+	id = 50
+	$parameter = { i }
 
+	$if = { $condition = { $COMP< = { $parameter.i /Info/PLAYER_NUM } }
+		$then = {
+			$call = { 
+				id = 51
+				i = $parameter.i
+				j = 0
+			}
+			$print = { "\n" }		
+			$call = {
+				id = 50
+				i = { $add= { $parameter.i 1 } }
+			}
+		}
+	}
+}
+Event = 
+{
+	id = 51
+	$parameter = { i j }
 
+	$if = { $condition = { $COMP< = { $parameter.j $size = { /PlayerCardList/$parameter.i } } }
+		$then = {
+			$call = { 
+				id = 100
+				sha = { $get = { $concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /sha } } }
+				num = { $get = { $concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /num } } }
+				isBlackJoker = { $get = { $concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /isBlackJoker } } } 
+				isColorJoker = { $get = { $concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /isColorJoker } } } 
+			}
+			$print = { "\n" }		
+			$call = {
+				id = 51
+				i = $parameter.i
+				j = { $add= { $parameter.j 1 } }
+			}
+		}
+	}
+}
 # Keyboard Input
 
 
@@ -237,6 +272,7 @@ Event =
 			$call = { id = 7 }
 			$call = { id = 8 }
 			$call = { id = 11 }
+			$call = { id = 50 i = 0 }
 			##$remove = { /PlayerCardList/0 } # has bug. for conscat = { ~ }
 			##$remove2 =  { /PlayerCardList/0 }
 			#$print = { list_name = { } start = { } last == { } }
