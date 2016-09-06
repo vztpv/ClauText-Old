@@ -615,7 +615,25 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		{
 			x = "FALSE";
 		}
-	
+
+		operandStack.push(x);
+	}
+	else if ("$element" == str)
+	{
+		string x = operandStack.pop(); // list_name
+		string y = operandStack.pop(); // idx
+		long long idx = atoll(y.c_str());
+
+		if ('/' == x[0])
+		{
+			wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, x).second[0];
+			x = ut->GetItemList(idx).Get(0);
+		}
+		else
+		{
+			x = "NONE";
+		}
+
 		operandStack.push(x);
 	}
 }
@@ -940,9 +958,9 @@ int main(void)
 			}
 
 			while (true) {
-				cout << val->GetName() << " id " << eventStack.top().id << endl;
+				//cout << val->GetName() << " id " << eventStack.top().id << endl;
 				if ("$call" == val->GetName()) {
-				cout << "$call " << val->GetItem("id")[0].Get(0) << endl;
+				//cout << "$call " << val->GetItem("id")[0].Get(0) << endl;
 					info.id = val->GetItem("id")[0].Get(0);
 
 					if (info.id == "51")
@@ -1158,8 +1176,8 @@ int main(void)
 					string value1 = val->GetUserTypeList(0).Get(0)->ToString();
 					string value2 = val->GetUserTypeList(1).Get(0)->ToString();
 
-					value1 = ToBool(global, eventStack.top().parameters, value1);
-					value2 = ToBool(global, eventStack.top().parameters, value2);
+					value1 = ToBool4(global, eventStack.top().parameters, value1);
+					value2 = ToBool4(global, eventStack.top().parameters, value2);
 					if (value1 != value2) {
 						long long x = atoll(value1.c_str());
 						long long y = atoll(value2.c_str());
@@ -1176,32 +1194,35 @@ int main(void)
 				}
 				else if ("$print" == val->GetName())
 				{
-					if (val->GetItemListSize() == 1 && val->GetUserTypeListSize() == 0)
+					if (val->GetUserTypeListSize() == 1)
 					{
-						string item = val->GetItemList(0).Get(0);
-						string data = ToBool4(global, eventStack.top().parameters, item);
-						
-						if (item[0] == '\"' && item.back() == '\"')
+						string listName = val->GetUserTypeList(0).Get(0)->GetItemList(0).Get(0);
+					
+						if (listName.size() >= 2 && listName[0] == '\"' && listName.back() == '\"')
 						{
-							item = wiz::String::substring(item, 1, item.size() - 2);
-							data = item;
+							listName = wiz::String::substring(listName, 1, listName.size() - 2);
+							cout << listName;
 						}
-						if (data == "\"\\n\"") { // miss
+						else if (listName.size() == 2 && listName[0] == '\\' && listName[1] == 'n')
+						{
 							cout << endl;
+						}	
+						else
+						{
+							wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, listName).second[0];
+							cout << ut->GetItemList(0).Get(0);
 						}
-						else {
-							cout << data;
-						}
+
 					}
 					else
 					{
-						string start = val->GetUserTypeList(0).Get(0)->ToString();
-						string last = val->GetUserTypeList(1).Get(0)->ToString();
+						string start = val->GetUserTypeList(1).Get(0)->ToString();
+						string last = val->GetUserTypeList(2).Get(0)->ToString();
 						
 						start = ToBool4(global, eventStack.top().parameters, start);
 						last = ToBool4(global, eventStack.top().parameters, last);
 
-						string listName = val->GetItemList(0).Get(0);
+						string listName = val->GetUserTypeList(0).Get(0)->GetItemList(0).Get(0);
 						long long _start = atoll(start.c_str());
 						long long _last  = atoll(last.c_str());
 						wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, listName).second[0];
@@ -1306,6 +1327,6 @@ int main(void)
 		}
 	}
 
-	cout << global << endl;
+	//cout << global << endl;
 	return 0;
 }
