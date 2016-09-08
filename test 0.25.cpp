@@ -29,9 +29,9 @@ public:
 	vector<pair<string, string>> parameters;
 	string id; //
 	wiz::ArrayStack<string> conditionStack;
-	int state;
+	wiz::ArrayStack<int> state;
 public:
-	EventInfo() : eventUT(NULL), state(0)
+	EventInfo() : eventUT(NULL)
 	{
 
 	}
@@ -250,6 +250,44 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		}
 		else {
 			operandStack.push("FALSE");
+		}
+	}
+	else if ("$AND" == str)
+	{
+		string x, y;
+		x = operandStack.pop();
+		y = operandStack.pop();
+
+		if (x == "TRUE" && y == "TRUE") {
+			operandStack.push("TRUE");
+		}
+		else {
+			operandStack.push("FALSE");
+		}
+	}
+	else if ("$OR" == str)
+	{
+		string x, y;
+		x = operandStack.pop();
+		y = operandStack.pop();
+
+		if (x == "TRUE" || y == "TRUE") {
+			operandStack.push("TRUE");
+		}
+		else {
+			operandStack.push("FALSE");
+		}
+	}
+	else if ("$NOT" == str)
+	{
+		string x;
+		x = operandStack.pop();
+
+		if (x == "TRUE") {
+			operandStack.push("FALSE");
+		}
+		else {
+			operandStack.push("TRUE");
 		}
 	}
 	else if ("$COMP<" == str)
@@ -819,14 +857,12 @@ int main(void)
 			}
 
 			while (true) {
-				//cout << val->GetName() << " id " << eventStack.top().id << endl;
+			//	cout << val->GetName() << " id " << eventStack.top().id << endl;
+
 				if ("$call" == val->GetName()) {
 				//cout << "$call " << val->GetItem("id")[0].Get(0) << endl;
 					info.id = val->GetItem("id")[0].Get(0);
-					//if (info.id == "100")
-					//{
-					//	cout << "chk" << endl;
-					//}
+
 					info.eventUT = events[no].Get(0);
 					info.userType_idx.clear();
 					info.userType_idx.push(0);
@@ -1051,7 +1087,7 @@ int main(void)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$print" == val->GetName())
+				else if ("$print" == val->GetName()) /// using tobool4?
 				{
 					if (val->GetUserTypeListSize() == 1)
 					{
@@ -1101,6 +1137,19 @@ int main(void)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
+				else if ("$load" == val->GetName())
+				{
+					// to do, load data and events from other file!
+					eventStack.top().userType_idx.top()++;
+					break;
+
+				}
+				else if ("$return" == val->GetName())
+				{
+					eventStack.top().userType_idx.top()++;
+					eventStack.pop();
+					break;
+				}
 				else if ("$parameter" == val->GetName())
 				{
 					// to do..
@@ -1109,16 +1158,24 @@ int main(void)
 				}
 				else if ("$if" == val->GetName()) // ToDo!!
 				{
+					if (!eventStack.top().conditionStack.empty() && "FALSE" == eventStack.top().conditionStack.top())
+					{
+						eventStack.top().conditionStack.pop();
+						eventStack.top().userType_idx.top()++;
+						break;
+					}
+					
 					string temp = val->GetUserTypeList(0).Get(0)->ToString();
 					temp = ToBool4(global, eventStack.top().parameters, temp);
 
 					eventStack.top().conditionStack.push(temp);
+
 					if ("TRUE" == temp)
 					{
 						eventStack.top().nowUT.push(val->GetUserTypeList(1).Get(0));
 						val = eventStack.top().nowUT.top()->GetUserTypeList(0).Get(0); // empty chk?
 						eventStack.top().userType_idx.push(0);
-						eventStack.top().state = 1;
+						eventStack.top().state.push( 1 );
 						state = 1;
 					}
 					else if ("FALSE" == temp)
@@ -1139,10 +1196,11 @@ int main(void)
 					//
 					if (!eventStack.top().conditionStack.empty() && "FALSE" == eventStack.top().conditionStack.top())
 					{
+						eventStack.top().conditionStack.top() = "TRUE";
 						eventStack.top().nowUT.push(val->GetUserTypeList(0).Get(0));
 						val = eventStack.top().nowUT.top()->GetUserTypeList(0).Get(0); // empty chk?
 						eventStack.top().userType_idx.push(0);
-						eventStack.top().state = 2;
+						eventStack.top().state.push(2);
 						state = 2;
 					}
 					else
@@ -1155,7 +1213,7 @@ int main(void)
 				//else 
 				{
 					///if (eventStack.top().state == 1 || eventStack.top().state == 2) // it is in "$if", "$else" statments..
-					if( eventStack.top().state == 1 || eventStack.top().state == 2 )
+					if( !eventStack.top().state.empty() && ( eventStack.top().state.top() == 1 || eventStack.top().state.top() == 2 ) )
 					{
 						if (eventStack.top().userType_idx.top() < eventStack.top().nowUT.top()->GetUserTypeListSize())
 						{
@@ -1165,12 +1223,13 @@ int main(void)
 						else
 						{
 							eventStack.top().nowUT.pop();
-							eventStack.top().userType_idx.pop();
+							eventStack.top().userType_idx.pop(); 
+							
 							eventStack.top().conditionStack.pop();
+							eventStack.top().state.pop();
 
 							if (eventStack.top().nowUT.size() < 1)
 							{
-								eventStack.top().state = 0;
 								state = 0;
 							}
 							eventStack.top().userType_idx.top()++;
