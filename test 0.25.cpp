@@ -1158,12 +1158,6 @@ int main(void)
 				}
 				else if ("$if" == val->GetName()) // ToDo!!
 				{
-					if (!eventStack.top().conditionStack.empty() && "FALSE" == eventStack.top().conditionStack.top())
-					{
-						eventStack.top().conditionStack.pop();
-						eventStack.top().userType_idx.top()++;
-						break;
-					}
 					
 					string temp = val->GetUserTypeList(0).Get(0)->ToString();
 					temp = ToBool4(global, eventStack.top().parameters, temp);
