@@ -30,8 +30,9 @@ public:
 	string id; //
 	wiz::ArrayStack<string> conditionStack;
 	wiz::ArrayStack<int> state;
+	string return_value;
 public:
-	EventInfo() : eventUT(NULL)
+	EventInfo() : eventUT(NULL), return_value("NONE")
 	{
 
 	}
@@ -787,7 +788,7 @@ int main(void)
 	srand(time(NULL));
 
 	// data, event load..
-	stack<EventInfo> eventStack;
+	wiz::ArrayStack<EventInfo> eventStack;
 	map<string, int> convert;
 	wiz::load_data::UserType global;
 	wiz::load_data::LoadData::LoadDataFromFile("test.txt", global);
@@ -857,7 +858,8 @@ int main(void)
 			}
 
 			while (true) {
-			//	cout << val->GetName() << " id " << eventStack.top().id << endl;
+
+				//cout << val->GetName() << " id " << eventStack.top().id << endl;
 
 				if ("$call" == val->GetName()) {
 				//cout << "$call " << val->GetItem("id")[0].Get(0) << endl;
@@ -920,7 +922,8 @@ int main(void)
 								//cout << temp << endl;
 							}
 						}
-						eventStack.pop();
+						//eventStack.pop();
+						eventStack.top().userType_idx.top()++;
 					}
 					
 					eventStack.push(info);
@@ -1147,6 +1150,10 @@ int main(void)
 				else if ("$return" == val->GetName())
 				{
 					eventStack.top().userType_idx.top()++;
+					if (eventStack.size() > 1)
+					{
+						eventStack[eventStack.size() - 2].return_value = "ret = { " + val->ToString() + " } "; 
+					}
 					eventStack.pop();
 					break;
 				}
@@ -1212,7 +1219,6 @@ int main(void)
 						if (eventStack.top().userType_idx.top() < eventStack.top().nowUT.top()->GetUserTypeListSize())
 						{
  							val = eventStack.top().nowUT.top()->GetUserTypeList(eventStack.top().userType_idx.top()).Get(0);
-							//eventStack.top().userType_idx.top()++;
 						}
 						else
 						{
@@ -1231,6 +1237,14 @@ int main(void)
 						}
 					}
 					else {
+						if (eventStack.top().userType_idx.top() >= eventStack.top().nowUT.top()->GetUserTypeListSize())
+						{
+							eventStack.top().nowUT.pop();
+							eventStack.top().userType_idx.pop();
+
+							eventStack.top().userType_idx.top()++;
+							break;
+						}
 						eventStack.top().userType_idx.top()++;
 						break;
 					}
@@ -1242,3 +1256,4 @@ int main(void)
 	//cout << global << endl;
 	return 0;
 }
+
