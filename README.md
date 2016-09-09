@@ -6,7 +6,7 @@
 	Info = { NUM_NUM = 13 SHA_NUM = 4 CARDNUM = 52 TOTAL_CARD_NUM = 54 PLAYER_NUM = 4 FIRST_CARD_NUM = 5 } # cardnum - no count two joker card!
 	
 	# Mode?
-	
+	Mode = { ATTACK_MODE = 1 GENERAL_MODE = 0 }
 	
 	# Turn
 	Turn = { dir=true start=1 end=4 n=4 now=4 } # 초기화 Event 따로??
@@ -216,11 +216,11 @@
 	
 		$if = { $condition = { $COMP< = { $parameter.i /Info/TOTAL_CARD_NUM } } 
 			$then = { 
-				$print = { value = { "start" } }
-				$print = { value = { \n } }
+			#	$print = { value = { "start" } }
+			#	$print = { value = { \n } }
 				$if = { $condition = { $EQ = { $get = { $concat = { $concat = { /Card $concat = { /  $parameter.i } } /isBlackJoker } } yes } }
 					$then = { $insert2 = { dir = { /FunctionNo } value = { 3 } }
-											$print = { value = { "0" } }
+			#								$print = { value = { "0" } }
 											# $call = { id = 1000 i = { $add = { $parameter.i 1 } } }
 											#	$return = { }
 												 }
@@ -229,7 +229,7 @@
 					$then = {
 						$if = { $condition = { $EQ = { $get = { $concat = { $concat = { /Card $concat = { /  $parameter.i } } /isColorJoker } } yes } }
 							$then = { $insert2 = { dir = { /FunctionNo } value = { 4 } }
-											$print = { value = { "1" } }
+			#								$print = { value = { "1" } }
 												#$call = { id = 1000 i = { $add = { $parameter.i 1 } } }
 												#$return = { } 
 												}
@@ -239,7 +239,7 @@
 								$if = { $condition =  { $AND = { $EQ = { $get = { $concat = { $concat = { /Card $concat = { /  $parameter.i } } /sha } } 0 } 
 																 $EQ = { $get = { $concat = { $concat = { /Card $concat = { /  $parameter.i } } /num } } 1 } } }
 									$then = { $insert2 = { dir = { /FunctionNo } value = { 9 } }
-											$print = { value = { "2" } }
+			#								$print = { value = { "2" } }
 												# $call = { id = 1000 i = { $add = { $parameter.i 1 } } }
 												#$return = { }
 												}
@@ -248,7 +248,7 @@
 									$then = {
 										$if = { $condition = { $EQ = { $get = { $concat = { $concat = { /Card $concat = { /  $parameter.i } } /num } } 0 } }
 											$then = { 
-											$print = { value = { "3" } }
+			#								$print = { value = { "3" } }
 												$insert2 = { dir = { /FunctionNo } value = { 8 } }
 						
 												$call = { id = 1000 i = { $add = { $parameter.i 1 } } }	
@@ -257,7 +257,7 @@
 										}
 										$if = { $condition = { $EQ = { $get = { $concat = { $concat = { /Card $concat = { /  $parameter.i } } /num } } 1 } }
 											$then = {
-											$print = { value = { "3" } }
+			#								$print = { value = { "3" } }
 												$insert2 = { dir = { /FunctionNo } value = { 1 } }
 								
 												$call = { id = 1000 i = { $add = { $parameter.i 1 } } }		
@@ -266,7 +266,7 @@
 										}
 										$if = { $condition = { $EQ = { $get = { $concat = { $concat = { /Card $concat = { /  $parameter.i } } /num } } 2 } }
 											$then = { 
-											$print = { value = { "3" } }
+			#								$print = { value = { "3" } }
 												$insert2 = { dir = { /FunctionNo } value = { 2 } }
 								
 												$call = { id = 1000 i = { $add = { $parameter.i 1 } } }
@@ -275,7 +275,7 @@
 										}
 										$if = { $condition = { $EQ = { $get = { $concat = { $concat = { /Card $concat = { /  $parameter.i } } /num } } 7 } }
 											$then = { 
-											$print = { value = { "3" } }
+			#								$print = { value = { "3" } }
 												$insert2 = { dir = { /FunctionNo } value = { 5 } }
 								
 												$call = { id = 1000 i = { $add = { $parameter.i 1 } } }							
@@ -284,7 +284,7 @@
 										}
 										$if = { $condition = { $EQ = { $get = { $concat = { $concat = { /Card $concat = { /  $parameter.i } } /num } } 11 } }
 											$then = { 
-											$print = { value = { "3" } }
+			#								$print = { value = { "3" } }
 												$insert2 = { dir = { /FunctionNo } value = { 6 } }
 								
 												$call = { id = 1000 i = { $add = { $parameter.i 1 } } }			
@@ -293,24 +293,30 @@
 										}
 										$if = { $condition = { $EQ = { $get = { $concat = { $concat = { /Card $concat = { /  $parameter.i } } /num } } 12 } }
 											$then = { 
-											$print = { value = { "3" } }
+			#								$print = { value = { "3" } }
 												$insert2 = { dir = { /FunctionNo } value = { 7 } }
 								
 												$call = { id = 1000 i = { $add = { $parameter.i 1 } } }
 												$return = { }
 											}
 										}
+			#							$if = { $condition = { FALSE } 
+			#								$then = { $print = { value = { "|" } } }
+			#							}
+			#							$if = { $condition = { TRUE }
+			#								$then = { $print = { value = { "/" } } }
+										
+			#							}
 										$insert2 = { dir = { /FunctionNo } value = { 0 } }
 										
-											$print = { value = { "4" } }
+			#								$print = { value = { "4" } }
 									}
 								}
 							}
 						}
 					}
 				}
-				
-											$print = { value = { \n } }
+			#	$print = { value = { \n } }
 				$call = { id = 1000 i = { $add = { $parameter.i 1 } } }
 			}
 		}
@@ -319,6 +325,27 @@
 		id = 1001
 	
 		$call = { id  = 1000 i = 0 }
+	}
+		#Onecard main rule Event
+	Event= {
+		id = 1005
+	
+		$parameter = { Old_num New_num Old_sha New_sha Old New Mode }
+	
+		$if = { $condition = { $EQ = { $parameter.Mode /Mode/ATTACK_MODE } }
+			$then = { 
+				$if = { $condition = { $OR = { $EQ = { $parameter.Old 3 } EQ = { $parameter.Old 4 } } } 
+					$then ={ 
+						$if = { $condition = { $EQ = { $parameter.New 3 } } 
+							$then = {
+								$return = { TRUE }
+							}	
+						}
+					}
+				}
+			}
+		}
+		$return = { FALSE }
 	}
 	
 	# AttackPoint
@@ -330,7 +357,7 @@
 	ChangeSha = { sha = NONE }
 	
 	# State
-	State = { mode = GENERAL_MODE }
+	State = { mode = /mode/GENERAL_MODE }
 	
 	
 	# Person 
@@ -446,22 +473,26 @@
 	Event =
 	{
 		id = 0
-	
+		$local = { result }
 		#Action
 		$if = { $condition = { FALSE }
 			$then = {  }
 		}
 		$else = {
 			$then = {
-				#$call = { id = 201 } # init Turn.
+				$call = { id = 201 } # init Turn.
 				$call = { id = 3 }
-				#$call = { id = 5 }
-				#$call = { id = 7 }
-				#$call = { id = 8 }
-				#$call = { id = 11 }
-				#$call = { id = 50 i = 0 } # debug test print!
+				$call = { id = 5 }
+				$call = { id = 7 }
+				$call = { id = 8 }
+				$call = { id = 11 }
+	
+				$call = { id = 50 i = 0 } # debug test print!
 				// test
 				$call = { id = 1001 }
+				$call = { id = 1005  Old_num  = 0 New_num = 0 Old_sha = 0 New_sha = 0 Old = 0 New = 0 Mode = /Mode/GENERAL_MODE  }
+				$assign = { $local.result value = { $return_value = { } } }
+				$print = { value = { $local.result } }
 			}
 		}
 		$call = { id = 1 }
