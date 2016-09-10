@@ -70,6 +70,18 @@ Event = { # just one!
 	$insert2 = { dir = { $concat = { /Card $concat = { / /Info/CARDNUM } } } value = {sha = -1 num = -1  isBlackJoker = yes isColorJoker = no } }
 	$insert2 = { dir = { $concat = { /Card $concat = { / $add = { /Info/CARDNUM 1 } } } }  value = {sha = -2 num = -2  isBlackJoker = no isColorJoker = yes } }
 }
+Event = {
+	id = 103
+	$parameter = { card }
+
+	$return = { $divide = { $parameter.card 13 } }
+}
+Event = {
+	id = 104
+	$parameter = { card }
+
+	$return = { $modular = { $parameter.card 13 } }
+}
 
 # Card String Image
 ##"♤","◆","♥","♧",  "☆","★"
@@ -326,8 +338,8 @@ Event = {
 
 	$call = { id  = 1000 i = 0 }
 }
-	#Onecard main rule Event
-Event= {
+	#Onecard main rule Event : CanPut?
+Event = {
 	id = 1005
 
 	$parameter = { Old_num New_num Old_sha New_sha Old New Mode }
@@ -341,11 +353,138 @@ Event= {
 							$return = { TRUE }
 						}	
 					}
+					$if = { $condition = { $EQ = { $parameter.New 4 } } 
+						$then = {
+							$return = { TRUE }
+						}
+					}
+					$if = { $condition = { $EQ = { $parameter.New 9 } } 
+						$then = {
+							$return = { TRUE }
+						}
+					}
+					$return = { FALSE }
+				}
+			}
+			$if = { $condition = { $OR = { $EQ = { $parameter.Old 1 } $EQ = { $parameter.Old 9 } } } 
+				$then = {
+					$if = { $condition = { $OR = { $EQ = { $parameter.New 1 } $EQ = { $parameter.New 9 } } } 
+						$then = {
+							$return = { TRUE }
+						}
+					}
+					$if = { $condition = { $OR = { $EQ = { $parameter.Old_sha $parameter.New_sha } 
+												   $EQ = { $parameter.New 2 } } } 
+						$then = {
+							$return = { TRUE }
+						}
+					}
+					$if = { $condition = { $EQ = { $parameter.New 3 } } 
+						$then = {
+							$return = { TRUE }
+						}
+					}
+					$if = { $condition = { $EQ = { $parameter.New 4 } } 
+						$then = {
+							$return = { TRUE }
+						}
+					}
+					$return = { FALSE }
+				}
+			}
+			$if = { $condition = { $EQ = { $parameter.Old 2 } }
+				$then = {
+					$if = { $condition = { $EQ = { $parameter.New 2 } } 
+						$then = {
+							$return = { TRUE }
+						}
+					}
+					$if = { $condition = { $AND = { $EQ = { $parameter.Old_sha $parameter.New_sha } 
+													$EQ = { $parameter.New 1 } } }
+						$then = {
+							$return = { TRUE }
+						}
+					}
+					$if = { $condition = { $AND = { $EQ = { $parameter.Old_sha $parameter.New_sha } 
+													$EQ = { $parameter.New 9 } } }
+						$then = {
+							$return = { TRUE }
+						}
+					}
+					$if = { $condition = { $EQ = { $parameter.New 3 } } 
+						$then = {
+							$return = { TRUE }
+						}
+					}
+					$if = { $condition = { $EQ = { $parameter.New 4 } } 
+						$then = {
+							$return = { TRUE }
+						}
+					}
+					$return = { FALSE }
+				}
+			}
+		}
+	}
+	$else = {
+		$then = {
+			$if = { $condition = { $EQ = { $parameter.New 3 } } 
+				$then = {
+					$return = { TRUE }
+				}
+			}
+			$if = { $condition = { $EQ = { $parameter.New 4 } } 
+				$then = {
+					$return = { TRUE }
+				}
+			}
+			$if = { $condition = { $OR = 
+								{ $NOT = { $AND = { 
+								$NOTEQ = { $parameter.Old_sha $parameter.New_sha } 
+								$NOTEQ = { $parameter.Old_num $parameter.New_num } } 
+								}  $AND = { $NOTEQ = { $parameter.Mode /Mode/ATTACK_MODE } 
+											$OR = { $EQ = { $parameter.Old 3 }
+											        $EQ = { $parameter.Old 4 } }
+								}
+					   } 		
+				}
+				$then = {
+					$return = { TRUE }
 				}
 			}
 		}
 	}
 	$return = { FALSE }
+}
+Event = {
+	id = 1006
+
+	$parameter = { put_card card mode }
+	$local = { Old_num New_num Old_sha New_sha Old New }
+
+	$call = { id = 103 card = $parameter.put_card }
+	$assign = { $local.Old_sha value = { $return_value = { } } }
+	$call = { id = 104 card = $parameter.put_card }
+	$assign = { $local.Old_num value = { $return_value = { } } }
+	
+	$call = { id = 103 card = $parameter.card }
+	$assign = { $local.New_sha value = { $return_value = { } } }
+	$call = { id = 104 card = $parameter.card }
+	$assign = { $local.New_num value = { $return_value = { } } }
+
+	$assign = { $local.Old value = { $element = { /FunctionNo $parameter.put_card } } }
+	$assign = { $local.New value = { $element = { /FunctionNo $parameter.card } } }
+
+	$call = { id = 1005 Old_num = { $local.Old_num } New_num = { $local.New_num }  
+						Old_sha = { $local.Old_sha }  New_sha = { $local.New_sha }  
+				Old = { $local.Old }  New = { $local.New }  Mode = { $parameter.mode }
+	}
+
+	#$call = { id = 1005 Old_num = 0 New_num = 0  
+	#					Old_sha = 0 New_sha = 0  
+	#			Old = 0  New = 0  Mode = 0
+	#}
+	$return = { $return_value = { } }
 }
 
 # AttackPoint
@@ -490,7 +629,7 @@ Event =
 			$call = { id = 50 i = 0 } # debug test print!
 			// test
 			$call = { id = 1001 }
-			$call = { id = 1005  Old_num  = 0 New_num = 0 Old_sha = 0 New_sha = 0 Old = 0 New = 0 Mode = /Mode/GENERAL_MODE  }
+			$call = { id = 1006  put_card = 0 card = 0 mode = { $get = { /Mode/GENERAL_MODE } } }
 			$assign = { $local.result value = { $return_value = { } } }
 			$print = { value = { $local.result } }
 		}
@@ -503,8 +642,7 @@ Main =
 {
 	$call = { id = 0 }
 
-	# $on = { id = ERROR }
-	# $on = { id = CONSOLE }
+	# $on = { id = ERROR }	# $on = { id = CONSOLE }
 }
 
 # Event : Evemt1 -> Event2 -> Event3 -> Event4
