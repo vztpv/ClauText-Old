@@ -424,6 +424,7 @@
 						$return = { FALSE }
 					}
 				}
+				$return = { FALSE }
 			}
 		}
 		$else = {
@@ -476,7 +477,7 @@
 		$assign = { $local.New value = { $element = { /FunctionNo $parameter.card } } }
 	
 		$call = { id = 1005 Old_num = { $local.Old_num } New_num = { $local.New_num }  
-							Old_sha = { $local.Old_sha }  New_sha = { $local.New_sha }  
+							Old_sha = { $local.Old_sha } New_sha = { $local.New_sha }  
 					Old = { $local.Old }  New = { $local.New }  Mode = { $parameter.mode }
 		}
 	
@@ -496,7 +497,8 @@
 	ChangeSha = { sha = NONE }
 	
 	# State
-	State = { mode = /mode/GENERAL_MODE }
+	State = { 
+	}
 	
 	
 	# Person 
