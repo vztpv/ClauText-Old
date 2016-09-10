@@ -934,24 +934,13 @@ int main(void)
 				if ("$call" == val->GetName()) {
 				//cout << "$call " << val->GetItem("id")[0].Get(0) << endl;
 					info.id = val->GetItem("id")[0].Get(0);
-
+				//	if (info.id == "1005") {
+				//		cout << "chk" << endl;
+				//	}
 					info.eventUT = events[no].Get(0);
 					info.userType_idx.clear();
 					info.userType_idx.push(0);
-					info.locals.clear();
 					info.return_value.clear();
-
-					const int no = convert[info.id];
-					for (int i = 0; i < events[no].Get(0)->GetUserTypeListSize(); ++i) {
-						if (events[no].Get(0)->GetUserTypeList(i).Get(0)->GetName() == "$local") {
-							for (int j = 0; j < events[no].Get(0)->GetUserTypeList(i).Get(0)->GetItemListSize(); ++j) {
-								string name = events[no].Get(0)->GetUserTypeList(i).Get(0)->GetItemList(j).Get(0); 
-								string value = "";
-								info.locals.insert(make_pair(name, value));
-							}
-							break;
-						}
-					}
 
 					EventInfo info2;
 					if (info.id != eventStack.top().id) {
@@ -1010,7 +999,21 @@ int main(void)
 						eventStack.top().userType_idx.top()++;
 					}
 					
+					info.locals.clear();
+					const int no = convert[info.id];
+					for (int i = 0; i < events[no].Get(0)->GetUserTypeListSize(); ++i) {
+						if (events[no].Get(0)->GetUserTypeList(i).Get(0)->GetName() == "$local") {
+							for (int j = 0; j < events[no].Get(0)->GetUserTypeList(i).Get(0)->GetItemListSize(); ++j) {
+								string name = events[no].Get(0)->GetUserTypeList(i).Get(0)->GetItemList(j).Get(0);
+								string value = "";
+								info.locals.insert(make_pair(name, value));
+							}
+							break;
+						}
+					}
+
 					eventStack.push(info);
+					
 					pass = true;
 					break;
 				}
