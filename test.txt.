@@ -346,7 +346,7 @@ Event = {
 
 	$if = { $condition = { $EQ = { $parameter.Mode /Mode/ATTACK_MODE } }
 		$then = { 
-			$if = { $condition = { $OR = { $EQ = { $parameter.Old 3 } EQ = { $parameter.Old 4 } } } 
+			$if = { $condition = { $OR = { $EQ = { $parameter.Old 3 } $EQ = { $parameter.Old 4 } } } 
 				$then ={ 
 					$if = { $condition = { $EQ = { $parameter.New 3 } } 
 						$then = {
@@ -629,12 +629,11 @@ Event =
 			$call = { id = 50 i = 0 } # debug test print!
 			// test
 			$call = { id = 1001 }
-			$call = { id = 1006  put_card = 0 card = 0 mode = { $get = { /Mode/GENERAL_MODE } } }
+			$call = { id = 1006  put_card = 0 card = 0 mode = { $get = { /Mode/ATTACK_MODE } } }
 			$assign = { $local.result value = { $return_value = { } } }
 			$print = { value = { $local.result } }
 		}
 	}
-	$call = { id = 1 }
 }
 
 # Main
@@ -642,7 +641,8 @@ Main =
 {
 	$call = { id = 0 }
 
-	# $on = { id = ERROR }	# $on = { id = CONSOLE }
+	# $on = { id = ERROR }
+	# $on = { id = CONSOLE }
 }
 
 # Event : Evemt1 -> Event2 -> Event3 -> Event4
