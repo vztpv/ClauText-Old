@@ -1,12 +1,15 @@
 	
 	
+	## id -> name?
 	# Onecard Data and Event.
 	
 	# Info
 	Info = { NUM_NUM = 13 SHA_NUM = 4 CARDNUM = 52 TOTAL_CARD_NUM = 54 PLAYER_NUM = 4 FIRST_CARD_NUM = 5 } # cardnum - no count two joker card!
 	
+	
 	# Mode?
-	Mode = { ATTACK_MODE = 1 GENERAL_MODE = 0 }
+	Mode = { JUMP_MODE = 6 BACK_MODE = 7 MORE_ONE_MODE = 8 CHANGE_SHA_MODE = 3 
+			 GAME_END_MODE = 4 GAME_OVER_MODE = 5ATTACK_MODE = 1 GENERAL_MODE = 0 }
 	
 	# Turn
 	Turn = { dir=true start=1 end=4 n=4 now=4 } # 초기화 Event 따로??
@@ -150,7 +153,7 @@
 		$if = { $condition = { $COMP> = { $parameter.n 0 } }
 			$then = {
 				$swap = { /CardList value = { $rand = { 0 $add={$parameter.n -1} } } value = { $add={$parameter.n -1} } }
-				$call = { id = 6 n = { $add={ $parameter.n -1 } } }
+				$call = { id = 6 n = { $add = { $parameter.n -1 } } }
 			}
 		}
 	}
@@ -158,7 +161,7 @@
 	{
 		id = 7
 		# Action
-		$call = { id = 6 n = { $add = { 2 /Info/CARDNUM } } }  # cf) /info/cardNum
+		$call = { id = 6 n = { $size = { /CardList } } }  # cf) /info/cardNum
 	}
 	
 	# First Card Distribution
@@ -213,7 +216,7 @@
 	# PutCard, move to card list!
 	Event = {
 		id = 22
-		$insert2 = { dir = { /CardList } value = { $get = /PutCard/cardId } }
+		$insert2 = { dir = { /CardList } value = { $get = { /PutCard/cardId } } }
 		$call = { id = 21 }
 	}
 	
@@ -231,7 +234,8 @@
 			#	$print = { value = { "start" } }
 			#	$print = { value = { \n } }
 				$if = { $condition = { $EQ = { $get = { $concat = { $concat = { /Card $concat = { /  $parameter.i } } /isBlackJoker } } yes } }
-					$then = { $insert2 = { dir = { /FunctionNo } value = { 3 } }
+					$then = { 
+						$insert2 = { dir = { /FunctionNo } value = { 3 } }
 			#								$print = { value = { "0" } }
 											# $call = { id = 1000 i = { $add = { $parameter.i 1 } } }
 											#	$return = { }
@@ -240,7 +244,8 @@
 				$else = {
 					$then = {
 						$if = { $condition = { $EQ = { $get = { $concat = { $concat = { /Card $concat = { /  $parameter.i } } /isColorJoker } } yes } }
-							$then = { $insert2 = { dir = { /FunctionNo } value = { 4 } }
+							$then = { 
+								$insert2 = { dir = { /FunctionNo } value = { 4 } }
 			#								$print = { value = { "1" } }
 												#$call = { id = 1000 i = { $add = { $parameter.i 1 } } }
 												#$return = { } 
@@ -424,7 +429,7 @@
 						$return = { FALSE }
 					}
 				}
-				$return = { FALSE }
+			#	$return = { FALSE }
 			}
 		}
 		$else = {
@@ -481,25 +486,167 @@
 					Old = { $local.Old }  New = { $local.New }  Mode = { $parameter.mode }
 		}
 	
-		#$call = { id = 1005 Old_num = 0 New_num = 0  
-		#					Old_sha = 0 New_sha = 0  
-		#			Old = 0  New = 0  Mode = 0
-		#}
 		$return = { $return_value = { } }
+	}
+	
+	# Functions
+	Functions = {
+	
+	}
+	Event = {
+		id = 1007
+	
+		$local = { Attack_A1 KK1 Attack_A2 Attack_A3 Attack_A4 Attack_A5 Change_Sha1 Jump1 Back1 }
+	
+		#NONE
+		$insert2 = { dir = { /Functions } value = { attack_point= 0 kk = no change_sha = no jump = no back = no } }
+	
+		$assign = { $local.Attack_A2 value = { attack_point = 1 kk = no change_sha = no jump = no back = no } }
+		$insert2 = { dir = { /Functions } value = { $local.Attack_A2 } }
+		
+		$assign = { $local.Attack_A3 value = { attack_point = 2 kk = no change_sha = no jump = no back = no } }
+		$insert2 = { dir = { /Functions } value = { $local.Attack_A3 } }
+		
+		$assign = { $local.Attack_A4 value = { attack_point = 5 kk = no change_sha = no jump = no back = no } }
+		$insert2 = { dir = { /Functions } value = { $local.Attack_4 } }
+		
+		$assign = { $local.Attack_A5 value = { attack_point = 7 kk = no change_sha = no jump = no back = no } }
+		$insert2 = { dir = { /Functions } value = { $local.Attack_A5 } }
+		
+		$assign = { $local.Change_Sha1 value = { attack_point = 0 kk = no change_sha = yes jump = no back = no } } 
+		$insert2 = { dir = { /Functions } value = { $local.Change_Sha1 } }
+		
+		$assign = { $local.Jump1 value = { attack_point = 0 kk = no change_sha = no jump = yes back = no } }
+		$insert2 = { dir = { /Functions } value = { $local.Jump1 } }
+		
+		$assign = { $local.Back1 value = { attack_point = 0 kk = no change_sha = no jump = no back = yes } } 
+		$insert2 = { dir = { /Functions } value = { $local.Back1 } }
+	
+		$assign = { $local.KK1 value = { attack_point = 0 kk = yes change_sha = no jump = no back = no } }
+		$insert2 = { dir = { /Functions } value = { $local.KK1 } }
+	
+		$assign = { $local.Attack_A1 value = { attack_point = 3 kk = no change_sha = no jump = no back = no }  }
+		$insert2 = { dir = { /Functions } value = { $local.Attack_A1 } }
+	}
+	
+	Event = {
+		id = 1008
+	
+		$parameter = { card }
+		$local = { card_function_no function_dir }
+	
+		# card -> card_function_no ( access table )
+		$assign = { $local.card_function_no value = { $element = { /FunctionNo card } } }
+	
+		# function_dir <= Functions/i/ # can??
+		#assign = { $local.function_dir value = { $concat = { $concat = { /Functions / } $concat = { $local.card_function_no / } } } }
+	
+		# / + $local.function_dir + attack_point > 0
+		$if = { $condition = { $COMP> = { $concat = { $concat = { / $local.function_dir } $concat = { / attack_point } } 0 } } 
+			$then = {
+				$call = { id = 1010 point = { $get = { $concat = { $concat = { / $local.function_dir } $concat = { / attack_point } } } } }
+			}
+		}
+		#			   + change_sha = yes ? 
+		$if = { $condition = { $EQ = { $concat = { $concat = { / $local.function_dir } $concat = { / change_sha } } yes } } 
+			$then = {
+				$call = { id = 1015 }
+			}
+		}
+		#			   + jump = yes?
+	 	$if = { $condition = { $EQ = { $concat = { $concat = { / $local.function_dir } $concat = { / jump } } yes } } 
+			$then = {
+				$call = { id = 1016 i = 0 }
+			}
+		}
+		#			   + back = yes?
+		$if = { $condition = { $EQ = { $concat = { $concat = { / $local.function_dir } $concat = { / back } } yes } } 
+			$then = {
+				$call = { id = 1017 }
+			}
+		}
+	}
+		# change_sha
+	Event = {
+		id = 1015
+	
+		# person? - $input = { } # todo!
+		# computer? - random!
+		$if = { $condition = { $EQ = { /Turn/now /State/person_stream } }
+			$then = {
+				# todo - person play!
+			}	
+		}
+		$else =	{
+			$then = {
+				$assign = { /ChangeSha/sha $rand = { 0 3 } }
+			}
+		}
+	}
+		# jump
+	Event = {
+		id = 1016
+	
+		$parameter = { i }
+		# with PlayerGameOverList
+	
+		$if = { 
+			$condition = { $EQ = { $element = { /PlayerGameOverList $add = { /Turn/now -1 } } no } }
+			$then = {
+				$call = { id = 1 }
+				$return = { }
+			}
+		}
+		$else = {
+			$then = {
+				$call = { id = 1016 i = { $add = { $parameter.i 1 } } }
+			}
+		}
+	}
+		# back
+	Event = {
+		id = 1017
+	
+		$call = { id = 200 }
 	}
 	
 	# AttackPoint
 	AttackPoint = { total_point = 0 now_point = 0 }
-		# point incerase
-		# point reset
+		# point incerase - id 1010?
+	Event = {
+		id = 1010
+	
+		$parameter = { point }
+	
+		$assign = { /AttackPoint/now_point value = { $parameter.point } }
+		$assign = { /AttackPoint/total_point value = { $add = { /AttackPoint/total_point $parameter.point } } }
+	}
+		# point reset - id 1011?
+	Event = {
+		id = 1011
+	
+		$assign = { /AttackPoint/now_point value = { 0 } }
+		$assign = { /AttackPoint/total_point value = { 0 } }
+	}
 	
 	# ChangeSha
 	ChangeSha = { sha = NONE }
 	
 	# State
-	State = { 
-	}
+	State = {
 	
+	}
+		# init? using insert2?
+	Event =
+	{
+		id = 1100
+	
+		$insert2 = { dir = { /State } value = { mode = /Mode/GENERAL_MODE } }
+		# add action_state? = NONE? EAT? PUT?
+		$insert2 = { dir = { /State } value = { action_state = NONE } }
+		# add person_stream? turn?
+		$insert2 = { dir = { /State } value = { person_stream = -1 } }
+	}
 	
 	# Person 
 		# io?
@@ -516,11 +663,12 @@
 	
 	}
 	
-	
 	# Player(common)
 		# name list
-		# card list
+		# card list - done.
 		# game over : yes or no list
+		# next Turn
+		# back
 	PlayerNameList =
 	{
 	
@@ -529,7 +677,49 @@
 	{
 	
 	}
+	Event = {
+		id = 3003
+		
+		$call = { id = 3002 i = 0 }
+	}
+	Evnet = {
+		id = 3002
 	
+		$paramter = { i } 
+	
+		$if = { $conditioin = { $COMP< = { $parameter.i /Info/PLAYER_NUM } } 
+			$insert2 = { dir = { /PlayerGameOverList } value = { no } }
+			$call = { id = 3002 i = { $add = { $pareter.i 1 } }  }
+		}
+	}
+	Event = {
+		id = 3001
+	
+		$call = { id = 3000 i = 0 j = 1 }
+	}
+	Event = {
+		id = 3000
+		
+		$parameter = { i j }
+		
+		$if = {
+			$condition = { $COMP< = { $parameter.i /Info/PLAYER_NUM } } 	
+			$then = {
+				$if = { $condition = { $NOTEQ = { $parameter.i /State/person_stream } }  
+					$then = { 
+						$insert2 = { dir = { /PlayerNameList } value = { $concat = { computer  j } } } 
+						$call = { id = 3000 i = { $add = { $parameter.i 1 } } j = { $add = { $parameter.j 1 } } }
+					}
+				}
+				$else = {
+					$then = {
+						$insert2 = { dir = { /PlayerNameList } value ={ person } } 
+						$call = { id = 3000 i = { $add = { $parameter.i 1 } } j = $paramter.j }
+					}
+				}
+			}
+		}
+	}
 	Event =
 	{
 		id = 8
@@ -606,7 +796,8 @@
 		#char?
 		#int?
 		#string?
-	
+		# $input = { } # cin >> string_type;
+		# $getch = { } # _getch();
 	# Pause
 	
 	
@@ -629,14 +820,66 @@
 				$call = { id = 11 }
 	
 				$call = { id = 50 i = 0 } # debug test print!
+	
 				// test
 				$call = { id = 1001 }
-				$call = { id = 1006  put_card = 0 card = 0 mode = { $get = { /Mode/ATTACK_MODE } } }
+				$call = { id = 1006  put_card = 0 card = 0 mode = { $get = { /Mode/GENERAL_MODE } } }
 				$assign = { $local.result value = { $return_value = { } } }
 				$print = { value = { $local.result } }
+				//~test
+	
+				$call = { id = 1100 }
+				$call = { id = 1011 }
+				$call = { id = 1 }  # next turn?
+				$call = { id = 3001 }
+				$call = { id = 3003 }
+	
+				// main call?
+				$call = { id = 4001 }
 			}
 		}
 	}
+	
+	Event = {
+		id = 4001
+	
+		$call = { id = 4000 }
+		$if = { $Condition = { $EQ = { $return_value = { }  /Mode/GAME_END_MODE } }
+			$then = { 
+				return = { }
+			}
+		}
+		$else = {
+			$then = {
+				$call = { id = 4000 }
+			}
+		}
+	}
+	
+	Event = {
+		id = 4000
+	
+		# $clear_secreen = { } # system( "cls" ); # in windows.
+		
+		# print turn
+		# print player`s cards
+		# print my card list
+		# print ?.
+		# input = 먹는다. 0, 그외 1~n
+		# input = $getch = { } # ?
+		# Card Put or Eat # <- state/action_state == PUT or EAT?
+		# print some string?
+		# Oneca Event
+		# Card Effect Event
+		# Change Sha Event
+		# Next Turn Event + PlayerGameOverList
+		# $getch() = { } # ?
+	
+		# Next Turn...
+	
+		$return = { $element = { /State/mode 0 } }
+	}
+	
 	
 	# Main
 	Main =
