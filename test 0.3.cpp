@@ -14,6 +14,8 @@
 #include <cstdlib>
 using namespace std;
 
+#include <conio.h>
+
 #include <wiz/load_data.h>
 #include <wiz/stacks.h>
 #include <wiz/cpp_string.h>
@@ -32,8 +34,10 @@ public:
 	wiz::ArrayStack<string> conditionStack;
 	wiz::ArrayStack<int> state;
 	string return_value;
+	string option;
+//	int if_depth;
 public:
-	EventInfo() : eventUT(NULL), return_value("NONE")
+	EventInfo() : eventUT(NULL), return_value("NONE")//, if_depth(0)
 	{
 
 	}
@@ -694,17 +698,30 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 	wiz::ArrayStack<string> resultStack;
 	wiz::load_data::UserType ut;
 	
-	
+	bool flag_A = false;
+	if (result.size() > 1 && result[0] == '/')
+	{
+		flag_A = true;
+	}
 	result = ToBool3(global, parameters, result, info);
-	result = string(result.c_str() + 1);
-
+	if (!flag_A) {
+		result = string(result.c_str() + 1);
+	}
 	wiz::load_data::LoadData::LoadDataFromString(result, ut);
 	result = ut.ToString();
 	if (result.empty()) { return result; }
 	result.pop_back();// 여백제거.
 					  // chk?
-	if (ut.GetUserTypeListSize() == 0) /// chk?
+	if (ut.GetUserTypeListSize() == 0 && ut.GetItemListSize() == 1) /// chk?
 	{
+		if ('/' == result[0] && result.size() > 1)
+		{
+			string temp = Find(&global, result);
+			if (!temp.empty()) {
+				result = temp;
+			}
+		}
+
 		return result;
 	}
 
@@ -839,6 +856,40 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 	return result;
 }
 
+bool chkFunc(wiz::ArrayStack<EventInfo>& eventStack, wiz::load_data::UserType** val)
+{
+	if (!eventStack.top().state.empty() && (eventStack.top().state.top() == 1 || eventStack.top().state.top() == 2))
+	{
+
+		if (eventStack.top().userType_idx.top() < eventStack.top().nowUT.top()->GetUserTypeListSize())
+		{
+			(*val) = eventStack.top().nowUT.top()->GetUserTypeList(eventStack.top().userType_idx.top()).Get(0);
+			return false;
+		}
+		else
+		{
+			//if (eventStack.top().state.top() == 1) {
+			//	eventStack.top().if_depth--;
+			//}
+			eventStack.top().nowUT.pop();
+			eventStack.top().userType_idx.pop();
+			if (!eventStack.top().conditionStack.empty())
+			{
+				eventStack.top().conditionStack.pop();
+			}
+			eventStack.top().state.pop(); // remove state?
+		}
+	}
+	else {
+		if (!eventStack.empty() && !eventStack.top().userType_idx.empty() && !eventStack.top().nowUT.empty()
+			&& eventStack.top().userType_idx.top() >= eventStack.top().nowUT.top()->GetUserTypeListSize())
+		{
+			eventStack.top().nowUT.pop();
+			eventStack.top().userType_idx.pop();
+		}
+	}
+	return true;
+}
 
 int main(void)
 {
@@ -930,21 +981,26 @@ int main(void)
 			while (true) {
 
 			//	cout << val->GetName() << " id " << eventStack.top().id << endl;
-
-				if ("$call" == val->GetName()) {
+				if ("$option" == val->GetName()) // first?
+				{
+					eventStack.top().option = ToBool4(global, eventStack.top().parameters, val->ToString(), eventStack.top());
+					
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$call" == val->GetName()) {
 				//cout << "$call " << val->GetItem("id")[0].Get(0) << endl;
 					info.id = val->GetItem("id")[0].Get(0);
-				//	if (info.id == "1005") {
-				//		cout << "chk" << endl;
-				//	}
+
 					info.eventUT = events[no].Get(0);
 					info.userType_idx.clear();
 					info.userType_idx.push(0);
 					info.return_value.clear();
 
 					EventInfo info2;
+					info2 = info;
+
 					if (info.id != eventStack.top().id) {
-						info2 = info;
 						info.parameters.clear();
 					}
 					info.conditionStack.clear();
@@ -963,7 +1019,6 @@ int main(void)
 								info.parameters.push_back(make_pair(val->GetUserTypeList(j).GetName(), temp));
 							}
 						}
-
 						eventStack.top().userType_idx.top()++;
 					}
 					else {
@@ -995,10 +1050,17 @@ int main(void)
 								//cout << temp << endl;
 							}
 						}
-						//eventStack.pop();
+
 						eventStack.top().userType_idx.top()++;
+
+
+						if (eventStack.top().option == "REMOVE_NOW_EVENT_STACK_A") //
+						{
+							eventStack.pop();
+						}
+						
 					}
-					
+
 					info.locals.clear();
 					const int no = convert[info.id];
 					for (int i = 0; i < events[no].Get(0)->GetUserTypeListSize(); ++i) {
@@ -1073,13 +1135,13 @@ int main(void)
 					string dir;
 					if (val->GetUserTypeList(0).Get(0)->GetItemListSize() > 0) {
 						dir = val->GetUserTypeList(0).Get(0)->GetItemList(0).Get(0);
-						dir = "/" + ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
+						dir = ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
 						//dir = string(dir.c_str() + 1);
 					}
 					else ///val->Ge
 					{
 						dir = string(val->GetUserTypeList(0).Get(0)->ToString());
-						dir = "/" + ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
+						dir = ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
 					//	dir = ToBool(global, eventStack.top().parameters, dir);
 					}
 
@@ -1098,12 +1160,12 @@ int main(void)
 					//string var = string(val->GetItemList(1).Get(0).c_str() + 1);
 					if (val->GetItemListSize() > 0) {
 						dir = val->GetItemList(0).Get(0);
-						dir = "/" + ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
+						dir = ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
 					}
 					else
 					{
 						dir = string(val->ToString());
-						dir = "/" +  ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
+						dir = ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
 					//	dir = ToBool(global, eventStack.top().parameters, dir);
 					}
 
@@ -1210,12 +1272,23 @@ int main(void)
 								cout << temp;
 							}
 						}
+						else if (wiz::String::startsWith(listName, "/") && listName.size() > 1 )
+						{
+							string temp = ToBool4(global, eventStack.top().parameters, listName, eventStack.top());
+							if (temp != listName) // chk 
+							{
+								cout << temp;
+							}
+							else {
+								wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, listName).second[0];
+								cout << ut->GetItemList(0).Get(0);
+							}
+						}
 						else
 						{
 							wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, listName).second[0];
 							cout << ut->GetItemList(0).Get(0);
 						}
-
 					}
 					else
 					{
@@ -1239,18 +1312,32 @@ int main(void)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$input" == val->GetName())
-				{
-					// to do
-					eventStack.top().userType_idx.top()++;
-					break;
-				}
 				else if ("$load" == val->GetName())
 				{
 					// to do, load data and events from other file!
 					eventStack.top().userType_idx.top()++;
 					break;
 
+				}
+				else if ("$clear_screen" == val->GetName())
+				{
+					system("cls");
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$_getch" == val->GetName())
+				{
+					_getch();
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$input" == val->GetName())
+				{
+					string str;
+					cin >> str;
+					eventStack.top().return_value = str;
+					eventStack.top().userType_idx.top()++;
+					break;
 				}
 				else if ("$return" == val->GetName())
 				{
@@ -1278,11 +1365,54 @@ int main(void)
 				}
 				else if ("$if" == val->GetName()) // ToDo!!
 				{
-					
 					string temp = val->GetUserTypeList(0).Get(0)->ToString();
 					temp = ToBool4(global, eventStack.top().parameters, temp, eventStack.top());
 
-					eventStack.top().conditionStack.push(temp);
+					//cout << eventStack.top().if_depth << " " <<  eventStack.top().conditionStack.size() << endl;
+
+					//if (eventStack.top().if_depth > 0 && eventStack.top().conditionStack[eventStack.top().if_depth - 1] == "FALSE")
+					//{//
+					//	eventStack.top().userType_idx.top()++;
+					//	break;
+					//}
+
+					if (!eventStack.top().conditionStack.empty())
+					{
+						if ("TRUE" == temp && eventStack.top().conditionStack.top() == "FALSE")
+						{
+							temp = "FALSE";
+						}
+						else if ("FALSE" == temp && eventStack.top().conditionStack.top() == "FALSE")
+						{
+							temp = "FALSE";
+						}
+						else if (!eventStack.top().nowUT.empty() && eventStack.top().userType_idx.top() + 1 < eventStack.top().nowUT.top()->GetUserTypeListSize()
+							&& (eventStack.top().nowUT.top()->GetUserTypeList(eventStack.top().userType_idx.top() + 1).GetName() == "$else") )
+						{
+							eventStack.top().conditionStack.push(temp);		
+						}
+						else if ("TRUE" == temp)
+						{
+							eventStack.top().conditionStack.push(temp);
+						}
+					}
+					else
+					{
+						if (!eventStack.top().nowUT.empty() && eventStack.top().userType_idx.top() + 1 < eventStack.top().nowUT.top()->GetUserTypeListSize()
+							&& (eventStack.top().nowUT.top()->GetUserTypeList(eventStack.top().userType_idx.top() + 1).GetName() == "$else"))
+						{
+							eventStack.top().conditionStack.push(temp);
+						}
+						else if (eventStack.top().userType_idx.top() +1 < events[no].Get(0)->GetUserTypeListSize() && 
+							events[no].Get(0)->GetUserTypeList(eventStack.top().userType_idx.top() + 1).GetName() == "$else")
+						{
+							eventStack.top().conditionStack.push(temp);
+						}
+						else if ("TRUE" == temp)
+						{
+							eventStack.top().conditionStack.push(temp);
+						}
+					}
 
 					if ("TRUE" == temp)
 					{
@@ -1291,11 +1421,15 @@ int main(void)
 						eventStack.top().userType_idx.push(0);
 						eventStack.top().state.push( 1 );
 						state = 1;
+					//	eventStack.top().if_depth++;
 					}
 					else if ("FALSE" == temp)
 					{
+						//if (chkFunc(eventStack, &val)) {
+
 						eventStack.top().userType_idx.top()++;
 						break;
+					//	}
 					}
 					else
 					{
@@ -1318,46 +1452,18 @@ int main(void)
 						state = 2;
 					}
 					else
-					{
+					{//
+					//	if (chkFunc(eventStack, &val))
+					//	{
 						eventStack.top().userType_idx.top()++;
 						break;
+					//}
 					}
 				}
 
 				//else 
 				{
-					///if (eventStack.top().state == 1 || eventStack.top().state == 2) // it is in "$if", "$else" statments..
-					if( !eventStack.top().state.empty() && ( eventStack.top().state.top() == 1 || eventStack.top().state.top() == 2 ) )
-					{
-						if (eventStack.top().userType_idx.top() < eventStack.top().nowUT.top()->GetUserTypeListSize())
-						{
- 							val = eventStack.top().nowUT.top()->GetUserTypeList(eventStack.top().userType_idx.top()).Get(0);
-						}
-						else
-						{
-							eventStack.top().nowUT.pop();
-							eventStack.top().userType_idx.pop(); 
-							
-							eventStack.top().conditionStack.pop();
-							eventStack.top().state.pop();
-
-							if (eventStack.top().nowUT.size() < 1)
-							{
-								state = 0;
-							}
-							eventStack.top().userType_idx.top()++;
-							break;
-						}
-					}
-					else {
-						if (eventStack.top().userType_idx.top() >= eventStack.top().nowUT.top()->GetUserTypeListSize())
-						{
-							eventStack.top().nowUT.pop();
-							eventStack.top().userType_idx.pop();
-
-							eventStack.top().userType_idx.top()++;
-							break;
-						}
+					if (chkFunc(eventStack, &val)) {
 						eventStack.top().userType_idx.top()++;
 						break;
 					}
