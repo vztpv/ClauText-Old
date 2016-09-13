@@ -9,7 +9,7 @@
 	
 	# Mode?
 	Mode = { JUMP_MODE = 6 BACK_MODE = 7 MORE_ONE_MODE = 8 CHANGE_SHA_MODE = 3 
-			 GAME_END_MODE = 4 GAME_OVER_MODE = 5ATTACK_MODE = 1 GENERAL_MODE = 0 }
+			 GAME_END_MODE = 4 GAME_OVER_MODE = 5 ATTACK_MODE = 1 GENERAL_MODE = 0 }
 	
 	# Turn
 	Turn = { dir=true start=1 end=4 n=4 now=4 } # 초기화 Event 따로??
@@ -830,7 +830,7 @@
 	
 				$call = { id = 1100 }
 				$call = { id = 1011 }
-				$call = { id = 1 }  # next turn?
+				
 				$call = { id = 3001 }
 				$call = { id = 3003 }
 	
@@ -842,16 +842,14 @@
 	
 	Event = {
 		id = 4001
+		
+		$option = { REMOVE_NOW_EVENT_STACK_A }
 	
 		$call = { id = 4000 }
-		$if = { $Condition = { $EQ = { $return_value = { }  /Mode/GAME_END_MODE } }
+	
+		$if = { $Condition = { $NOTEQ = { $return_value = { }  /Mode/GAME_END_MODE } }
 			$then = { 
-				return = { }
-			}
-		}
-		$else = {
-			$then = {
-				$call = { id = 4000 }
+				$call = { id = 4001 }
 			}
 		}
 	}
@@ -859,25 +857,27 @@
 	Event = {
 		id = 4000
 	
-		# $clear_secreen = { } # system( "cls" ); # in windows.
-		
-		# print turn
-		# print player`s cards
-		# print my card list
-		# print ?.
-		# input = 먹는다. 0, 그외 1~n
-		# input = $getch = { } # ?
-		# Card Put or Eat # <- state/action_state == PUT or EAT?
-		# print some string?
-		# Oneca Event
-		# Card Effect Event
-		# Change Sha Event
-		# Next Turn Event + PlayerGameOverList
-		# $getch() = { } # ?
+			#$clear_screen = { } # system( "cls" ); # in windows.
+		#$clear_screen = { }
+			# print turn
+		$print = { value = { /Turn/now } }
+		$print = { value = { \n } }
+			# print player`s cards
+			# print my card list
+			# print ?.
+			# input = 먹는다. 0, 그외 1~n
+			# input = $getch = { } # ?
+			# Card Put or Eat # <- state/action_state == PUT or EAT?
+			# print some string?
+			# Oneca Event
+			# Card Effect Event
+			# Change Sha Event
+			# Next Turn Event + PlayerGameOverList
+			# $getch() = { } # ?
 	
-		# Next Turn...
+			# Next Turn...
 	
-		$return = { $element = { /State/mode 0 } }
+		$return = { /State/mode }
 	}
 	
 	
