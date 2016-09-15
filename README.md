@@ -1,4 +1,5 @@
-	
+	# maybe has many bugs..
+	# Todo - "K" ( one more card ) effect.
 	
 	## id -> name?
 	# Onecard Data and Event.
