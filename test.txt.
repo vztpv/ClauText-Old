@@ -586,6 +586,14 @@ Event = {
 		}
 	}
 	## todo - kk
+	$if = { 
+		$condition = { $EQ = { $get = { $concat = { $local.function_dir $concat = { / kk } } } yes } }  
+		$then = {
+			$call = { id = 1017 }
+			$call = { id = 1016 i = 0 }
+			$call = { id = 1017 } 
+		}
+	}
 }
 	# change_sha
 Event = {
