@@ -355,6 +355,7 @@
 	
 		$parameter = { Old_num New_num Old_sha New_sha Old New Mode }
 	
+	
 		$if = { $condition = { $EQ = { $parameter.Mode /Mode/ATTACK_MODE } }
 			$then = { 
 				$if = { $condition = { $OR = { $EQ = { $parameter.Old 3 } $EQ = { $parameter.Old 4 } } } 
@@ -384,7 +385,7 @@
 								$return = { TRUE }
 							}
 						}
-						$if = { $condition = { $OR = { $EQ = { $parameter.Old_sha $parameter.New_sha } 
+						$if = { $condition = { $AND = { $EQ = { $parameter.Old_sha $parameter.New_sha } 
 													   $EQ = { $parameter.New 2 } } } 
 							$then = {
 								$return = { TRUE }
@@ -435,7 +436,7 @@
 						$return = { FALSE }
 					}
 				}
-			#	$return = { FALSE }
+				#$return = { FALSE }
 			}
 		}
 		$else = {
@@ -476,6 +477,13 @@
 	
 		$call = { id = 103 card = $parameter.put_card }
 		$assign = { $local.Old_sha value = { $return_value = { } } }
+	
+		$if = { 
+			$condition = { $EQ = { $parameter.mode /Mode/CHANGE_SHA_MODE } }
+			$then = {
+				$assign = { $local.Old_sha value = { /ChangeSha/sha } }
+			}
+		}
 		$call = { id = 104 card = $parameter.put_card }
 		$assign = { $local.Old_num value = { $return_value = { } } }
 		
@@ -486,6 +494,7 @@
 	
 		$assign = { $local.Old value = { $element = { /FunctionNo $parameter.put_card } } }
 		$assign = { $local.New value = { $element = { /FunctionNo $parameter.card } } }
+	
 	
 		$call = { id = 1005 Old_num = { $local.Old_num } New_num = { $local.New_num }  
 							Old_sha = { $local.Old_sha } New_sha = { $local.New_sha }  
@@ -518,7 +527,7 @@
 		
 		$assign = { $local.Attack_A4 value = { attack_point = 5 kk = no change_sha = no jump = no back = no } }
 		$make = { /Functions/3 }
-		$insert2 = { dir = { /Functions/3 } value = { $local.Attack_4 } }
+		$insert2 = { dir = { /Functions/3 } value = { $local.Attack_A4 } }
 		
 		$assign = { $local.Attack_A5 value = { attack_point = 7 kk = no change_sha = no jump = no back = no } }
 		$make = { /Functions/4 }
@@ -609,6 +618,12 @@
 		$else =	{
 			$then = {
 				$assign = { /ChangeSha/sha value = { $rand = { 0 3 } } }
+				$assign = { /State/mode value = { /Mode/CHANGE_SHA_MODE } }
+				
+				#debug..
+				$print = { value = { "change sha : " } }
+				$print = { value = { /ChangeSha/sha } }
+				$print = { value = { \n } }
 			}
 		}
 	}
@@ -977,6 +992,7 @@
 					$then = {
 						# one card event
 						$call = { id = 4011 card = $local.card }
+						
 						# next turn
 						$call = { id = 1016 i = 0 }
 						$return = { /State/mode }
@@ -1214,6 +1230,14 @@
 					value = { $local.idx }
 				}
 	
+				# end of change sha
+				$if = {
+					$condition = { $EQ = { /State/mode /Mode/CHANGE_SHA_MODE } }
+					$then = {
+						$assign = { /State/mode value = { /Mode/GENERAL_MODE } }
+					}
+				}
+	
 				# card effect.
 				$call = { id = 1008 card = $parameter.card }
 			}
@@ -1245,7 +1269,7 @@
 					}
 				}
 				$call = { id = 4010 i = { $add = { $parameter.i 1 } } n = { $parameter.n } }
-				#$assign = { /State/action_state value = { EAT } } # chk
+				##$assign = { /State/action_state value = { EAT } } # chk
 				$return = { $return_value = { } }
 			}
 		}
