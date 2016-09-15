@@ -4,7 +4,9 @@
 # Onecard Data and Event.
 
 # Info
-Info = { NUM_NUM = 13 SHA_NUM = 4 CARDNUM = 52 TOTAL_CARD_NUM = 54 PLAYER_NUM = 4 FIRST_CARD_NUM = 5 } # cardnum - no count two joker card!
+Info = { NUM_NUM = 13 SHA_NUM = 4 CARDNUM = 52 TOTAL_CARD_NUM = 54 PLAYER_NUM = 4 FIRST_CARD_NUM = 5
+	GAME_OVER_CARD_NUM = 15  ONE_CARD_FAIL_CARD_NUM = 5
+ } # cardnum - no count two joker card!
 
 
 # Mode?
@@ -19,10 +21,14 @@ Event = {
 	id=1
 	# Action
 	$if = { $condition = { $EQ = { /Turn/dir true } }
-		$then = { $assign = { /Turn/now value = { $add = { $modular = { /Turn/now /Turn/n } 1 } } } }
+		$then = { 
+			$assign = { /Turn/now value = { $add = { $modular = { /Turn/now /Turn/n } 1 } } }
+		}
 	}
 	$else = { # if else link problem? - depth?, depth max setting?
-		$then = { $assign = { /Turn/now value = { $add = { $modular = { $add = { /Turn/now $add = { /Turn/n -2 } } /Turn/n} } } } }
+		$then = { 
+			$assign = { /Turn/now value = { $add = { $modular = { $add = { /Turn/now $add = { /Turn/n -2 } } /Turn/n } 1 } } } 
+		}
 	}
 }
 Event = {
@@ -30,10 +36,10 @@ Event = {
 	id = 200
 	#Action
 	$if = { $condition = { $EQ = { /Turn/dir true } } 
-		$then = { $assign = { /Turn/dir false } }
+		$then = { $assign = { /Turn/dir value = { false } } }
 	}
 	$else = {
-		$then = { $assign = { /Turn/dir true } }
+		$then = { $assign = { /Turn/dir value = { true } } }
 	}
 }
 	# Turn initial Event
@@ -42,9 +48,9 @@ Event = {
 
 	$assign = { /Turn/dir value = { true } }
 	$assign = { /Turn/start value = { 1 } }
-	$assign = { /Turn/end value = { $get = { /Info/PLAYER_NUM } } }
-	$assign = { /Turn/n value = { $get = { /Info/PLAYER_NUM } } }
-	$assign = { /Turn/now value = { $get = { /Info/PLAYER_NUM } } }
+	$assign = { /Turn/end value = { /Info/PLAYER_NUM } } 
+	$assign = { /Turn/n value = { /Info/PLAYER_NUM } } 
+	$assign = { /Turn/now value = { /Info/PLAYER_NUM } } 
 }
 
 # Card
@@ -216,7 +222,7 @@ Event = {
 # PutCard, move to card list!
 Event = {
 	id = 22
-	$insert2 = { dir = { /CardList } value = { $get = { /PutCard/cardId } } }
+	$insert2 = { dir = { /CardList } value = { /PutCard/cardId } }
 	$call = { id = 21 }
 }
 
@@ -499,34 +505,44 @@ Event = {
 	$local = { Attack_A1 KK1 Attack_A2 Attack_A3 Attack_A4 Attack_A5 Change_Sha1 Jump1 Back1 }
 
 	#NONE
-	$insert2 = { dir = { /Functions } value = { attack_point= 0 kk = no change_sha = no jump = no back = no } }
+	$make = { /Functions/0 }
+	$insert2 = { dir = { /Functions/0 } value = { attack_point= 0 kk = no change_sha = no jump = no back = no } }
 
 	$assign = { $local.Attack_A2 value = { attack_point = 1 kk = no change_sha = no jump = no back = no } }
-	$insert2 = { dir = { /Functions } value = { $local.Attack_A2 } }
+	$make = { /Functions/1 }
+	$insert2 = { dir = { /Functions/1 } value = { $local.Attack_A2 } }
 	
 	$assign = { $local.Attack_A3 value = { attack_point = 2 kk = no change_sha = no jump = no back = no } }
-	$insert2 = { dir = { /Functions } value = { $local.Attack_A3 } }
+	$make = { /Functions/2 }
+	$insert2 = { dir = { /Functions/2 } value = { $local.Attack_A3 } }
 	
 	$assign = { $local.Attack_A4 value = { attack_point = 5 kk = no change_sha = no jump = no back = no } }
-	$insert2 = { dir = { /Functions } value = { $local.Attack_4 } }
+	$make = { /Functions/3 }
+	$insert2 = { dir = { /Functions/3 } value = { $local.Attack_4 } }
 	
 	$assign = { $local.Attack_A5 value = { attack_point = 7 kk = no change_sha = no jump = no back = no } }
-	$insert2 = { dir = { /Functions } value = { $local.Attack_A5 } }
+	$make = { /Functions/4 }
+	$insert2 = { dir = { /Functions/4 } value = { $local.Attack_A5 } }
 	
 	$assign = { $local.Change_Sha1 value = { attack_point = 0 kk = no change_sha = yes jump = no back = no } } 
-	$insert2 = { dir = { /Functions } value = { $local.Change_Sha1 } }
+	$make = { /Functions/5 }
+	$insert2 = { dir = { /Functions/5 } value = { $local.Change_Sha1 } }
 	
 	$assign = { $local.Jump1 value = { attack_point = 0 kk = no change_sha = no jump = yes back = no } }
-	$insert2 = { dir = { /Functions } value = { $local.Jump1 } }
+	$make = { /Functions/6 }
+	$insert2 = { dir = { /Functions/6 } value = { $local.Jump1 } }
 	
 	$assign = { $local.Back1 value = { attack_point = 0 kk = no change_sha = no jump = no back = yes } } 
-	$insert2 = { dir = { /Functions } value = { $local.Back1 } }
+	$make = { /Functions/7 }
+	$insert2 = { dir = { /Functions/7 } value = { $local.Back1 } }
 
 	$assign = { $local.KK1 value = { attack_point = 0 kk = yes change_sha = no jump = no back = no } }
-	$insert2 = { dir = { /Functions } value = { $local.KK1 } }
+	$make = { /Functions/8 }
+	$insert2 = { dir = { /Functions/8 } value = { $local.KK1 } }
 
 	$assign = { $local.Attack_A1 value = { attack_point = 3 kk = no change_sha = no jump = no back = no }  }
-	$insert2 = { dir = { /Functions } value = { $local.Attack_A1 } }
+	$make = { /Functions/9 }
+	$insert2 = { dir = { /Functions/9 } value = { $local.Attack_A1 } }
 }
 
 Event = {
@@ -535,36 +551,41 @@ Event = {
 	$parameter = { card }
 	$local = { card_function_no function_dir }
 
+	#debug
+	$print = { value = { $parameter.card } }
+
 	# card -> card_function_no ( access table )
-	$assign = { $local.card_function_no value = { $element = { /FunctionNo card } } }
+	$assign = { $local.card_function_no value = { $element = { /FunctionNo $parameter.card } } }
 
-	# function_dir <= Functions/i/ # can??
-	#assign = { $local.function_dir value = { $concat = { $concat = { /Functions / } $concat = { $local.card_function_no / } } } }
+	# function_dir <= Functions/i/ # can?? $get?
+	$assign = { $local.function_dir value = { $concat = { /Functions $concat = { / $local.card_function_no } } } }
 
+	$print = { vallue = { $local.function_dir } }
 	# / + $local.function_dir + attack_point > 0
-	$if = { $condition = { $COMP> = { $concat = { $concat = { / $local.function_dir } $concat = { / attack_point } } 0 } } 
+	$if = { $condition = { $COMP> = { $get = { $concat = { $local.function_dir $concat = { / attack_point } } } 0 } } 
 		$then = {
-			$call = { id = 1010 point = { $get = { $concat = { $concat = { / $local.function_dir } $concat = { / attack_point } } } } }
+			$call = { id = 1010 point = { $get = { $concat = { $local.function_dir $concat = { / attack_point } } } } }
 		}
 	}
 	#			   + change_sha = yes ? 
-	$if = { $condition = { $EQ = { $concat = { $concat = { / $local.function_dir } $concat = { / change_sha } } yes } } 
+	$if = { $condition = { $EQ = { $get = { $concat = { $local.function_dir $concat = { / change_sha } } } yes } } 
 		$then = {
 			$call = { id = 1015 }
 		}
 	}
 	#			   + jump = yes?
- 	$if = { $condition = { $EQ = { $concat = { $concat = { / $local.function_dir } $concat = { / jump } } yes } } 
+ 	$if = { $condition = { $EQ = { $get = { $concat = { $local.function_dir $concat = { / jump } } } yes } } 
 		$then = {
 			$call = { id = 1016 i = 0 }
 		}
 	}
 	#			   + back = yes?
-	$if = { $condition = { $EQ = { $concat = { $concat = { / $local.function_dir } $concat = { / back } } yes } } 
+	$if = { $condition = { $EQ = { $get = { $concat = { $local.function_dir $concat = { / back } } } yes } } 
 		$then = {
 			$call = { id = 1017 }
 		}
 	}
+	## todo - kk
 }
 	# change_sha
 Event = {
@@ -572,28 +593,29 @@ Event = {
 
 	# person? - $input = { } # todo!
 	# computer? - random!
-	$if = { $condition = { $EQ = { /Turn/now /State/person_stream } }
+	$if = { $condition = { $EQ = { /Turn/now /State/person_stream } } # start at 1
 		$then = {
 			# todo - person play!
 		}	
 	}
 	$else =	{
 		$then = {
-			$assign = { /ChangeSha/sha $rand = { 0 3 } }
+			$assign = { /ChangeSha/sha value = { $rand = { 0 3 } } }
 		}
 	}
 }
-	# jump
+	# jump, next with gameover list.
 Event = {
 	id = 1016
 
 	$parameter = { i }
 	# with PlayerGameOverList
 
+	$call = { id = 1 }
+
 	$if = { 
 		$condition = { $EQ = { $element = { /PlayerGameOverList $add = { /Turn/now -1 } } no } }
 		$then = {
-			$call = { id = 1 }
 			$return = { }
 		}
 	}
@@ -620,6 +642,7 @@ Event = {
 
 	$assign = { /AttackPoint/now_point value = { $parameter.point } }
 	$assign = { /AttackPoint/total_point value = { $add = { /AttackPoint/total_point $parameter.point } } }
+	$assign = { /State/mode value = { /Mode/ATTACK_MODE } }
 }
 	# point reset - id 1011?
 Event = {
@@ -641,9 +664,10 @@ Event =
 {
 	id = 1100
 
-	$insert2 = { dir = { /State } value = { mode = /Mode/GENERAL_MODE } }
+	$insert2 = { dir = { /State } value = { mode = { /Mode/GENERAL_MODE } } } ## why? cf) mode = /Mode/GENEREAL_MODE
 	# add action_state? = NONE? EAT? PUT?
 	$insert2 = { dir = { /State } value = { action_state = NONE } }
+	$insert2 = { dir = { /State } value = { action_card = NONE } }
 	# add person_stream? turn?
 	$insert2 = { dir = { /State } value = { person_stream = -1 } }
 }
@@ -661,6 +685,12 @@ Person =
 Computer =
 {
 
+}
+Event =
+{
+	id = 1200
+
+	$parameter = { }
 }
 
 # Player(common)
@@ -682,14 +712,16 @@ Event = {
 	
 	$call = { id = 3002 i = 0 }
 }
-Evnet = {
+Event = {
 	id = 3002
 
-	$paramter = { i } 
+	$parameter = { i } 
 
-	$if = { $conditioin = { $COMP< = { $parameter.i /Info/PLAYER_NUM } } 
-		$insert2 = { dir = { /PlayerGameOverList } value = { no } }
-		$call = { id = 3002 i = { $add = { $pareter.i 1 } }  }
+	$if = { $conditioin = { $COMP< = { $parameter.i /Info/PLAYER_NUM } }
+		$then = { 
+			$insert2 = { dir = { /PlayerGameOverList } value = { no } }
+			$call = { id = 3002 i = { $add = { $parameter.i 1 } }  }
+		}
 	}
 }
 Event = {
@@ -714,7 +746,7 @@ Event = {
 			$else = {
 				$then = {
 					$insert2 = { dir = { /PlayerNameList } value ={ person } } 
-					$call = { id = 3000 i = { $add = { $parameter.i 1 } } j = $paramter.j }
+					$call = { id = 3000 i = { $add = { $parameter.i 1 } } j = $parameter.j }
 				}
 			}
 		}
@@ -742,32 +774,23 @@ Event =
 	}
 }
 
+Event =
+{
+	id = 52 
+
+	$parameter = { card }
+
+	$call = { 
+		id = 100
+		sha = { $get= {$concat = { $concat = { /Card $concat = { / $parameter.card } } /sha } } }
+		num = { $get= {$concat = { $concat = { /Card $concat = { / $parameter.card } } /num } } }
+		isBlackJoker = { $get= {$concat = { $concat = { /Card $concat = { / $parameter.card } } /isBlackJoker } } } 
+		isColorJoker = { $get= {$concat = { $concat = { /Card $concat = { / $parameter.card } } /isColorJoker } } }
+	}
+}
 
 
 # Print Card ??
-
-
-# Print Card List
-Event = 
-{
-	id = 50
-	$parameter = { i }
-
-	$if = { $condition = { $COMP< = { $parameter.i /Info/PLAYER_NUM } }
-		$then = {
-			$call = { 
-				id = 51
-				i = $parameter.i
-				j = 0
-			}
-			$print = { value = { \n } }		
-			$call = {
-				id = 50
-				i = { $add= { $parameter.i 1 } }
-			}
-		}
-	}
-}
 Event = 
 {
 	id = 51
@@ -792,12 +815,34 @@ Event =
 	}
 }
 
+# Print Card List
+Event = 
+{
+	id = 50
+	$parameter = { i }
+
+	$if = { $condition = { $COMP< = { $parameter.i /Info/PLAYER_NUM } }
+		$then = {
+			$call = { 
+				id = 51
+				i = $parameter.i
+				j = 0
+			}
+			$print = { value = { \n } }		
+			$call = {
+				id = 50
+				i = { $add= { $parameter.i 1 } }
+			}
+		}
+	}
+}
+
 # Keyboard Input
 	#char?
 	#int?
 	#string?
 	# $input = { } # cin >> string_type;
-	# $getch = { } # _getch();
+	# $_getch = { } # _getch();
 # Pause
 
 
@@ -818,12 +863,15 @@ Event =
 			$call = { id = 7 }
 			$call = { id = 8 }
 			$call = { id = 11 }
+			$call = { id = 21 }
+			#
+			$assign = { /PutCard/cardId value = { $pop_back = { /CardList } } }
 
 			$call = { id = 50 i = 0 } # debug test print!
 
 			// test
 			$call = { id = 1001 }
-			$call = { id = 1006  put_card = 0 card = 0 mode = { $get = { /Mode/GENERAL_MODE } } }
+			$call = { id = 1006  put_card = 0 card = 0 mode = { /Mode/GENERAL_MODE  } }
 			$assign = { $local.result value = { $return_value = { } } }
 			$print = { value = { $local.result } }
 			//~test
@@ -833,7 +881,7 @@ Event =
 			
 			$call = { id = 3001 }
 			$call = { id = 3003 }
-
+			$call = { id = 1007 }
 			// main call?
 			$call = { id = 4001 }
 		}
@@ -857,27 +905,342 @@ Event = {
 Event = {
 	id = 4000
 
+	$local = { card idx }
+
 		#$clear_screen = { } # system( "cls" ); # in windows.
-	#$clear_screen = { }
+	$clear_screen = { }
 		# print turn
 	$print = { value = { /Turn/now } }
 	$print = { value = { \n } }
-		# print player`s cards
-		# print my card list
+	$print = { value = { /State/mode } } 
+	$print = { value = { \n } }
+		# print player`s cards - $parameter = { id i n }  # n==i
+	$call = { id = 50 i = 0 }
+			# print my card list
+		# print putCard
+	$call = { id = 52 card = /PutCard/cardId }
+	$print = { value = { \n } }
 		# print ?.
-		# input = 먹는다. 0, 그외 1~n
-		# input = $getch = { } # ?
+			#$print = { value = { "? : " } }
+			# input = 먹는다. 0, 그외 1~n
+			# input = $getch = { } # ?
 		# Card Put or Eat # <- state/action_state == PUT or EAT?
+	$if = { # computer
+		$condition = { $NOTEQ = { /Turn/now /State/person_stream } }
+		$then = {
+			$assign = { /State/action_state  value = { EAT } }
+			$call = { id = 4010 i = 0 n = 20 } # replace??
+			#$print = { value = { $local.card } }
+
+			$if = { 
+				$conditio = { $EQ = { /State/action_state PUT } }
+				$then = { 
+					$assign = { $local.card value = { $return_value = { } } }
+					$call = { id = 52 card = $local.card }
+					$print = { value = { \n } }
+				}
+			}
+		}	
+	}
+	$else = { # person
+		$then = {
+			#
+		}
+	}
+
+	$print = { value = { /State/action_state } }
+	$if = {
+		$condition = { $EQ = { /State/action_state PUT } } # action_state initial event??
+		$then = {
+			$assign = { /State/action_state value = { -1 } }
+			
+			$call = { id = 1006 put_card = /PutCard/cardId card = $local.card mode = /State/mode }
+			$if = {
+				$condition = { $EQ = { FALSE $return_value = { } } }
+				$then =  {
+					// for person!
+					$return = { /State/mode }
+				}
+			}
+			# one card chk
+			$if = {
+				$condition = { $EQ = { 2 $size = { $concat = { /PlayerCardList $concat = { 
+											/ $add = { -1 /Turn/now } } } } } }
+				$then = {
+					# one card event
+					$call = { id = 4011 card = $local.card }
+					# next turn
+					$call = { id = 1016 i = 0 }
+					$return = { /State/mode }
+				}
+			}	
+			$insert2 = { dir = { /CardList } value = { /PutCard/cardId } }
+			# mix
+			$call = { id = 7 }
+			
+			#  findindex( card )
+			$findIndex = { 
+				dir = { $concat = { /PlayerCardList $concat = { / $add = { /Turn/now -1 } } } }
+				value = { $local.card } 
+			}
+			$assign = { $local.idx value = { $return_value = { } } }
+				#putcard = getcard(idx);
+			$assign = { /PutCard/cardId value = { $element = { $concat = { /PlayerCardList $concat = { / $add = { /Turn/now -1 } } } $local.idx } } }
+			$remove3 = {
+				dir = { $concat = { /PlayerCardList $concat = { / $add = { /Turn/now -1 } } } }
+				value = { $local.idx }
+			}
+
+			# gameOver chk
+			$if = {
+				$condition = { $EQ = { 0 $size = { $concat = { /PlayerCardList $concat = { / $add = { -1 /Turn/now } } } } } }
+				$then = {
+					$assign = { /State/mode value = { /Mode/GAME_END_MODE } }
+					$return = { /State/mode }
+				}
+			}
+
+			# end of change sha
+			$if = {
+				$condition = { $EQ = { /State/mode /Mode/CHANGE_SHA_MODE } }
+				$then = {
+					$assign = { /State/mode value = { /Mode/GENERAL_MODE } }
+				}
+			}
+			
+			# card effect.
+			$call = { id = 1008 card = $local.card }
+		}
+	}
+	$if = {
+		$condition = { $EQ = { /State/action_state EAT } }
+		$then = {
+			$assign = { /State/action_state value = { -1 } }
+			# 4013 - Eat
+			$if = { 
+				$condition = { $EQ = { /State/mode /Mode/ATTACK_MODE } } 
+				$then = {
+					$call = { id = 4013 i = 0 n = /AttackPoint/total_point }
+					$assign = { /State/mode value ={ /Mode/GENERAL_MODE } }
+					$call = { id = 1011 }
+				}
+			}
+			$else = {
+				$then = {
+					$call = { id = 4013 i = 0 n = 1 }
+				}
+			}
+			# 게임오버 체크 + 전체게임오버 체크
+			$if = {
+				$condition = { $COMP< = { $add = { /Info/GAME_OVER_CARD_NUM -1 } $size = { $concat = { /PlayerCardList $concat = { / $add = { /Turn/now -1 } } } } } }
+				$then = {
+					# 1명만 살아 남은 경우
+					$assign = { /Temp/count value = { 0 } }
+					$call = { id = 4014 i = 0 n =  /Info/PLAYER_NUM }
+					$if = {
+						$condition = { $EQ = { /Temp/count 2 } }
+						$then = { 
+							$assign = { /State/mode value = { /Mode/GAME_END_MODE } }
+							$return = { /State/mode }
+						}
+					}
+					$assign = { /Temp/count value = { 0 } }
+					
+					# set gameOver to yes! #주의  TRUE FALSE / yes no / true false
+					$setElement = { 
+						dir = { /PlayerGameOverList } 
+						idx = { $add = { -1 /Turn/now } } 
+						value = { yes } 
+					}
+					
+					# 카드를 카드리스트에 넣는다.
+					$call = { id = 4015 }
+					
+					# mix
+					$call = { id = 7 }
+				}
+			}
+		}
+	}
 		# print some string?
-		# Oneca Event
-		# Card Effect Event
-		# Change Sha Event
-		# Next Turn Event + PlayerGameOverList
 		# $getch() = { } # ?
-
+	$_getch = { }
 		# Next Turn...
-
+	$call = { id = 1016 i = 0 }
 	$return = { /State/mode }
+}
+
+Temp = # ???
+{
+	count = 0
+}
+
+Event =
+{
+	id = 4015
+
+	$local = { index card }
+	
+	$if = {
+		$condition = { $COMP< = { 0 $size = { $concat = { /PlayerCardList
+													 $concat = { / $add = { -1 /Turn/now } } } } } }
+		$then = {
+			$assign = { $local.index value = { $add = { -1 $size = { $concat = { 
+						/PlayerCardList $concat = { / $add = { -1 /Turn/now } } } } } } }
+			$assign = { $local.card value = { $element = { $concat = { /PlayerCardList $concat = { / $add = { -1 /Turn/now } } } $local.index } } }
+			$insert2 = { dir = { /CardList } value = { $local.card } }
+			$remove3 = { 
+				dir = { $concat = { /PlayerCardList $concat = { / $add = { -1 /Turn/now } } } }
+			 	idx = { $local.index }
+			}
+			$call = { id = 4015 }
+		}
+	}
+}
+
+Event = 
+{
+	id = 4014
+	
+	$parameter = { i n }
+	# return count.
+
+	$if = { 
+		$condition = { $COMP< = { $parameter.i $parameter.n } }
+		$then = {
+			$if = { 
+				$condition = { $EQ = { yes $element = { /PlayerGameOverList $parameter.i } } }
+				$then = {
+					$assign = { /Temp/count value = { $add = { /Temp/count 1 } } }
+				}
+			}
+			$call = { id = 4014 i = { $add = { $parameter.i 1 } } n = parameter.n }
+		}
+	}
+}
+
+Event =
+{
+	# name for ~ { Eat }
+	id = 4013
+
+	$parameter = { i n }
+
+	$if = {
+		$condition = { $COMP< = { $parameter.i $parameter.n } }
+		$then = {
+			$call = { id = 4012 }
+			$call = { id = 4013 i = { $add = { $parameter.i 1 } } n = $parameter.n }
+		}
+	}
+}
+
+Event =
+{
+	# name = Eat
+	id = 4012
+
+	$local = { card }
+
+	$if = {
+		$condition = { $EQ = { 0 $size = { /CardList } } }
+		$then = { 
+			$return = { "ERROR_cardList_is_empty" } # chk.. $isError = { $return_value = { } }
+		}
+	}
+	$assign = { $local.card value = { $pop_back = { /CardList } } }
+	$insert2 = {
+		 dir = { $concat = { /PlayerCardList $concat = { / $add ={ /Turn/now -1 } } } } 
+  		 value = { $local.card  } 
+	}
+}
+Event =
+{
+	id = 4011
+	
+	$parameter = { card }
+
+	$local = { select idx }
+	
+	$if = { 
+		$condition = { $NOTEQ = { /Turn/now /State/person_stream } } 
+		$then = { 
+			$assign = { $local.select value =  { $rand = { 1 3 } } }
+		}
+	}
+	
+	$if = {
+		$condition = { $NOTEQ = { $local.select $rand = { 1 3 } } } // fail 
+		$then = { 
+			$call = { id = 4013 i= 0 n = /Info/ONE_CARD_FAIL_CARD_NUM }
+			# chk error?? - todo.. 
+		}
+	}
+	$else = { # oneca success
+		$then = {
+			# end of change sha
+			$if = {
+				$condition = { $EQ = { /State/mode /Mode/CHANGE_SHA_MODE } }
+				$then = {
+					$assign = { /State/mode value = { /Mode/GENERAL_MODE } }
+				}
+			}
+			# card put
+			$insert2 = { 
+				dir = { /CardList } 
+				value = { /PutCard/cardId }
+			}
+			# mix
+			$call  = { id = 7 }
+
+			#  findindex( card )
+			$findIndex = { 
+				dir = { $concat = { /PlayerCardList $concat = { / $add = { /Turn/now -1 } } } }
+				value = { $parameter.card } 
+			}
+			$assign = { $local.idx value = { $return_value = { } } }
+				#putcard = getcard(idx);
+			$assign = { /PutCard/cardId value = { $element = { $concat = { /PlayerCardList $concat = { / $add = { /Turn/now -1 } } } $local.idx } } }
+			$remove3 = {
+				dir = { $concat = { /PlayerCardList $concat = { / $add = { /Turn/now -1 } } } }
+				value = { $local.idx }
+			}
+
+			# card effect.
+			$call = { id = 1008 card = $parameter.card }
+		}
+	}
+}
+Event = 
+{
+	id = 4010
+
+	$parameter = { i n }
+	$local = { index card }
+
+	$if = { $condition = { $COMP< = { $parameter.i $parameter.n } } 
+		$then = {
+			$assign = { $local.index  value = { $rand = { 0 $add = { -1 $size = { $concat = { 
+				/PlayerCardList $concat = { / $add = { /Turn/now -1 } }
+			  } } } } } }
+			$assign = { $local.card value = { $element = { $concat = { /PlayerCardList $concat = { / $add = { /Turn/now -1 } } 
+			} $local.index } } }
+
+			$call = { id = 1006 put_card = /PutCard/cardId card = $local.card mode = /State/mode }
+			
+			$if = { 
+				$condition = { $EQ = { TRUE $return_value = { } } }
+				$then = {
+					$assign = { /State/action_card value = { $local.card } }
+					$assign = { /State/action_state value = { PUT } }
+					$return = { $local.card }
+				}
+			}
+			$call = { id = 4010 i = { $add = { $parameter.i 1 } } n = { $parameter.n } }
+			#$assign = { /State/action_state value = { EAT } } # chk
+			$return = { $return_value = { } }
+		}
+	}
 }
 
 
@@ -889,7 +1252,3 @@ Main =
 	# $on = { id = ERROR }
 	# $on = { id = CONSOLE }
 }
-
-# Event : Evemt1 -> Event2 -> Event3 -> Event4
-#					-> Event2 or Event5 or Event1 or Event(for Error)?
-#
