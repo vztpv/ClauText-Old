@@ -1108,7 +1108,7 @@ int main(void)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				//Remove $insert? and rename $insert2 to $insert
+				// Remove $insert? and rename $insert2 to $insert
 				else if ("$insert" == val->GetName())
 				{
 					string dir = string(val->GetItemList(0).Get(0).c_str() + 1);
@@ -1265,6 +1265,18 @@ int main(void)
 
 					wiz::load_data::UserType::Find(&global, dir).second[0]->RemoveItemList(idx);
 					
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$setElement" == val->GetName())
+				{
+					string dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
+					string idx = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1).Get(0)->ToString(), eventStack.top());
+					string value = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2).Get(0)->ToString(), eventStack.top());
+					
+					long long _idx = stoll(idx);
+					wiz::load_data::UserType::Find(&global, dir).second[0]->SetItem(_idx, value);
+
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
@@ -1518,6 +1530,6 @@ int main(void)
 	}
 
 	//cout << global << endl;
-	return 0;
+       	return 0;
 }
 
