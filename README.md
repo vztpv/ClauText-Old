@@ -1060,7 +1060,8 @@
 					$then = {
 						# 1명만 살아 남은 경우
 						$assign = { /Temp/count value = { 0 } }
-						$call = { id = 4014 i = 0 n =  /Info/PLAYER_NUM }
+						$call = { id = 4014 i = 0 n = /Info/PLAYER_NUM }
+	
 						$if = {
 							$condition = { $EQ = { /Temp/count 2 } }
 							$then = { 
@@ -1133,12 +1134,12 @@
 			$condition = { $COMP< = { $parameter.i $parameter.n } }
 			$then = {
 				$if = { 
-					$condition = { $EQ = { yes $element = { /PlayerGameOverList $parameter.i } } }
+					$condition = { $EQ = { no $element = { /PlayerGameOverList $parameter.i } } }
 					$then = {
 						$assign = { /Temp/count value = { $add = { /Temp/count 1 } } }
 					}
 				}
-				$call = { id = 4014 i = { $add = { $parameter.i 1 } } n = parameter.n }
+				$call = { id = 4014 i = { $add = { $parameter.i 1 } } n = $parameter.n }
 			}
 		}
 	}
@@ -1198,6 +1199,20 @@
 			$then = { 
 				$call = { id = 4013 i= 0 n = /Info/ONE_CARD_FAIL_CARD_NUM }
 				# chk error?? - todo.. 
+	
+				
+				# 1명만 살아 남은 경우
+				$assign = { /Temp/count value = { 0 } }
+				$call = { id = 4014 i = 0 n = /Info/PLAYER_NUM }
+	
+				$if = {
+					$condition = { $EQ = { /Temp/count 2 } }
+					$then = { 
+						$assign = { /State/mode value = { /Mode/GAME_END_MODE } }
+						$return = { /State/mode }
+					}
+				}
+				$assign = { /Temp/count value = { 0 } }
 			}
 		}
 		$else = { # oneca success
