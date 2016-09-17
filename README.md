@@ -1,4 +1,8 @@
 	
+	#  # is notation
+	
+	# Event = {  ~  } # add Event
+	# DataName = {  ~  } # add Data
 	
 	## id -> name?
 	# Onecard Data and Event.
