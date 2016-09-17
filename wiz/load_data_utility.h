@@ -277,7 +277,7 @@ namespace wiz {
 					//temp = RemoveEndSpace(temp);
 					temp = PassSharp(temp);
 					temp = AddSpace(temp);
-					temp = ChangeSpace(temp, '^'); 
+					temp = ChangeSpace(temp, "\\_" ); 
 
 					strVecTemp.push_back(temp);
 					count++;
@@ -456,7 +456,7 @@ namespace wiz {
 				return temp;
 			}
 			/// need to rename!, has bug.., line ±‚¡ÿ..
-			static string ChangeSpace(const string& str, const char result_ch) {
+			static string ChangeSpace(const string& str, const string& result_str) {
 				string temp;
 				int state = 0;
 
@@ -468,7 +468,9 @@ namespace wiz {
 					}
 					else if (1 == state && '\"' != str[i] && (' ' == str[i] || '\t' == str[i])) {
 						state = 1;
-						temp.push_back(result_ch);
+						for (int j = 0; j < result_str.size(); ++j) {
+							temp.push_back(result_str[j]);
+						}
 					}
 					else if (1 == state && '\"' == str[i]) {
 						state = 0;
@@ -483,15 +485,9 @@ namespace wiz {
 				return temp;
 			}
 
-			static void ChangeCharInString(string& str, const char target_ch, const char result_ch)
+			static void ChangeCharInString(string& str, const string& target_str, const string& result_str)
 			{
-				for (int i = 0; i < str.size(); ++i)
-				{
-					if (str[i] == target_ch)
-					{
-						str[i] = result_ch;
-					}
-				}
+				str = wiz::String::replace(str, target_str, result_str);
 			}
 
 		};

@@ -741,7 +741,7 @@ namespace wiz {
 				return stream;
 			}
 		public:
-			static void ReplaceAll(UserType* temp, const char target_ch, const char result_ch) {
+			static void ReplaceAll(UserType* temp, const string& target_ch, const string& result_ch) {
 				const int itemListSize = temp->GetItemListSize();
 				const int userTypeListSize = temp->GetUserTypeListSize();
 
