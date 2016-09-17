@@ -1,6 +1,6 @@
 	
 # To Do 
-	add $load =- { "test.txt" } # cf) "test space.txt" 
+	add $load = { "test.txt" } # cf) "test space.txt" 
 
 # example codes 
 	#  # is notation
