@@ -2,11 +2,6 @@
 # To Do 
 	add $load =- { "test.txt" } # cf) "test space.txt" 
 
-# Event = {  ~  } # add Event
-# DataName = {  ~  } # add Data
-
-
-
 # example codes 
 	#  # is notation
 	## id -> name?
