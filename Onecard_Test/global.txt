@@ -15,3 +15,12 @@ Mode = { JUMP_MODE = 6 BACK_MODE = 7 MORE_ONE_MODE = 8 CHANGE_SHA_MODE = 3
 State = {
 
 }
+
+PlayerNameList =
+{
+
+}
+PlayerGameOverList = 
+{
+
+}
