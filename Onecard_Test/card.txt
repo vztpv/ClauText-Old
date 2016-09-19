@@ -1,1 +1,118 @@
 
+
+# Card
+Event = { # just one!
+	id = 101
+	$parameter = { i } #
+	# Action  cf) Card                 <--------------------
+	$if = { $condition = { $COMP< = { $parameter.i /Info/CARDNUM  } }
+		$then = {
+				$if = { $condition = { $EQ = { $parameter.i 0 } }
+					$then = { $make = { /Card } }
+				}
+				$make = { /Card/$parameter.i }
+				$insert2 = { dir = { /Card/$parameter.i } value = { sha = { $divide ={$parameter.i 13} } num = { $modular={$parameter.i 13} } # no ???
+					isBlackJoker = no isColorJoker = no } }
+				$call = { id = 101 i = { $add = { $parameter.i 1  } } }
+		}
+	}
+}
+Event = { # just one!
+	id = 3
+	$call = { id = 101 i = 0 } # using stack? + 몇번쨰까찌 했는가?
+	# insert two joker
+	$make = { $concat = { /Card $concat = { / /Info/CARDNUM } } }
+	$make = { $concat = { /Card $concat = { / $add = { /Info/CARDNUM 1 } } } } 
+	$insert2 = { dir = { $concat = { /Card $concat = { / /Info/CARDNUM } } } value = {sha = -1 num = -1  isBlackJoker = yes isColorJoker = no } }
+	$insert2 = { dir = { $concat = { /Card $concat = { / $add = { /Info/CARDNUM 1 } } } }  value = {sha = -2 num = -2  isBlackJoker = no isColorJoker = yes } }
+}
+Event = {
+	id = 103
+	$parameter = { card }
+
+	$return = { $divide = { $parameter.card 13 } }
+}
+Event = {
+	id = 104
+	$parameter = { card }
+
+	$return = { $modular = { $parameter.card 13 } }
+}
+
+# Card String Image
+##"♤","◆","♥","♧",  "☆","★"
+## 0    1     2    3     4    5
+## K->A->.....->J->Q
+## 0  1        11 12
+CardStringImage = 
+{
+	num = { K A 2 3 4 5 6 7 8 9 10 J Q }
+	sha = { 
+		sha_image = { ♤ ◆ ♥ ♧ }
+		sha_name = { spade dia heart clover }
+	}
+	blackJoker = { ☆ }
+	colorJoker = { ★ }
+}
+Event = 
+{
+	// $name?
+	id = 100
+
+	$parameter = { sha num isBlackJoker isColorJoker }
+
+	#Action
+	$if = { $condition = { $EQ = { yes $parameter.isBlackJoker } }
+		$then = { $print = { value = { /CardStringImage/blackJoker } } } 
+	}
+	$if = { $condition = { $EQ = { yes $parameter.isColorJoker } }
+		$then = { $print = { value = { /CardStringImage/colorJoker } } } 
+	}
+	$if = { $condition = { $COMP< = { -1 $parameter.num } }
+		$then = { 
+			$print = { dir = { /CardStringImage/sha/sha_image } start = { $parameter.sha } last = { $parameter.sha } }
+			$print = { dir = { /CardStringImage/num } start = { $parameter.num } last = { $parameter.num } }
+		}
+	}
+}
+# CardList 
+Event = # just one!
+{
+	id = 4
+	$parameter = { i }
+	# Action
+
+	$if = { $condition = { $COMP< = { $parameter.i $add= { 2 /Info/CARDNUM  } } }
+		$then = {	
+			$if = { $condition = { $EQ = { $parameter.i 0 } }
+				$then = { $make = { /CardList } }
+			}		
+			$insert2 = { dir = { /CardList } value = { $parameter.i } }
+			$call = { id = 4 i = { $add = { $parameter.i 1 } } }
+		}
+	}
+}
+Event =
+{
+	id = 5
+	# Action
+	$call = { id = 4 i = 0 }
+}
+Event =
+{
+	id = 6
+	$parameter = { n }
+	# Action
+	$if = { $condition = { $COMP> = { $parameter.n 0 } }
+		$then = {
+			$swap = { /CardList value = { $rand = { 0 $add={$parameter.n -1} } } value = { $add={$parameter.n -1} } }
+			$call = { id = 6 n = { $add = { $parameter.n -1 } } }
+		}
+	}
+}
+Event =
+{
+	id = 7
+	# Action
+	$call = { id = 6 n = { $size = { /CardList } } }  # cf) /info/cardNum
+}
