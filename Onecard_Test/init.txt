@@ -30,3 +30,16 @@ Event =
 		}
 	}	
 }
+
+	# init? using insert2?
+Event =
+{
+	id = 1100
+
+	$insert2 = { dir = { /State } value = { mode = { /Mode/GENERAL_MODE } } } ## why? cf) mode = /Mode/GENEREAL_MODE
+	# add action_state? = NONE? EAT? PUT?
+	$insert2 = { dir = { /State } value = { action_state = NONE } }
+	$insert2 = { dir = { /State } value = { action_card = NONE } }
+	# add person_stream? turn?
+	$insert2 = { dir = { /State } value = { person_stream = -1 } }
+}
