@@ -1,0 +1,41 @@
+# CardList 
+Event = # just one!
+{
+	id = 4
+	$parameter = { i }
+	# Action
+
+	$if = { $condition = { $COMP< = { $parameter.i $add= { 2 /Info/CARDNUM  } } }
+		$then = {	
+			$if = { $condition = { $EQ = { $parameter.i 0 } }
+				$then = { $make = { /CardList } }
+			}		
+			$insert2 = { dir = { /CardList } value = { $parameter.i } }
+			$call = { id = 4 i = { $add = { $parameter.i 1 } } }
+		}
+	}
+}
+Event =
+{
+	id = 5
+	# Action
+	$call = { id = 4 i = 0 }
+}
+Event =
+{
+	id = 6
+	$parameter = { n }
+	# Action
+	$if = { $condition = { $COMP> = { $parameter.n 0 } }
+		$then = {
+			$swap = { /CardList value = { $rand = { 0 $add={$parameter.n -1} } } value = { $add={$parameter.n -1} } }
+			$call = { id = 6 n = { $add = { $parameter.n -1 } } }
+		}
+	}
+}
+Event =
+{
+	id = 7
+	# Action
+	$call = { id = 6 n = { $size = { /CardList } } }  # cf) /info/cardNum
+}
