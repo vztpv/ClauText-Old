@@ -1,1 +1,13 @@
 
+## id -> name?
+# Onecard Data and Event.
+
+# Info
+Info = { NUM_NUM = 13 SHA_NUM = 4 CARDNUM = 52 TOTAL_CARD_NUM = 54 PLAYER_NUM = 4 FIRST_CARD_NUM = 5
+	GAME_OVER_CARD_NUM = 15  ONE_CARD_FAIL_CARD_NUM = 5
+ } # cardnum - no count two joker card!
+
+
+# Mode?
+Mode = { JUMP_MODE = 6 BACK_MODE = 7 MORE_ONE_MODE = 8 CHANGE_SHA_MODE = 3 
+		 GAME_END_MODE = 4 GAME_OVER_MODE = 5 ATTACK_MODE = 1 GENERAL_MODE = 0 }
