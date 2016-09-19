@@ -277,7 +277,7 @@ namespace wiz {
 					//temp = RemoveEndSpace(temp);
 					temp = PassSharp(temp);
 					temp = AddSpace(temp);
-					temp = ChangeSpace(temp, "\\_" ); 
+					temp = ChangeSpace(temp, "^" ); 
 
 					strVecTemp.push_back(temp);
 					count++;
@@ -456,23 +456,34 @@ namespace wiz {
 				return temp;
 			}
 			/// need to rename!, has bug.., line ±‚¡ÿ..
+			/// result_str must not "\\1"			
 			static string ChangeSpace(const string& str, const string& result_str) {
+				//string temp = wiz::String::replace(str, "\\\"", "\\1");
+				return _ChangeSpace(str, result_str);
+				//return wiz::String::replace(temp, "\\1", "\\\"");
+			}
+			static string _ChangeSpace(const string& str, const string& result_str) {
 				string temp;
 				int state = 0;
 
 				for (int i = 0; i < str.size(); ++i)
 				{
-					if (0 == state && '\"' == str[i]) {
+					if (0 == state && i == 0 && '\"' == str[i]) {
 						state = 1;
 						temp.push_back(str[i]);
 					}
-					else if (1 == state && '\"' != str[i] && (' ' == str[i] || '\t' == str[i])) {
+					else if (0 == state && i > 0 && '\"' == str[i] && '\\' != str[i])
+					{
+						state = 1;
+						temp.push_back(str[i]);
+					}
+					else if (1 == state && (' ' == str[i] || '\t' == str[i])) {
 						state = 1;
 						for (int j = 0; j < result_str.size(); ++j) {
 							temp.push_back(result_str[j]);
 						}
 					}
-					else if (1 == state && '\"' == str[i]) {
+					else if (1 == state && i > 0 && '\\' != str[i-1] && '\"' == str[i]) {
 						state = 0;
 						temp.push_back('\"');
 					}

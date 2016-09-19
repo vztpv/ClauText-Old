@@ -508,7 +508,7 @@ namespace wiz {
 					/// ToDo - Change ^ to ' '
 					{
 						// for all, remove ^ in val
-						UserType::ReplaceAll(&globalTemp, "\\_", " ");
+						UserType::ReplaceAll(&globalTemp, "^", " ");
 					}
 					//std::cout << "remove ^ end" << endl;
 
@@ -529,7 +529,7 @@ namespace wiz {
 				UserType utTemp = ut;
 				str = Utility::PassSharp(str);
 				str = Utility::AddSpace(str);
-				str = Utility::ChangeSpace(str, "\\_");
+				str = Utility::ChangeSpace(str, "^");
 				/// ToDp - ""안에 여백이 있을 떄 다른 것으로 대체후 다시 변경
 				/// ToDo -  #주석이 있다면? 없애는 함수 제작? - using str.find, String::Substr.
 				/// ToDo - error 처리..
@@ -547,7 +547,7 @@ namespace wiz {
 					{
 						return true;
 					}
-					UserType::ReplaceAll(&utTemp, "\\_", " ");
+					UserType::ReplaceAll(&utTemp, "^", " ");
 				}
 				catch (Error& e) { std::cout << e << endl; return false; }
 				catch (const char* err) { std::cout << err << endl; return false; }

@@ -271,6 +271,97 @@ namespace wiz{
 		}
 
     };
+
+	class StringTokenizer2
+	{
+	private:
+		vector<string> _m_str;
+		int count;
+		bool exist;
+	private:
+		void Init(const string& str, const vector<string>& separator)
+		{
+			if (separator.empty() || str.empty()) { return; }
+			std::pair<bool, size_t> idx; int k = 0;
+			int i = 0; int select = -1;
+			string tempStr;
+
+			//_m_str.reserve( str.size() );
+
+			while (true) {
+				int counter_minus1 = 0;
+				k = str.size(); ///
+				idx.first = false; idx.second = 0; select = 0; ///
+				for (int j = 0; j < separator.size(); j++) {
+					idx = String::indexOf(str, separator[j], i);
+
+					if (false == idx.first) { counter_minus1++; }
+					if (false == idx.first && counter_minus1 == separator.size()) {
+						tempStr = String::substring(str, i);
+						if (!tempStr.empty()) { _m_str.push_back(tempStr); }
+						// vector<string>( _m_str ).swap( _m_str );
+						return;
+					}
+					if (idx.first) { exist = true; if (k > idx.second) { select = j; k = idx.second; } } /// idx가 같다면 가장 처음에 나온것이 선택된다. -> 길이가 긴 것을 우선시 해야한다?
+				}
+				
+				tempStr = String::substring(str, i, k - 1);
+				
+				if (tempStr.empty()) {
+					_m_str.push_back(separator[select]);
+				}
+				if (!tempStr.empty()) {
+					_m_str.push_back(tempStr); _m_str.push_back(separator[select]);
+				}
+
+				i = k + separator[select].size();
+			}
+		}
+	public:
+		explicit StringTokenizer2() : count(0), exist(false) { }
+		explicit StringTokenizer2(const string& str, const string& separator)
+			: count(0), exist(false)
+		{
+			vector<string> vec; vec.push_back(separator);
+			Init(str, vec);
+		}
+		explicit StringTokenizer2(const string& str, const vector<string>& separator)
+			: count(0), exist(false)
+		{
+			Init(str, separator);
+		}
+		explicit StringTokenizer2(const string& str)
+			: count(0), exist(false)
+		{
+			vector<string> vec;
+			vec.push_back(" ");
+			vec.push_back("\t");
+			vec.push_back("\r");
+			vec.push_back("\n");
+			Init(str, vec);
+		}
+		int countTokens()const
+		{
+			return _m_str.size();
+		}
+		string nextToken()
+		{
+			if (hasMoreTokens())
+				return _m_str[count++];
+			else
+				return "";
+		}
+		bool hasMoreTokens()const
+		{
+			return count < _m_str.size();
+		}
+
+		bool isFindExist()const
+		{
+			return exist;
+		}
+
+	};
     /*
     class StringTokenizer
     {
