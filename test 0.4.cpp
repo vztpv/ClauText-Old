@@ -35,7 +35,7 @@ public:
 	wiz::ArrayStack<int> state;
 	string return_value;
 	string option;
-//	int if_depth;
+	//	int if_depth;
 public:
 	EventInfo() : eventUT(NULL), return_value("NONE")//, if_depth(0)
 	{
@@ -74,7 +74,7 @@ string Find(wiz::load_data::UserType* ut, const string& str)
 		auto x = wiz::load_data::UserType::Find(ut,
 			wiz::String::substring(str, 0, idx));
 		if (x.first == false) { return ""; }
-		else if(x.second[0]->GetItem(wiz::String::substring(str, idx + 1)).empty())
+		else if (x.second[0]->GetItem(wiz::String::substring(str, idx + 1)).empty())
 		{
 			if ((x = wiz::load_data::UserType::Find(ut, str)).first)
 			{
@@ -228,7 +228,7 @@ inline string FindParameters(const vector<pair<string, string>>& parameters, con
 }
 inline string FindLocals(map<string, string>& locals, const string& operand)
 {
-	if (wiz::String::startsWith(operand, "$local.") && locals.end() != locals.find(wiz::String::substring(operand, 7) ) )
+	if (wiz::String::startsWith(operand, "$local.") && locals.end() != locals.find(wiz::String::substring(operand, 7)))
 	{
 		return locals[wiz::String::substring(operand, 7)];
 	}
@@ -494,7 +494,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if ('/' == x[0])
 		{
-			string temp = Find(&global, x); if(!temp.empty()) { x = temp; }
+			string temp = Find(&global, x); if (!temp.empty()) { x = temp; }
 		}
 		{
 			string temp = FindParameters(parameters, x);
@@ -564,7 +564,7 @@ string ToBool(wiz::load_data::UserType& global, const vector<pair<string, string
 				tokenVec[i] = temp;
 			}
 		}
-		else if (wiz::String::startsWith(tokenVec[i], "$local.") ) {
+		else if (wiz::String::startsWith(tokenVec[i], "$local.")) {
 			string temp = FindLocals(info.locals, tokenVec[i]);
 			if (!temp.empty()) { tokenVec[i] = temp; }
 		}
@@ -606,7 +606,7 @@ wiz::ArrayStack<string> ToBool2(wiz::load_data::UserType& global, const vector<p
 				tokenVec[i] = temp;
 			}
 		}
-		else if(wiz::String::startsWith(tokenVec[i], "$parameter.")) {
+		else if (wiz::String::startsWith(tokenVec[i], "$parameter.")) {
 			string temp = FindParameters(parameters, tokenVec[i]);
 			if (!temp.empty()) { tokenVec[i] = temp; }
 		}
@@ -680,7 +680,7 @@ string ToBool3(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 				if (!temp.empty()) {
 					tokenVec[i] = wiz::String::replace(wiz::String::substring(tokenVec[i], 0, last), wiz::String::substring(tokenVec[i], 0, last), temp)
-														+ wiz::String::substring(tokenVec[i], last + 1);
+						+ wiz::String::substring(tokenVec[i], last + 1);
 				}
 			}
 			else
@@ -701,7 +701,7 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 	string result = temp;
 	wiz::ArrayStack<string> resultStack;
 	wiz::load_data::UserType ut;
-	
+
 	bool flag_A = false;
 	if (result.size() > 1 && result[0] == '/')
 	{
@@ -745,7 +745,7 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 		wiz::StringTokenizer tokenizer2(result, { " ", "\n", "\t", "\r" });
 		vector<string> tokenVec;
 		vector<string> tokenVec2;
-		
+
 		while (tokenizer.hasMoreTokens()) {
 			tokenVec.push_back(tokenizer.nextToken());
 		}
@@ -812,7 +812,7 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 	{
 		if ('/' == tokenVec[i][0] && tokenVec[i].size() > 1)
 		{
-			string temp = Find(&global, tokenVec[i]); 
+			string temp = Find(&global, tokenVec[i]);
 			if (!temp.empty()) {
 				tokenVec[i] = temp;
 			}
@@ -838,8 +838,8 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 	//result = "";
 	int count = 0;
 	vector<string> strVec;
-	
-	for (int i = operandStack.size()-1; i >= 0; --i)
+
+	for (int i = operandStack.size() - 1; i >= 0; --i)
 	{
 		if (operandStack[i] == "}") {
 			count++;
@@ -914,12 +914,17 @@ int main(void)
 	wiz::ArrayStack<EventInfo> eventStack;
 	map<string, int> convert;
 	wiz::load_data::UserType global;
-	wiz::load_data::LoadData::LoadDataFromFile("test.txt", global);
+	wiz::load_data::LoadData::LoadDataFromFile("Onecard_Test/main.txt", global);
 	auto events = global.GetUserTypeItem("Event");
-	auto Main = GetUserType(&global, "Main");
-	//
+	if (global.GetUserTypeItem("Main").empty())
+	{
+		cout << "do not exist Main" << endl;
+		return -1;
+	}
+	auto Main = GetUserType(&global, "Main"); // Main이 없으면 에러..!
+											  //
 
-	// event table setting?
+											  // event table setting?
 	for (int i = 0; i < events.size(); ++i)
 	{
 		auto x = events[i].Get(0)->GetItem("id");
@@ -943,8 +948,8 @@ int main(void)
 			make_pair("id", info.eventUT->GetUserTypeItem("$call")[0].Get(0)->GetItem("id")[0].Get(0))
 		);
 		info.id = info.parameters[0].second;
-		
-		const int no = convert[info.id];
+
+		const int no = convert.at(info.id);
 		for (int i = 0; i < events[no].Get(0)->GetUserTypeListSize(); ++i) {
 			if (events[no].Get(0)->GetUserTypeList(i).Get(0)->GetName() == "$local") {
 				for (int j = 0; j < events[no].Get(0)->GetUserTypeList(i).Get(0)->GetItemListSize(); ++j) {
@@ -972,7 +977,8 @@ int main(void)
 			}
 		}
 
-		const int no = convert[str];
+		int no = convert.at(str);
+
 		bool pass = false;
 		int state = 0;
 
@@ -1077,7 +1083,7 @@ int main(void)
 					}
 
 					info.locals.clear();
-					const int no = convert[info.id];
+					const int no = convert.at(info.id);
 					for (int i = 0; i < events[no].Get(0)->GetUserTypeListSize(); ++i) {
 						if (events[no].Get(0)->GetUserTypeList(i).Get(0)->GetName() == "$local") {
 							for (int j = 0; j < events[no].Get(0)->GetUserTypeList(i).Get(0)->GetItemListSize(); ++j) {
@@ -1212,9 +1218,9 @@ int main(void)
 				{
 					string dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
 					string value = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1).Get(0)->ToString(), eventStack.top());
-					
+
 					wiz::load_data::UserType ut;
-					wiz::load_data::LoadData::LoadDataFromString( wiz::load_data::UserType::Find(&global, dir).second[0]->ToString(), ut );
+					wiz::load_data::LoadData::LoadDataFromString(wiz::load_data::UserType::Find(&global, dir).second[0]->ToString(), ut);
 
 					for (int i = 0; i < ut.GetItemListSize(); ++i) {
 						if (ut.GetItemList(i).Get(0) == value) {
@@ -1264,7 +1270,7 @@ int main(void)
 					long long idx = atoll(value.c_str());
 
 					wiz::load_data::UserType::Find(&global, dir).second[0]->RemoveItemList(idx);
-					
+
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
@@ -1273,7 +1279,7 @@ int main(void)
 					string dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
 					string idx = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1).Get(0)->ToString(), eventStack.top());
 					string value = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2).Get(0)->ToString(), eventStack.top());
-					
+
 					long long _idx = stoll(idx);
 					wiz::load_data::UserType::Find(&global, dir).second[0]->SetItem(_idx, value);
 
@@ -1294,7 +1300,7 @@ int main(void)
 
 						string temp = wiz::load_data::UserType::Find(&global, dir).second[0]->GetItemList(x).Get(0);
 						string temp2 = wiz::load_data::UserType::Find(&global, dir).second[0]->GetItemList(y).Get(0);
-						
+
 						wiz::load_data::LoadData::SetData(global, dir, x, temp2, "TRUE");
 						wiz::load_data::LoadData::SetData(global, dir, y, temp, "TRUE");
 					}
@@ -1307,7 +1313,7 @@ int main(void)
 					if (val->GetUserTypeListSize() == 1)
 					{
 						string listName = val->GetUserTypeList(0).Get(0)->GetItemList(0).Get(0);
-					
+
 						if (listName.size() >= 2 && listName[0] == '\"' && listName.back() == '\"')
 						{
 							listName = wiz::String::substring(listName, 1, listName.size() - 2);
@@ -1316,7 +1322,7 @@ int main(void)
 						else if (listName.size() == 2 && listName[0] == '\\' && listName[1] == 'n')
 						{
 							cout << endl;
-						}	
+						}
 						else if (wiz::String::startsWith(listName, "$local.")
 							|| wiz::String::startsWith(listName, "$parameter.")
 							)
@@ -1329,7 +1335,7 @@ int main(void)
 								cout << temp;
 							}
 						}
-						else if (wiz::String::startsWith(listName, "/") && listName.size() > 1 )
+						else if (wiz::String::startsWith(listName, "/") && listName.size() > 1)
 						{
 							string temp = ToBool4(global, eventStack.top().parameters, listName, eventStack.top());
 							if (temp != listName) // chk 
@@ -1351,13 +1357,13 @@ int main(void)
 					{
 						string start = val->GetUserTypeList(1).Get(0)->ToString();
 						string last = val->GetUserTypeList(2).Get(0)->ToString();
-						
+
 						start = ToBool4(global, eventStack.top().parameters, start, eventStack.top());
 						last = ToBool4(global, eventStack.top().parameters, last, eventStack.top());
 
 						string listName = val->GetUserTypeList(0).Get(0)->GetItemList(0).Get(0);
 						long long _start = atoll(start.c_str());
-						long long _last  = atoll(last.c_str());
+						long long _last = atoll(last.c_str());
 						wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, listName).second[0];
 						for (int i = _start; i <= _last; ++i)
 						{
@@ -1372,6 +1378,40 @@ int main(void)
 				else if ("$load" == val->GetName())
 				{
 					// to do, load data and events from other file!
+					string fileName = ToBool4(global, eventStack.top().parameters, val->GetItemList(0).Get(0), eventStack.top());
+					wiz::load_data::UserType ut;
+					if (wiz::load_data::LoadData::LoadDataFromFile(fileName, ut)) {
+						wiz::load_data::LoadData::AddData(global, "", ut.ToString(), "TRUE");
+						events = global.GetUserTypeItem("Event");
+						convert.clear();
+
+						// event table setting?
+						for (int i = 0; i < events.size(); ++i)
+						{
+							auto x = events[i].Get(0)->GetItem("id");
+							if (!x.empty()) {
+								//cout <<	x[0].Get(0) << endl;
+								convert.insert(pair<string, int>(x[0].Get(0), i));
+							}
+							else {
+								// error?
+							}
+						}
+
+						// update no
+						no = convert[str];
+
+						auto _Main = ut.GetUserTypeItem("Main");
+						if (NULL != Main && !_Main.empty())
+						{
+							// error!
+							cout << "err" << endl;
+							return -2;
+						}
+					}
+					else {
+						// error!
+					}
 					eventStack.top().userType_idx.top()++;
 					break;
 
@@ -1410,13 +1450,11 @@ int main(void)
 				}
 				else if ("$parameter" == val->GetName())
 				{
-					// to do..
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$local" == val->GetName())
 				{
-					// to do..
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
@@ -1444,9 +1482,9 @@ int main(void)
 							temp = "FALSE";
 						}
 						else if (!eventStack.top().nowUT.empty() && eventStack.top().userType_idx.top() + 1 < eventStack.top().nowUT.top()->GetUserTypeListSize()
-							&& (eventStack.top().nowUT.top()->GetUserTypeList(eventStack.top().userType_idx.top() + 1).GetName() == "$else") )
+							&& (eventStack.top().nowUT.top()->GetUserTypeList(eventStack.top().userType_idx.top() + 1).GetName() == "$else"))
 						{
-							eventStack.top().conditionStack.push(temp);		
+							eventStack.top().conditionStack.push(temp);
 						}
 						else if ("TRUE" == temp)
 						{
@@ -1460,7 +1498,7 @@ int main(void)
 						{
 							eventStack.top().conditionStack.push(temp);
 						}
-						else if (eventStack.top().userType_idx.top() +1 < events[no].Get(0)->GetUserTypeListSize() && 
+						else if (eventStack.top().userType_idx.top() + 1 < events[no].Get(0)->GetUserTypeListSize() &&
 							events[no].Get(0)->GetUserTypeList(eventStack.top().userType_idx.top() + 1).GetName() == "$else")
 						{
 							eventStack.top().conditionStack.push(temp);
@@ -1476,9 +1514,9 @@ int main(void)
 						eventStack.top().nowUT.push(val->GetUserTypeList(1).Get(0));
 						val = eventStack.top().nowUT.top()->GetUserTypeList(0).Get(0); // empty chk?
 						eventStack.top().userType_idx.push(0);
-						eventStack.top().state.push( 1 );
+						eventStack.top().state.push(1);
 						state = 1;
-					//	eventStack.top().if_depth++;
+						//	eventStack.top().if_depth++;
 					}
 					else if ("FALSE" == temp)
 					{
@@ -1486,7 +1524,7 @@ int main(void)
 
 						eventStack.top().userType_idx.top()++;
 						break;
-					//	}
+						//	}
 					}
 					else
 					{
@@ -1510,11 +1548,11 @@ int main(void)
 					}
 					else
 					{//
-					//	if (chkFunc(eventStack, &val))
-					//	{
+					 //	if (chkFunc(eventStack, &val))
+					 //	{
 						eventStack.top().userType_idx.top()++;
 						break;
-					//}
+						//}
 					}
 				}
 
@@ -1530,6 +1568,6 @@ int main(void)
 	}
 
 	//cout << global << endl;
-       	return 0;
+	return 0;
 }
 
