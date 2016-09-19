@@ -1379,6 +1379,7 @@ int main(void)
 				{
 					// to do, load data and events from other file!
 					string fileName = ToBool4(global, eventStack.top().parameters, val->GetItemList(0).Get(0), eventStack.top());
+					fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
 					wiz::load_data::UserType ut;
 					if (wiz::load_data::LoadData::LoadDataFromFile(fileName, ut)) {
 						wiz::load_data::LoadData::AddData(global, "", ut.ToString(), "TRUE");
