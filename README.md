@@ -1,4 +1,6 @@
-	
+# ToDo
+	add $option = { REMOVE_IF_CALL_ANY_EVENT }
+
 # DONE 
 	add $load = { "test.txt" } # cf) "test space.txt" 
 
