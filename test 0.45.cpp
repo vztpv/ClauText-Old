@@ -35,9 +35,8 @@ public:
 	wiz::ArrayStack<int> state;
 	string return_value;
 	string option;
-	//	int if_depth;
 public:
-	EventInfo() : eventUT(NULL), return_value("NONE")//, if_depth(0)
+	EventInfo() : eventUT(NULL), return_value("")
 	{
 
 	}
@@ -906,25 +905,22 @@ bool chkFunc(wiz::ArrayStack<EventInfo>& eventStack, wiz::load_data::UserType** 
 	return true;
 }
 
-int main(void)
-{
-	srand(time(NULL));
 
+string excute_module( wiz::load_data::UserType& global)
+{
+	string module_value = "";
 	// data, event load..
 	wiz::ArrayStack<EventInfo> eventStack;
 	map<string, int> convert;
-	wiz::load_data::UserType global;
-	wiz::load_data::LoadData::LoadDataFromFile("Onecard_Test/main.txt", global);
 	auto events = global.GetUserTypeItem("Event");
 	if (global.GetUserTypeItem("Main").empty())
 	{
 		cout << "do not exist Main" << endl;
-		return -1;
+		return "ERROR -1";
 	}
 	auto Main = GetUserType(&global, "Main"); // Main이 없으면 에러..!
-											  //
-
-											  // event table setting?
+	  
+	// event table setting?
 	for (int i = 0; i < events.size(); ++i)
 	{
 		auto x = events[i].Get(0)->GetItem("id");
@@ -984,6 +980,11 @@ int main(void)
 
 		if (info.userType_idx.size() == 1 && info.userType_idx[0] >= events[no].Get(0)->GetUserTypeListSize())
 		{
+			if (eventStack.size() == 1)
+			{
+				module_value = eventStack.top().return_value;
+			}
+
 			eventStack.pop();
 			continue;
 		}
@@ -1002,7 +1003,19 @@ int main(void)
 			while (true) {
 
 				//	cout << val->GetName() << " id " << eventStack.top().id << endl;
-				if ("$option" == val->GetName()) // first?
+				if ("$module" == val->GetName())
+				{
+					string moduleFileName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
+					moduleFileName = wiz::String::substring(moduleFileName, 1, moduleFileName.size() - 2);
+
+					wiz::load_data::UserType moduleUT;
+					wiz::load_data::LoadData::LoadDataFromFile(moduleFileName, moduleUT);
+					eventStack.top().return_value = excute_module(moduleUT);
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$option" == val->GetName()) // first?
 				{
 					eventStack.top().option = ToBool4(global, eventStack.top().parameters, val->ToString(), eventStack.top());
 
@@ -1045,7 +1058,7 @@ int main(void)
 					else {
 						if (val->GetItemListSize() > 0) {
 							for (int j = 0; j < val->GetItemListSize(); ++j) {
-								string temp = ToBool4(global, info.parameters, val->GetItemList(j).Get(0), info);
+								string temp = ToBool4(global, info2.parameters, val->GetItemList(j).Get(0), info);
 								for (int k = 0; k < info.parameters.size(); ++k)
 								{
 									if (info.parameters[k].first == val->GetItemList(j).GetName())
@@ -1059,7 +1072,7 @@ int main(void)
 						}
 						if (val->GetUserTypeListSize() > 0) {
 							for (int j = 0; j < val->GetUserTypeListSize(); ++j) {
-								string temp = ToBool4(global, info.parameters, val->GetUserTypeList(j).Get(0)->ToString(), info);
+								string temp = ToBool4(global, info2.parameters, val->GetUserTypeList(j).Get(0)->ToString(), info);
 								for (int k = 0; k < info.parameters.size(); ++k)
 								{
 									if (info.parameters[k].first == val->GetUserTypeList(j).GetName())
@@ -1080,11 +1093,12 @@ int main(void)
 							eventStack.pop();
 						}
 					}
-
-					if (eventStack.top().option == "REMOVE_IF_CALL_ANY_STATE")
+					
+					if (eventStack.top().option == "REMOVE_IF_CALL_ANY_EVENT")
 					{
 						eventStack.pop();
 					}
+					
 
 					info.locals.clear();
 					const int no = convert.at(info.id);
@@ -1314,7 +1328,8 @@ int main(void)
 				}
 				else if ("$print" == val->GetName()) /// using tobool4?
 				{
-					if (val->GetUserTypeListSize() == 1)
+					if (val->GetUserTypeListSize() == 1
+						&& val->GetUserTypeList(0).Get(0)->GetItemListSize() == 1)
 					{
 						string listName = val->GetUserTypeList(0).Get(0)->GetItemList(0).Get(0);
 
@@ -1356,6 +1371,14 @@ int main(void)
 							wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, listName).second[0];
 							cout << ut->GetItemList(0).Get(0);
 						}
+					}
+					else if (val->GetUserTypeListSize() == 1
+						&& val->GetUserTypeList(0).Get(0)->GetItemListSize() == 0
+						&& val->GetUserTypeList(0).Get(0)->GetUserTypeListSize() == 1)
+					{
+						string name = ToBool4(global, eventStack.top().parameters,
+														val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
+						cout << name;
 					}
 					else
 					{
@@ -1411,7 +1434,7 @@ int main(void)
 						{
 							// error!
 							cout << "err" << endl;
-							return -2;
+							return "ERROR -2";
 						}
 					}
 					else {
@@ -1449,6 +1472,11 @@ int main(void)
 						string temp = ToBool4(global, eventStack.top().parameters, val->ToString(), eventStack.top());
 						/// if temp just one?
 						eventStack[eventStack.size() - 2].return_value = temp;
+					}
+
+					if (eventStack.size() == 1)
+					{
+						module_value = eventStack.top().return_value;
 					}
 					eventStack.pop();
 					break;
@@ -1535,7 +1563,7 @@ int main(void)
 					{
 						// debug..
 						cout << "Error Debug : " << temp << endl;
-						return -1;
+						return "ERROR -3";
 					}
 				}
 				else if ("$else" == val->GetName())
@@ -1572,7 +1600,17 @@ int main(void)
 		}
 	}
 
-	//cout << global << endl;
+	return module_value;
+}
+int main(void)
+{
+	srand(time(NULL));
+
+	wiz::load_data::UserType global;			// 6 -> 5
+	wiz::load_data::LoadData::LoadDataFromFile( "Onecard_Test/main.txt", global);
+	
+	cout << "excute result is " << excute_module(global) << endl;
+
 	return 0;
 }
 
