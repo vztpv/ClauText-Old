@@ -1079,7 +1079,11 @@ int main(void)
 						{
 							eventStack.pop();
 						}
+					}
 
+					if (eventStack.top().option == "REMOVE_IF_CALL_ANY_STATE")
+					{
+						eventStack.pop();
 					}
 
 					info.locals.clear();
