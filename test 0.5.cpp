@@ -906,7 +906,7 @@ bool chkFunc(wiz::ArrayStack<EventInfo>& eventStack, wiz::load_data::UserType** 
 }
 
 
-string excute_module( wiz::load_data::UserType& global)
+string excute_module(wiz::load_data::UserType& global)
 {
 	string module_value = "";
 	// data, event load..
@@ -1006,10 +1006,18 @@ string excute_module( wiz::load_data::UserType& global)
 				if ("$module" == val->GetName())
 				{
 					string moduleFileName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
+					string input;
+
+					if (val->GetUserTypeListSize() >= 2) {
+						input = val->GetUserTypeList(1).Get(0)->ToString();
+					}
+
 					moduleFileName = wiz::String::substring(moduleFileName, 1, moduleFileName.size() - 2);
 
 					wiz::load_data::UserType moduleUT;
 					wiz::load_data::LoadData::LoadDataFromFile(moduleFileName, moduleUT);
+					wiz::load_data::LoadData::AddData(moduleUT, "", input, "TRUE");
+
 					eventStack.top().return_value = excute_module(moduleUT);
 
 					eventStack.top().userType_idx.top()++;
@@ -1025,6 +1033,8 @@ string excute_module( wiz::load_data::UserType& global)
 				else if ("$call" == val->GetName()) {
 					//cout << "$call " << val->GetItem("id")[0].Get(0) << endl;
 					info.id = val->GetItem("id")[0].Get(0);
+					// cf) id =  [ $local.i }
+					// 추가??? todo???
 
 					info.eventUT = events[no].Get(0);
 					info.userType_idx.clear();
@@ -1607,7 +1617,7 @@ int main(void)
 	srand(time(NULL));
 
 	wiz::load_data::UserType global;			// 6 -> 5
-	wiz::load_data::LoadData::LoadDataFromFile( "Onecard_Test/main.txt", global);
+	wiz::load_data::LoadData::LoadDataFromFile("Onecard_Test/main.txt", global);
 	
 	cout << "excute result is " << excute_module(global) << endl;
 
