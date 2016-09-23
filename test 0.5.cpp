@@ -1009,7 +1009,7 @@ string excute_module(wiz::load_data::UserType& global)
 					string input;
 
 					if (val->GetUserTypeListSize() >= 2) {
-						input = val->GetUserTypeList(1).Get(0)->ToString();
+						input = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1).Get(0)->ToString(), eventStack.top());
 					}
 
 					moduleFileName = wiz::String::substring(moduleFileName, 1, moduleFileName.size() - 2);
@@ -1185,7 +1185,6 @@ string excute_module(wiz::load_data::UserType& global)
 					if (val->GetUserTypeList(0).Get(0)->GetItemListSize() > 0) {
 						dir = val->GetUserTypeList(0).Get(0)->GetItemList(0).Get(0);
 						dir = ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
-						//dir = string(dir.c_str() + 1);
 					}
 					else ///val->Ge
 					{
