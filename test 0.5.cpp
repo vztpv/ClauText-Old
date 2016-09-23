@@ -835,28 +835,32 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 	// =>  A = { B = 1 C = 3  }  D = E
 
 	//result = "";
-	int count = 0;
 	vector<string> strVec;
+	stack<int> chkBrace;
+
+	chkBrace.push(0);
 
 	for (int i = operandStack.size() - 1; i >= 0; --i)
 	{
 		if (operandStack[i] == "}") {
-			count++;
-			if (count == 2)
+			chkBrace.top()++;
+			if (chkBrace.top() == 2)
 			{
-				count = 0;
 				string temp = strVec.back();
 				strVec.pop_back();
 				strVec.pop_back();
 				strVec.push_back(temp);
+				
+				chkBrace.pop();
 				continue;
 			}
+			chkBrace.pop();
 		}
 		else if (operandStack[i] == "{") {
-			count = 0;
+			chkBrace.push(0);
 		}
 		else {
-			count++;
+			chkBrace.top()++;
 		}
 		strVec.push_back(operandStack[i]);
 	}
