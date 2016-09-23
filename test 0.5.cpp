@@ -521,7 +521,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		operandStack.push(x);
 	}
-	else if ("$element" == str)
+	else if ("$element" == str) // for list
 	{
 		string x = operandStack.pop(); // list_name
 		string y = operandStack.pop(); // idx
@@ -1615,13 +1615,27 @@ string excute_module(wiz::load_data::UserType& global)
 
 	return module_value;
 }
-int main(void)
+
+
+int main(int argc, char* argv[])
 {
-	srand(time(NULL));
+	srand(time(NULL)); // ?
+
+	string fileName;
+
+	if (argc == 1) {
+		cout << "FileName: ";
+		getline(cin, fileName);
+	}
+	else
+	{
+		fileName = string( argv[1] );
+	}
 
 	wiz::load_data::UserType global;			// 6 -> 5
-	wiz::load_data::LoadData::LoadDataFromFile("Onecard_Test/main.txt", global);
+	wiz::load_data::LoadData::LoadDataFromFile(fileName, global); // "Onecard_Test/main.txt", global);
 	
+
 	cout << "excute result is " << excute_module(global) << endl;
 
 	return 0;
