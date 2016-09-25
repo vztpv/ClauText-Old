@@ -42,7 +42,25 @@ public:
 	}
 };
 
+class SortInfo // need to rename?
+{
+public:
+	string name;
+	int iElement; // 2 : userType, // 1 : item?
+	size_t idx;
+public:
+	SortInfo() { }
+	SortInfo(const string& name, int iElement, size_t idx)
+		: name(name), iElement(iElement), idx(idx)
+	{
 
+	}
+	// for sorting..
+	bool operator<(const SortInfo& info) const
+	{
+		return this->name < info.name;
+	}
+};
 // only one exist or do not exist?
 inline string GetItem(const wiz::load_data::UserType* ut, const string& name) {
 	return ut->GetItem(name)[0].Get(0);
@@ -1107,12 +1125,12 @@ string excute_module(wiz::load_data::UserType& global)
 							eventStack.pop();
 						}
 					}
-					
+
 					if (eventStack.top().option == "REMOVE_IF_CALL_ANY_EVENT")
 					{
 						eventStack.pop();
 					}
-					
+
 
 					info.locals.clear();
 					const int no = convert.at(info.id);
@@ -1263,9 +1281,9 @@ string excute_module(wiz::load_data::UserType& global)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$remove" == val->GetName())
+				else if ("$remove" == val->GetName()) // remove by dir.
 				{
-					string dir = string(val->GetItemList(0).Get(0).c_str()); // +1?
+					string dir = string(val->GetItemList(0).Get(0).c_str()); // item -> userType?
 
 					dir = ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
 
@@ -1274,9 +1292,9 @@ string excute_module(wiz::load_data::UserType& global)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$remove2" == val->GetName())
+				else if ("$remove2" == val->GetName()) // remove /dir/name
 				{
-					string dir = string(val->GetItemList(0).Get(0).c_str()); // +1 ??
+					string dir = string(val->GetItemList(0).Get(0).c_str()); // item -> userType?
 					dir = ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
 					string name;
 					for (int i = dir.size() - 1; i >= 0; --i)
@@ -1293,7 +1311,7 @@ string excute_module(wiz::load_data::UserType& global)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$remove3" == val->GetName())
+				else if ("$remove3" == val->GetName()) /// remove itemlist by idx.
 				{
 					string dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
 					string value = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1).Get(0)->ToString(), eventStack.top());
@@ -1390,7 +1408,7 @@ string excute_module(wiz::load_data::UserType& global)
 						&& val->GetUserTypeList(0).Get(0)->GetUserTypeListSize() == 1)
 					{
 						string name = ToBool4(global, eventStack.top().parameters,
-														val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
+							val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
 						cout << name;
 					}
 					else
@@ -1411,6 +1429,16 @@ string excute_module(wiz::load_data::UserType& global)
 							cout << ut->GetItemList(i).Get(0);
 						}
 					}
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$print2" == val->GetName())
+				{
+					string dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
+					str = wiz::load_data::UserType::Find(&global, dir).second[0]->ToString();
+					
+					cout << str;
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1501,6 +1529,64 @@ string excute_module(wiz::load_data::UserType& global)
 				}
 				else if ("$local" == val->GetName())
 				{
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$sort" == val->GetName()) {
+					// todo
+					vector<SortInfo> siVec;
+					wiz::load_data::UserType* utTemp = 
+						wiz::load_data::UserType::Find(&global, 
+							ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top())).second[0];
+	
+					vector<wiz::load_data::Type*> temp;
+
+
+					for (int i = 0; i < utTemp->GetItemListSize(); ++i)
+					{
+						siVec.emplace_back(utTemp->GetItemList(i).GetName(), 1, i);
+					}
+					for (int i = 0; i < utTemp->GetUserTypeListSize(); ++i)
+					{
+						siVec.emplace_back(utTemp->GetUserTypeList(i).GetName(), 2, utTemp->GetItemListSize() + i);
+					}
+
+					std::sort(siVec.begin(), siVec.end());
+
+					int item_count = 0, ut_count = 0;
+					for (int i = 0; i < utTemp->GetIList().size(); ++i) {
+						if (utTemp->GetIList()[i] == 1) {
+							temp.push_back(&(utTemp->GetItemList(item_count)));
+							item_count++;
+						}
+						else {
+							temp.push_back(&(utTemp->GetUserTypeList(ut_count)));
+							ut_count++;
+						}
+					}
+
+					wiz::load_data::UserType ut;
+					for (int i = 0; i < temp.size(); ++i)
+					{
+						if (siVec[i].iElement == 1) {
+							ut.AddItem(siVec[i].name, static_cast<wiz::load_data::TypeArray<string>*>(temp[siVec[i].idx])->Get(0));
+						}
+						else {
+							ut.AddUserTypeItem(*(static_cast<wiz::load_data::TypeArray<wiz::load_data::UserType*>*>(temp[siVec[i].idx])->Get(0)));
+						}
+					}
+
+					utTemp->Remove();
+
+					wiz::load_data::LoadData::AddData(*(utTemp), "", ut.ToString(), "TRUE");
+					
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$stable_sort" == val->GetName()) {
+					// todo
+
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
@@ -1635,7 +1721,7 @@ int main(int argc, char* argv[])
 	wiz::load_data::UserType global;			// 6 -> 5
 	wiz::load_data::LoadData::LoadDataFromFile(fileName, global); // "Onecard_Test/main.txt", global);
 	
-
+	cout << "fileName is " << fileName << endl;
 	cout << "excute result is " << excute_module(global) << endl;
 
 	return 0;
