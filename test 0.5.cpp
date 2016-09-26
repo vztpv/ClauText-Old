@@ -1542,28 +1542,22 @@ string excute_module(wiz::load_data::UserType& global)
 					vector<wiz::load_data::Type*> temp;
 
 
-					for (int i = 0; i < utTemp->GetItemListSize(); ++i)
-					{
-						siVec.emplace_back(utTemp->GetItemList(i).GetName(), 1, i);
-					}
-					for (int i = 0; i < utTemp->GetUserTypeListSize(); ++i)
-					{
-						siVec.emplace_back(utTemp->GetUserTypeList(i).GetName(), 2, utTemp->GetItemListSize() + i);
-					}
-
-					std::sort(siVec.begin(), siVec.end());
-
 					int item_count = 0, ut_count = 0;
 					for (int i = 0; i < utTemp->GetIList().size(); ++i) {
 						if (utTemp->GetIList()[i] == 1) {
 							temp.push_back(&(utTemp->GetItemList(item_count)));
+							siVec.emplace_back(utTemp->GetItemList(item_count).GetName(), 1, i);
 							item_count++;
 						}
 						else {
-							temp.push_back(&(utTemp->GetUserTypeList(ut_count)));
+							temp.push_back(utTemp->GetUserTypeList(ut_count).Get(0));
+							siVec.emplace_back(utTemp->GetUserTypeList(ut_count).GetName(), 2, i);
 							ut_count++;
 						}
 					}
+
+					std::sort(siVec.begin(), siVec.end());
+					
 
 					wiz::load_data::UserType ut;
 					for (int i = 0; i < temp.size(); ++i)
@@ -1572,7 +1566,7 @@ string excute_module(wiz::load_data::UserType& global)
 							ut.AddItem(siVec[i].name, static_cast<wiz::load_data::TypeArray<string>*>(temp[siVec[i].idx])->Get(0));
 						}
 						else {
-							ut.AddUserTypeItem(*(static_cast<wiz::load_data::TypeArray<wiz::load_data::UserType*>*>(temp[siVec[i].idx])->Get(0)));
+							ut.AddUserTypeItem(*(static_cast<wiz::load_data::UserType*>(temp[siVec[i].idx])));
 						}
 					}
 
