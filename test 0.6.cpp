@@ -501,7 +501,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 	{
 		// to do...
 	}
-	else if ("$findIndex" == str)
+	else if ("$findIndex" == str) // removal?
 	{
 		// todo?
 	}
@@ -521,6 +521,14 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 			string temp = FindLocals(info.locals, x);
 			if (!temp.empty()) { x = temp; }
 		}
+		operandStack.push(x);
+	}
+	else if ("$val" == str)
+	{
+		string x = operandStack.pop();
+
+		// todo..
+
 		operandStack.push(x);
 	}
 	else if ("$size" == str)
@@ -1161,6 +1169,18 @@ string excute_module(wiz::load_data::UserType& global)
 					else {
 						wiz::load_data::LoadData::SetData(global, dir.first, dir.second, data, "TRUE");
 					}
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$assign2" == val->GetName())
+				{
+					pair<string, string> dir = Find2(&global, ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top()));
+					string data = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1).Get(0)->ToString(), eventStack.top());
+					
+					{
+						wiz::load_data::LoadData::SetData(global, dir.first, dir.second, data, "TRUE");
+					}
+					
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
