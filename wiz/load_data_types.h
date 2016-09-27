@@ -790,6 +790,8 @@ namespace wiz {
 				vector< UserType* > temp;
 				if (position.empty()) { temp.push_back(global); return{ true, temp }; }
 				if (position == ".") { temp.push_back(global); return{ true, temp }; }
+				if (position == "/./") { temp.push_back(global); return{ true, temp }; } // chk..
+
 				//if (position == "..") { temp.push_back(global->GetParent());  return{ global->GetParent() != NULL, temp }; }
 
 				StringTokenizer tokenizer(position, "/");
@@ -814,7 +816,7 @@ namespace wiz {
 					}
 				}
 
-				//
+				// maybe, has bug!
 				{
 					int count = 0;
 
@@ -853,6 +855,18 @@ namespace wiz {
 								utDeck.push_front(make_pair(x, utTemp.second + 1));
 							}
 						}
+					}
+					else if (utTemp.second < strVec.size() &&
+						wiz::String::startsWith(strVec[utTemp.second], "$ut")
+						)
+					{
+						long long idx = std::stoll(wiz::String::substring(strVec[utTemp.second], 3));
+
+						if (idx < 0 || idx >= utTemp.first->GetUserTypeListSize()) {
+							throw string("ERROR NOT VALID IDX");
+						}
+
+						utDeck.push_front(make_pair(utTemp.first->GetUserTypeList(idx).Get(0), utTemp.second + 1));
 					}
 					else if (utTemp.second < strVec.size() &&
 						// isExist ( utTemp.first, strVec[utTemp.second] )

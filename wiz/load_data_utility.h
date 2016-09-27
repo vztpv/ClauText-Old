@@ -472,7 +472,7 @@ namespace wiz {
 						state = 1;
 						temp.push_back(str[i]);
 					}
-					else if (0 == state && i > 0 && '\"' == str[i] && '\\' != str[i])
+					else if (0 == state && i > 0 && '\"' == str[i] && '\\' != str[i-1])
 					{
 						state = 1;
 						temp.push_back(str[i]);
