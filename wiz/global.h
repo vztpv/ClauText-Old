@@ -162,7 +162,7 @@ namespace wiz{
     /// PASC_PEE, PDSC_PEE, PNOT_EE, PEE_SAME_VALUE, PNOT_EE_SAME_VALUE
     /// LEFT_HAS_SMALL_VALUE, LEFT_HAS_LARGE_VALUE, PLEFT_HAS_SMALL_VALUE, PLEFT_HAS_LARGE_VALUE
 
-	template <class T, class COMP = ASC<T>, class COMP2 = ASC<int>, class EE = EE<T> > /// 순서 바꾸기? - 2015.07.18
+	template <class T, class COMP = ASC<T>, class COMP2 = ASC<int>, class EE = EE<T> > /// ?�서 바꾸�? - 2015.07.18
 	class WrapForInfinity
 	{
 		enum Op{ MIF = 0, GR = 1, IF = 2 };
@@ -226,7 +226,7 @@ namespace wiz{
 	};
 
     template <typename T> /// x is 10진수..
-    inline T pos_1(const T x, const int base=10) // 1의 자리 값 계산
+    inline T pos_1(const T x, const int base=10) // 1???�리 �?계산
 	{
 		if( x >= 0 ) { return x % base; }// x - ( x / 10 ) * 10; }
 		else{ return (x / base) * base - x; }
@@ -243,7 +243,7 @@ namespace wiz{
 		string tempString;
 		int k;
 		bool isMinus = (i < 0);
-		temp[INT_SIZE+1] = '\0'; ///문자열 표시..
+		temp[INT_SIZE+1] = '\0'; ///문자???�시..
 
 		for (k = INT_SIZE; k >= 1; k--){
             T val = pos_1<T>(i, base); /// 0 ~ base-1
@@ -253,7 +253,7 @@ namespace wiz{
 
 			i /= base;
 
-			if (0 == i){ // 숫자열 끝..
+			if (0 == i){ // ?�자????.
 				k--;
 				break;
 			}
@@ -285,7 +285,7 @@ namespace wiz{
 		string tempString;
 		int k;
 		bool isMinus = (i < 0);
-		temp[INT_SIZE+1] = '\0'; ///문자열 표시..
+		temp[INT_SIZE+1] = '\0'; ///문자???�시..
 
 		for (k = INT_SIZE; k >= 1; k--){
             T val = pos_1<T>(i, base); /// 0 ~ base-1
@@ -295,7 +295,7 @@ namespace wiz{
 
 			i /= base;
 
-			if (0 == i){ // 숫자열 끝..
+			if (0 == i){ // ?�자????.
 				k--;
 				break;
 			}
@@ -326,7 +326,7 @@ namespace wiz{
 		return toStr<int>(x);
 	}
 
-	template <typename T> /// 호출할때 알아서 체크한다?
+	template <typename T> /// ?�출?�때 ?�아??체크?�다?
 	inline string _toString(const T x)
 	{
 		std::stringstream strs;

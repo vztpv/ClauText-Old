@@ -157,8 +157,8 @@ namespace wiz {
 					{
 					case 0:
 						if (LEFT == Utility::Top(strVec)) {
-							Utility::Pop(strVec);
-							state = 1;
+							//Utility::Pop(strVec);
+							state = 2;
 						}
 						else {
 							pair<bool, string> bsPair = Utility::LookUp(strVec, 1);
@@ -215,6 +215,8 @@ namespace wiz {
 							val = Utility::Pop(strVec);
 
 							nestedUT[braceNum]->AddItem(var2, val);
+							var2 = "";
+							val = "";
 
 							state = 0;
 						}
@@ -302,14 +304,19 @@ namespace wiz {
 									// var1
 									var1 = Utility::Pop(strVec);
 									nestedUT[braceNum]->AddItem("", var1);
+									var1 = "";
 
 									state = 4;
 								}
 							}
 							else
 							{
-								// syntax error..
-								throw "syntax error 3 ";
+								// var1
+								var1 = Utility::Pop(strVec);
+								nestedUT[braceNum]->AddItem("", var1);
+								var1 = "";
+
+								state = 4;
 							}
 						}
 						break;
@@ -366,7 +373,7 @@ namespace wiz {
 								nestedUT[braceNum]->AddUserTypeItem(UserType(var2));
 								TypeArray<UserType*> pTemp;
 								nestedUT[braceNum]->GetLastUserTypeItemRef(var2, pTemp);
-
+								var2 = "";
 								braceNum++;
 
 								/// new nestedUT
@@ -383,6 +390,7 @@ namespace wiz {
 							val = Utility::Pop(strVec);
 
 							nestedUT[braceNum]->AddItem(var2, val);
+							var2 = ""; val = "";
 							if (strVec.empty())
 							{
 								//
