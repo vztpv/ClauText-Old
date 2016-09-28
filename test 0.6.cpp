@@ -883,6 +883,7 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 			chkBrace.pop();
 		}
 		else if (operandStack[i] == "{") {
+			chkBrace.top()++;
 			chkBrace.push(0);
 		}
 		else {
