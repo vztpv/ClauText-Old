@@ -9,6 +9,7 @@
 #include <algorithm>
 using namespace std;
 
+#include <wiz/cpp_string.h>
 //#include <wiz/load_data_types.h> /// 
 
 namespace wiz {
@@ -277,7 +278,11 @@ namespace wiz {
 					//temp = RemoveEndSpace(temp);
 					temp = PassSharp(temp);
 					temp = AddSpace(temp);
-					temp = ChangeSpace(temp, "^" ); 
+					temp = ChangeStr(temp, "^", "^0"); 
+					temp = ChangeStr(temp, " ", "^1");
+					temp = ChangeStr(temp, "\t", "^2");
+					temp = ChangeStr(temp, "\r", "^3");
+					temp = ChangeStr(temp, "\n", "^4");
 
 					strVecTemp.push_back(temp);
 					count++;
@@ -455,14 +460,8 @@ namespace wiz {
 				}
 				return temp;
 			}
-			/// need to rename!, has bug.., line ±‚¡ÿ..
-			/// result_str must not "\\1"			
-			static string ChangeSpace(const string& str, const string& result_str) {
-				//string temp = wiz::String::replace(str, "\\\"", "\\1");
-				return _ChangeSpace(str, result_str);
-				//return wiz::String::replace(temp, "\\1", "\\\"");
-			}
-			static string _ChangeSpace(const string& str, const string& result_str) {
+	
+			static string ChangeStr(const string& str, const string changed_str, const string& result_str) {
 				string temp;
 				int state = 0;
 
@@ -477,7 +476,7 @@ namespace wiz {
 						state = 1;
 						temp.push_back(str[i]);
 					}
-					else if (1 == state && (' ' == str[i] || '\t' == str[i])) {
+					else if (1 == state && (changed_str == wiz::String::substring( str, i, i+changed_str.size()-1))) {
 						state = 1;
 						for (int j = 0; j < result_str.size(); ++j) {
 							temp.push_back(result_str[j]);
