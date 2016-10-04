@@ -741,6 +741,9 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 	if (result.empty()) { return result; }
 	result.pop_back();// 여백제거.
 					  // chk?
+	if (ut.empty()) {
+		return "";
+	}
 	if (ut.GetUserTypeListSize() == 0 && ut.GetItemListSize() == 1) /// chk?
 	{
 		if ('/' == result[0] && result.size() > 1)
