@@ -765,6 +765,14 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 		return result;
 	}
 
+	{
+		result = wiz::load_data::Utility::ChangeStr(result, "^", "^0");
+		result = wiz::load_data::Utility::ChangeStr(result, " ", "^1");
+		result = wiz::load_data::Utility::ChangeStr(result, "\t", "^2");
+		result = wiz::load_data::Utility::ChangeStr(result, "\r", "^3");
+		result = wiz::load_data::Utility::ChangeStr(result, "\n", "^4");
+	}
+
 	{ // chk..
 		wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r", "{", "=", "}" });
 		wiz::StringTokenizer tokenizer2(result, { " ", "\n", "\t", "\r" });
@@ -784,6 +792,8 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 				if ("" != _temp) {
 					tokenVec[i] = _temp;
 				}
+
+
 			}
 			else if (wiz::String::startsWith(tokenVec[i], "$local.")) {
 				string _temp = FindLocals(info.locals, tokenVec[i]);
@@ -898,6 +908,13 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 		result = result + strVec[i];
 	}
 
+	{
+		wiz::load_data::Utility::ChangeCharInString(result, "^4", "\n");
+		wiz::load_data::Utility::ChangeCharInString(result, "^3", "\r");
+		wiz::load_data::Utility::ChangeCharInString(result, "^2", "\t");
+		wiz::load_data::Utility::ChangeCharInString(result, "^1", " ");
+		wiz::load_data::Utility::ChangeCharInString(result, "^0", "^");
+	}
 	return result;
 }
 
@@ -1032,8 +1049,6 @@ string excute_module(wiz::load_data::UserType& global)
 			}
 
 			while (true) {
-
-				//	cout << val->GetName() << " id " << eventStack.top().id << endl;
 				if ("$module" == val->GetName())
 				{
 					string moduleFileName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
@@ -1064,7 +1079,7 @@ string excute_module(wiz::load_data::UserType& global)
 				else if ("$call" == val->GetName()) {
 					//cout << "$call " << val->GetItem("id")[0].Get(0) << endl;
 					info.id = val->GetItem("id")[0].Get(0);
-					// cf) id =  [ $local.i }
+					// cf) id =  { $local.i }
 					// 추가??? todo???
 
 					info.eventUT = events[no].Get(0);
