@@ -42,6 +42,71 @@ namespace wiz {
 				}
 				return 1 == state; /// chk..
 			}
+			static bool IsNumberInJson(const string& str)
+			{
+				int state = 0;
+				for (int i = 0; i < str.size(); ++i) {
+					switch (state)
+					{
+					case 0:
+						if ( // '+' == str[i] || // why can`t +?
+							'-' == str[i]
+							) {
+							state = 0;
+						}
+						else if (str[i] >= '0' && str[i] <= '9')
+						{
+							state = 1;
+						}
+						else { return false; }
+						break;
+					case 1:
+						if (str[i] >= '0' && str[i] <= '9') {
+							state = 1;
+						}
+						else if (str[i] == '.') {
+							state = 2;
+						}
+						else { return false; }
+						break;
+					case 2:
+						if (str[i] >= '0' && str[i] <= '9') { state = 3; }
+						else { return false; }
+						break;
+					case 3:
+						if (str[i] >= '0' && str[i] <= '9') { state = 3; }
+						else if ('e' == str[i] || 'E' == str[i]) {
+							state = 4;
+						}
+						else { return false; }
+						break;
+					case 4:
+						if (str[i] == '+' || str[i] == '-') {
+							state = 5;
+						}
+						else {
+							state = 5;
+						}
+						break;
+					case 5:
+						if (str[i] >= '0' && str[i] <= '9') {
+							state = 6;
+						}
+						else {
+							return false;
+						}
+						break;
+					case 6:
+						if (str[i] >= '0' && str[i] <= '9') {
+							state = 6;
+						}
+						else {
+							return false;
+						}
+					}
+				}
+				return 3 == state || 6 == state;
+			}
 			static bool IsDouble(const string& str) {
 				int state = 0;
 				for (int i = 0; i < str.size(); ++i) {
@@ -55,7 +120,7 @@ namespace wiz {
 						{
 							state = 1;
 						}
-						else return false;
+						else { return false; }
 						break;
 					case 1:
 						if (str[i] >= '0' && str[i] <= '9') {
@@ -64,19 +129,45 @@ namespace wiz {
 						else if (str[i] == '.') {
 							state = 2;
 						}
-						else return false;
+						else { return false; }
 						break;
 					case 2:
 						if (str[i] >= '0' && str[i] <= '9') { state = 3; }
-						else return false;
+						else { return false; }
 						break;
 					case 3:
 						if (str[i] >= '0' && str[i] <= '9') { state = 3; }
-						else return false;
+						else if ('e' == str[i] || 'E' == str[i]) {
+							state = 4;
+						}
+						else { return false; }
 						break;
+					case 4:
+						if (str[i] == '+' || str[i] == '-') {
+							state = 5;
+						}
+						else {
+							state = 5;
+						}
+						break;
+					case 5:
+						if (str[i] >= '0' && str[i] <= '9') {
+							state = 6;
+						}
+						else {
+							return false;
+						}
+						break;
+					case 6:
+						if (str[i] >= '0' && str[i] <= '9') {
+							state = 6;
+						}
+						else {
+							return false;
+						}
 					}
 				}
-				return 3 == state;
+				return 3 == state || 6 == state;
 			}
 			static bool IsDate(const string& str)
 			{

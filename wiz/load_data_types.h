@@ -785,14 +785,18 @@ namespace wiz {
 				return chk;
 			}
 			// find userType! not itemList!,// this has bug??
-			static std::pair<bool, vector< UserType*> > Find(UserType* global, const string& position) /// option, option_offset
+			static std::pair<bool, vector< UserType*> > Find(UserType* global, const string& _position) /// option, option_offset
 			{
+				string position = _position;
 				vector< UserType* > temp;
-				if (position.empty()) { temp.push_back(global); return{ true, temp }; }
-				if (position == ".") { temp.push_back(global); return{ true, temp }; }
-				if (position == "/./") { temp.push_back(global); return{ true, temp }; } // chk..
-
-				//if (position == "..") { temp.push_back(global->GetParent());  return{ global->GetParent() != NULL, temp }; }
+				if (_position.empty()) { temp.push_back(global); return{ true, temp }; }
+				if (_position == ".") { temp.push_back(global); return{ true, temp }; }
+				if (_position == "/./") { temp.push_back(global); return{ true, temp }; } // chk..
+				if (_position == "/.") { temp.push_back(global); return{ true, temp }; }
+				if (String::startsWith(_position, "/." ))
+				{
+					position = String::substring(_position, 3);
+				}
 
 				StringTokenizer tokenizer(position, "/");
 				vector<string> strVec;
@@ -869,15 +873,10 @@ namespace wiz {
 						utDeck.push_front(make_pair(utTemp.first->GetUserTypeList(idx).Get(0), utTemp.second + 1));
 					}
 					else if (utTemp.second < strVec.size() &&
-						// isExist ( utTemp.first, strVec[utTemp.second] )
-						///utTemp.first->GetLastUserTypeItemRef(strVec[utTemp.second], utTemp2)) 
 						(utTemp.first->GetUserTypeItem(strVec[utTemp.second]).empty() == false))
 					{
-						// for( int j = size ( utTemp.first, strVec[utTemp.second] )-1; j >= 0; --j )
-						///for (int j = utTemp2.size() - 1; j >= 0; --j) {
 						auto  x = utTemp.first->GetUserTypeItem(strVec[utTemp.second]);
 						for (int j = x.size() - 1; j >= 0; --j) {
-							//utDeck.push_front(make_pair(utTemp2.Get(j), utTemp.second + 1));
 							utDeck.push_front(make_pair(x[j].Get(0), utTemp.second + 1));
 						}
 					}
@@ -890,8 +889,6 @@ namespace wiz {
 				if (false == exist) { return{ false, vector<UserType*>() }; }
 				return{ true, temp };
 			}
-
-
 		};
 	}
 }
