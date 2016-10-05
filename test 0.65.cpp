@@ -42,11 +42,11 @@ public:
 	}
 };
 
-class SortInfo // need to rename?
+class SortInfo // need to rename
 {
 public:
 	string name;
-	int iElement; // 2 : userType, // 1 : item?
+	int iElement; // 2 : userType, // 1 : item
 	size_t idx;
 public:
 	SortInfo() { }
@@ -61,7 +61,7 @@ public:
 		return this->name < info.name;
 	}
 };
-// only one exist or do not exist?
+// only one exist or do not exist
 inline string GetItem(const wiz::load_data::UserType* ut, const string& name) {
 	return ut->GetItem(name)[0].Get(0);
 }
@@ -122,7 +122,7 @@ pair<string, string> Find2(wiz::load_data::UserType* ut, const string& str)
 	}
 	return{ wiz::String::substring(str, 0, idx), wiz::String::substring(str,idx + 1) };
 }
-string reverse(string str) { /// to std::reverse ?
+string reverse(string str) { /// to std::reverse 
 	std::reverse(str.begin(), str.end());
 	return str;
 }
@@ -383,7 +383,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		x = operandStack.pop();
 		y = operandStack.pop();
 
-		if (GetType(x) == GetType(y) && (GetType(y) == "INTEGER")) { /// only integer? -> BigInteger?
+		if (GetType(x) == GetType(y) && (GetType(y) == "INTEGER")) { /// only integer -> BigInteger
 			operandStack.push(wiz::toStr(atoll(x.c_str()) + atoll(y.c_str())));
 		}
 		else
@@ -399,7 +399,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 
 
-		if (GetType(x) == GetType(y) && (GetType(y) == "INTEGER")) { /// only integer? -> BigInteger?
+		if (GetType(x) == GetType(y) && (GetType(y) == "INTEGER")) { /// only integer -> BigInteger
 			operandStack.push(wiz::toStr(atoll(x.c_str()) * atoll(y.c_str())));
 		}
 		else
@@ -413,7 +413,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		x = operandStack.pop();
 		y = operandStack.pop();
 
-		if (GetType(x) == GetType(y) && (GetType(y) == "INTEGER")) { /// only integer? -> BigInteger?
+		if (GetType(x) == GetType(y) && (GetType(y) == "INTEGER")) { /// only integer -> BigInteger
 			operandStack.push(wiz::toStr(atoll(x.c_str()) / atoll(y.c_str())));
 		}
 		else
@@ -427,7 +427,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		x = operandStack.pop();
 		y = operandStack.pop();
 
-		if (GetType(x) == GetType(y) && (GetType(y) == "INTEGER")) { /// only integer? -> BigInteger?
+		if (GetType(x) == GetType(y) && (GetType(y) == "INTEGER")) { /// only integer -> BigInteger
 			operandStack.push(wiz::toStr(atoll(x.c_str()) % atoll(y.c_str())));
 		}
 		else
@@ -441,7 +441,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		x = operandStack.pop();
 		y = operandStack.pop();
 
-		if (GetType(x) == GetType(y) && (GetType(y) == "INTEGER")) { /// only integer? -> BigInteger?
+		if (GetType(x) == GetType(y) && (GetType(y) == "INTEGER")) { /// only integer -> BigInteger
 			long long _x = atoll(x.c_str());
 			long long _y = atoll(y.c_str());
 			long long _z = rand() % (_y - _x + 1) + _x;
@@ -497,13 +497,13 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		operandStack.push(z);
 	}
-	else if ("$link" == str) // removal?
+	else if ("$link" == str) // removal
 	{
 		// to do...
 	}
-	else if ("$findIndex" == str) // removal?
+	else if ("$findIndex" == str) // removal
 	{
-		// todo?
+		// todo
 	}
 	else if ("$get" == str)
 	{
@@ -649,6 +649,7 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 		flag_A = true;
 	}
 	result = ToBool3(global, parameters, result, info);
+	if (result.empty()) { return ""; }
 	if (!flag_A) {
 		result = string(result.c_str() + 1);
 	}
@@ -656,11 +657,11 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 	result = ut.ToString();
 	if (result.empty()) { return result; }
 	result.pop_back();// 여백제거.
-					  // chk?
+					  // chk
 	if (ut.empty()) {
 		return "";
 	}
-	if (ut.GetUserTypeListSize() == 0 && ut.GetItemListSize() == 1) /// chk?
+	if (ut.GetUserTypeListSize() == 0 && ut.GetItemListSize() == 1) /// chk
 	{
 		if ('/' == result[0] && result.size() > 1)
 		{
@@ -849,16 +850,13 @@ bool chkFunc(wiz::ArrayStack<EventInfo>& eventStack, wiz::load_data::UserType** 
 		}
 		else
 		{
-			//if (eventStack.top().state.top() == 1) {
-			//	eventStack.top().if_depth--;
-			//}
 			eventStack.top().nowUT.pop();
 			eventStack.top().userType_idx.pop();
 			if (!eventStack.top().conditionStack.empty())
 			{
 				eventStack.top().conditionStack.pop();
 			}
-			eventStack.top().state.pop(); // remove state?
+			eventStack.top().state.pop(); // remove state
 		}
 	}
 	else {
@@ -888,7 +886,7 @@ string excute_module(wiz::load_data::UserType& global)
 	auto Main = GetUserType(&global, "Main"); // Main이 없으면 에러..!
 	
 
-	// event table setting?
+	// event table setting
 	for (int i = 0; i < events.size(); ++i)
 	{
 		auto x = events[i].Get(0)->GetItem("id");
@@ -897,7 +895,7 @@ string excute_module(wiz::load_data::UserType& global)
 			convert.insert(pair<string, int>(x[0].Get(0), i));
 		}
 		else {
-			// error?
+			// error
 		}
 	}
 
@@ -956,7 +954,6 @@ string excute_module(wiz::load_data::UserType& global)
 			continue;
 		}
 
-		//for (int i = eventStack.top().userType_idx.top(); i < events[no].Get(0)->GetUserTypeListSize(); ++i) 
 		{
 			wiz::load_data::UserType* val = NULL;
 			if (eventStack.top().userType_idx.size() == 1) {
@@ -988,7 +985,7 @@ string excute_module(wiz::load_data::UserType& global)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$option" == val->GetName()) // first?
+				else if ("$option" == val->GetName()) // first
 				{
 					eventStack.top().option = ToBool4(global, eventStack.top().parameters, val->ToString(), eventStack.top());
 
@@ -1004,7 +1001,7 @@ string excute_module(wiz::load_data::UserType& global)
 						info.id = ToBool4(global, eventStack.top().parameters, val->GetUserTypeItem("id")[0].Get(0)->ToString(), eventStack.top());
 					}
 					// cf) id =  { $local.i }
-					// 추가??? todo???
+					// 추가 todo
 
 					info.eventUT = events[no].Get(0);
 					info.userType_idx.clear();
@@ -1202,7 +1199,7 @@ string excute_module(wiz::load_data::UserType& global)
 				}
 				else if ("$remove" == val->GetName()) // remove by dir.
 				{
-					string dir = string(val->GetItemList(0).Get(0).c_str()); // item -> userType?
+					string dir = string(val->GetItemList(0).Get(0).c_str()); // item -> userType
 
 					dir = ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
 
@@ -1213,7 +1210,7 @@ string excute_module(wiz::load_data::UserType& global)
 				}
 				else if ("$remove2" == val->GetName()) // remove /dir/name
 				{
-					string dir = string(val->GetItemList(0).Get(0).c_str()); // item -> userType?
+					string dir = string(val->GetItemList(0).Get(0).c_str()); // item -> userType
 					dir = ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
 					string name;
 					for (int i = dir.size() - 1; i >= 0; --i)
@@ -1254,9 +1251,9 @@ string excute_module(wiz::load_data::UserType& global)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$swap" == val->GetName()) // $swap2?
+				else if ("$swap" == val->GetName()) // $swap2
 				{
-					string dir = string(val->GetItemList(0).Get(0).c_str()); // + 0?
+					string dir = string(val->GetItemList(0).Get(0).c_str()); // + 0
 					string value1 = val->GetUserTypeList(0).Get(0)->ToString();
 					string value2 = val->GetUserTypeList(1).Get(0)->ToString();
 
@@ -1276,7 +1273,7 @@ string excute_module(wiz::load_data::UserType& global)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$print" == val->GetName()) /// using tobool4?, has many bugs..!!
+				else if ("$print" == val->GetName()) /// using tobool4, has many bugs..!!
 				{
 					if (val->GetUserTypeListSize() == 1
 						&& val->GetUserTypeList(0).Get(0)->GetItemListSize() == 1)
@@ -1393,7 +1390,7 @@ string excute_module(wiz::load_data::UserType& global)
 					{
 						convert.clear();
 
-						// event table setting?
+						// event table setting
 						for (int i = 0; i < events.size(); ++i)
 						{
 							auto x = events[i].Get(0)->GetItem("id");
@@ -1402,7 +1399,7 @@ string excute_module(wiz::load_data::UserType& global)
 								convert.insert(pair<string, int>(x[0].Get(0), i));
 							}
 							else {
-								// error?
+								// error
 							}
 						}
 
@@ -1440,7 +1437,7 @@ string excute_module(wiz::load_data::UserType& global)
 					if (eventStack.size() > 1)
 					{
 						string temp = ToBool4(global, eventStack.top().parameters, val->ToString(), eventStack.top());
-						/// if temp just one?
+						/// if temp just one
 						eventStack[eventStack.size() - 2].return_value = temp;
 					}
 
@@ -1608,7 +1605,7 @@ string excute_module(wiz::load_data::UserType& global)
 					if ("TRUE" == temp)
 					{
 						eventStack.top().nowUT.push(val->GetUserTypeList(1).Get(0));
-						val = eventStack.top().nowUT.top()->GetUserTypeList(0).Get(0); // empty chk?
+						val = eventStack.top().nowUT.top()->GetUserTypeList(0).Get(0); // empty chk
 						eventStack.top().userType_idx.push(0);
 						eventStack.top().state.push(1);
 						state = 1;
@@ -1631,13 +1628,13 @@ string excute_module(wiz::load_data::UserType& global)
 				}
 				else if ("$else" == val->GetName())
 				{
-					// if가 바로 앞에 나와야한다. - later?
+					// if가 바로 앞에 나와야한다. - later
 					//
 					if (!eventStack.top().conditionStack.empty() && "FALSE" == eventStack.top().conditionStack.top())
 					{
 						eventStack.top().conditionStack.top() = "TRUE";
 						eventStack.top().nowUT.push(val->GetUserTypeList(0).Get(0));
-						val = eventStack.top().nowUT.top()->GetUserTypeList(0).Get(0); // empty chk?
+						val = eventStack.top().nowUT.top()->GetUserTypeList(0).Get(0); // empty chk
 						eventStack.top().userType_idx.push(0);
 						eventStack.top().state.push(2);
 						state = 2;
@@ -1669,7 +1666,7 @@ string excute_module(wiz::load_data::UserType& global)
 
 int main(int argc, char* argv[])
 {
-	srand(time(NULL)); // ?
+	srand(time(NULL)); // 
 
 	string fileName;
 
