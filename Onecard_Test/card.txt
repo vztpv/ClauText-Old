@@ -1,4 +1,4 @@
-ï»¿
+
 
 # Card
 Event = { # just one!
@@ -19,7 +19,7 @@ Event = { # just one!
 }
 Event = { # just one!
 	id = 3
-	$call = { id = 101 i = 0 } # using stack? + ï§ë‰–ì¾²å¤·ê³Œí‰´ï§¡??ëˆë’—åª›Â€?
+	$call = { id = 101 i = 0 } # using stack? + ëª‡ë²ˆì¨°ê¹Œì°??ˆëŠ”ê°€?
 	# insert two joker
 	$make = { $concat = { /Card $concat = { / /Info/CARDNUM } } }
 	$make = { $concat = { /Card $concat = { / $add = { /Info/CARDNUM 1 } } } } 
@@ -40,7 +40,7 @@ Event = {
 }
 
 # Card String Image
-##"â™¤","â—†","â™¥","â™§",  "â˜†","â˜…"
+##"¢»","¡ß","¢¾","¢¿",  "¡Ù","¡Ú"
 ## 0    1     2    3     4    5
 ## K->A->.....->J->Q
 ## 0  1        11 12
@@ -48,11 +48,11 @@ CardStringImage =
 {
 	num = { K A 2 3 4 5 6 7 8 9 10 J Q }
 	sha = { 
-		sha_image = { â™¤ â—† â™¥ â™§ }
+		sha_image = { ¢» ¡ß ¢¾ ¢¿ }
 		sha_name = { spade dia heart clover }
 	}
-	blackJoker = { â˜† }
-	colorJoker = { â˜… }
+	blackJoker = { ¡Ù }
+	colorJoker = { ¡Ú }
 }
 Event = 
 {

@@ -17,14 +17,14 @@ Event =
 	$local = { result }
 	#Action
 
-	$load = { "Onecard_Test/global.txt" }
-	$load = { "Onecard_Test/card.txt" }
-	$load = { "Onecard_Test/cardList.txt" }
-	$load = { "Onecard_Test/init.txt" }
-	$load = { "Onecard_Test/print.txt" }
-	$load = { "Onecard_Test/putcard.txt" }
-	$load = { "Onecard_Test/turn.txt" }
-	$load = { "Onecard_Test/rule.txt" }
+	$load = { "Onecard_Test/global.txt" 
+			  "Onecard_Test/card.txt" 
+	          "Onecard_Test/cardList.txt" 
+	          "Onecard_Test/init.txt" 
+	          "Onecard_Test/print.txt"
+	          "Onecard_Test/putcard.txt" 
+			  "Onecard_Test/turn.txt" 
+			  "Onecard_Test/rule.txt" }
 	 
 
 	$if = { $condition = { FALSE }
