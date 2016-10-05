@@ -1082,7 +1082,12 @@ string excute_module(wiz::load_data::UserType& global)
 				}
 				else if ("$call" == val->GetName()) {
 					//cout << "$call " << val->GetItem("id")[0].Get(0) << endl;
-					info.id = val->GetItem("id")[0].Get(0);
+					if (!val->GetItem("id").empty()) {
+						info.id = val->GetItem("id")[0].Get(0);
+					}
+					else {
+						info.id = ToBool4(global, eventStack.top().parameters, val->GetUserTypeItem("id")[0].Get(0)->ToString(), eventStack.top());
+					}
 					// cf) id =  { $local.i }
 					// 추가??? todo???
 
