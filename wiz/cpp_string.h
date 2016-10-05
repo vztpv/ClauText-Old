@@ -219,7 +219,7 @@ namespace wiz{
                        // vector<string>( _m_str ).swap( _m_str );
                         return;
                     }
-					if (idx.first) { exist = true; if (k > idx.second) { select = j; k = idx.second; } } /// idx가 같다면 가장 처음에 나온것이 선택된다. -> 길이가 긴 것을 우선시 해야한다?
+					if (idx.first) { exist = true; if (k > idx.second) { select = j; k = idx.second; } } /// idx가 같다�?가??처음???�온것이 ?�택?�다. -> 길이가 �?것을 ?�선???�야?�다?
                 }
                 tempStr = String::substring( str, i, k-1 );
                 if( !tempStr.empty() ) { _m_str.push_back( tempStr ); }
@@ -302,7 +302,7 @@ namespace wiz{
 						// vector<string>( _m_str ).swap( _m_str );
 						return;
 					}
-					if (idx.first) { exist = true; if (k > idx.second) { select = j; k = idx.second; } } /// idx가 같다면 가장 처음에 나온것이 선택된다. -> 길이가 긴 것을 우선시 해야한다?
+					if (idx.first) { exist = true; if (k > idx.second) { select = j; k = idx.second; } } /// idx가 같다�?가??처음???�온것이 ?�택?�다. -> 길이가 �?것을 ?�선???�야?�다?
 				}
 				
 				tempStr = String::substring(str, i, k - 1);
