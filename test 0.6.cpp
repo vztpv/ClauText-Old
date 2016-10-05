@@ -970,7 +970,8 @@ string excute_module(wiz::load_data::UserType& global)
 		return "ERROR -1";
 	}
 	auto Main = GetUserType(&global, "Main"); // Main이 없으면 에러..!
-	  
+	
+
 	// event table setting?
 	for (int i = 0; i < events.size(); ++i)
 	{
@@ -1485,12 +1486,28 @@ string excute_module(wiz::load_data::UserType& global)
 				else if ("$load" == val->GetName())
 				{
 					// to do, load data and events from other file!
-					string fileName = ToBool4(global, eventStack.top().parameters, val->GetItemList(0).Get(0), eventStack.top());
-					fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
-					wiz::load_data::UserType ut;
-					if (wiz::load_data::LoadData::LoadDataFromFile(fileName, ut)) {
-						wiz::load_data::LoadData::AddData(global, "", ut.ToString(), "TRUE");
-						events = global.GetUserTypeItem("Event");
+					for (int i = 0; i < val->GetItemListSize(); ++i) {
+						string fileName = ToBool4(global, eventStack.top().parameters, val->GetItemList(i).Get(0), eventStack.top());
+						fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
+						wiz::load_data::UserType ut;
+						if (wiz::load_data::LoadData::LoadDataFromFile(fileName, ut)) {
+							wiz::load_data::LoadData::AddData(global, "", ut.ToString(), "TRUE");
+							events = global.GetUserTypeItem("Event");
+
+							auto _Main = ut.GetUserTypeItem("Main");
+							if (NULL != Main && !_Main.empty())
+							{
+								// error!
+								cout << "err" << endl;
+								return "ERROR -2";
+							}
+						}
+						else {
+							// error!
+						}
+					}
+
+					{
 						convert.clear();
 
 						// event table setting?
@@ -1508,18 +1525,8 @@ string excute_module(wiz::load_data::UserType& global)
 
 						// update no
 						no = convert[str];
+					}
 
-						auto _Main = ut.GetUserTypeItem("Main");
-						if (NULL != Main && !_Main.empty())
-						{
-							// error!
-							cout << "err" << endl;
-							return "ERROR -2";
-						}
-					}
-					else {
-						// error!
-					}
 					eventStack.top().userType_idx.top()++;
 					break;
 
@@ -1619,6 +1626,47 @@ string excute_module(wiz::load_data::UserType& global)
 				}
 				else if ("$stable_sort" == val->GetName()) {
 					// todo
+					// todo
+					vector<SortInfo> siVec;
+					wiz::load_data::UserType* utTemp =
+						wiz::load_data::UserType::Find(&global,
+							ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top())).second[0];
+
+					vector<wiz::load_data::Type*> temp;
+
+
+					int item_count = 0, ut_count = 0;
+					for (int i = 0; i < utTemp->GetIList().size(); ++i) {
+						if (utTemp->GetIList()[i] == 1) {
+							temp.push_back(&(utTemp->GetItemList(item_count)));
+							siVec.emplace_back(utTemp->GetItemList(item_count).GetName(), 1, i);
+							item_count++;
+						}
+						else {
+							temp.push_back(utTemp->GetUserTypeList(ut_count).Get(0));
+							siVec.emplace_back(utTemp->GetUserTypeList(ut_count).GetName(), 2, i);
+							ut_count++;
+						}
+					}
+
+					std::stable_sort(siVec.begin(), siVec.end());
+
+
+					wiz::load_data::UserType ut;
+					for (int i = 0; i < temp.size(); ++i)
+					{
+						if (siVec[i].iElement == 1) {
+							ut.AddItem(siVec[i].name, static_cast<wiz::load_data::TypeArray<string>*>(temp[siVec[i].idx])->Get(0));
+						}
+						else {
+							ut.AddUserTypeItem(*(static_cast<wiz::load_data::UserType*>(temp[siVec[i].idx])));
+						}
+					}
+
+					utTemp->Remove();
+
+					wiz::load_data::LoadData::AddData(*(utTemp), "", ut.ToString(), "TRUE");
+
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1748,7 +1796,7 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		fileName = string( argv[1] );
+		fileName = string(argv[1]);
 	}
 
 	wiz::load_data::UserType global;			// 6 -> 5
