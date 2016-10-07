@@ -4,7 +4,7 @@
 	3. Event Group?
 	4. Event Graph?
 	5. Register Module or Call Registered Module?
-	4. fix bugs. 
+	6. Fix bugs. 
 	
 # example codes 
 	#  # is notation
