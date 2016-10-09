@@ -24,7 +24,7 @@ namespace wiz {
 				: name(type.name)
 			{ }
 			virtual ~Type() { }
-			bool IsFail() const { // change body?
+			bool IsFail() const { // change body
 				return "" == name;
 			}
 			const string& GetName()const {
@@ -85,7 +85,7 @@ namespace wiz {
 				return arr[index];
 			}
 			const T& Get(const int index) const {
-				// #ifdef DEBUG ??
+				// #ifdef DEBUG 
 				/*if (index < 0 || index >= count || arr.size() <= 0) {
 					std::cout << "index " << index << endl;
 					throw "index not valid";
@@ -146,6 +146,38 @@ namespace wiz {
 			const TypeArray<string>& GetItemList(const int idx) const { return itemList[idx]; }
 			TypeArray<UserType*>& GetUserTypeList(const int idx) { return userTypeList[idx]; }
 			const TypeArray<UserType*>& GetUserTypeList(const int idx) const { return userTypeList[idx]; }
+
+			bool IsItemList(const int idx) const
+			{
+				return ilist[idx] == 1;
+			}
+			bool IsUserTypeList(const int idx) const
+			{
+				return ilist[idx] == 2;
+			}
+			//todo - bool IsItemList? IsUserTypeList? by ilist_idx
+			//		Type* GetList( const int idx )
+			Type* GetList(const int idx)
+			{
+				if (ilist[idx] == 1) {
+					int item_idx = -1;
+
+					for (int i = 0; i < ilist.size() && i <= idx; ++i) {
+						if (ilist[idx] == 1) { item_idx++; }
+					}
+
+					return (Type*)(&itemList[item_idx]);
+				}
+				else {
+					int usertype_idx = -1;
+
+					for (int i = 0; i < ilist.size() && i <= idx; ++i) {
+						if (ilist[idx] == 2) { usertype_idx++; }
+					}
+					return (Type*)(&userTypeList[usertype_idx]);
+				}
+			}
+
 			void AddItemList(const TypeArray<string>& strTa)
 			{
 				for (int i = 0; i < strTa.size(); ++i) {
@@ -336,7 +368,7 @@ namespace wiz {
 			}
 			void Remove()
 			{
-				/// parent->removeUserType(name); - ToDo - X?
+				/// parent->removeUserType(name); - ToDo - X
 				ilist = vector<int>();
 				itemList = vector< TypeArray<string> >();
 
@@ -390,7 +422,31 @@ namespace wiz {
 				}
 				userTypeList = move( tempDic );
 			}
+			// todo - 
+			void RemoveList(const int idx) // ilist_idx!
+			{
+				// chk whether item or usertype.
+				// find item_idx or usertype_idx.
+				// remove item or remove usertype.
+				if (ilist[idx] == 1) {
+					int item_idx = -1;
 
+					for (int i = 0; i < ilist.size() && i <= idx; ++i) {
+						if (ilist[idx] == 1) { item_idx++; }
+					}
+
+					RemoveItemList(item_idx);
+				}
+				else {
+					int usertype_idx = -1;
+
+					for (int i = 0; i < ilist.size() && i <= idx; ++i) {
+						if (ilist[idx] == 2) { usertype_idx++; }
+					}
+
+					RemoveItemList(usertype_idx);
+				}
+			}
 		public:
 			bool empty()const { return ilist.empty(); }
 			void AddItem(const string& name, const string& item) {
@@ -454,8 +510,28 @@ namespace wiz {
 
 				userTypeList.push_back(temp2);
 			}
+			// todo - AddItemAtFront, AddUserTypeItemAtFront
+			void AddItemAtFront(const string& name, const string& item) {
+				TypeArray<string> temp(name);
+				temp.Push(item);
 
-			/// To Do!!
+				itemList.insert(itemList.begin(), temp);
+
+				ilist.insert(ilist.begin(), 1);
+			}
+			void AddUserTypeItemAtFront(const UserType& item) {
+				UserType* temp = new UserType(item);
+				temp->parent = this;
+
+				TypeArray<UserType*> temp2(item.GetName());
+				temp2.Push(temp);
+
+				ilist.insert(ilist.begin(), 2);
+
+				userTypeList.insert(userTypeList.begin(), temp2);
+			}
+
+
 			vector<TypeArray<string>> GetItem(const string& name) const {
 				vector<TypeArray<string>> temp;
 
@@ -479,7 +555,7 @@ namespace wiz {
 
 				return -1 != index;
 			}
-			/// add set Data?
+			/// add set Data
 			bool SetItem(const int var_idx, const string& value) {
 				itemList[var_idx].Set(0, value);
 				return true;
@@ -763,7 +839,7 @@ namespace wiz {
 					}
 				}
 			}
-			/// move to UserType?
+			/// move to UserType
 			static bool ChkData(const UserType* utTemp)
 			{
 				bool chk = true;
@@ -784,7 +860,7 @@ namespace wiz {
 
 				return chk;
 			}
-			// find userType! not itemList!,// this has bug??
+			// find userType! not itemList!,// this has bug
 			static std::pair<bool, vector< UserType*> > Find(UserType* global, const string& _position) /// option, option_offset
 			{
 				string position = _position;

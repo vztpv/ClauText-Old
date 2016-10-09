@@ -49,7 +49,7 @@ namespace wiz{
     public:
         void operator()( T& t1, T& t2 )
         {
-            std::swap( t1, t2 ); /// if c++11, maybe move...or make Move?
+            std::swap( t1, t2 ); /// if c++11, maybe move...or make Move
         }
     };
     template <class T>
@@ -161,8 +161,10 @@ namespace wiz{
     /// TO DO
     /// PASC_PEE, PDSC_PEE, PNOT_EE, PEE_SAME_VALUE, PNOT_EE_SAME_VALUE
     /// LEFT_HAS_SMALL_VALUE, LEFT_HAS_LARGE_VALUE, PLEFT_HAS_SMALL_VALUE, PLEFT_HAS_LARGE_VALUE
+	template <typename T> /// T <- char, int, long, long long...
+	string toStr(const T x, const int base); /// chk!!
 
-	template <class T, class COMP = ASC<T>, class COMP2 = ASC<int>, class EE = EE<T> > /// ?úÏÑú Î∞îÍæ∏Í∏? - 2015.07.18
+	template <class T, class COMP = ASC<T>, class COMP2 = ASC<int>, class EE = EE<T> > /// úÏÑú Î∞îÍæ∏Í∏ - 2015.07.18
 	class WrapForInfinity
 	{
 		enum Op{ MIF = 0, GR = 1, IF = 2 };
@@ -206,6 +208,73 @@ namespace wiz{
 			return *this < wfi ||
 				*this == wfi;
 		}
+		bool operator>=(const WrapForInfinity <T,COMP, COMP2, EE>& wfi)const
+		{
+			return wfi <= *this;
+		}
+		WrapForInfinity<T> operator+(const WrapForInfinity<T>& other)const
+		{
+			if (other.op == this->op) {
+				return WrapForInfinity<T>(this->val + ohter.val, this->op);
+			}
+			else if (this->op == MIF && other.op == GR) {
+				return WrapForInfinity<T>::GetMinusInfinity();
+			}
+			else if (this->op == IF && other.op == GR) {
+				return WrapForInfinity<T>::GetInfinity();
+			}
+			else if (this->op == GR && other.op == IF) {
+				return WrapForInfinity<T>::GetInfinity();
+			}
+			else if (this->op == GR && other.op == MIF) {
+				return WrapForInfinity<T>::GetMinusInfinity();
+			}
+			else if (this->op == MIF && other.op == MIF) {
+				return WrapForInfinity<T>::GetMinusInfinity();
+			}
+			else if (this->op == IF && other.op == IF) {
+				return WrapForInfinity<T>::GetInfinity();
+			}
+			else
+			{
+				throw string(" + Error in wrapforinfiinity");
+			}
+		}
+		WrapForInfinity<T> operator-(const WrapForInfinity<T>& other)const
+		{
+			if (other.op == this->op && this->op == GR) {
+				return WrapForInfinity<T>(this->val - other.val, this->op);
+			}
+			else if (this->op == MIF && other.op == GR) {
+				return WrapForInfinity<T>::GetMinusInfinity();
+			}
+			else if (this->op == GR && other.op == MIF) {
+				return WrapForInfinity<T>::GetInfinity();
+			}
+			else if (this->op == IF && other.op == GR) {
+				return WrapForInfinity<T>::GetInfinity();
+			}
+			else if (this->op == GR && other.op == IF) {
+				return WrapForInfinity<T>::GetMinusInfinity();
+			}
+			else if (this->op == MIF && other.op == IF) {
+				return WrapForInfinity<T>::GetMinusInfinity();
+			}
+			else if (this->op == IF && other.op == MIF) {
+				return WrapForInfinity<T>::GetInfinity();
+			}
+			else
+			{
+				throw string(" - Error in wrapforinfiinity");
+			}
+		}
+		string toString()const
+		{
+			if (this->op == MIF) return "minus infinity";
+			else if (this->op == IF) return "plus infinity";
+			else return wiz::toStr(this->val);
+		}
+
 		friend
         ostream& operator<<(ostream& stream, const WrapForInfinity<T,COMP,COMP2,EE>& wfi)
 		{
@@ -226,7 +295,7 @@ namespace wiz{
 	};
 
     template <typename T> /// x is 10ÏßÑÏàò..
-    inline T pos_1(const T x, const int base=10) // 1???êÎ¶¨ Í∞?Í≥ÑÏÇ∞
+    inline T pos_1(const T x, const int base=10) // 1êÎ¶¨ Í∞Í≥ÑÏÇ∞
 	{
 		if( x >= 0 ) { return x % base; }// x - ( x / 10 ) * 10; }
 		else{ return (x / base) * base - x; }
@@ -243,7 +312,7 @@ namespace wiz{
 		string tempString;
 		int k;
 		bool isMinus = (i < 0);
-		temp[INT_SIZE+1] = '\0'; ///Î¨∏Ïûê???úÏãú..
+		temp[INT_SIZE+1] = '\0'; ///Î¨∏ÏûêúÏãú..
 
 		for (k = INT_SIZE; k >= 1; k--){
             T val = pos_1<T>(i, base); /// 0 ~ base-1
@@ -253,7 +322,7 @@ namespace wiz{
 
 			i /= base;
 
-			if (0 == i){ // ?´Ïûê????.
+			if (0 == i){ // ´Ïûê.
 				k--;
 				break;
 			}
@@ -285,7 +354,7 @@ namespace wiz{
 		string tempString;
 		int k;
 		bool isMinus = (i < 0);
-		temp[INT_SIZE+1] = '\0'; ///Î¨∏Ïûê???úÏãú..
+		temp[INT_SIZE+1] = '\0'; ///Î¨∏ÏûêúÏãú..
 
 		for (k = INT_SIZE; k >= 1; k--){
             T val = pos_1<T>(i, base); /// 0 ~ base-1
@@ -295,7 +364,7 @@ namespace wiz{
 
 			i /= base;
 
-			if (0 == i){ // ?´Ïûê????.
+			if (0 == i){ // ´Ïûê.
 				k--;
 				break;
 			}
@@ -326,7 +395,7 @@ namespace wiz{
 		return toStr<int>(x);
 	}
 
-	template <typename T> /// ?∏Ï∂ú?†Îïå ?åÏïÑ??Ï≤¥ÌÅ¨?úÎã§?
+	template <typename T> /// ∏Ï∂ú†Îïå åÏïÑÏ≤¥ÌÅ¨úÎã§
 	inline string _toString(const T x)
 	{
 		std::stringstream strs;
@@ -345,7 +414,7 @@ namespace wiz{
 		return "false";
 	}
 
-    // following remove????
+    // following remove
     inline bool isWhitespace( const char ch )
     {
         switch( ch )

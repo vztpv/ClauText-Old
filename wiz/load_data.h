@@ -12,7 +12,7 @@
 using namespace std;
 
 #include <wiz/global.h>
-//#include <wiz/Dictionary.h> /// change to map?
+//#include <wiz/Dictionary.h> /// change to map
 
 #include <wiz/cpp_string.h>
 #include <wiz/queues.h>
@@ -37,7 +37,7 @@ namespace wiz {
 		bool PassSharp(ifstream& inFile, const string& str) {
 			if ('#' == str[0]) {
 				string temp;
-				getline(inFile, temp); // enter key?
+				getline(inFile, temp); // enter key
 				return true;
 			}
 			return false;
@@ -52,7 +52,7 @@ namespace wiz {
 
 		UserType LoadData(const string& fileName) {
 			vector< UserType* > nestedUT;
-			UserType global("global"); /// fileName을 받아와서 global를 리턴하는 dll등을 해보자??
+			UserType global("global"); /// fileName을 받아와서 global를 리턴하는 dll등을 해보자
 			ifstream inFile;
 			int state = 0;
 			string id;
@@ -61,7 +61,7 @@ namespace wiz {
 
 			// init
 			inFile.open(fileName);
-			if (inFile.fail()) { throw "infile.fail.."; } /// throw error??
+			if (inFile.fail()) { throw "infile.fail.."; } /// throw error
 
 			nestedUT.push_back(&global);
 
@@ -125,7 +125,7 @@ namespace wiz {
 			/// core
 		private:
 			template <class Reserver>
-			static bool _LoadData(ArrayQueue<string>& strVec, Reserver& vecReserver, UserType& global) // first, strVec.empty() must be true!!?
+			static bool _LoadData(ArrayQueue<string>& strVec, Reserver& vecReserver, UserType& global) // first, strVec.empty() must be true!!
 			{
 				int state = 0;
 				int braceNum = 0;
@@ -147,7 +147,7 @@ namespace wiz {
 							strVec.empty() &&
 							vecReserver.end()
 							) {
-							return false; // throw "Err nextToken does not exist"; // cf) or empty? file or empty? string!
+							return false; // throw "Err nextToken does not exist"; // cf) or empty file or empty string!
 						}
 					}
 				}
@@ -245,7 +245,7 @@ namespace wiz {
 							if (biPair.first)
 							*/
 							{
-								/// uisng struct?
+								/// uisng struct
 								state_reserve.push(0);
 								do_reserve.push(RIGHT_DO);
 								state = 4;
@@ -350,7 +350,7 @@ namespace wiz {
 							if (biPair.first)
 							*/
 							{
-								/// uisng struct?
+								/// uisng struct
 								state_reserve.push(4);
 
 								{
@@ -445,7 +445,7 @@ namespace wiz {
 							}
 							if (biPair.first) */
 							{
-								/// uisng struct?
+								/// uisng struct
 								state_reserve.push(4);
 
 								{
@@ -493,7 +493,7 @@ namespace wiz {
 			}
 
 		public:
-			static bool LoadDataFromFile(const string& fileName, UserType& global) /// global should be empty?
+			static bool LoadDataFromFile(const string& fileName, UserType& global) /// global should be empty
 			{
 				ifstream inFile;
 				inFile.open(fileName, ios::binary);
@@ -549,7 +549,7 @@ namespace wiz {
 				str = Utility::ChangeStr(str, "\r", "^3");
 				str = Utility::ChangeStr(str, "\n", "^4");
 				/// ToDp - ""안에 여백이 있을 떄 다른 것으로 대체후 다시 변경
-				/// ToDo -  #주석이 있다면? 없애는 함수 제작? - using str.find, String::Substr.
+				/// ToDo -  #주석이 있다면 없애는 함수 제작 - using str.find, String::Substr.
 				/// ToDo - error 처리..
 				StringTokenizer tokenizer(str, vector<string>{" ", "\t", "\r", "\n"});
 				ArrayQueue<string> strVec;
@@ -610,7 +610,7 @@ namespace wiz {
 			bool AllRemoveWizDB() {
 				return AllRemoveWizDB(global);
 			}
-			// AddQuery AddData, AddUserTypeData?
+			// AddQuery AddData, AddUserTypeData
 			bool AddData(const string& position, const string& data, const string& condition = "") {
 				return AddData(global, position, data, condition);
 			}
@@ -643,7 +643,7 @@ namespace wiz {
 			/// varName = val - do
 			/// varName = { val val val } - GetData(position+"/varName", ""); 
 			/// varName = { var = val } - GetData(position+"/varname", var);
-			string GetData(const string& position, const string& varName, const string& condition) // ??
+			string GetData(const string& position, const string& varName, const string& condition) // 
 			{
 				return GetData(global, position, varName, condition);
 			}
@@ -673,8 +673,8 @@ namespace wiz {
 				return SaveWizDB(global, fileName, option);
 			}
 
-			/// To Do - ExistItem, ExistUserType, SetUserType? GetUserType?
-			bool ExistData(const string& position, const string& varName, const string& condition) // ??
+			/// To Do - ExistItem, ExistUserType, SetUserType GetUserType
+			bool ExistData(const string& position, const string& varName, const string& condition) // 
 			{
 				return ExistData(global, position, varName, condition);
 			}
@@ -683,7 +683,7 @@ namespace wiz {
 				return UserType::ChkData(&global);
 			}
 
-			/// ToDo - recursive function??
+			/// ToDo - recursive function
 			string SearchItem(const string& var, const string& condition)
 			{
 				return SearchItem(global, var, condition);
@@ -791,7 +791,7 @@ namespace wiz {
 				global = UserType("");
 				return true;
 			}
-			// AddQuery AddData, AddUserTypeData?
+			// AddQuery AddData, AddUserTypeData
 			static bool AddData(UserType& global, const string& position, const string& data, const string& condition = "") {
 				UserType utTemp = UserType("global");
 				bool isTrue = false;
@@ -806,7 +806,7 @@ namespace wiz {
 						int item_n = 0;
 						int user_n = 0;
 
-						/// chk temp test codes - > using flag? 1->Exist 2->Comparision?
+						/// chk temp test codes - > using flag 1->Exist 2->Comparision
 						//if (finded.second[i]->GetItem("base_tax").GetCount() > 0) { continue; }
 						///~end
 						if (false == condition.empty()) {
@@ -839,6 +839,53 @@ namespace wiz {
 					return false;
 				}
 			}
+			static bool AddDataAtFront(UserType& global, const string& position, const string& data, const string& condition = "") {
+				UserType utTemp = UserType("global");
+				bool isTrue = false;
+
+				if (false == LoadDataFromString(data, utTemp))
+				{
+					return false;
+				}
+				auto finded = UserType::Find(&global, position);
+				if (finded.first) {
+					for (int i = 0; i < finded.second.size(); ++i) {
+						int item_n = 0;
+						int user_n = 0;
+
+						/// chk temp test codes - > using flag 1->Exist 2->Comparision
+						//if (finded.second[i]->GetItem("base_tax").GetCount() > 0) { continue; }
+						///~end
+						if (false == condition.empty()) {
+							Condition cond(condition, finded.second[i], &global);
+
+							while (cond.Next());
+
+							if (cond.Now().size() != 1 || "TRUE" != cond.Now()[0]) // || cond.Now().size()  != 1
+							{
+								//std::cout << cond.Now()[0] << endl;
+								continue;
+							}
+						}
+
+						for (int k = 0; k < utTemp.GetIList().size(); ++k) {
+							if (utTemp.GetIList()[k] == 1) {
+								finded.second[i]->AddItemAtFront(utTemp.GetItemList(item_n).GetName(), utTemp.GetItemList(item_n).Get(0));
+								item_n++;
+							}
+							else if (utTemp.GetIList()[k] == 2) {
+								finded.second[i]->AddUserTypeItemAtFront(*utTemp.GetUserTypeList(user_n).Get(0));
+								user_n++;
+							}
+						}
+						isTrue = true;
+					}
+					return isTrue;
+				}
+				else {
+					return false;
+				}
+			}
 			static bool AddNoNameUserType(UserType& global, const string& position, const string& data, const string& condition = "")
 			{
 				UserType utTemp = UserType("");
@@ -854,7 +901,7 @@ namespace wiz {
 						int item_n = 0;
 						int user_n = 0;
 
-						/// chk temp test codes - > using flag? 1->Exist 2->Comparision?
+						/// chk temp test codes - > using flag 1->Exist 2->Comparision
 						//if (finded.second[i]->GetItem("base_tax").GetCount() > 0) { continue; }
 						///~end
 						if (false == condition.empty()) {
@@ -1057,7 +1104,7 @@ namespace wiz {
 											continue;
 										}
 									}
-									finded.second[i]->SetItem(_varName, data); /// chk??
+									finded.second[i]->SetItem(_varName, data); /// chk
 									isTrue = true;
 								}
 
@@ -1100,7 +1147,7 @@ namespace wiz {
 									continue;
 								}
 							}
-							finded.second[i]->SetItem(var_idx, data); /// chk??
+							finded.second[i]->SetItem(var_idx, data); /// chk
 							isTrue = true;
 						}
 
@@ -1216,7 +1263,7 @@ namespace wiz {
 			/// varName = val - do
 			/// varName = { val val val } - GetData(position+"/varName", ""); 
 			/// varName = { var = val } - GetData(position+"/varname", var);
-			static string GetData(UserType& global, const string& position, const string& varName, const string& condition) // ??
+			static string GetData(UserType& global, const string& position, const string& varName, const string& condition) // 
 			{
 				string str;
 				string _var = varName;
@@ -1251,7 +1298,7 @@ namespace wiz {
 				return str;
 			}
 			
-			/// todo - SetUserTypeName?? // 합치는 함수??
+			/// todo - SetUserTypeName // 합치는 함수
 
 			/*
 			bool RemoveData(const string& position) {
@@ -1344,7 +1391,6 @@ namespace wiz {
 				auto finded = UserType::Find(&global, position);
 				bool isTrue = false;
 
-
 				if (finded.first) {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						UserType* temp = finded.second[i];
@@ -1370,7 +1416,37 @@ namespace wiz {
 					return false;
 				}
 			}
-			
+			// todo - static bool Remove(UserType& global, const string& positiion, oonst int idx, const string& condition)
+			static bool Remove(UserType& global, const string& position, const int idx, const string& condition) {
+				auto finded = UserType::Find(&global, position);
+				bool isTrue = false;
+
+				if (finded.first) {
+					for (int i = 0; i < finded.second.size(); ++i) {
+						UserType* temp = finded.second[i];
+
+						if (false == condition.empty()) {
+							Condition cond(condition, finded.second[i], &global);
+
+							while (cond.Next());
+
+							if (cond.Now().size() != 1 || "TRUE" != cond.Now()[0])
+							{
+								// std::cout << cond.Now()[0] << endl;
+								continue;
+							}
+						}
+
+						temp->RemoveList(idx);
+						isTrue = true;
+					}
+					return isTrue;
+				}
+				else {
+					return false;
+				}
+			}
+			// cf) idx == -1 -> size()-1 ?? or RemoveBack() ??
 			static bool RemoveNoNameItem(UserType& global, const string& position, const string& value)
 			{
 				auto finded = UserType::Find(&global, position);
@@ -1496,9 +1572,9 @@ namespace wiz {
 
 				/// saveFile
 				if (option == "0")
-					outFile << global; /// SaveFile( fileName, data, use option 1 or 2? )
+					outFile << global; /// SaveFile( fileName, data, use option 1 or 2 )
 				else if (option == "1") // for eu4.
-					global.Save1(outFile); // cf) friend?
+					global.Save1(outFile); // cf) friend
 				else if (option == "2")
 					global.Save2(outFile);
 
@@ -1544,8 +1620,8 @@ namespace wiz {
 				return true;
 			}
 
-			/// To Do - ExistItem, ExistUserType, SetUserType? GetUserType?
-			static bool ExistData(UserType& global, const string& position, const string& varName, const string& condition) // ??
+			/// To Do - ExistItem, ExistUserType, SetUserType GetUserType
+			static bool ExistData(UserType& global, const string& position, const string& varName, const string& condition) // 
 			{
 				int count = 0;
 				string _var = varName;
@@ -1570,7 +1646,7 @@ namespace wiz {
 				}
 				return 0 != count;
 			}
-			static bool ExistUserType(UserType& global, const string& position, const string& condition) // ??
+			static bool ExistUserType(UserType& global, const string& position, const string& condition) // 
 			{
 				int count = 0;
 
@@ -1593,7 +1669,7 @@ namespace wiz {
 				}
 				return 0 != count;
 			}
-			static bool ExistOneUserType(UserType& global, const string& position, const string& condition) // ??
+			static bool ExistOneUserType(UserType& global, const string& position, const string& condition) // 
 			{
 				int count = 0;
 				
@@ -1619,7 +1695,7 @@ namespace wiz {
 				}
 				return 1 == count;
 			}
-			static bool ExistItem(UserType& global, const string& position, const string& varName, const string& condition) // ??
+			static bool ExistItem(UserType& global, const string& position, const string& varName, const string& condition) // 
 			{
 				int count = 0;
 				string _var = varName;
