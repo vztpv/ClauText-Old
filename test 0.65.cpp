@@ -464,7 +464,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 	{
 		operandStack.push(info.return_value);
 	}
-	else if ("$back" == str) // ex) for x  = { 0 1 2 3 .. }
+	else if ("$back" == str) // ex) for x  = { 0 1 2 3 .. }, for usertaypelist? and mixed?
 	{
 		string x = operandStack.pop();
 
@@ -472,9 +472,17 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		wiz::load_data::UserType ut;
 		wiz::load_data::LoadData::LoadDataFromString(value, ut);
 
-		operandStack.push(ut.GetItemList(ut.GetItemListSize() - 1).Get(0));
+		if (ut.IsItemList(ut.GetIList().size()-1))
+		{
+			auto x = (wiz::load_data::TypeArray<string>*)ut.GetList(ut.GetIList().size() - 1);
+			operandStack.push(x->Get(0));
+		}
+		else {
+			auto x = (wiz::load_data::TypeArray<wiz::load_data::UserType*>*)ut.GetList(ut.GetIList().size() - 1);
+			operandStack.push("\"" + x->Get(0)->ToString() + "\"");
+		}
 	}
-	else if ("$pop_back" == str)
+	else if ("$pop_back" == str) // and for usertypelist? and mixed?, usertype-> "~"
 	{
 		string x = operandStack.pop();
 		string name;
@@ -492,10 +500,68 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		wiz::load_data::UserType* ut = NULL;
 		auto finded = wiz::load_data::UserType::Find(&global, x);
 		ut = finded.second[0];
-		string z = ut->GetItemList(ut->GetItemListSize() - 1).Get(0);
-		ut->RemoveItemList(ut->GetItemListSize() - 1);
 
-		operandStack.push(z);
+		if (ut->IsItemList(ut->GetIList().size() - 1))
+		{
+			auto x = (wiz::load_data::TypeArray<string>*)ut->GetList(ut->GetIList().size() - 1);
+			operandStack.push(x->Get(0));
+			ut->RemoveItemList(ut->GetItemListSize() - 1);
+		}
+		else {
+			auto x = (wiz::load_data::TypeArray<wiz::load_data::UserType*>*)ut->GetList(ut->GetIList().size() - 1);
+			operandStack.push("\"" + x->Get(0)->ToString() + "\"");
+			ut->RemoveUserTypeList(ut->GetUserTypeListSize() - 1);
+		}
+	}
+	// todo - $front, pop-front.
+	else if ("$front" == str)
+	{
+		string x = operandStack.pop();
+
+		string value = wiz::load_data::LoadData::GetItemListData(global, x, "TRUE");
+		wiz::load_data::UserType ut;
+		wiz::load_data::LoadData::LoadDataFromString(value, ut);
+
+		if (ut.IsItemList(0))
+		{
+			auto x = (wiz::load_data::TypeArray<string>*)ut.GetList(0);
+			operandStack.push(x->Get(0));
+		}
+		else {
+			auto x = (wiz::load_data::TypeArray<wiz::load_data::UserType*>*)ut.GetList(0);
+			operandStack.push("\"" + x->Get(0)->ToString() + "\"");
+		}
+	}
+	else if ("$pop_front" == str)
+	{
+		string x = operandStack.pop();
+		string name;
+		for (int i = x.size() - 1; i >= 0; --i)
+		{
+			if (x[i] == '/' && i != 0) {
+				name = wiz::String::substring(x, i + 1);
+				x = wiz::String::substring(x, 0, i - 1);
+				break;
+			}
+		}
+
+		if (x.empty()) { x = "."; }
+
+		wiz::load_data::UserType* ut = NULL;
+		auto finded = wiz::load_data::UserType::Find(&global, x);
+		ut = finded.second[0];
+
+		if (ut->IsItemList(0))
+		{
+			auto x = (wiz::load_data::TypeArray<string>*)ut->GetList(0);
+			operandStack.push(x->Get(0));
+			ut->RemoveItemList(0);
+		}
+		else {
+			auto x = (wiz::load_data::TypeArray<wiz::load_data::UserType*>*)ut->GetList(0);
+			operandStack.push("\"" + x->Get(0)->ToString() + "\"");
+			ut->RemoveUserTypeList(0);
+		}
 	}
 	else if ("$link" == str) // removal
 	{
@@ -992,8 +1058,47 @@ string excute_module(wiz::load_data::UserType& global)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
+				// todo - ($push_back-insert!) $pop_back, $push_front, $pop_front ($front?, $back?)
+				else if ("$pop_back" == val->GetName()) {
+					string dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
+					wiz::load_data::UserType* ut = NULL;
+					auto finded = wiz::load_data::UserType::Find(&global, dir);
+					ut = finded.second[0];
+
+					wiz::load_data::LoadData::Remove(global, dir, ut->GetIList().size() - 1, "TRUE");
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$push_front" == val->GetName()) {
+					string value = val->GetUserTypeList(1).Get(0)->ToString();
+					string dir;
+					if (val->GetUserTypeList(0).Get(0)->GetItemListSize() > 0) {
+						dir = val->GetUserTypeList(0).Get(0)->GetItemList(0).Get(0);
+						dir = ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
+					}
+					else ///val->Ge
+					{
+						dir = string(val->GetUserTypeList(0).Get(0)->ToString());
+						dir = ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
+					}
+
+					value = ToBool4(global, eventStack.top().parameters, value, eventStack.top());
+					
+					wiz::load_data::LoadData::AddDataAtFront(global, dir, value, "TRUE");
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$pop_front" == val->GetName()) {
+					string dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
+					
+					wiz::load_data::LoadData::Remove(global, dir, 0, "TRUE");
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
 				else if ("$call" == val->GetName()) {
-					//cout << "$call " << val->GetItem("id")[0].Get(0) << endl;
 					if (!val->GetItem("id").empty()) {
 						info.id = val->GetItem("id")[0].Get(0);
 					}
@@ -1064,8 +1169,8 @@ string excute_module(wiz::load_data::UserType& global)
 
 						eventStack.top().userType_idx.top()++;
 
-
-						if (eventStack.top().option == "REMOVE_NOW_EVENT_STACK_A") //
+						// remove remove_now_event_stack_a?
+						if (eventStack.top().option == "REMOVE_NOW_EVENT_STACK_A" || "REMOVE_IF_CALL_ONESELF_EVENT" == eventStack.top().option) //
 						{
 							eventStack.pop();
 						}
@@ -1121,7 +1226,7 @@ string excute_module(wiz::load_data::UserType& global)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$insert" == val->GetName() || "$insert2" == val->GetName())
+				else if ("push_back" == val->GetName() || "$insert" == val->GetName() || "$insert2" == val->GetName())
 				{
 					string value = val->GetUserTypeList(1).Get(0)->ToString();
 					string dir;
@@ -1145,7 +1250,7 @@ string excute_module(wiz::load_data::UserType& global)
 				else if ("$make" == val->GetName()) // To Do
 				{
 					string dir;
-					//string var = string(val->GetItemList(1).Get(0).c_str() + 1);
+
 					if (val->GetItemListSize() > 0) {
 						dir = val->GetItemList(0).Get(0);
 						dir = ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
@@ -1556,14 +1661,6 @@ string excute_module(wiz::load_data::UserType& global)
 					string temp = val->GetUserTypeList(0).Get(0)->ToString();
 					temp = ToBool4(global, eventStack.top().parameters, temp, eventStack.top());
 
-					//cout << eventStack.top().if_depth << " " <<  eventStack.top().conditionStack.size() << endl;
-
-					//if (eventStack.top().if_depth > 0 && eventStack.top().conditionStack[eventStack.top().if_depth - 1] == "FALSE")
-					//{//
-					//	eventStack.top().userType_idx.top()++;
-					//	break;
-					//}
-
 					if (!eventStack.top().conditionStack.empty())
 					{
 						if ("TRUE" == temp && eventStack.top().conditionStack.top() == "FALSE")
@@ -1640,16 +1737,12 @@ string excute_module(wiz::load_data::UserType& global)
 						state = 2;
 					}
 					else
-					{//
-					 //	if (chkFunc(eventStack, &val))
-					 //	{
+					{
 						eventStack.top().userType_idx.top()++;
 						break;
-						//}
 					}
 				}
 
-				//else 
 				{
 					if (chkFunc(eventStack, &val)) {
 						eventStack.top().userType_idx.top()++;
