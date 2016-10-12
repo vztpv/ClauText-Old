@@ -1683,12 +1683,7 @@ string excute_module(wiz::load_data::UserType& global)
 					}
 					else
 					{
-						if (!eventStack.top().nowUT.empty() && eventStack.top().userType_idx.top() + 1 < eventStack.top().nowUT.top()->GetUserTypeListSize()
-							&& (eventStack.top().nowUT.top()->GetUserTypeList(eventStack.top().userType_idx.top() + 1).GetName() == "$else"))
-						{
-							eventStack.top().conditionStack.push(temp);
-						}
-						else if (eventStack.top().userType_idx.top() + 1 < events[no].Get(0)->GetUserTypeListSize() &&
+						if (eventStack.top().userType_idx.top() + 1 < events[no].Get(0)->GetUserTypeListSize() &&
 							events[no].Get(0)->GetUserTypeList(eventStack.top().userType_idx.top() + 1).GetName() == "$else")
 						{
 							eventStack.top().conditionStack.push(temp);
@@ -1702,19 +1697,15 @@ string excute_module(wiz::load_data::UserType& global)
 					if ("TRUE" == temp)
 					{
 						eventStack.top().nowUT.push(val->GetUserTypeList(1).Get(0));
-						val = eventStack.top().nowUT.top()->GetUserTypeList(0).Get(0); // empty chk
+						val = eventStack.top().nowUT.top()->GetUserTypeList(0).Get(0); 
 						eventStack.top().userType_idx.push(0);
 						eventStack.top().state.push(1);
 						state = 1;
-						//	eventStack.top().if_depth++;
 					}
 					else if ("FALSE" == temp)
 					{
-						//if (chkFunc(eventStack, &val)) {
-
 						eventStack.top().userType_idx.top()++;
 						break;
-						//	}
 					}
 					else
 					{
@@ -1725,7 +1716,7 @@ string excute_module(wiz::load_data::UserType& global)
 				}
 				else if ("$else" == val->GetName())
 				{
-					// if가 바로 앞에 나와야한다. - later
+					// if가 바로 앞에 나와야한다.
 					//
 					if (!eventStack.top().conditionStack.empty() && "FALSE" == eventStack.top().conditionStack.top())
 					{
