@@ -1051,6 +1051,38 @@ string excute_module(wiz::load_data::UserType& global)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
+				// todo - register module from file
+				// todo	- register module from string
+				// todo - call registered module.
+
+				/// object of class?
+				else if ("$object" == val->GetName()) {
+					string objectFileName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
+					objectFileName = wiz::String::substring(objectFileName, 1, objectFileName.size() - 2);
+					string parameter;
+					if (val->GetUserTypeListSize() >= 2) {
+						parameter = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1).Get(0)->ToString(), eventStack.top());
+					}
+
+					wiz::load_data::UserType objectUT;
+					wiz::load_data::LoadData::LoadDataFromFile(objectFileName, objectUT);
+
+					string data = objectUT.ToString();
+
+					data = data + " Main = { $call = { id = 0 } } Event = { id = 0 $call = { " + parameter + "  } } ";
+					
+					objectUT.Remove();
+					wiz::load_data::LoadData::LoadDataFromString(data, objectUT);
+
+					eventStack.top().return_value = excute_module(objectUT);
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				// todo - register object from file.
+				//		~.ToString() + "Main = { $call = { id = 0 } } Event = { id = 0 $call = { id = " + id_val + " " + param_name1 + " = " + param_val1 + "  } } "
+				// todo - register object from string.
+				// todo - call registred object.
 				else if ("$option" == val->GetName()) // first
 				{
 					eventStack.top().option = ToBool4(global, eventStack.top().parameters, val->ToString(), eventStack.top());
@@ -1058,7 +1090,7 @@ string excute_module(wiz::load_data::UserType& global)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				// todo - ($push_back-insert!) $pop_back, $push_front, $pop_front ($front?, $back?)
+				// done - ($push_back-insert!) $pop_back, $push_front, $pop_front ($front?, $back?)
 				else if ("$pop_back" == val->GetName()) {
 					string dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
 					wiz::load_data::UserType* ut = NULL;
