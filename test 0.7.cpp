@@ -939,6 +939,8 @@ bool chkFunc(wiz::ArrayStack<EventInfo>& eventStack, wiz::load_data::UserType** 
 
 string excute_module(wiz::load_data::UserType& global)
 {
+	map<string, string> objectMap;
+	map<string, wiz::load_data::UserType> moduleMap;
 	string module_value = "";
 	// data, event load..
 	wiz::ArrayStack<EventInfo> eventStack;
@@ -1053,16 +1055,16 @@ string excute_module(wiz::load_data::UserType& global)
 				}
 				// todo - register module from file
 				// todo	- register module from string
-				// todo - call registered module.
+				// todo - call registered module.  $registered_module = { name = { ~ } input = { input = { n = 1 } } }
 
 				/// object of class?
 				else if ("$object" == val->GetName()) {
 					string objectFileName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
 					objectFileName = wiz::String::substring(objectFileName, 1, objectFileName.size() - 2);
 					string parameter;
-					if (val->GetUserTypeListSize() >= 2) {
-						parameter = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1).Get(0)->ToString(), eventStack.top());
-					}
+					
+					parameter = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1).Get(0)->ToString(), eventStack.top());
+					
 
 					wiz::load_data::UserType objectUT;
 					wiz::load_data::LoadData::LoadDataFromFile(objectFileName, objectUT);
@@ -1082,7 +1084,7 @@ string excute_module(wiz::load_data::UserType& global)
 				// todo - register object from file.
 				//		~.ToString() + "Main = { $call = { id = 0 } } Event = { id = 0 $call = { id = " + id_val + " " + param_name1 + " = " + param_val1 + "  } } "
 				// todo - register object from string.
-				// todo - call registred object.
+				// todo - call registered object.  $registered_object = { name = { "ex2.txt" } parameter = { id = 1 i = 1 j = 1 } }  
 				else if ("$option" == val->GetName()) // first
 				{
 					eventStack.top().option = ToBool4(global, eventStack.top().parameters, val->ToString(), eventStack.top());
@@ -1410,7 +1412,7 @@ string excute_module(wiz::load_data::UserType& global)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$print" == val->GetName()) /// using tobool4, has many bugs..!!
+				else if ("$print" == val->GetName()) /// has many bugs..!?, for print list or print item?.
 				{
 					if (val->GetUserTypeListSize() == 1
 						&& val->GetUserTypeList(0).Get(0)->GetItemListSize() == 1)
@@ -1490,7 +1492,7 @@ string excute_module(wiz::load_data::UserType& global)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$print2" == val->GetName())
+				else if ("$print2" == val->GetName()) /// for print usertype.ToString();
 				{
 					string dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
 					str = wiz::load_data::UserType::Find(&global, dir).second[0]->ToString();
@@ -1580,7 +1582,9 @@ string excute_module(wiz::load_data::UserType& global)
 
 					if (eventStack.size() == 1)
 					{
-						module_value = eventStack.top().return_value;
+						string temp = ToBool4(global, eventStack.top().parameters, val->ToString(), eventStack.top());
+
+						module_value = temp;
 					}
 					eventStack.pop();
 					break;
