@@ -1032,7 +1032,40 @@ string excute_module(wiz::load_data::UserType& global)
 			}
 
 			while (true) {
-				if ("$module" == val->GetName())
+				/// module name or object name -> must "~" .
+				if ("$register_module" == val->GetName())
+				{
+					string moduleFileName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
+					moduleFileName = wiz::String::substring(moduleFileName, 1, moduleFileName.size() - 2);
+
+					wiz::load_data::UserType moduleUT;
+					wiz::load_data::LoadData::LoadDataFromFile(moduleFileName, moduleUT);
+
+					moduleMap.insert(make_pair(moduleFileName, moduleUT));
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$call_registered_module" == val->GetName())
+				{
+					string moduleFileName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
+					string input;
+
+					if (val->GetUserTypeListSize() >= 2) {
+						input = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1).Get(0)->ToString(), eventStack.top());
+					}
+
+					moduleFileName = wiz::String::substring(moduleFileName, 1, moduleFileName.size() - 2);
+
+					wiz::load_data::UserType moduleUT = moduleMap.at(moduleFileName);
+					wiz::load_data::LoadData::AddData(moduleUT, "", input, "TRUE");
+
+					eventStack.top().return_value = excute_module(moduleUT);
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$module" == val->GetName())
 				{
 					string moduleFileName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
 					string input;
