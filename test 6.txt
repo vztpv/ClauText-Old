@@ -23,7 +23,14 @@ Event =
 	$print = { value = { /Test2/$ut0/no } } # chk! $uto - todo/done list?
 	$print = { value = { \n } }
 
-	$module = { value = { "test 5.txt" } value = { input = 5 } }
+	# $module = { value = { "test 5.txt" } value = { input = 5 } }
+	$register_module = { name = { "test 5.txt" } }
+	
+	$call_registered_module = { name = { "test 5.txt" } value=  { input = 5 } }
+	$print = { value = { $return_value = { } } }
+	$print = { value = { \n } }
+
+	$call_registered_module = { name = { "test 5.txt" } value=  { input = 6 } }
 
 	$print = { value = { $return_value = { } } }
 	$print = { value = { \n } }
