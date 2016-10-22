@@ -5,7 +5,6 @@
 //#define ARRAYS_DEBUG
 #include <iostream>
 #include <vector>
-#include <list>
 #include <map>
 #include <utility>
 #include <algorithm>
@@ -1057,6 +1056,38 @@ string excute_module(wiz::load_data::UserType& global)
 				// todo	- register module from string
 				// todo - call registered module.  $registered_module = { name = { ~ } input = { input = { n = 1 } } }
 
+				else if ("$register_object" == val->GetName()) {
+					string objectFileName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
+					objectFileName = wiz::String::substring(objectFileName, 1, objectFileName.size() - 2);
+
+					wiz::load_data::UserType objectUT;
+					wiz::load_data::LoadData::LoadDataFromFile(objectFileName, objectUT);
+
+					string data = objectUT.ToString();
+
+					objectMap.insert(make_pair(objectFileName, data));
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$call_registered_object" == val->GetName()) {
+					string objectFileName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
+					objectFileName = wiz::String::substring(objectFileName, 1, objectFileName.size() - 2);
+					string parameter;
+
+					parameter = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1).Get(0)->ToString(), eventStack.top());
+					
+					string data = objectMap.at(objectFileName);
+					data = data + " Main = { $call = { id = 0 } } Event = { id = 0 $call = { " + parameter + "  } } ";
+					
+					wiz::load_data::UserType objectUT;
+					wiz::load_data::LoadData::LoadDataFromString(data, objectUT);
+
+					eventStack.top().return_value = excute_module(objectUT);
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
 				/// object of class?
 				else if ("$object" == val->GetName()) {
 					string objectFileName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
