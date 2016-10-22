@@ -3,7 +3,7 @@
 	2. To json or From json?
 	3. Event Group?
 	4. Event Graph?
-	5. Register Module or Call Registered Module?
+	5. Register Module or Call Registered Module? - Done
 	6. Fix bugs. 
 	
 # example codes 
