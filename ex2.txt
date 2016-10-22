@@ -12,7 +12,10 @@ Event =
 {
     id = 0
     
-    $object = { fileName = { "ex3.txt" }  parameter = { id = 1 i = 1 j = 1 } }
+    $register_object = { fileName = { "ex3.txt" } } # parameter = { id = 1 i = 1 j = 1 } }
+	
+	$call_registered_object = { name = { "ex3.txt" } parameter = { id = 1 i = 1 j = 1 } }
+	$call_registered_object = { name = { "ex3.txt" } parameter = { id = 1 i = 1 j = 1 } }
 
     $return = { success }
 }

@@ -1,0 +1,40 @@
+
+
+Main =
+{
+	$call = { id = 0 }
+}
+
+
+Test = { x = { y = { 5 4 3 } a = { 7 3  } } } # "test test	test  !!" }
+Test2 = { { no = BBB } }
+
+Event =
+{
+	id = 0
+	
+	$local = { x }
+
+	#$remove = { /Test/x }
+	#$insert2 = { dir = { /Test/x } value = { { n = { 1 } } { m = 2 } } }
+
+	$assign = { $local.x value = { $concat = { Test2/$ut $concat = { 0 /no } } } }
+	$assign2 = { dir = { $concat = { / $local.x } } value = { CCC } }
+	$print = { value = { /Test2/$ut0/no } } # chk! $uto - todo/done list?
+	$print = { value = { \n } }
+
+	$module = { value = { "test 5.txt" } value = { input = 5 } }
+
+	$print = { value = { $return_value = { } } }
+	$print = { value = { \n } }
+
+	$print2 = { value = { /Test } }
+	$print = { value = { \n } }
+
+	$sort = { value = { /Test/x } }
+
+	$print2 = { value = { /Test } }
+	$print = { value = { \n } }
+}
+
+
