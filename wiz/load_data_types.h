@@ -865,6 +865,8 @@ namespace wiz {
 			{
 				string position = _position;
 				vector< UserType* > temp;
+
+				if (!position.empty() && position[0] == '@') { position.erase(position.begin()); }
 				if (_position.empty()) { temp.push_back(global); return{ true, temp }; }
 				if (_position == ".") { temp.push_back(global); return{ true, temp }; }
 				if (_position == "/./") { temp.push_back(global); return{ true, temp }; } // chk..
