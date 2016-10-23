@@ -838,7 +838,7 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 			}
 		}
 
-		if ('$' != tokenVec[i][0]) {
+		if ('$' != tokenVec[i][0] || ('$' == tokenVec[i][0] && tokenVec[i].size() == 1)) {
 			operandStack.push(tokenVec[i]);
 		}
 		else
@@ -1559,9 +1559,11 @@ string excute_module(wiz::load_data::UserType& global)
 				else if ("$print2" == val->GetName()) /// for print usertype.ToString();
 				{
 					string dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
-					str = wiz::load_data::UserType::Find(&global, dir).second[0]->ToString();
+					auto x = wiz::load_data::UserType::Find(&global, dir);
 					
-					cout << str;
+					for (auto& ut : x.second) {
+						cout << ut->ToString();
+					}
 
 					eventStack.top().userType_idx.top()++;
 					break;
