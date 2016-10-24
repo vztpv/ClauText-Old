@@ -9,6 +9,7 @@ Main =
 Test = { x = { y = { z = { 1 3 } 5 4 3 } a = { 7 3  } } k = 1 }
 Test = { x = { y = 1 } k = 0 } # "test test	test  !!" }
 Test2 = { { no = BBB } }
+x = 1
 
 Event =
 {
@@ -17,12 +18,12 @@ Event =
 	$local = { x y }
 
 	#$remove = { /Test/x }
-	$insert2 = { dir = { /Test/x } value = { { n = { 1 } } { m = 2 } } condition = { EQ = { k .. 0 ~ 0 } } }
+	$insert2 = { dir = { /Test/x } value = { { n = { 1 } } { m = 2 } } condition = { EQ = { k .. /./x  ~ 0 } } }
 
-	$assign2 = { dir = { $local.y } value = { y } }
+	$assign_local = { dir = { $local.y } value = { y } }
 
 	$assign = { $local.x value = { $concat = { Test2/$ut $concat = { 0 /no } } } }
-	$assign2 = { dir = { $concat = { / $local.x } } value = { CCC } }
+	$assign_global = { dir = { $concat = { / $local.x } } value = { CCC } condition = { TRUE } }
 	$print = { value = { /Test2/$ut0/no } } # chk! $uto - todo/done list?
 	$print = { value = { \n } }
 
