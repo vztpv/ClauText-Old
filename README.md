@@ -5,7 +5,7 @@
 	4. Event Graph?
 	5. Register Module or Call Registered Module? - Done
 	6. Fix bugs. 
-	7. $ option?(all), + Condition?
+	7. $ option?(all), + Condition? - Done??
 	
 # example codes 
 	#  # is notation
