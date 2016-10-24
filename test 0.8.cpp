@@ -1345,6 +1345,40 @@ string excute_module(wiz::load_data::UserType& global)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
+				else if ("$assign_local" == val->GetName()) /// no condition, 
+				{
+					pair<string, string> dir = Find2(&global, ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top()));
+					string data = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1).Get(0)->ToString(), eventStack.top());
+
+					{
+						if (dir.first == "" && wiz::String::startsWith(dir.second, "$local."))
+						{
+							eventStack.top().locals[wiz::String::substring(dir.second, 7)] = data;
+						}
+						else {
+							// throw error??
+						}
+					}
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$assign_global" == val->GetName())
+				{
+					pair<string, string> dir = Find2(&global, ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top()));
+					string data = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1).Get(0)->ToString(), eventStack.top());
+
+					string condition;
+					if (val->GetUserTypeListSize() >= 3) {
+						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2).Get(0)->ToString(), eventStack.top());
+					}
+					wiz::load_data::LoadData::SetData(global, dir.first, dir.second, data, condition);
+
+					// chk local?
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
 				/// cf) insert3? - any position?
 				else if ("push_back" == val->GetName() || "$insert" == val->GetName() || "$insert2" == val->GetName())
 				{
