@@ -6,17 +6,20 @@ Main =
 }
 
 
-Test = { x = { y = { 5 4 3 } a = { 7 3  } } } # "test test	test  !!" }
+Test = { x = { y = { z = { 1 3 } 5 4 3 } a = { 7 3  } } k = 1 }
+Test = { x = { y = 1 } k = 0 } # "test test	test  !!" }
 Test2 = { { no = BBB } }
 
 Event =
 {
 	id = 0
-	
-	$local = { x }
+
+	$local = { x y }
 
 	#$remove = { /Test/x }
-	#$insert2 = { dir = { /Test/x } value = { { n = { 1 } } { m = 2 } } }
+	$insert2 = { dir = { /Test/x } value = { { n = { 1 } } { m = 2 } } condition = { EQ = { k .. 0 ~ 0 } } }
+
+	$assign2 = { dir = { $local.y } value = { y } }
 
 	$assign = { $local.x value = { $concat = { Test2/$ut $concat = { 0 /no } } } }
 	$assign2 = { dir = { $concat = { / $local.x } } value = { CCC } }
@@ -35,13 +38,18 @@ Event =
 	$print = { value = { $return_value = { } } }
 	$print = { value = { \n } }
 
-	$print2 = { value = { /Test } }
-	$print = { value = { \n } }
+	#$print2 = { value = { /Test } }
+	#$print = { value = { \n } }
 
 	$sort = { value = { /Test/x } }
 
-	$print2 = { value = { /Test } }
+	#$print2 = { value = { /Test } }
+	#$print = { value = { \n } }
+
+	$print2 = { value = { @/$/x/$local.y } } # $떄문에  @를 추가?, $ : any, all. 
+	$print = { value = { \n } }
+
+	$print2 = { value = { / } }
 	$print = { value = { \n } }
 }
-
 
