@@ -1036,15 +1036,40 @@ string excute_module(wiz::load_data::UserType& global)
 			}
 
 			while (true) {
-				if ("$save_only_data" == val->GetName())
+				if ("$save_data_only" == val->GetName())
 				{
+					//todo
 					// "filename" save_option(0~2)
+					string fileName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
+					fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
+					string option = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1).Get(0)->ToString(), eventStack.top());
 					
+					wiz::load_data::LoadData::SaveWizDB(global, fileName, option, "");
+
+
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$save" == val->GetName())
+				else if ("$save" == val->GetName()) // save data, event, main!
 				{
+					//todo
+					// "filename" save_option(0~2)
+					string fileName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
+					fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
+					string option = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1).Get(0)->ToString(), eventStack.top());
+
+					wiz::load_data::LoadData::SaveWizDB(global, fileName, option, "");
+					for (int i = 0; i < events.size(); ++i)
+					{
+						wiz::load_data::UserType utTemp(events[i].Get(0)->GetName());
+						utTemp.AddUserTypeItem(*events[i].Get(0));
+						wiz::load_data::LoadData::SaveWizDB(utTemp, fileName, option, "APPEND");
+					}
+					{
+						wiz::load_data::UserType utTemp(Main->GetName());
+						utTemp.AddUserTypeItem(*Main);
+						wiz::load_data::LoadData::SaveWizDB(utTemp, fileName, option, "APPEND");
+					}
 
 					eventStack.top().userType_idx.top()++;
 					break;
