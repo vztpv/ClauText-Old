@@ -944,14 +944,18 @@ string excute_module(wiz::load_data::UserType& global)
 	// data, event load..
 	wiz::ArrayStack<EventInfo> eventStack;
 	map<string, int> convert;
-	auto events = global.GetUserTypeItem("Event");
+	auto events = global.GetCopyUserTypeItem("Event");
+	
+	global.RemoveUserTypeList("Event");
+
 	if (global.GetUserTypeItem("Main").empty())
 	{
 		cout << "do not exist Main" << endl;
 		return "ERROR -1";
 	}
-	auto Main = GetUserType(&global, "Main"); // Main이 없으면 에러..!
+	auto Main = global.GetCopyUserTypeItem("Main")[0].Get(0); // Main이 없으면 에러..!
 	
+	global.RemoveUserTypeList("Main");
 
 	// event table setting
 	for (int i = 0; i < events.size(); ++i)
@@ -1032,8 +1036,21 @@ string excute_module(wiz::load_data::UserType& global)
 			}
 
 			while (true) {
+				if ("$save_only_data" == val->GetName())
+				{
+					// "filename" save_option(0~2)
+					
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$save" == val->GetName())
+				{
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
 				/// module name or object name -> must "~" .
-				if ("$register_module" == val->GetName())
+				else if ("$register_module" == val->GetName())
 				{
 					string moduleFileName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
 					moduleFileName = wiz::String::substring(moduleFileName, 1, moduleFileName.size() - 2);
@@ -1408,7 +1425,7 @@ string excute_module(wiz::load_data::UserType& global)
 				else if ("$make" == val->GetName()) // To Do? - make2?
 				{
 					string dir;
-
+					bool is2 = false;
 					if (val->GetItemListSize() > 0) {
 						dir = val->GetItemList(0).Get(0);
 						dir = ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
@@ -1417,6 +1434,7 @@ string excute_module(wiz::load_data::UserType& global)
 					{
 						dir = string(val->ToString());
 						dir = ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
+						is2 = true;
 					}
 
 					string name;
@@ -1431,18 +1449,15 @@ string excute_module(wiz::load_data::UserType& global)
 					if (dir.empty()) { dir = "."; }
 
 					string condition = "TRUE";
-					if (val->GetUserTypeListSize() >= 1) {
+					if (is2 && val->GetUserTypeListSize() >= 2) {
+						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1).Get(0)->ToString(), eventStack.top());
+					}
+					else if (false == is2 && val->GetUserTypeListSize() >= 1 ) {
 						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0).Get(0)->ToString(), eventStack.top());
 					}
 
-					if (dir == ".")
-					{
-						wiz::load_data::LoadData::AddUserType(global, dir, name, "", condition);
-					}
-					else
-					{
-						wiz::load_data::LoadData::AddUserType(global, dir, name, "", condition);
-					}
+					wiz::load_data::LoadData::AddUserType(global, dir, name, "", condition);
+
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1656,10 +1671,13 @@ string excute_module(wiz::load_data::UserType& global)
 						fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
 						wiz::load_data::UserType ut;
 						if (wiz::load_data::LoadData::LoadDataFromFile(fileName, ut)) {
-							wiz::load_data::LoadData::AddData(global, "", ut.ToString(), "TRUE");
-							events = global.GetUserTypeItem("Event");
+							auto new_events = ut.GetCopyUserTypeItem("Event");
+							events.insert(events.end(), new_events.begin(), new_events.end());
+							ut.RemoveUserTypeList("Event");
 
-							auto _Main = ut.GetUserTypeItem("Main");
+							wiz::load_data::LoadData::AddData(global, "", ut.ToString(), "TRUE");
+
+							auto _Main = ut.GetCopyUserTypeItem("Main");
 							if (NULL != Main && !_Main.empty())
 							{
 								// error!
