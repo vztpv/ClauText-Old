@@ -197,7 +197,7 @@ namespace wiz {
 
 							///
 							nestedUT[braceNum]->AddUserTypeItem(UserType(var2));
-							TypeArray<UserType*> pTemp;
+							UserType* pTemp;
 							nestedUT[braceNum]->GetLastUserTypeItemRef(var2, pTemp);
 
 							braceNum++;
@@ -207,7 +207,7 @@ namespace wiz {
 								nestedUT.push_back(NULL);
 
 							/// initial new nestedUT.
-							nestedUT[braceNum] = pTemp.Get(pTemp.size() - 1);
+							nestedUT[braceNum] = pTemp;
 							///
 							state = 3;
 						}
@@ -263,7 +263,7 @@ namespace wiz {
 							UserType temp("");
 
 							nestedUT[braceNum]->AddUserTypeItem(temp);
-							TypeArray<UserType*> pTemp;
+							UserType* pTemp;
 							nestedUT[braceNum]->GetLastUserTypeItemRef("", pTemp);
 
 							braceNum++;
@@ -273,7 +273,7 @@ namespace wiz {
 								nestedUT.push_back(NULL);
 
 							/// initial new nestedUT.
-							nestedUT[braceNum] = pTemp.Get(pTemp.size() - 1);
+							nestedUT[braceNum] = pTemp;
 							///
 							//}
 
@@ -371,7 +371,7 @@ namespace wiz {
 							///
 							{
 								nestedUT[braceNum]->AddUserTypeItem(UserType(var2));
-								TypeArray<UserType*> pTemp;
+								UserType* pTemp;
 								nestedUT[braceNum]->GetLastUserTypeItemRef(var2, pTemp);
 								var2 = "";
 								braceNum++;
@@ -381,7 +381,7 @@ namespace wiz {
 									nestedUT.push_back(NULL);
 
 								/// initial new nestedUT.
-								nestedUT[braceNum] = pTemp.Get(pTemp.size() - 1);
+								nestedUT[braceNum] = pTemp;
 							}
 							///
 							state = 7;
@@ -726,18 +726,16 @@ namespace wiz {
 				}
 
 				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
-					string temp = ut->GetUserTypeList(i).GetName();
+					string temp = ut->GetUserTypeList(i)->GetName();
 					if (temp == "") { temp = " "; }
-					for (int j = 0; j < ut->GetUserTypeList(i).size(); ++j) {
-						SearchItem(
-							global,
-							positionVec,
-							_var,
-							nowPosition + "/" + temp,
-							ut->GetUserTypeList(i).Get(j),
-							condition
-						);
-					}
+					SearchItem(
+						global,
+						positionVec,
+						_var,
+						nowPosition + "/" + temp,
+						ut->GetUserTypeList(i),
+						condition
+					);
 				}
 			}
 
@@ -765,19 +763,17 @@ namespace wiz {
 				}
 
 				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
-					string temp = ut->GetUserTypeList(i).GetName();
+					string temp = ut->GetUserTypeList(i)->GetName();
 
 					if (temp == "") { temp = " "; }
-					for (int j = 0; j < ut->GetUserTypeList(i).size(); ++j) {
-						SearchUserType(
-							global,
-							positionVec,
-							_var,
-							nowPosition + "/" + temp,
-							ut->GetUserTypeList(i).Get(j),
-							condition
-						);
-					}
+					SearchUserType(
+						global,
+						positionVec,
+						_var,
+						nowPosition + "/" + temp,
+						ut->GetUserTypeList(i),
+						condition
+					);
 				}
 			}
 
@@ -827,7 +823,7 @@ namespace wiz {
 								item_n++;
 							}
 							else if (utTemp.GetIList()[k] == 2) {
-								finded.second[i]->AddUserTypeList(utTemp.GetUserTypeList(user_n));
+								finded.second[i]->AddUserTypeItem(*utTemp.GetUserTypeList(user_n));
 								user_n++;
 							}
 						}
@@ -874,7 +870,7 @@ namespace wiz {
 								item_n++;
 							}
 							else if (utTemp.GetIList()[k] == 2) {
-								finded.second[i]->AddUserTypeItemAtFront(*utTemp.GetUserTypeList(user_n).Get(0));
+								finded.second[i]->AddUserTypeItemAtFront(*utTemp.GetUserTypeList(user_n));
 								user_n++;
 							}
 						}
@@ -1564,10 +1560,15 @@ namespace wiz {
 				return true;
 			}
 			// SaveQuery
-			static bool SaveWizDB(UserType& global, const string& fileName, const string option = "0") { /// , int option
+			static bool SaveWizDB(UserType& global, const string& fileName, const string& option = "0", const string& option2="") { /// , int option
 				ofstream outFile;
 				if (fileName.empty()) { return false; }
-				outFile.open(fileName + "temp", ios::binary);
+				if (option2 == "") {
+					outFile.open(fileName + "temp", ios::binary);
+				}
+				else {
+					outFile.open(fileName + "temp", ios::binary | ios::app);
+				}
 				if (outFile.fail()) { return false; }
 
 				/// saveFile

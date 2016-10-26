@@ -144,8 +144,8 @@ namespace wiz {
 			int GetUserTypeListSize()const { return userTypeList.size(); }
 			TypeArray<string>& GetItemList(const int idx) { return itemList[idx]; }
 			const TypeArray<string>& GetItemList(const int idx) const { return itemList[idx]; }
-			TypeArray<UserType*>& GetUserTypeList(const int idx) { return userTypeList[idx]; }
-			const TypeArray<UserType*>& GetUserTypeList(const int idx) const { return userTypeList[idx]; }
+			UserType* GetUserTypeList(const int idx) { return userTypeList[idx]; }
+			const UserType* GetUserTypeList(const int idx) const { return const_cast<const UserType*&>(userTypeList[idx]); }
 
 			bool IsItemList(const int idx) const
 			{
@@ -184,12 +184,6 @@ namespace wiz {
 					this->AddItem(strTa.GetName(), strTa.Get(i));
 				}
 			}
-			void AddUserTypeList(const TypeArray<UserType*>& utTa)
-			{
-				for (int i = 0; i < utTa.size(); ++i) {
-					this->AddUserTypeItem(*utTa.Get(i));
-				}
-			}
 		public:
 			UserType* GetParent() { return parent; }
 			const UserType* GetParent()const { return parent; }
@@ -197,7 +191,7 @@ namespace wiz {
 			UserType* parent;
 			std::vector<int> ilist;
 			std::vector< TypeArray<string> > itemList;
-			std::vector< TypeArray<UserType*>> userTypeList;
+			std::vector< UserType* > userTypeList;
 		//	bool userTypeList_sortFlagA; // A : sorted < , B ; sorted > , false : not sorted!
 		//	bool userTypeList_sortFlagB;
 		private:
@@ -238,11 +232,7 @@ namespace wiz {
 				parent = ut.parent;
 
 				for (int i = 0; i < ut.userTypeList.size(); i++) {
-					TypeArray<UserType*> temp(ut.userTypeList[i].GetName());
-					for (int j = 0; j < ut.userTypeList[i].size(); j++) {
-						temp.Push( new UserType(*ut.userTypeList[i].Get(j)) );
-					}
-					userTypeList.push_back(move(temp));
+					userTypeList.push_back(new UserType(*ut.userTypeList[i]));
 				}
 			}
 			void Reset2(UserType&& ut) {
@@ -376,15 +366,13 @@ namespace wiz {
 			}
 			void RemoveUserTypeList() { /// chk memory leak test!!
 				for (int i = 0; i < userTypeList.size(); i++) {
-					for (int j = 0; j < userTypeList[i].size(); j++) {
-						if (NULL != userTypeList[i].Get(j)) {
-							delete userTypeList[i].Get(j); //
-							userTypeList[i].Set(j, NULL);
-						}
+					if (NULL != userTypeList[i]) {
+						delete userTypeList[i]; //
+						userTypeList[i] = NULL;
 					}
 				}
 				// DO Empty..
-				userTypeList = vector< TypeArray<UserType*> >();
+				userTypeList = vector< UserType* >();
 
 				vector<int> temp;
 				for (int i = 0; i < ilist.size(); ++i) {
@@ -398,20 +386,14 @@ namespace wiz {
 			void RemoveUserTypeList(const string& varName)
 			{
 				int k = _GetIndex(ilist, 2, 0);
-				vector<TypeArray<UserType*>> tempDic;
+				vector<UserType*> tempDic;
 				for (int i = 0; i < userTypeList.size(); ++i) {
-					if (varName != userTypeList[i].GetName()) {
+					if (varName != userTypeList[i]->GetName()) {
 						tempDic.push_back(userTypeList[i]);
 						k = _GetIndex(ilist, 2, k + 1);
 					}
 					else {
 						// remove usertypeitem, ilist left shift 1.
-						for (int j = 0; j < userTypeList[i].size(); ++j) {
-							if (NULL != userTypeList[i].Get(j)) {
-								delete userTypeList[i].Get(j);
-								userTypeList[i].Set(j, NULL);
-							}
-						}
 						for (int j = k + 1; j < ilist.size(); ++j) {
 							ilist[j - 1] = ilist[j];
 						}
@@ -449,6 +431,22 @@ namespace wiz {
 			}
 		public:
 			bool empty()const { return ilist.empty(); }
+			void AddItem(string&& name, string&& item) {
+				/*int index = -1;
+				if (!itemList.Search(TypeArray<string>(name), &index))
+				{
+				ilist.push_back(1);
+
+				itemList.PushBack(TypeArray<string>(name));//
+				itemList.Search(TypeArray<string>(name), &index);
+				}
+				itemList[index].Push(item);
+				*/
+				TypeArray<string> temp(name);
+				temp.Push(item);
+				itemList.push_back(temp);
+				ilist.push_back(1);
+			}
 			void AddItem(const string& name, const string& item) {
 				/*int index = -1;
 				if (!itemList.Search(TypeArray<string>(name), &index))
@@ -464,6 +462,48 @@ namespace wiz {
 				temp.Push( item );
 				itemList.push_back(temp);
 				ilist.push_back(1);
+			}
+			void AddUserTypeItem(UserType&& item) {
+				/*if (this->userTypeList_sortFlagA) {
+				string str_compare = Compare(userTypeList.back().GetName(), item.GetName());
+
+				if (str_compare == "<" || str_compare == "==")
+				{
+				this->userTypeList_sortFlagA = true;
+				}
+				else {
+				this->userTypeList_sortFlagA = false;
+				}
+				}
+				if (this->userTypeList_sortFlagB) {
+				string str_compare = Compare(userTypeList.back().GetName(), item.GetName());
+
+				if (str_compare == ">" || str_compare == "==")
+				{
+				this->userTypeList_sortFlagB = true;
+				}
+				else {
+				this->userTypeList_sortFlagB = false;
+				}
+				}*/
+
+				/*
+				int index = -1;
+				if (!userTypeList.Search(TypeArray<UserType*>(item.GetName()), &index))
+				{
+				ilist.push_back(2);
+
+				userTypeList.PushBack(TypeArray<UserType*>(item.GetName()));//
+				userTypeList.Search(TypeArray<UserType*>(item.GetName()), &index);
+				}
+				*/
+				UserType* temp = new UserType(item);
+				temp->parent = this;
+				//temp->SetName("");
+
+				ilist.push_back(2);
+
+				userTypeList.push_back(std::move(temp));
 			}
 			void AddUserTypeItem(const UserType& item) {
 				/*if (this->userTypeList_sortFlagA) {
@@ -503,14 +543,11 @@ namespace wiz {
 				temp->parent = this;
 				//temp->SetName("");
 
-				TypeArray<UserType*> temp2(item.GetName());
-				temp2.Push(temp);
-
 				ilist.push_back(2);
 
-				userTypeList.push_back(temp2);
+				userTypeList.push_back(std::move(temp));
 			}
-			// todo - AddItemAtFront, AddUserTypeItemAtFront
+
 			void AddItemAtFront(const string& name, const string& item) {
 				TypeArray<string> temp(name);
 				temp.Push(item);
@@ -523,12 +560,9 @@ namespace wiz {
 				UserType* temp = new UserType(item);
 				temp->parent = this;
 
-				TypeArray<UserType*> temp2(item.GetName());
-				temp2.Push(temp);
-
 				ilist.insert(ilist.begin(), 2);
 
-				userTypeList.insert(userTypeList.begin(), temp2);
+				userTypeList.insert(userTypeList.begin(), temp);
 			}
 
 
@@ -561,42 +595,40 @@ namespace wiz {
 				return true;
 			}
 
-			vector<TypeArray<UserType*>> GetUserTypeItem(const string& name) const { /// chk...
-				vector<TypeArray<UserType*>> temp;
+			vector<UserType*> GetUserTypeItem(const string& name) const { /// chk...
+				vector<UserType*> temp;
 
 				for (int i = 0; i < userTypeList.size(); ++i) {
-					if (userTypeList[i].GetName() == name) {
+					if (userTypeList[i]->GetName() == name) {
 						temp.push_back(userTypeList[i]);
 					}
 				}
 
 				return temp;
 			}
-			vector<TypeArray<UserType*>> GetCopyUserTypeItem(const string& name) const { /// chk...
-				vector<TypeArray<UserType*>> temp;
+			vector<UserType*> GetCopyUserTypeItem(const string& name) const { /// chk...
+				vector<UserType*> temp;
 
 				for (int i = 0; i < userTypeList.size(); ++i) {
-					if (userTypeList[i].GetName() == name) {
-						TypeArray<UserType*> ta;
-						ta.Push(new UserType(*userTypeList[i].Get(0)));
-						temp.push_back(ta);
+					if (userTypeList[i]->GetName() == name) {
+						temp.push_back(new UserType(*userTypeList[i]));
 					}
 				}
 
 				return temp;
 			}
 		public:
-			bool GetUserTypeItemRef(const int idx, TypeArray<UserType*>& ref)
+			bool GetUserTypeItemRef(const int idx, UserType*& ref)
 			{
 				ref = userTypeList[idx];
 				return true;
 			}
-			bool GetLastUserTypeItemRef(const string& name, TypeArray<UserType*>& ref) {
+			bool GetLastUserTypeItemRef(const string& name, UserType*& ref) {
 				int idx = -1;
 				
 				for (int i = 0; i < userTypeList.size(); ++i)
 				{
-					if (name == userTypeList[i].GetName()) {
+					if (name == userTypeList[i]->GetName()) {
 						idx = i;
 					}
 				}
@@ -626,14 +658,14 @@ namespace wiz {
 					}
 					else if (ut->ilist[i] == 2) {
 						// std::cout << "UserTypeList" << endl;
-						for (int j = 0; j < ut->userTypeList[userTypeListCount].size(); j++) {
-							if (ut->userTypeList[userTypeListCount].GetName() != "")
-								stream << ut->userTypeList[userTypeListCount].GetName() << "=";
-							stream << "{\n";
-							Save1(stream, ut->userTypeList[userTypeListCount].Get(j));
-							stream << "\n";
-							stream << " }" << "\n";
+						if (ut->userTypeList[userTypeListCount]->GetName() != "") {
+							stream << ut->userTypeList[userTypeListCount]->GetName() << "=";
 						}
+						stream << "{\n";
+						Save1(stream, ut->userTypeList[userTypeListCount]);
+						stream << "\n";
+						stream << " }" << "\n";
+						
 						userTypeListCount++;
 					}
 				}
@@ -658,14 +690,14 @@ namespace wiz {
 					}
 					else if (ut->ilist[i] == 2) {
 						// std::cout << "UserTypeList" << endl;
-						for (int j = 0; j < ut->userTypeList[userTypeListCount].size(); j++) {
-							if (ut->userTypeList[userTypeListCount].GetName() != "")
-								stream << ut->userTypeList[userTypeListCount].GetName() << " = ";
-							stream << " {\n";
-							Save2(stream, ut->userTypeList[userTypeListCount].Get(j));
-							stream << "\n";
-							stream << " }" << "\n";
+						if (ut->userTypeList[userTypeListCount]->GetName() != "")
+						{
+							stream << ut->userTypeList[userTypeListCount]->GetName() << " = ";
 						}
+						stream << " {\n";
+						Save2(stream, ut->userTypeList[userTypeListCount]);
+						stream << "\n";
+						stream << " }" << "\n";
 						userTypeListCount++;
 					}
 				}
@@ -729,12 +761,11 @@ namespace wiz {
 				int userTypeListCount = 0;
 
 				for (int i = 0; i < userTypeList.size(); ++i) {
-					for (int j = 0; j < userTypeList[userTypeListCount].size(); j++) {
-						if (userTypeList[userTypeListCount].GetName() != "")
-							temp.push_back(userTypeList[userTypeListCount].GetName());
-						else {
-							temp.push_back(" "); // chk!! cf) wiz::load_data::Utility::Find function...
-						}
+					if (userTypeList[userTypeListCount]->GetName() != "") {
+						temp.push_back(userTypeList[userTypeListCount]->GetName());
+					}
+					else {
+						temp.push_back(" "); // chk!! cf) wiz::load_data::Utility::Find function...
 					}
 					userTypeListCount++;
 				}
@@ -746,14 +777,13 @@ namespace wiz {
 				int userTypeListCount = 0;
 
 				for (int i = 0; i < userTypeList.size(); ++i) {
-					for (int j = 0; j < userTypeList[userTypeListCount].size(); j++) {
-						if (userTypeList[userTypeListCount].GetName() != "")
-							temp = temp + userTypeList[userTypeListCount].GetName();
-						else
-							temp = temp + " "; // chk!! cf) wiz::load_data::Utility::Find function...
-						if (j != userTypeList[userTypeListCount].size() - 1)
-							temp = temp + "/";
+					if (userTypeList[userTypeListCount]->GetName() != "") {
+						temp = temp + userTypeList[userTypeListCount]->GetName();
 					}
+					else {
+						temp = temp + " "; // chk!! cf) wiz::load_data::Utility::Find function...
+					}
+
 					if (i != itemList.size() - 1)
 					{
 						temp = temp + "/";
@@ -773,23 +803,23 @@ namespace wiz {
 					if (ilist[i] == 1) {
 						for (int j = 0; j < itemList[itemListCount].size(); j++) {
 							if (itemList[itemListCount].GetName() != "")
-								temp = temp + itemList[itemListCount].GetName() + " = ";
-							temp = temp + itemList[itemListCount].Get(j);
+								temp += itemList[itemListCount].GetName() + " = ";
+							temp += itemList[itemListCount].Get(j);
 							if (j != itemList[itemListCount].size() - 1)
-								temp = temp + " ";
+								temp += " ";
 						}
-						temp = temp + " ";
+						temp += " ";
 						itemListCount++;
 					}
 					else if (ilist[i] == 2) {
 						// std::cout << "UserTypeList" << endl;
-						for (int j = 0; j < userTypeList[userTypeListCount].size(); j++) {
-							if (userTypeList[userTypeListCount].GetName() != "")
-								temp = temp + userTypeList[userTypeListCount].GetName() + " = ";
-							temp = temp + " { ";
-							temp = temp + (userTypeList[userTypeListCount].Get(j)->ToString()) + " ";
-							temp = temp + " } " + " ";
+						if (userTypeList[userTypeListCount]->GetName() != "") {
+							temp = temp + userTypeList[userTypeListCount]->GetName() + " = ";
 						}
+						temp += " { ";
+						temp += (userTypeList[userTypeListCount]->ToString()) + " ";
+						temp += ( string( " } " ) + " " );
+						
 						userTypeListCount++;
 					}
 				}
@@ -816,13 +846,13 @@ namespace wiz {
 					}
 					else if (ut.ilist[i] == 2) {
 						// std::cout << "UserTypeList" << endl;
-						for (int j = 0; j < ut.userTypeList[userTypeListCount].size(); j++) {
-							if (ut.userTypeList[userTypeListCount].GetName() != "")
-								stream << ut.userTypeList[userTypeListCount].GetName() << "=";
-							stream << "{\n";
-							stream << *ut.userTypeList[userTypeListCount].Get(j) << "\n";
-							stream << " }" << "\n";
+						if (ut.userTypeList[userTypeListCount]->GetName() != "") {
+							stream << ut.userTypeList[userTypeListCount]->GetName() << "=";
 						}
+						stream << "{\n";
+						stream << *ut.userTypeList[userTypeListCount] << "\n";
+						stream << " }" << "\n";
+
 						userTypeListCount++;
 					}
 				}
@@ -847,9 +877,7 @@ namespace wiz {
 					}
 				}
 				for (int i = 0; i < userTypeListSize; ++i) {
-					for (int j = 0; j < temp->GetUserTypeList(i).size(); ++j) {
-						ReplaceAll(temp->GetUserTypeList(i).Get(j), target_ch, result_ch);
-					}
+					ReplaceAll(temp->GetUserTypeList(i), target_ch, result_ch);
 				}
 			}
 			/// move to UserType
@@ -866,9 +894,7 @@ namespace wiz {
 				}
 				const int UserTypeSize = utTemp->GetUserTypeListSize();
 				for (int i = 0; i < UserTypeSize; ++i) {
-					for (int j = 0; j < utTemp->GetUserTypeList(i).size(); ++j) {
-						chk = chk && ChkData(utTemp->GetUserTypeList(i).Get(j));
-					}
+					chk = chk && ChkData(utTemp->GetUserTypeList(i));
 				}
 
 				return chk;
@@ -945,10 +971,8 @@ namespace wiz {
 					if (utTemp.second < strVec.size() && strVec[utTemp.second] == "$")
 					{
 						for (int j = utTemp.first->GetUserTypeListSize() - 1; j >= 0; --j) {
-							for (int k = utTemp.first->GetUserTypeList(j).size() - 1; k >= 0; --k) {
-								UserType* x = utTemp.first->GetUserTypeList(j).Get(k);
-								utDeck.push_front(make_pair(x, utTemp.second + 1));
-							}
+							UserType* x = utTemp.first->GetUserTypeList(j);
+							utDeck.push_front(make_pair(x, utTemp.second + 1));
 						}
 					}
 					else if (utTemp.second < strVec.size() &&
@@ -961,14 +985,14 @@ namespace wiz {
 							throw string("ERROR NOT VALID IDX");
 						}
 
-						utDeck.push_front(make_pair(utTemp.first->GetUserTypeList(idx).Get(0), utTemp.second + 1));
+						utDeck.push_front(make_pair(utTemp.first->GetUserTypeList(idx), utTemp.second + 1));
 					}
 					else if (utTemp.second < strVec.size() &&
 						(utTemp.first->GetUserTypeItem(strVec[utTemp.second]).empty() == false))
 					{
 						auto  x = utTemp.first->GetUserTypeItem(strVec[utTemp.second]);
 						for (int j = x.size() - 1; j >= 0; --j) {
-							utDeck.push_front(make_pair(x[j].Get(0), utTemp.second + 1));
+							utDeck.push_front(make_pair(x[j], utTemp.second + 1));
 						}
 					}
 
