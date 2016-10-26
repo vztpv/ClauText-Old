@@ -1700,7 +1700,15 @@ string excute_module(wiz::load_data::UserType& global)
 							events.insert(events.end(), new_events.begin(), new_events.end());
 							ut.RemoveUserTypeList("Event");
 
-							wiz::load_data::LoadData::AddData(global, "", ut.ToString(), "TRUE");
+							//wiz::load_data::LoadData::AddData(global, "", ut.ToString(), "TRUE");
+							{
+								for (int i = 0; i < ut.GetItemListSize(); ++i) {
+									global.AddItem(ut.GetItemList(i).GetName(), ut.GetItemList(i).Get(0));
+								}
+								for (int i = 0; i < ut.GetUserTypeListSize(); ++i) {
+									global.AddUserTypeItem(*ut.GetUserTypeList(i).Get(0));
+								}
+							}
 
 							auto _Main = ut.GetCopyUserTypeItem("Main");
 							if (NULL != Main && !_Main.empty())
