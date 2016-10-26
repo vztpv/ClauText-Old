@@ -572,6 +572,19 @@ namespace wiz {
 
 				return temp;
 			}
+			vector<TypeArray<UserType*>> GetCopyUserTypeItem(const string& name) const { /// chk...
+				vector<TypeArray<UserType*>> temp;
+
+				for (int i = 0; i < userTypeList.size(); ++i) {
+					if (userTypeList[i].GetName() == name) {
+						TypeArray<UserType*> ta;
+						ta.Push(new UserType(*userTypeList[i].Get(0)));
+						temp.push_back(ta);
+					}
+				}
+
+				return temp;
+			}
 		public:
 			bool GetUserTypeItemRef(const int idx, TypeArray<UserType*>& ref)
 			{
