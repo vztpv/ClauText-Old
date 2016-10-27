@@ -1703,7 +1703,7 @@ string excute_module(wiz::load_data::UserType& global)
 							//wiz::load_data::LoadData::AddData(global, "", ut.ToString(), "TRUE");
 							{
 								for (int i = 0; i < ut.GetItemListSize(); ++i) {
-									global.AddItem(std::move(ut.GetItemList(i).Get(0)), std::move(ut.GetItemList(i).Get(0)));
+									global.AddItem(std::move(ut.GetItemList(i).GetName()), std::move(ut.GetItemList(i).Get(0)));
 								}
 								for (int i = 0; i < ut.GetUserTypeListSize(); ++i) {
 									global.AddUserTypeItem(std::move(*ut.GetUserTypeList(i)));
