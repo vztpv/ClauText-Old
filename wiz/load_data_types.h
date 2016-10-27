@@ -444,7 +444,7 @@ namespace wiz {
 				*/
 				TypeArray<string> temp(name);
 				temp.Push(item);
-				itemList.push_back(temp);
+				itemList.push_back(std::move(temp));
 				ilist.push_back(1);
 			}
 			void AddItem(const string& name, const string& item) {
@@ -460,7 +460,7 @@ namespace wiz {
 				*/
 				TypeArray<string> temp( name );
 				temp.Push( item );
-				itemList.push_back(temp);
+				itemList.push_back(std::move(temp));
 				ilist.push_back(1);
 			}
 			void AddUserTypeItem(UserType&& item) {
@@ -503,7 +503,7 @@ namespace wiz {
 
 				ilist.push_back(2);
 
-				userTypeList.push_back(std::move(temp));
+				userTypeList.push_back(temp);
 			}
 			void AddUserTypeItem(const UserType& item) {
 				/*if (this->userTypeList_sortFlagA) {
