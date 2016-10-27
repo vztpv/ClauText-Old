@@ -1560,7 +1560,7 @@ namespace wiz {
 				return true;
 			}
 			// SaveQuery
-			static bool SaveWizDB(UserType& global, const string& fileName, const string& option = "0", const string& option2="") { /// , int option
+			static bool SaveWizDB(const UserType& global, const string& fileName, const string& option = "0", const string& option2="") { /// , int option
 				ofstream outFile;
 				if (fileName.empty()) { return false; }
 				if (option2 == "") {

@@ -639,7 +639,7 @@ namespace wiz {
 			}
 		private:
 			/// save1 - like EU4 savefiles.
-			void Save1(ostream& stream, UserType* ut) {
+			void Save1(ostream& stream, const UserType* ut) const {
 				int itemListCount = 0;
 				int userTypeListCount = 0;
 
@@ -647,11 +647,13 @@ namespace wiz {
 					//std::cout << "ItemList" << endl;
 					if (ut->ilist[i] == 1) {
 						for (int j = 0; j < ut->itemList[itemListCount].size(); j++) {
-							if (ut->itemList[itemListCount].GetName() != "")
+							if (ut->itemList[itemListCount].GetName() != "") {
 								stream << ut->itemList[itemListCount].GetName() << "=";
+							}
 							stream << ut->itemList[itemListCount].Get(j);
-							if (j != ut->itemList[itemListCount].size() - 1)
+							if (j != ut->itemList[itemListCount].size() - 1) {
 								stream << "\n";
+							}
 						}
 						stream << "\n";
 						itemListCount++;
@@ -671,7 +673,7 @@ namespace wiz {
 				}
 			}
 			/// savw2 - for more seed loading data!
-			void Save2(ostream& stream, UserType* ut) {
+			void Save2(ostream& stream, const UserType* ut) const  {
 				int itemListCount = 0;
 				int userTypeListCount = 0;
 
@@ -703,10 +705,10 @@ namespace wiz {
 				}
 			}
 		public:
-			void Save1(ostream& stream) {
+			void Save1(ostream& stream) const{
 				Save1(stream, this);
 			}
-			void Save2(ostream& stream) {
+			void Save2(ostream& stream) const {
 				Save2(stream, this);
 			}
 			string ItemListToString()const
