@@ -548,9 +548,8 @@ namespace wiz {
 				str = Utility::ChangeStr(str, "\t", "^2");
 				str = Utility::ChangeStr(str, "\r", "^3");
 				str = Utility::ChangeStr(str, "\n", "^4");
-				/// ToDp - ""안에 여백이 있을 떄 다른 것으로 대체후 다시 변경
-				/// ToDo -  #주석이 있다면 없애는 함수 제작 - using str.find, String::Substr.
-				/// ToDo - error 처리..
+				/// DONE - ""안에 여백이 있을 떄 다른 것으로 대체후 다시 변경
+
 				StringTokenizer tokenizer(str, vector<string>{" ", "\t", "\r", "\n"});
 				ArrayQueue<string> strVec;
 
@@ -577,7 +576,7 @@ namespace wiz {
 				catch (exception& e) { std::cout << e.what() << endl; return false; }
 				catch (...) { std::cout << "not expected error" << endl; return  false; }
 
-				ut = move(utTemp);
+				ut = std::move(utTemp);
 				return true;
 			}
 		private:

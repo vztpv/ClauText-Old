@@ -870,12 +870,11 @@ namespace wiz {
 					TypeArray<std::string>& itemList = temp->GetItemList(i);
 
 					string name = itemList.GetName();
-					Utility::ChangeCharInString(name, target_ch, result_ch);
+					name = Utility::ChangeStr(name, target_ch, result_ch);
 					itemList.SetName(name);
 
 					for (int j = 0; j < itemList.size(); ++j) {
-						Utility::ChangeCharInString(itemList.Get(j), target_ch, result_ch);
-
+						itemList.Get(j) = Utility::ChangeStr(itemList.Get(j), target_ch, result_ch);
 					}
 				}
 				for (int i = 0; i < userTypeListSize; ++i) {

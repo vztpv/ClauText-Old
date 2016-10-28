@@ -49,7 +49,7 @@ namespace wiz {
 					switch (state)
 					{
 					case 0:
-						if ( // '+' == str[i] || // why can`t +?
+						if ( // '+' == str[i] || // why can`t +
 							'-' == str[i]
 							) {
 							state = 0;
@@ -369,7 +369,7 @@ namespace wiz {
 					//temp = RemoveEndSpace(temp);
 					temp = PassSharp(temp);
 					temp = AddSpace(temp);
-					temp = ChangeStr(temp, "^", "^0"); 
+					temp = ChangeStr(temp, "^", "^0"); // 1ÁÙ¿¡ "~~~" ?
 					temp = ChangeStr(temp, " ", "^1");
 					temp = ChangeStr(temp, "\t", "^2");
 					temp = ChangeStr(temp, "\r", "^3");
@@ -417,34 +417,7 @@ namespace wiz {
 				}
 				return{ count > 0, count };
 			}
-			/*
-			pair< bool, int > Reserve(ifstream& inFile, ArrayQueue<string>& strVec, const int lineNum = 1)
-			{
-			int count = 0; // string num : not valid line num!
-			pair<bool, bool> prTemp(false, false);
-
-			for (int i = 0; i < lineNum; ++i) {
-			ArrayQueue<string> temp;
-			bool b1 = prTemp.first;
-			bool b2 = prTemp.second;
-			pair<bool, bool> bbTemp = PassSharp(inFile, temp);
-			if (bbTemp.second) {
-			for (int i = 0; i < temp.size(); ++i) {
-			const string str = temp[i];
-			StringTokenizer tokenizer(str, vector<string>{ " ", "\t", "\r", "\n" });
-			for (int k = 0; k < tokenizer.countTokens(); ++k) {
-			string str = tokenizer.nextToken();
-			strVec.push(str);
-			}
-			count = count + tokenizer.countTokens();
-			}
-			}
-			prTemp.first = b1 || bbTemp.first;
-			}
-
-			return{ prTemp.first, count };
-			}
-			*/
+			
 			static const string& Top(const ArrayQueue<string>& strVec)
 			{
 				return strVec[0];
@@ -477,7 +450,7 @@ namespace wiz {
 				}
 				return{ true, strVec[idx] };
 			}
-			/// must strVec[start] == up or down?
+			/// must strVec[start] == up or down
 			/// now not use!!
 			static pair<bool, int> IsMatched(const ArrayQueue<string>& strVec, const string& up, const string& down, const int start = 0, const int start_num = 0, int* pidx = NULL, int*pnum = NULL)
 			{
@@ -506,7 +479,7 @@ namespace wiz {
 		public:
 
 			// To Do
-			// AddSpace : return string?
+			// AddSpace : return string
 			static string AddSpace(const string& str)
 			{
 				string temp;
@@ -554,6 +527,7 @@ namespace wiz {
 	
 			static string ChangeStr(const string& str, const string changed_str, const string& result_str) {
 				string temp;
+				temp.reserve(str.size() * 2);
 				int state = 0;
 
 				for (int i = 0; i < str.size(); ++i)
@@ -569,9 +543,8 @@ namespace wiz {
 					}
 					else if (1 == state && (changed_str == wiz::String::substring( str, i, i+changed_str.size()-1))) {
 						state = 1;
-						for (int j = 0; j < result_str.size(); ++j) {
-							temp.push_back(result_str[j]);
-						}
+						temp += result_str;
+						i = i + changed_str.size() - 1;
 					}
 					else if (1 == state && i > 0 && '\\' != str[i-1] && '\"' == str[i]) {
 						state = 0;
@@ -584,11 +557,6 @@ namespace wiz {
 				}
 
 				return temp;
-			}
-
-			static void ChangeCharInString(string& str, const string& target_str, const string& result_str)
-			{
-				str = wiz::String::replace(str, target_str, result_str);
 			}
 
 		};
