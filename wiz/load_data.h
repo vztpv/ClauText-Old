@@ -1551,7 +1551,7 @@ namespace wiz {
 				*/
 				//	getch();
 
-				// Scan + Parse  // output3.txt
+				// Scan + Parse 
 				if (false == LoadDataFromFile(fileName, globalTemp)) { return false; }
 				std::cout << "LoadData End" << endl;
 

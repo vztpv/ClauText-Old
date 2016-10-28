@@ -45,6 +45,11 @@ namespace wiz {
 				name = type.name;
 				return *this;
 			}
+			void operator=(Type&& type)
+			{
+				name = std::move(type.name);
+				type.name.clear();
+			}
 		};
 
 		template < class T >
@@ -217,7 +222,7 @@ namespace wiz {
 			UserType& operator=(UserType&& ut) {
 				if (this == &ut) { return *this;  }
 
-				Type::operator=(ut);
+				Type::operator=(move(ut));
 				RemoveUserTypeList();
 				Reset2(move(ut));
 				return *this;
@@ -243,7 +248,12 @@ namespace wiz {
 				ut.parent = NULL; /// chk..
 				ilist = std::move(ut.ilist);
 				itemList = std::move(ut.itemList);
-				userTypeList = std::move(ut.userTypeList);
+
+				for (int i = 0; i < ut.userTypeList.size(); ++i) {
+					userTypeList.push_back(move(ut.userTypeList[i]));
+					ut.userTypeList[i] = NULL;
+				}
+				ut.userTypeList.resize(0);
 			}
 
 			void _Remove()
@@ -497,7 +507,7 @@ namespace wiz {
 				userTypeList.Search(TypeArray<UserType*>(item.GetName()), &index);
 				}
 				*/
-				UserType* temp = new UserType(item);
+				UserType* temp = new UserType(std::move(item));
 				temp->parent = this;
 				//temp->SetName("");
 
