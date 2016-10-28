@@ -541,7 +541,7 @@ namespace wiz {
 						state = 1;
 						temp.push_back(str[i]);
 					}
-					else if (1 == state && (changed_str == wiz::String::substring( str, i, i+changed_str.size()-1))) {
+					else if (1 == state && (wiz::String::Comp( changed_str.c_str(), str.c_str()+i, changed_str.size()))) {
 						state = 1;
 						temp += result_str;
 						i = i + changed_str.size() - 1;
