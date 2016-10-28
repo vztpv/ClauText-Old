@@ -123,7 +123,9 @@ namespace wiz {
 				Type::operator=(ta);
 				if (arr == ta.arr) { return *this; }
 
-				arr = move( ta.arr );
+				arr = std::move( ta.arr );
+				ta.arr.clear();
+
 				return *this;
 			}
 			/*string ToString()const
@@ -253,7 +255,7 @@ namespace wiz {
 					userTypeList.push_back(move(ut.userTypeList[i]));
 					ut.userTypeList[i] = NULL;
 				}
-				ut.userTypeList.resize(0);
+				ut.userTypeList.clear();
 			}
 
 			void _Remove()
