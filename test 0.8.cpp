@@ -894,11 +894,11 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 	}
 
 	{
-		wiz::load_data::Utility::ChangeCharInString(result, "^4", "\n");
-		wiz::load_data::Utility::ChangeCharInString(result, "^3", "\r");
-		wiz::load_data::Utility::ChangeCharInString(result, "^2", "\t");
-		wiz::load_data::Utility::ChangeCharInString(result, "^1", " ");
-		wiz::load_data::Utility::ChangeCharInString(result, "^0", "^");
+		result = wiz::load_data::Utility::ChangeStr(result, "^4", "\n");
+		result = wiz::load_data::Utility::ChangeStr(result, "^3", "\r");
+		result = wiz::load_data::Utility::ChangeStr(result, "^2", "\t");
+		result = wiz::load_data::Utility::ChangeStr(result, "^1", " ");
+		result = wiz::load_data::Utility::ChangeStr(result, "^0", "^");
 	}
 	return result;
 }
