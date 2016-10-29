@@ -873,6 +873,28 @@ namespace wiz {
 
 				return stream;
 			}
+		private:
+			class DoThread // need to rename!
+			{
+			private:
+				vector<UserType*>* utVec;
+				ArrayQueue<string>* aq;
+				string target_ch;
+				string result_ch;
+				int utVecStart;
+				int utVecEnd;
+			public:
+				DoThread(vector<UserType*>* utVec, const string& target_ch, const string& result_ch, int utVecStart, int utVecEnd)
+					: utVec(utVec), target_ch(target_ch), result_ch(result_ch), utVecStart(utVecStart), utVecEnd(utVecEnd)
+				{
+				}
+				void operator() () {
+					for (int i = utVecStart; i <= utVecEnd; ++i)
+					{
+						ReplaceAll((*utVec)[i], target_ch, result_ch);
+					}
+				}
+			};
 		public:
 			static void ReplaceAll(UserType* temp, const string& target_ch, const string& result_ch) {
 				const int itemListSize = temp->GetItemListSize();
@@ -889,10 +911,27 @@ namespace wiz {
 						itemList.Get(j) = Utility::ChangeStr(itemList.Get(j), target_ch, result_ch);
 					}
 				}
-				for (int i = 0; i < userTypeListSize; ++i) {
-					ReplaceAll(temp->GetUserTypeList(i), target_ch, result_ch);
+				
+				if (userTypeListSize > 200) { ///  chk 20, ... ?
+					const int count = userTypeListSize;
+					DoThread dtA(&(temp->userTypeList), target_ch, result_ch, 0, count / 4 - 1),
+						dtB(&(temp->userTypeList), target_ch, result_ch, count / 4, (count / 4) * 2 - 1),
+						dtC(&(temp->userTypeList), target_ch, result_ch, (count / 4) * 2, (count / 4) * 3 - 1),
+						dtD(&(temp->userTypeList), target_ch, result_ch, (count / 4) * 3, count - 1);
+					std::thread _threadA(dtA), _threadB(dtB), _threadC(dtC), _threadD(dtD);
+
+					_threadA.join();
+					_threadB.join();
+					_threadC.join();
+					_threadD.join();
+				}
+				else {
+					for (int i = 0; i < userTypeListSize; ++i) {
+						ReplaceAll(temp->GetUserTypeList(i), target_ch, result_ch);
+					}
 				}
 			}
+		public:
 			/// move to UserType
 			static bool ChkData(const UserType* utTemp)
 			{

@@ -525,7 +525,7 @@ namespace wiz {
 				return temp;
 			}
 	
-			static string ChangeStr(const string& str, const string changed_str, const string& result_str) {
+			static string ChangeStr(const string& str, const string& changed_str, const string& result_str) {
 				string temp;
 				temp.reserve(str.size() * 2);
 				int state = 0;

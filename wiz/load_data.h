@@ -508,22 +508,17 @@ namespace wiz {
 					InFIleReserver ifReserver(inFile);
 
 					ifReserver.Num = 100000;
-					// empty file..
+					// cf) empty file..
 					if (false == _LoadData(strVec, ifReserver, globalTemp))
 					{
 						return true;
 					}
-					/// ToDo - Change ^ to ' '
-					{
-						
 
 					UserType::ReplaceAll(&globalTemp, "^4", "\n");
 					UserType::ReplaceAll(&globalTemp, "^3", "\r");
 					UserType::ReplaceAll(&globalTemp, "^2", "\t");
 					UserType::ReplaceAll(&globalTemp, "^1", " ");
 					UserType::ReplaceAll(&globalTemp, "^0", "^");
-					}
-					//std::cout << "remove ^ end" << endl;
 
 					inFile.close();
 				}
