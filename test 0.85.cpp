@@ -997,6 +997,14 @@ string excute_module(wiz::load_data::UserType& global)
 			if (eventStack.top().userType_idx.size() == 1) {
 				if (events[no]->GetUserTypeListSize() > eventStack.top().userType_idx.top()) {
 					val = events[no]->GetUserTypeList(eventStack.top().userType_idx.top());
+
+					if (eventStack.top().userType_idx.top() >= 1 && val->GetName() == "$else"
+						&& events[no]->GetUserTypeList(eventStack.top().userType_idx.top() - 1)->GetName() != "$if") {
+						return "ERROR not exist $if, front $else.";
+					}
+					if (eventStack.top().userType_idx.top() == 0 && val->GetName() == "$else") {
+						return "ERROR not exist $if, front $else.";
+					}
 				}
 				else {
 					val = NULL;
@@ -1014,11 +1022,27 @@ string excute_module(wiz::load_data::UserType& global)
 
 				if (!eventStack.top().nowUT.empty() && eventStack.top().nowUT.top()->GetUserTypeListSize() > eventStack.top().userType_idx.top()) {
 					val = eventStack.top().nowUT.top()->GetUserTypeList(eventStack.top().userType_idx.top());
+
+					if (eventStack.top().userType_idx.top() >= 1 && val->GetName() == "$else"
+						&& eventStack.top().nowUT.top()->GetUserTypeList(eventStack.top().userType_idx.top() - 1)->GetName() != "$if") {
+						return "ERROR not exist $if, front $else.";
+					}
+					if (eventStack.top().userType_idx.top() == 0 && val->GetName() == "$else") {
+						return "ERROR not exist $if, front $else.";
+					}
 				}
 				else
 				{
 					if (events[no]->GetUserTypeListSize() > eventStack.top().userType_idx.top()) {
 						val = events[no]->GetUserTypeList(eventStack.top().userType_idx.top());
+
+						if (eventStack.top().userType_idx.top() >= 1 && val->GetName() == "$else"
+							&& events[no]->GetUserTypeList(eventStack.top().userType_idx.top() - 1)->GetName() != "$if") {
+							return "ERROR not exist $if, front $else.";
+						}
+						if (eventStack.top().userType_idx.top() == 0 && val->GetName() == "$else") {
+							return "ERROR not exist $if, front $else.";
+						}
 					}
 					else {
 						val = NULL;
@@ -1944,8 +1968,6 @@ string excute_module(wiz::load_data::UserType& global)
 				}
 				else if ("$else" == val->GetName())
 				{
-					// if가 바로 앞에 나와야한다.
-					//
 					if (!eventStack.top().conditionStack.empty() && "FALSE" == eventStack.top().conditionStack.top())
 					{
 						eventStack.top().conditionStack.top() = "TRUE";
