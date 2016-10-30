@@ -903,38 +903,6 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 	return result;
 }
 
-bool chkFunc(wiz::ArrayStack<EventInfo>& eventStack, wiz::load_data::UserType** val)
-{
-	if (!eventStack.top().state.empty() && (eventStack.top().state.top() == 1 || eventStack.top().state.top() == 2))
-	{
-
-		if (eventStack.top().userType_idx.top() < eventStack.top().nowUT.top()->GetUserTypeListSize())
-		{
-			(*val) = eventStack.top().nowUT.top()->GetUserTypeList(eventStack.top().userType_idx.top());
-			return false;
-		}
-		else
-		{
-			eventStack.top().nowUT.pop();
-			eventStack.top().userType_idx.pop();
-			if (!eventStack.top().conditionStack.empty())
-			{
-				eventStack.top().conditionStack.pop();
-			}
-			eventStack.top().state.pop(); // remove state
-		}
-	}
-	else {
-		if (!eventStack.empty() && !eventStack.top().userType_idx.empty() && !eventStack.top().nowUT.empty()
-			&& eventStack.top().userType_idx.top() >= eventStack.top().nowUT.top()->GetUserTypeListSize())
-		{
-			eventStack.top().nowUT.pop();
-			eventStack.top().userType_idx.pop();
-		}
-	}
-	return true;
-}
-
 
 string excute_module(wiz::load_data::UserType& global)
 {
@@ -1011,7 +979,6 @@ string excute_module(wiz::load_data::UserType& global)
 
 		int no = convert.at(str);
 
-		bool pass = false;
 		int state = 0;
 
 		if (info.userType_idx.size() == 1 && info.userType_idx[0] >= events[no]->GetUserTypeListSize())
@@ -1025,17 +992,43 @@ string excute_module(wiz::load_data::UserType& global)
 			continue;
 		}
 
-		{
+		{ /// has bug!! WARNNING!!
 			wiz::load_data::UserType* val = NULL;
 			if (eventStack.top().userType_idx.size() == 1) {
-				val = events[no]->GetUserTypeList(eventStack.top().userType_idx.top());
+				if (events[no]->GetUserTypeListSize() > eventStack.top().userType_idx.top()) {
+					val = events[no]->GetUserTypeList(eventStack.top().userType_idx.top());
+				}
+				else {
+					val = NULL;
+				}
 			}
 			else
 			{
-				val = eventStack.top().nowUT.top();
+				// # of userType_idx == nowUT.size() + 1, and nowUT.size() == conditionStack.size()..
+				while (!eventStack.top().nowUT.empty() && eventStack.top().nowUT.top()->GetUserTypeListSize() <= eventStack.top().userType_idx.top())
+				{
+					eventStack.top().nowUT.pop();
+					eventStack.top().userType_idx.pop();
+					eventStack.top().conditionStack.pop();
+				}
+
+				if (!eventStack.top().nowUT.empty() && eventStack.top().nowUT.top()->GetUserTypeListSize() > eventStack.top().userType_idx.top()) {
+					val = eventStack.top().nowUT.top()->GetUserTypeList(eventStack.top().userType_idx.top());
+				}
+				else
+				{
+					if (events[no]->GetUserTypeListSize() > eventStack.top().userType_idx.top()) {
+						val = events[no]->GetUserTypeList(eventStack.top().userType_idx.top());
+					}
+					else {
+						val = NULL;
+					}
+				}
 			}
 
-			while (true) {
+			while (val != NULL) 
+			{
+
 				if ("$save_data_only" == val->GetName())
 				{
 					//todo
@@ -1265,6 +1258,7 @@ string excute_module(wiz::load_data::UserType& global)
 					info.userType_idx.clear();
 					info.userType_idx.push(0);
 					info.return_value.clear();
+					info.nowUT.clear();
 
 					EventInfo info2;
 					info2 = info;
@@ -1350,7 +1344,6 @@ string excute_module(wiz::load_data::UserType& global)
 
 					eventStack.push(info);
 
-					pass = true;
 					break;
 				}
 				
@@ -1930,11 +1923,13 @@ string excute_module(wiz::load_data::UserType& global)
 					if ("TRUE" == temp)
 					{
 						eventStack.top().nowUT.push(val->GetUserTypeList(1));
-						val = eventStack.top().nowUT.top()->GetUserTypeList(0); 
+						//val = eventStack.top().nowUT.top()->GetUserTypeList(0); 
+						eventStack.top().userType_idx.top()++;
 						eventStack.top().userType_idx.push(0);
-						eventStack.top().state.push(1);
-						state = 1;
-					}
+						//eventStack.top().state.push(1);
+						//state = 1;
+						break;
+					}//
 					else if ("FALSE" == temp)
 					{
 						eventStack.top().userType_idx.top()++;
@@ -1943,7 +1938,7 @@ string excute_module(wiz::load_data::UserType& global)
 					else
 					{
 						// debug..
-						cout << "Error Debug : " << temp << endl;
+						std::cout << "Error Debug : " << temp << endl;
 						return "ERROR -3";
 					}
 				}
@@ -1955,10 +1950,12 @@ string excute_module(wiz::load_data::UserType& global)
 					{
 						eventStack.top().conditionStack.top() = "TRUE";
 						eventStack.top().nowUT.push(val->GetUserTypeList(0));
-						val = eventStack.top().nowUT.top()->GetUserTypeList(0); // empty chk
+						//val = eventStack.top().nowUT.top()->GetUserTypeList(0); // empty chk
+						eventStack.top().userType_idx.top()++;
 						eventStack.top().userType_idx.push(0);
-						eventStack.top().state.push(2);
-						state = 2;
+						//eventStack.top().state.push(2);
+						//state = 2; //
+						break;
 					}
 					else
 					{
@@ -1968,10 +1965,10 @@ string excute_module(wiz::load_data::UserType& global)
 				}
 
 				{
-					if (chkFunc(eventStack, &val)) {
-						eventStack.top().userType_idx.top()++;
-						break;
-					}
+				//	if (chkFunc(eventStack, &val)) {
+				//		eventStack.top().userType_idx.top()++;
+				//		break;
+				//	}
 				}
 			}
 		}
