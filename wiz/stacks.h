@@ -37,7 +37,7 @@ class Stack
     public:
         //
         explicit Element( const T& d=T() )
-        {  // 기본 대입. // 얕은 복사.
+        {  // 기본 ?�?? // ?��? 복사.
             data = d; // why this?
             next = NULL;
         }
@@ -94,7 +94,7 @@ public:
         return *this;
     }
 private:
-    Element* Rear;// 꼬리에 데이터를 넣는다.
+    Element* Rear;// 꼬리???�이?��? ?�는??
     int num;  // for toArray
 public:
     explicit Stack() : Rear( NULL ), num( 0 ) { }
@@ -106,35 +106,35 @@ public:
             pop();
         }
     }
-    bool isEmpty()const{ // 비었나? //
+    bool isEmpty()const{ // 비었?? //
         return NULL == Rear; // num <= 0
     }
     bool empty() const{ return isEmpty(); }
     //
-    void push( const T& p ){ // 넣기
+    void push( const T& p ){ // ?�기
         Element* temp = new Element(p); //
         //Rear
-        temp->next = Rear; // Rear가 가르키던 값을 가르키게 한다.
-        Rear = temp; //새로 들어오는 것을 기준으로 한다
+        temp->next = Rear; // Rear가 가르키??값을 가르키�??�다.
+        Rear = temp; //?�로 ?�어?�는 것을 기�??�로 ?�다
         //
         num++;
     }
     //
-    T pop(){ // 빼기... cf  Rear가 고정, 데이터가 이동하는 것 처럼 행동.
-        // 예외 테스트..
+    T pop(){ // 빼기... cf  Rear가 고정, ?�이?��? ?�동?�는 �?처럼 ?�동.
+        // ?�외 ?�스??.
         if( isEmpty() )
         {
             throw StackEmptyError();
         }
         //
-        Element* temp = Rear; // 현재 가르키는 것.
-        Rear = Rear->next; // Rear에는 ..
+        Element* temp = Rear; // ?�재 가르키??�?
+        Rear = Rear->next; // Rear?�는 ..
         T returnTemp = (temp->data);
         delete temp;
         //
         num--;
         //
-        return returnTemp; //return이 없어도 컴파일이 되다니;;; - in CodeBlocks.
+        return returnTemp; //return???�어??컴파?�이 ?�다??;; - in CodeBlocks.
     }
     T getTop()const
     {
@@ -175,7 +175,7 @@ public:
         }
     }
 
-    // 스택에 넣는다.
+    // ?�택???�는??
     Stack<T>& operator<<( const T& p ){
         push(p);
         return *this;

@@ -556,6 +556,7 @@ namespace wiz {
 					}
 				}
 
+				temp.shrink_to_fit();
 				return temp;
 			}
 

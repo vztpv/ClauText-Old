@@ -208,7 +208,7 @@ namespace wiz {
 				Reset(ut);  // Initial
 			}
 			UserType(UserType&& ut) : Type(ut.GetName()) {
-				Reset2(move(ut));
+				Reset2(std::move(ut));
 			}
 			virtual ~UserType() {
 				_Remove();
@@ -224,9 +224,9 @@ namespace wiz {
 			UserType& operator=(UserType&& ut) {
 				if (this == &ut) { return *this;  }
 
-				Type::operator=(move(ut));
+				Type::operator=(std::move(ut));
 				RemoveUserTypeList();
-				Reset2(move(ut));
+				Reset2(std::move(ut));
 				return *this;
 			}
 		private:
