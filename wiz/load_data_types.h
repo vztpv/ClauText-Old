@@ -197,7 +197,6 @@ namespace wiz {
 
 			void LinkUserType(UserType* ut)
 			{
-				ut->parent = this;
 				userTypeList.push_back(ut);
 				ilist.push_back(2);
 			}
