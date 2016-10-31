@@ -395,7 +395,7 @@ namespace wiz {
 				}
 				ilist = move( temp );
 			}
-			void RemoveUserTypeList(const string& varName)
+			void RemoveUserTypeList(const string& varName, const bool chk = true)
 			{
 				int k = _GetIndex(ilist, 2, 0);
 				vector<UserType*> tempDic;
@@ -405,6 +405,9 @@ namespace wiz {
 						k = _GetIndex(ilist, 2, k + 1);
 					}
 					else {
+						if (chk) {
+							delete userTypeList[i];
+						}
 						// remove usertypeitem, ilist left shift 1.
 						for (int j = k + 1; j < ilist.size(); ++j) {
 							ilist[j - 1] = ilist[j];
@@ -412,7 +415,6 @@ namespace wiz {
 						ilist.resize(ilist.size() - 1);	
 						k = _GetIndex(ilist, 2, k);
 					}
-				
 				}
 				userTypeList = move( tempDic );
 			}
@@ -438,7 +440,7 @@ namespace wiz {
 						if (ilist[idx] == 2) { usertype_idx++; }
 					}
 
-					RemoveItemList(usertype_idx);
+					RemoveUserTypeList(usertype_idx);
 				}
 			}
 		public:
@@ -613,17 +615,6 @@ namespace wiz {
 				for (int i = 0; i < userTypeList.size(); ++i) {
 					if (userTypeList[i]->GetName() == name) {
 						temp.push_back(userTypeList[i]);
-					}
-				}
-
-				return temp;
-			}
-			vector<UserType*> GetCopyUserTypeItem(const string& name) const { /// chk...
-				vector<UserType*> temp;
-
-				for (int i = 0; i < userTypeList.size(); ++i) {
-					if (userTypeList[i]->GetName() == name) {
-						temp.push_back(new UserType(*userTypeList[i]));
 					}
 				}
 

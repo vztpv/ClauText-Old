@@ -191,8 +191,11 @@ public:
         #endif
         p = new T[_N];
 
-        reset( reset_val );
-    }
+        //reset( reset_val );
+		for (int i = 0; i < N; i++) {
+			p[i] = reset_val;
+		}
+	}
 
     Array( const Array<T>& _arr )
     : p(NULL), N(0)
