@@ -310,7 +310,7 @@ namespace wiz {
 				}
 				return{ chk, false };
 			}
-		private:
+		public:
 			class DoThread // need to rename!
 			{
 			private:
@@ -509,6 +509,37 @@ namespace wiz {
 
 				return temp;
 			}
+
+			static string AddSpace2(const string& str)
+			{
+				string temp;
+
+				for (int i = 0; i < str.size(); ++i)
+				{
+					/// To Do - chabnge to switch statement.
+					if ('=' == str[i]) {
+						temp.push_back(' ');
+						temp.push_back('=');
+						temp.push_back(' ');
+					}
+					else if ('{' == str[i]) {
+						temp.push_back(' ');
+						temp.push_back('{');
+						temp.push_back(' ');
+					}
+					else if ('}' == str[i]) {
+						temp.push_back(' ');
+						temp.push_back('}');
+						temp.push_back('\n');
+					}
+					else {
+						temp.push_back(str[i]);
+					}
+				}
+
+				return temp;
+			}
+
 			/// need testing!
 			static string PassSharp(const string& str) {
 				string temp;

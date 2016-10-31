@@ -2,9 +2,12 @@
 #ifndef LOAD_DATA_RESERVERS_H
 #define LOAD_DATA_RESERVERS_H
 
+#include <vector>
 #include <fstream>
+#include <string>
 using namespace std;
 
+#include <wiz/cpp_string.h>
 #include <wiz/load_data_utility.h>
 #include <wiz/queues.h>
 
@@ -42,7 +45,6 @@ namespace wiz {
 			}
 			bool end()const { return 1 == count; }
 		};
-
 	}
 }
 

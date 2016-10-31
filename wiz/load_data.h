@@ -123,7 +123,7 @@ namespace wiz {
 		class LoadData
 		{
 			/// core
-		private:
+		public:
 			template <class Reserver>
 			static bool _LoadData(ArrayQueue<string>& strVec, Reserver& vecReserver, UserType& global) // first, strVec.empty() must be true!!
 			{
