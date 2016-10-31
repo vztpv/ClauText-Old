@@ -912,18 +912,18 @@ string excute_module(wiz::load_data::UserType& global)
 	// data, event load..
 	wiz::ArrayStack<EventInfo> eventStack;
 	map<string, int> convert;
-	auto events = global.GetCopyUserTypeItem("Event");
+	auto events = global.GetUserTypeItem("Event");
 	
-	global.RemoveUserTypeList("Event");
+	//global.RemoveUserTypeList("Event", false);
 
 	if (global.GetUserTypeItem("Main").empty())
 	{
 		cout << "do not exist Main" << endl;
 		return "ERROR -1";
 	}
-	auto Main = global.GetCopyUserTypeItem("Main")[0]; // Main이 없으면 에러..!
+	auto Main = global.GetUserTypeItem("Main")[0]; // Main이 없으면 에러..!
 	
-	global.RemoveUserTypeList("Main");
+	//global.RemoveUserTypeList("Main", false);
 
 	// event table setting
 	for (int i = 0; i < events.size(); ++i)
@@ -1713,9 +1713,9 @@ string excute_module(wiz::load_data::UserType& global)
 						fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
 						wiz::load_data::UserType ut;
 						if (wiz::load_data::LoadData::LoadDataFromFile(fileName, ut)) {
-							auto new_events = ut.GetCopyUserTypeItem("Event");
+							auto new_events = ut.GetUserTypeItem("Event");
 							events.insert(events.end(), new_events.begin(), new_events.end());
-							ut.RemoveUserTypeList("Event");
+							//ut.RemoveUserTypeList("Event", false);
 
 							//wiz::load_data::LoadData::AddData(global, "", ut.ToString(), "TRUE");
 							{
@@ -1727,11 +1727,12 @@ string excute_module(wiz::load_data::UserType& global)
 								}
 							}
 
-							auto _Main = ut.GetCopyUserTypeItem("Main");
+							auto _Main = ut.GetUserTypeItem("Main");
 							if (NULL != Main && !_Main.empty())
 							{
 								// error!
 								cout << "err" << endl;
+								
 								return "ERROR -2";
 							}
 						}
