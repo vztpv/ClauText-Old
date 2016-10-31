@@ -1099,7 +1099,7 @@ string excute_module(wiz::load_data::UserType& global)
 								// nothing..
 							}
 							else {
-								wiz::load_data::UserType y("", false);
+								wiz::load_data::UserType y("", true);
 								y.LinkUserType(x);
 								y.Save1(outFile);
 							}
