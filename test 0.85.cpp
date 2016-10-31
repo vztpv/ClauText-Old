@@ -463,6 +463,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 	{
 		operandStack.push(info.return_value);
 	}
+
 	else if ("$back" == str) // ex) for x  = { 0 1 2 3 .. }, for usertaypelist? and mixed?
 	{
 		string x = operandStack.pop();
@@ -1075,23 +1076,72 @@ string excute_module(wiz::load_data::UserType& global)
 					fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
 					string option = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
 
-					wiz::load_data::UserType* temp = new wiz::load_data::UserType();
+					ofstream outFile;
+					outFile.open(fileName+"temp");
+					if (outFile.fail()) {
+						eventStack.top().userType_idx.top()++;
+						break;
+					}
+					int item_count = 0;
+					int userType_count = 0;
+
 					for (int i = 0; i < global.GetIList().size(); ++i) {
 						if (global.GetIList()[i] == 1) {
-							auto x = (wiz::load_data::TypeArray<string>*)( global.GetList(i) );
-							temp->AddItem(x->GetName(), x->Get(0));
+							auto x = global.GetItemList(item_count);
+							wiz::load_data::UserType ut;
+							ut.AddItem(x.GetName(), x.Get(0));
+							ut.Save1(outFile);
+							item_count++;
 						}
 						else { // == 2
-							auto x = ((wiz::load_data::UserType*)global.GetList(i));
+							auto x = global.GetUserTypeList(userType_count);
 							if (x->GetName() == "Event" || x->GetName() == "Main") {
 								// nothing..
 							}
 							else {
-								temp->AddUserTypeItem(*x);
+								x->Save1(outFile);
+							}
+							userType_count++;
+						}		
+					}
+					outFile.close();
+					{ // for eu4, last line remove!
+						ifstream inFile;
+						ofstream outFile;
+						inFile.open(fileName + "temp", ios::binary);
+						outFile.open(fileName, ios::binary);
+						if( inFile.fail()) { eventStack.top().userType_idx.top()++; break; }
+						if (outFile.fail()) { inFile.close(); eventStack.top().userType_idx.top()++; break; }
+
+						string temp;
+						size_t line_size = 0;
+						size_t line_count = 0;
+						{
+							while (getline(inFile, temp)) { line_size++; }
+							inFile.close();
+						}
+						inFile.open(fileName + "temp", ios::binary);
+						if (inFile.fail()) { outFile.close(); eventStack.top().userType_idx.top()++; break; }
+						for (int i = 0; i < line_size; ++i)
+						{
+							getline(inFile, temp);
+							if (temp == "") { continue; }
+							int count = 0;
+							for (const char ch : temp)
+							{
+								if (wiz::isWhitespace(ch)) { count++; }
+							}
+							if (count == temp.size()) { continue; }
+							if (inFile.eof()) { break; }
+							outFile << temp;
+							//std::cout << temp << endl;
+							if (i < line_size - 1) {
+								outFile << "\n";
 							}
 						}
-						wiz::load_data::LoadData::SaveWizDB(*temp, fileName, option, "");
-						delete temp;
+
+						inFile.close();
+						outFile.close();
 					}
 
 					eventStack.top().userType_idx.top()++;
