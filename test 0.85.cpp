@@ -464,7 +464,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		operandStack.push(info.return_value);
 	}
 
-	else if ("$back" == str) // ex) for x  = { 0 1 2 3 .. }, for usertaypelist? and mixed?
+	else if ("$back" == str) // ex) for x  = { 0 1 2 3 .. }, for usertaypelist? and mixed? and need more test!
 	{
 		string x = operandStack.pop();
 
@@ -1086,7 +1086,7 @@ string excute_module(wiz::load_data::UserType& global)
 					int userType_count = 0;
 
 					for (int i = 0; i < global.GetIList().size(); ++i) {
-						if (global.GetIList()[i] == 1) {
+						if (global.IsItemList(i)) {
 							auto x = global.GetItemList(item_count);
 							wiz::load_data::UserType ut;
 							ut.AddItem(x.GetName(), x.Get(0));
@@ -1094,12 +1094,14 @@ string excute_module(wiz::load_data::UserType& global)
 							item_count++;
 						}
 						else { // == 2
-							auto x = global.GetUserTypeList(userType_count);
+							wiz::load_data::UserType* x = global.GetUserTypeList(userType_count);
 							if (x->GetName() == "Event" || x->GetName() == "Main") {
 								// nothing..
 							}
 							else {
-								x->Save1(outFile);
+								wiz::load_data::UserType y("", false);
+								y.LinkUserType(x);
+								y.Save1(outFile);
 							}
 							userType_count++;
 						}		
@@ -1110,7 +1112,7 @@ string excute_module(wiz::load_data::UserType& global)
 						ofstream outFile;
 						inFile.open(fileName + "temp", ios::binary);
 						outFile.open(fileName, ios::binary);
-						if( inFile.fail()) { eventStack.top().userType_idx.top()++; break; }
+						if (inFile.fail()) { eventStack.top().userType_idx.top()++; break; }
 						if (outFile.fail()) { inFile.close(); eventStack.top().userType_idx.top()++; break; }
 
 						string temp;
@@ -1775,11 +1777,19 @@ string excute_module(wiz::load_data::UserType& global)
 
 							//wiz::load_data::LoadData::AddData(global, "", ut.ToString(), "TRUE");
 							{
-								for (int i = 0; i < ut.GetItemListSize(); ++i) {
-									global.AddItem(std::move(ut.GetItemList(i).GetName()), std::move(ut.GetItemList(i).Get(0)));
-								}
-								for (int i = 0; i < ut.GetUserTypeListSize(); ++i) {
-									global.AddUserTypeItem(std::move(*ut.GetUserTypeList(i)));
+								int item_count = 0;
+								int userType_count = 0;
+
+								for (int i = 0; i < ut.GetIList().size(); ++i) {
+									if (ut.IsItemList(i)) {
+										global.AddItem(std::move(ut.GetItemList(item_count).GetName()),
+											std::move(ut.GetItemList(item_count).Get(0)));
+										item_count++;
+									}
+									else {
+										global.AddUserTypeItem(std::move(*ut.GetUserTypeList(userType_count)));
+										userType_count++;
+									}
 								}
 							}
 
