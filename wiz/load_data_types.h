@@ -206,11 +206,12 @@ namespace wiz {
 			std::vector<int> ilist;
 			std::vector< TypeArray<string> > itemList;
 			std::vector< UserType* > userTypeList;
-		//	bool userTypeList_sortFlagA; // A : sorted < , B ; sorted > , false : not sorted!
+			bool noRemove = false;
+			//	bool userTypeList_sortFlagA; // A : sorted < , B ; sorted > , false : not sorted!
 		//	bool userTypeList_sortFlagB;
 		private:
 		public:
-			explicit UserType(const string& name = "") : Type(name), parent(NULL) { } //, userTypeList_sortFlagA(true), userTypeList_sortFlagB(true) { }
+			explicit UserType(const string& name = "", bool noRemove = false) : Type(name), parent(NULL), noRemove(noRemove) { } //, userTypeList_sortFlagA(true), userTypeList_sortFlagB(true) { }
 			UserType(const UserType& ut) : Type(ut.GetName()) {
 				Reset(ut);  // Initial
 			}
@@ -218,7 +219,9 @@ namespace wiz {
 				Reset2(std::move(ut));
 			}
 			virtual ~UserType() {
-				_Remove();
+				if (false == noRemove) {
+					_Remove();
+				}
 			}
 			UserType& operator=(const UserType& ut) {
 				if (this == &ut) { return *this; }
