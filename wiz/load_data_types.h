@@ -164,7 +164,7 @@ namespace wiz {
 			}
 			//todo - bool IsItemList? IsUserTypeList? by ilist_idx
 			//		Type* GetList( const int idx )
-			/*Type* GetList(const int idx)
+			Type* GetList(const int idx)
 			{
 				if (ilist[idx] == 1) {
 					int item_idx = -1;
@@ -183,7 +183,7 @@ namespace wiz {
 					}
 					return (Type*)(userTypeList[usertype_idx]);
 				}
-			}*/
+			}
 
 			void AddItemList(const TypeArray<string>& strTa)
 			{
@@ -194,6 +194,13 @@ namespace wiz {
 		public:
 			UserType* GetParent() { return parent; }
 			const UserType* GetParent()const { return parent; }
+
+			void LinkUserType(UserType* ut)
+			{
+				ut->parent = this;
+				userTypeList.push_back(ut);
+				ilist.push_back(2);
+			}
 		private:
 			UserType* parent;
 			std::vector<int> ilist;
@@ -295,8 +302,11 @@ namespace wiz {
 					}
 				}
 			}
-			void RemoveUserTypeList(const int idx)
+			void RemoveUserTypeList(const int idx, const bool chk = true)
 			{
+				if (chk) {
+					delete userTypeList[idx];
+				}
 				// left shift start idx, to end, at itemList. and resize!
 				for (int i = idx + 1; i < GetItemListSize(); ++i) {
 					userTypeList[i - 1] = std::move(userTypeList[i]);

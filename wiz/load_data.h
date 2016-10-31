@@ -1579,7 +1579,7 @@ namespace wiz {
 					ifstream inFile;
 					ofstream outFile;
 					inFile.open(fileName + "temp", ios::binary);
-					outFile.open(fileName);
+					outFile.open(fileName, ios::binary);
 
 					if (outFile.fail()) { inFile.close(); return false; }
 
