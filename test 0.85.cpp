@@ -477,8 +477,8 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 			operandStack.push(x->Get(0));
 		}
 		else {
-			auto x = (wiz::load_data::TypeArray<wiz::load_data::UserType*>*)ut.GetList(ut.GetIList().size() - 1);
-			operandStack.push("\"" + x->Get(0)->ToString() + "\"");
+			auto x = (wiz::load_data::UserType*)ut.GetList(ut.GetIList().size() - 1);
+			operandStack.push("\"" + x->ToString() + "\"");
 		}
 	}
 	else if ("$pop_back" == str) // and for usertypelist? and mixed?, usertype-> "~"
@@ -507,8 +507,8 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 			ut->RemoveItemList(ut->GetItemListSize() - 1);
 		}
 		else {
-			auto x = (wiz::load_data::TypeArray<wiz::load_data::UserType*>*)ut->GetList(ut->GetIList().size() - 1);
-			operandStack.push("\"" + x->Get(0)->ToString() + "\"");
+			auto x = (wiz::load_data::UserType*)ut->GetList(ut->GetIList().size() - 1);
+			operandStack.push("\"" + x->ToString() + "\"");
 			ut->RemoveUserTypeList(ut->GetUserTypeListSize() - 1);
 		}
 	}
@@ -527,8 +527,8 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 			operandStack.push(x->Get(0));
 		}
 		else {
-			auto x = (wiz::load_data::TypeArray<wiz::load_data::UserType*>*)ut.GetList(0);
-			operandStack.push("\"" + x->Get(0)->ToString() + "\"");
+			auto x = (wiz::load_data::UserType*)ut.GetList(0);
+			operandStack.push("\"" + x->ToString() + "\"");
 		}
 	}
 	else if ("$pop_front" == str)
@@ -557,8 +557,8 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 			ut->RemoveItemList(0);
 		}
 		else {
-			auto x = (wiz::load_data::TypeArray<wiz::load_data::UserType*>*)ut->GetList(0);
-			operandStack.push("\"" + x->Get(0)->ToString() + "\"");
+			auto x = (wiz::load_data::UserType*)ut->GetList(0);
+			operandStack.push("\"" + x->ToString() + "\"");
 			ut->RemoveUserTypeList(0);
 		}
 	}
@@ -1031,7 +1031,7 @@ string excute_module(wiz::load_data::UserType& global)
 						return "ERROR not exist $if, front $else.";
 					}
 				}
-				else
+				else // same to else if( eventSTack.top().nowUT.empty() ), also same to else if ( 1 == eventStack.top().userType_idx.size() )
 				{
 					if (events[no]->GetUserTypeListSize() > eventStack.top().userType_idx.top()) {
 						val = events[no]->GetUserTypeList(eventStack.top().userType_idx.top());
