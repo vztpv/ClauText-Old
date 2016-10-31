@@ -1053,7 +1053,7 @@ string excute_module(wiz::load_data::UserType& global)
 			while (val != NULL) 
 			{
 
-				if ("$save_data_only" == val->GetName())
+				if ("$save" == val->GetName())
 				{
 					//todo
 					// "filename" save_option(0~2)
@@ -1067,7 +1067,7 @@ string excute_module(wiz::load_data::UserType& global)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$save" == val->GetName()) // save data, event, main!
+				else if ("$save_data_only" == val->GetName()) // save data, event, main!
 				{
 					//todo
 					// "filename" save_option(0~2)
@@ -1075,17 +1075,23 @@ string excute_module(wiz::load_data::UserType& global)
 					fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
 					string option = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
 
-					wiz::load_data::LoadData::SaveWizDB(global, fileName, option, "");
-					for (int i = 0; i < events.size(); ++i)
-					{
-						wiz::load_data::UserType utTemp(events[i]->GetName());
-						utTemp.AddUserTypeItem(*events[i]);
-						wiz::load_data::LoadData::SaveWizDB(utTemp, fileName, option, "APPEND");
-					}
-					{
-						wiz::load_data::UserType utTemp(Main->GetName());
-						utTemp.AddUserTypeItem(*Main);
-						wiz::load_data::LoadData::SaveWizDB(utTemp, fileName, option, "APPEND");
+					wiz::load_data::UserType* temp = new wiz::load_data::UserType();
+					for (int i = 0; i < global.GetIList().size(); ++i) {
+						if (global.GetIList()[i] == 1) {
+							auto x = (wiz::load_data::TypeArray<string>*)( global.GetList(i) );
+							temp->AddItem(x->GetName(), x->Get(0));
+						}
+						else { // == 2
+							auto x = ((wiz::load_data::UserType*)global.GetList(i));
+							if (x->GetName() == "Event" || x->GetName() == "Main") {
+								// nothing..
+							}
+							else {
+								temp->AddUserTypeItem(*x);
+							}
+						}
+						wiz::load_data::LoadData::SaveWizDB(*temp, fileName, option, "");
+						delete temp;
 					}
 
 					eventStack.top().userType_idx.top()++;
