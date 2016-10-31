@@ -164,7 +164,7 @@ namespace wiz {
 			}
 			//todo - bool IsItemList? IsUserTypeList? by ilist_idx
 			//		Type* GetList( const int idx )
-			Type* GetList(const int idx)
+			/*Type* GetList(const int idx)
 			{
 				if (ilist[idx] == 1) {
 					int item_idx = -1;
@@ -181,9 +181,9 @@ namespace wiz {
 					for (int i = 0; i < ilist.size() && i <= idx; ++i) {
 						if (ilist[idx] == 2) { usertype_idx++; }
 					}
-					return (Type*)(&userTypeList[usertype_idx]);
+					return (Type*)(userTypeList[usertype_idx]);
 				}
-			}
+			}*/
 
 			void AddItemList(const TypeArray<string>& strTa)
 			{
@@ -456,8 +456,8 @@ namespace wiz {
 				}
 				itemList[index].Push(item);
 				*/
-				TypeArray<string> temp(name);
-				temp.Push(item);
+				TypeArray<string> temp(std::move(name));
+				temp.Push(std::move(item));
 				itemList.push_back(std::move(temp));
 				ilist.push_back(1);
 			}
