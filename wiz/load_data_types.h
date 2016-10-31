@@ -912,7 +912,7 @@ namespace wiz {
 					}
 				}
 				
-				if (userTypeListSize > 200) { ///  chk 20, ... ?
+				if (userTypeListSize > 100) { ///  chk 20, ... ?
 					const int count = userTypeListSize;
 					DoThread dtA(&(temp->userTypeList), target_ch, result_ch, 0, count / 4 - 1),
 						dtB(&(temp->userTypeList), target_ch, result_ch, count / 4, (count / 4) * 2 - 1),

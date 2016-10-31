@@ -259,7 +259,17 @@ public:
         p[count] = data;
         count++;
     }
+	void push(const T&& data)
+	{
+		if (count >= p.size())
+		{
+			// changed 2012.06.04
+			p.expand();
+		}
 
+		p[count] = std::move(data);
+		count++;
+	}
     // pop
     T pop()
     {

@@ -28,7 +28,7 @@ namespace wiz{
 
             return -1;
         }
-        static bool Comp( const char* cstr1, const char* cstr2, const int n ) /// isSameData?
+        static bool Comp( const char* cstr1, const char* cstr2, const int n ) /// isSameData
         {
             for( int i=0; i < n; i++ )
             {
@@ -36,7 +36,7 @@ namespace wiz{
             }
             return true;
         }
-        static bool Comp( const string& str1, const string& str2, const int n ) /// isSameData?
+        static bool Comp( const string& str1, const string& str2, const int n ) /// isSameData
         {
             for( int i=0; i < n; i++ )
             {
@@ -87,24 +87,6 @@ namespace wiz{
 			auto idx = str.find(str1, fromIndex);
 			if (idx == std::string::npos) { return{ false, 0 }; }
 			return{ true, idx };
-
-/*
-            /// chk fromIndex...
-            if( str1.empty() ) { return -1; }
-            const char* pStr = str.c_str();
-            string result;
-
-            for( int i=fromIndex; i <= str.size() - str1.size(); i++ ) {
-                const int n = strlen( pStr+i );
-                if( n >= str1.size()
-                   && Comp( pStr+i, str1.c_str(), str1.size() ) )
-                {
-                    return i;
-                }
-            }
-
-            return -1;
-            **/
         }
         static auto indexOf(const string& str, const string& str1 )
         {
@@ -157,21 +139,6 @@ namespace wiz{
         static string substring( const string& str, const int start, const int last )
         {
             return str.substr( start, last-start+1 );
-            /*
-            if( str.empty() ) { return string(); }
-            char* buf = new char[str.size()+1];
-
-            int count = 0;
-            for(int i=start; i <= last; i++ ) /// cf) i <=end - why??
-            {
-                buf[count++] = str[i];
-            }
-            buf[count] = '\0';
-            string temp = buf;
-            delete[] buf;
-
-            return temp;
-            */
         }
         static string substring( const string& str, const int start )
         {
@@ -185,10 +152,11 @@ namespace wiz{
         static bool endsWith( const string& str, const string& last )
         {
             if( str.size() < last.size() ) { return false; }
-            if( last.empty() ) { return true; } /// chk... return false; ??
+            if( last.empty() ) { return true; } /// chk... return false; 
             return Comp(  str.c_str() + ( str.size() - last.size() ), last.c_str(), last.size() );
         }
     };
+
     class StringTokenizer
     {
     private:
@@ -215,14 +183,13 @@ namespace wiz{
                     if( false == idx.first ) { counter_minus1++; }
                     if( false == idx.first && counter_minus1 == separator.size() ) {
                         tempStr = String::substring( str, i );
-                        if( !tempStr.empty() ) { _m_str.push_back( tempStr ); }
-                       // vector<string>( _m_str ).swap( _m_str );
+                        if( !tempStr.empty() ) { _m_str.push_back( std::move(tempStr) ); }
                         return;
                     }
-					if (idx.first) { exist = true; if (k > idx.second) { select = j; k = idx.second; } } /// idx가 같다�?가??처음???�온것이 ?�택?�다. -> 길이가 �?것을 ?�선???�야?�다?
+					if (idx.first) { exist = true; if (k > idx.second) { select = j; k = idx.second; } } 
                 }
                 tempStr = String::substring( str, i, k-1 );
-                if( !tempStr.empty() ) { _m_str.push_back( tempStr ); }
+                if( !tempStr.empty() ) { _m_str.push_back( std::move(tempStr) ); }
                 i = k + separator[select].size();
             }
         }
@@ -272,139 +239,5 @@ namespace wiz{
 
     };
 
-	class StringTokenizer2
-	{
-	private:
-		vector<string> _m_str;
-		int count;
-		bool exist;
-	private:
-		void Init(const string& str, const vector<string>& separator)
-		{
-			if (separator.empty() || str.empty()) { return; }
-			std::pair<bool, size_t> idx; int k = 0;
-			int i = 0; int select = -1;
-			string tempStr;
-
-			//_m_str.reserve( str.size() );
-
-			while (true) {
-				int counter_minus1 = 0;
-				k = str.size(); ///
-				idx.first = false; idx.second = 0; select = 0; ///
-				for (int j = 0; j < separator.size(); j++) {
-					idx = String::indexOf(str, separator[j], i);
-
-					if (false == idx.first) { counter_minus1++; }
-					if (false == idx.first && counter_minus1 == separator.size()) {
-						tempStr = String::substring(str, i);
-						if (!tempStr.empty()) { _m_str.push_back(tempStr); }
-						// vector<string>( _m_str ).swap( _m_str );
-						return;
-					}
-					if (idx.first) { exist = true; if (k > idx.second) { select = j; k = idx.second; } } /// idx가 같다�?가??처음???�온것이 ?�택?�다. -> 길이가 �?것을 ?�선???�야?�다?
-				}
-				
-				tempStr = String::substring(str, i, k - 1);
-				
-				if (tempStr.empty()) {
-					_m_str.push_back(separator[select]);
-				}
-				if (!tempStr.empty()) {
-					_m_str.push_back(tempStr); _m_str.push_back(separator[select]);
-				}
-
-				i = k + separator[select].size();
-			}
-		}
-	public:
-		explicit StringTokenizer2() : count(0), exist(false) { }
-		explicit StringTokenizer2(const string& str, const string& separator)
-			: count(0), exist(false)
-		{
-			vector<string> vec; vec.push_back(separator);
-			Init(str, vec);
-		}
-		explicit StringTokenizer2(const string& str, const vector<string>& separator)
-			: count(0), exist(false)
-		{
-			Init(str, separator);
-		}
-		explicit StringTokenizer2(const string& str)
-			: count(0), exist(false)
-		{
-			vector<string> vec;
-			vec.push_back(" ");
-			vec.push_back("\t");
-			vec.push_back("\r");
-			vec.push_back("\n");
-			Init(str, vec);
-		}
-		int countTokens()const
-		{
-			return _m_str.size();
-		}
-		string nextToken()
-		{
-			if (hasMoreTokens())
-				return _m_str[count++];
-			else
-				return "";
-		}
-		bool hasMoreTokens()const
-		{
-			return count < _m_str.size();
-		}
-
-		bool isFindExist()const
-		{
-			return exist;
-		}
-
-	};
-    /*
-    class StringTokenizer
-    {
-    private:
-        vector<string> _m_str;
-        int count;
-    public:
-        explicit StringTokenizer() :count(0) { }
-        explicit StringTokenizer( const string& str, const string& separator  )
-        : count( 0 )
-        {
-            if( separator.empty() || str.empty() ) { return; }
-            int idx = 0;
-            int i=0;
-            string tempStr;
-
-            while(true)
-            {
-                idx = String::indexOf( str, separator , i );
-                if( -1 == idx ) {
-                    tempStr = String::substring( str, i );
-                    if( !tempStr.empty() ) { _m_str.push_back( tempStr ); }
-                    break;
-                }
-                tempStr = String::substring( str, i, idx-1 );
-                if( !tempStr.empty() ) { _m_str.push_back( tempStr ); }
-                i = idx + separator.size();
-            }
-        }
-        int countTokens()const
-        {
-            return _m_str.size();
-        }
-        string nextToken()
-        {
-            return _m_str[count++];
-        }
-        bool hasMoreTokens()const
-        {
-            return count < _m_str.size();
-        }
-
-    };
-}*/
 }
 #endif // CPP_STRING_H_INCLUDED

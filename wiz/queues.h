@@ -230,6 +230,21 @@ public:
         que[(start+num) % (que.size())] = val;
         num++;
     }
+	void push(T&& val)
+	{
+		if (isFull())
+		{
+			// expand array queue.
+			ArrayQueue temp(que.size() * 2);
+			//
+			while (!this->isEmpty()) {
+				temp.push(this->pop());
+			}
+			*this = std::move(temp);
+		}
+		que[(start + num) % (que.size())] = std::move(val);
+		num++;
+	}
 
     T pop()
     {

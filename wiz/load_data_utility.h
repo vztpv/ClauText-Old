@@ -379,7 +379,7 @@ namespace wiz {
 					count++;
 				}
 
-				if (count >= 4) {
+				if (count >= 100) { // 4 ?
 					DoThread dtA(&strVecTemp, &arrayQueue[0], 0, count / 4 - 1),
 						dtB(&strVecTemp, &arrayQueue[1], count / 4, (count / 4) * 2 - 1),
 						dtC(&strVecTemp, &arrayQueue[2], (count / 4) * 2, (count / 4) * 3 - 1),
@@ -510,36 +510,6 @@ namespace wiz {
 				return temp;
 			}
 
-			static string AddSpace2(const string& str)
-			{
-				string temp;
-
-				for (int i = 0; i < str.size(); ++i)
-				{
-					/// To Do - chabnge to switch statement.
-					if ('=' == str[i]) {
-						temp.push_back(' ');
-						temp.push_back('=');
-						temp.push_back(' ');
-					}
-					else if ('{' == str[i]) {
-						temp.push_back(' ');
-						temp.push_back('{');
-						temp.push_back(' ');
-					}
-					else if ('}' == str[i]) {
-						temp.push_back(' ');
-						temp.push_back('}');
-						temp.push_back('\n');
-					}
-					else {
-						temp.push_back(str[i]);
-					}
-				}
-
-				return temp;
-			}
-
 			/// need testing!
 			static string PassSharp(const string& str) {
 				string temp;
@@ -558,8 +528,13 @@ namespace wiz {
 	
 			static string ChangeStr(const string& str, const string& changed_str, const string& result_str) {
 				string temp;
-				temp.reserve(str.size() * 2);
 				int state = 0;
+
+				string::size_type x = str.find('\"');
+				if (x == string::npos) { return str; }
+
+				temp.reserve(str.size() * 2);
+
 
 				for (int i = 0; i < str.size(); ++i)
 				{
