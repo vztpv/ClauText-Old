@@ -172,13 +172,26 @@ namespace wiz{
             string tempStr;
 
             //_m_str.reserve( str.size() );
+			vector<int> arr( separator.size(), 0 );
 
             while(true) {
                 int counter_minus1 = 0;
-                k = str.size(); ///
+                k = str.size(); /// 긴문장은 뒤로??
 				idx.first = false; idx.second = 0; select = 0; ///
                 for( int j = 0; j < separator.size(); j++ ) {
+					if (-1 == arr[j]) { 
+						counter_minus1++;
+						if (counter_minus1 == separator.size()) {
+							tempStr = String::substring(str, i);
+							if (!tempStr.empty()) { _m_str.push_back(std::move(tempStr)); }
+							return;
+						}
+						continue; 
+					}
+
                     idx = String::indexOf( str, separator[j], i );
+					
+					if (false == idx.first) { arr[j] = -1; }
 
                     if( false == idx.first ) { counter_minus1++; }
                     if( false == idx.first && counter_minus1 == separator.size() ) {
@@ -186,7 +199,7 @@ namespace wiz{
                         if( !tempStr.empty() ) { _m_str.push_back( std::move(tempStr) ); }
                         return;
                     }
-					if (idx.first) { exist = true; if (k > idx.second) { select = j; k = idx.second; } } 
+					if (idx.first) { exist = true; if (k >= idx.second) { select = j; k = idx.second; } } 
                 }
                 tempStr = String::substring( str, i, k-1 );
                 if( !tempStr.empty() ) { _m_str.push_back( std::move(tempStr) ); }

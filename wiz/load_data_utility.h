@@ -369,6 +369,7 @@ namespace wiz {
 					//temp = RemoveEndSpace(temp);
 					temp = PassSharp(temp);
 					temp = AddSpace(temp);
+
 					temp = ChangeStr(temp, "^", "^0"); // 1ÁÙ¿¡ "~~~" ?
 					temp = ChangeStr(temp, " ", "^1");
 					temp = ChangeStr(temp, "\t", "^2");

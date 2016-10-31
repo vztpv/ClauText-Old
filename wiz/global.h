@@ -105,7 +105,7 @@ namespace wiz{
 		bool operator() (const T& t1, const T& t2) const { return t1 > t2; }
 	};
 	template <class T>
-	class EE {
+	class EQ { // EE -> EQ!
 	public:
 		bool operator() (const T& t1, const T& t2) const { return t1 == t2; }
 	};
@@ -164,7 +164,7 @@ namespace wiz{
 	template <typename T> /// T <- char, int, long, long long...
 	string toStr(const T x, const int base); /// chk!!
 
-	template <class T, class COMP = ASC<T>, class COMP2 = ASC<int>, class EE = EE<T> > /// œì„œ ë°”ê¾¸ê¸ - 2015.07.18
+	template <class T, class COMP = ASC<T>, class COMP2 = ASC<int>, class EE = EQ<T> > /// œì„œ ë°”ê¾¸ê¸ - 2015.07.18
 	class WrapForInfinity
 	{
 		enum Op{ MIF = 0, GR = 1, IF = 2 };
