@@ -1767,15 +1767,11 @@ string excute_module(wiz::load_data::UserType& global)
 				{
 					// to do, load data and events from other file!
 					for (int i = 0; i < val->GetItemListSize(); ++i) {
+						wiz::load_data::UserType ut;
 						string fileName = ToBool4(global, eventStack.top().parameters, val->GetItemList(i).Get(0), eventStack.top());
 						fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
-						wiz::load_data::UserType ut;
-						if (wiz::load_data::LoadData::LoadDataFromFile(fileName, ut)) {
-							auto new_events = ut.GetUserTypeItem("Event");
-							events.insert(events.end(), new_events.begin(), new_events.end());
-							//ut.RemoveUserTypeList("Event", false);
 
-							//wiz::load_data::LoadData::AddData(global, "", ut.ToString(), "TRUE");
+						if (wiz::load_data::LoadData::LoadDataFromFile(fileName, ut)) {
 							{
 								int item_count = 0;
 								int userType_count = 0;
@@ -1799,7 +1795,7 @@ string excute_module(wiz::load_data::UserType& global)
 								// error!
 								cout << "err" << endl;
 								
-								return "ERROR -2";
+								return "ERROR -2"; /// exit?
 							}
 						}
 						else {
@@ -1809,6 +1805,9 @@ string excute_module(wiz::load_data::UserType& global)
 
 					{
 						convert.clear();
+						events.clear();
+
+						events = global.GetUserTypeItem("Event");
 
 						// event table setting
 						for (int i = 0; i < events.size(); ++i)
