@@ -513,7 +513,7 @@ namespace wiz {
 					{
 						return true;
 					}
-
+					UserType::ReplaceAll(&globalTemp, "^5", "#");
 					UserType::ReplaceAll(&globalTemp, "^4", "\n");
 					UserType::ReplaceAll(&globalTemp, "^3", "\r");
 					UserType::ReplaceAll(&globalTemp, "^2", "\t");
@@ -535,10 +535,13 @@ namespace wiz {
 			static bool LoadDataFromString(string str, UserType& ut)
 			{
 				UserType utTemp = ut;
+
+				str = Utility::ChangeStr(str, "^", "^0");
+				str = Utility::ChangeStr(str, "#", "^5");
+
 				str = Utility::PassSharp(str);
 				str = Utility::AddSpace(str);
 
-				str = Utility::ChangeStr(str, "^", "^0");
 				str = Utility::ChangeStr(str, " ", "^1");
 				str = Utility::ChangeStr(str, "\t", "^2");
 				str = Utility::ChangeStr(str, "\r", "^3");
@@ -560,6 +563,7 @@ namespace wiz {
 						return true;
 					}
 
+					UserType::ReplaceAll(&utTemp, "^5", "#");
 					UserType::ReplaceAll(&utTemp, "^4", "\n");
 					UserType::ReplaceAll(&utTemp, "^3", "\r");
 					UserType::ReplaceAll(&utTemp, "^2", "\t");

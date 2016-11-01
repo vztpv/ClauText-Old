@@ -367,10 +367,11 @@ namespace wiz {
 				
 				for (int i = 0; i < num && (getline(inFile,temp)); ++i) {
 					//temp = RemoveEndSpace(temp);
+					temp = ChangeStr(temp, "^", "^0"); // 1줄에 "~~~" ?	
+					temp = Utility::ChangeStr(temp, "#", "^5");
 					temp = PassSharp(temp);
 					temp = AddSpace(temp);
 
-					temp = ChangeStr(temp, "^", "^0"); // 1줄에 "~~~" ?
 					temp = ChangeStr(temp, " ", "^1");
 					temp = ChangeStr(temp, "\t", "^2");
 					temp = ChangeStr(temp, "\r", "^3");
