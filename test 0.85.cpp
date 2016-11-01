@@ -1077,7 +1077,7 @@ string excute_module(wiz::load_data::UserType& global)
 					string option = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
 
 					ofstream outFile;
-					outFile.open(fileName+"temp");
+					outFile.open(fileName+"temp", ios::binary);
 					if (outFile.fail()) {
 						eventStack.top().userType_idx.top()++;
 						break;
@@ -1122,9 +1122,12 @@ string excute_module(wiz::load_data::UserType& global)
 							while (getline(inFile, temp)) { line_size++; }
 							inFile.close();
 						}
+
+						//cout << "chk " << line_size << endl;
+
 						inFile.open(fileName + "temp", ios::binary);
 						if (inFile.fail()) { outFile.close(); eventStack.top().userType_idx.top()++; break; }
-						for (int i = 0; i < line_size; ++i)
+						for (size_t i = 0; i < line_size; ++i)
 						{
 							getline(inFile, temp);
 							if (temp == "") { continue; }
