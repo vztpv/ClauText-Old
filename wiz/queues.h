@@ -194,7 +194,7 @@ private:
     int start;
     int num;
 public:
-    explicit ArrayQueue( const int max=1 ) : start(0), num(0)
+    explicit ArrayQueue( const int max=2 ) : start(0), num(0)
     {
         #ifdef QUEUES_DEBUG
         // max > 0
@@ -222,12 +222,15 @@ public:
             // expand array queue.
             ArrayQueue temp( que.size() * 2 );
             //
-            while( !this->isEmpty() ) {
-                temp.push( this->pop() );
-            }
+			for (int i = 0; i < que.size(); ++i) {
+				temp[i] = std::move(que[(start + i) & (que.size()-1)]);
+			}
+			temp.start = 0;
+			temp.num = que.size();
+
             *this = std::move( temp );
         }
-        que[(start+num) % (que.size())] = val;
+        que[(start+num) & (que.size()-1)] = val;
         num++;
     }
 	void push(T&& val)
@@ -237,12 +240,15 @@ public:
 			// expand array queue.
 			ArrayQueue temp(que.size() * 2);
 			//
-			while (!this->isEmpty()) {
-				temp.push(this->pop());
+			for (int i = 0; i < que.size(); ++i) {
+				temp[i] = std::move(que[(start + i) & (que.size()-1)]);
 			}
+			temp.start = 0;
+			temp.num = que.size();
+			
 			*this = std::move(temp);
 		}
-		que[(start + num) % (que.size())] = std::move(val);
+		que[(start + num) & (que.size()-1)] = std::move(val);
 		num++;
 	}
 
