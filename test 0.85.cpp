@@ -463,7 +463,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 	{
 		operandStack.push(info.return_value);
 	}
-
+	///ToDo - GetList -> // GetItemListByIListIdx, GetUserTypeListByIListIdx ?
 	else if ("$back" == str) // ex) for x  = { 0 1 2 3 .. }, for usertaypelist? and mixed? and need more test!
 	{
 		string x = operandStack.pop();
