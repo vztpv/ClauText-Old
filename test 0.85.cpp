@@ -463,7 +463,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 	{
 		operandStack.push(info.return_value);
 	}
-	///ToDo - GetList -> // GetItemListByIListIdx, GetUserTypeListByIListIdx ?
+	///ToDo - GetList -> // GetItemListIdxByIListIdx, GetUserTypeLisIdxtByIListIdx ?
 	else if ("$back" == str) // ex) for x  = { 0 1 2 3 .. }, for usertaypelist? and mixed? and need more test!
 	{
 		string x = operandStack.pop();
@@ -1483,7 +1483,7 @@ string excute_module(wiz::load_data::UserType& global)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$assign_global" == val->GetName())
+				else if ("$assign_global" == val->GetName()) // 주의!! dir=> dir/name ( dir= { name = val } } , @를 앞에 붙여야 한다. 
 				{
 					pair<string, string> dir = Find2(&global, ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top()));
 					string data = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
@@ -1583,7 +1583,7 @@ string excute_module(wiz::load_data::UserType& global)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$remove" == val->GetName()) // remove by dir.
+				else if ("$remove" == val->GetName()) // remove by dir., remove all?
 				{
 					string dir = string(val->GetItemList(0).Get(0).c_str()); // item -> userType
 
@@ -1640,6 +1640,22 @@ string excute_module(wiz::load_data::UserType& global)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
+				
+				/// ToDo Chk $add, $set, $remove.
+				/// ToDo Make $set - from wiz::load_data::LoadData::SetData function.
+				//	$set~ 할때, ~~가 있다면 ( set하기전의 value )로 바꾼다? - condition 문법처럼 추가하여 쓴다?
+				//  $set_by_empty_name == val->GetName() ?
+				//	$set_by_name == val->GetName()
+					//	string dir
+					//	string var_name
+					//  string value   : ex) value = "$multiple = { ~~ 2 }" - ToDo!!
+					//  string condition
+				//  $set_by_idx == val->GetName()
+					//	string dir
+					//	string idx
+					//	string value
+					//	string condition
+				//
 				else if ("$setElement" == val->GetName())
 				{
 					string dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
