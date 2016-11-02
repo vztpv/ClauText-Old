@@ -6,8 +6,7 @@
 	5. Register Module or Call Registered Module? - Done
 	6. Fix bugs. 
 	7. $ option?(all), + Condition? - Done??
-	8. /// ToDo - vector<pair<string, string>> data_and_condition; 
-	   //	condition이 만족하는 최초에 한해서 data를 set, add한다.?
+	8. vector<pair<string, string>> data_and_condition.
 # example codes 
 	#  # is notation
 	## id -> name?
