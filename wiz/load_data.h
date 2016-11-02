@@ -1008,7 +1008,7 @@ namespace wiz {
 					return false;
 				}
 			}
-			// SetQuery
+			/// SetData - Re Do!
 			static bool SetData(UserType& global, const string& position, const string& varName, const string& data, const string& condition = "")
 			{
 				auto finded = UserType::Find(&global, position);
@@ -1025,7 +1025,7 @@ namespace wiz {
 					while (tokenizer.hasMoreTokens()) {
 						string _varName = tokenizer.nextToken();
 						/// todo - if varName is "" then data : val val val ... 
-						if (_varName == "" || _varName == " ") {
+						if (_varName == "" || _varName == " ") { // re?
 							const int n = utTemp.GetItem("").size();
 							for (int i = 0; i < finded.second.size(); ++i) {
 								if (false == condition.empty()) {

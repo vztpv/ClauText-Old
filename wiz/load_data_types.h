@@ -19,7 +19,7 @@ namespace wiz {
 		private:
 			string name;
 		public:
-			explicit Type(const string& name = "", const bool valid=true) : name(name) { }
+			explicit Type(const string& name = "", const bool valid = true) : name(name) { }
 			Type(const Type& type)
 				: name(type.name)
 			{ }
@@ -63,7 +63,7 @@ namespace wiz {
 			}
 			TypeArray(TypeArray<T>&& ta) : Type(ta)
 			{
-				arr = move( ta.arr );
+				arr = move(ta.arr);
 			}
 		public:
 			explicit TypeArray(const string& name = "", const bool valid = true) : Type(name, valid) { }
@@ -92,19 +92,19 @@ namespace wiz {
 			const T& Get(const int index) const {
 				// #ifdef DEBUG 
 				/*if (index < 0 || index >= count || arr.size() <= 0) {
-					std::cout << "index " << index << endl;
-					throw "index not valid";
+				std::cout << "index " << index << endl;
+				throw "index not valid";
 				}*/
 				return arr[index];
 			}
 			void Set(const int index, const T& val) {
 				//if (index >= 0 && index < count) {
-					arr[index] = val;
+				arr[index] = val;
 				//}
 				//else
-			//	{
-			//		std::cout << "error " << index << " " << count << endl;
-			//	}
+				//	{
+				//		std::cout << "error " << index << " " << count << endl;
+				//	}
 			}
 			int size()const {
 				return arr.size();
@@ -123,23 +123,23 @@ namespace wiz {
 				Type::operator=(ta);
 				if (arr == ta.arr) { return *this; }
 
-				arr = std::move( ta.arr );
+				arr = std::move(ta.arr);
 				ta.arr.clear();
 
 				return *this;
 			}
 			/*string ToString()const
 			{
-				string temp;
+			string temp;
 
-				for (int i = 0; i < size(); ++i) {
-					temp = temp + arr[i].ToString();
-					if (i != size() - 1) {
-						temp = temp + "/";
-					}
-				}
+			for (int i = 0; i < size(); ++i) {
+			temp = temp + arr[i].ToString();
+			if (i != size() - 1) {
+			temp = temp + "/";
+			}
+			}
 
-				return temp;
+			return temp;
 			} */
 		};
 
@@ -207,7 +207,7 @@ namespace wiz {
 			std::vector< UserType* > userTypeList;
 			bool noRemove = false;
 			//	bool userTypeList_sortFlagA; // A : sorted < , B ; sorted > , false : not sorted!
-		//	bool userTypeList_sortFlagB;
+			//	bool userTypeList_sortFlagB;
 		private:
 		public:
 			explicit UserType(const string& name = "", bool noRemove = false) : Type(name), parent(NULL), noRemove(noRemove) { } //, userTypeList_sortFlagA(true), userTypeList_sortFlagB(true) { }
@@ -231,7 +231,7 @@ namespace wiz {
 				return *this;
 			}
 			UserType& operator=(UserType&& ut) {
-				if (this == &ut) { return *this;  }
+				if (this == &ut) { return *this; }
 
 				Type::operator=(std::move(ut));
 				RemoveUserTypeList();
@@ -240,8 +240,8 @@ namespace wiz {
 			}
 		private:
 			void Reset(const UserType& ut) { /// UT 전체를 복사한다.
-			//	userTypeList_sortFlagA = ut.userTypeList_sortFlagA;
-				//userTypeList_sortFlagB = ut.userTypeList_sortFlagB;
+											 //	userTypeList_sortFlagA = ut.userTypeList_sortFlagA;
+											 //userTypeList_sortFlagB = ut.userTypeList_sortFlagB;
 
 				ilist = ut.ilist;
 				itemList = ut.itemList;
@@ -286,17 +286,17 @@ namespace wiz {
 			void RemoveItemList(const int idx)
 			{
 				// left shift start idx, to end, at itemList. and resize!
-				for (int i = idx+1; i < GetItemListSize(); ++i) {
+				for (int i = idx + 1; i < GetItemListSize(); ++i) {
 					itemList[i - 1] = std::move(itemList[i]);
 				}
 				itemList.resize(itemList.size() - 1);
 				//  ilist left shift and resize - count itemType!
 				int count = 0;
 				for (int i = 0; i < ilist.size(); ++i) {
-					if (ilist[i] == 1 ) { count++; }
+					if (ilist[i] == 1) { count++; }
 					if (count == idx + 1) {
 						// i부터 left shift!and resize!
-						for (int k = i+1; k < ilist.size(); ++k) {
+						for (int k = i + 1; k < ilist.size(); ++k) {
 							ilist[k - 1] = std::move(ilist[k]);
 						}
 						ilist.resize(ilist.size() - 1);
@@ -342,11 +342,11 @@ namespace wiz {
 						for (int j = k + 1; j < ilist.size(); ++j) {
 							ilist[j - 1] = ilist[j];
 						}
-						ilist.resize(ilist.size() - 1);	
+						ilist.resize(ilist.size() - 1);
 						k = _GetIndex(ilist, 1, k);
 					}
 				}
-				itemList = ( tempDic );
+				itemList = (tempDic);
 			}
 			void RemoveItemList() /// ALL
 			{
@@ -359,7 +359,7 @@ namespace wiz {
 						temp.push_back(2);
 					}
 				}
-				ilist = move( temp );
+				ilist = move(temp);
 			}
 			void RemoveEmptyItem() // fixed..
 			{
@@ -405,7 +405,7 @@ namespace wiz {
 						temp.push_back(1);
 					}
 				}
-				ilist = move( temp );
+				ilist = move(temp);
 			}
 			void RemoveUserTypeList(const string& varName, const bool chk = true)
 			{
@@ -424,11 +424,11 @@ namespace wiz {
 						for (int j = k + 1; j < ilist.size(); ++j) {
 							ilist[j - 1] = ilist[j];
 						}
-						ilist.resize(ilist.size() - 1);	
+						ilist.resize(ilist.size() - 1);
 						k = _GetIndex(ilist, 2, k);
 					}
 				}
-				userTypeList = move( tempDic );
+				userTypeList = move(tempDic);
 			}
 			// todo - 
 			void RemoveList(const int idx) // ilist_idx!
@@ -477,15 +477,15 @@ namespace wiz {
 				/*int index = -1;
 				if (!itemList.Search(TypeArray<string>(name), &index))
 				{
-					ilist.push_back(1);
+				ilist.push_back(1);
 
-					itemList.PushBack(TypeArray<string>(name));//
-					itemList.Search(TypeArray<string>(name), &index);
+				itemList.PushBack(TypeArray<string>(name));//
+				itemList.Search(TypeArray<string>(name), &index);
 				}
-				itemList[index].Push(item);				
+				itemList[index].Push(item);
 				*/
-				TypeArray<string> temp( name );
-				temp.Push( item );
+				TypeArray<string> temp(name);
+				temp.Push(item);
 				itemList.push_back(std::move(temp));
 				ilist.push_back(1);
 			}
@@ -533,36 +533,36 @@ namespace wiz {
 			}
 			void AddUserTypeItem(const UserType& item) {
 				/*if (this->userTypeList_sortFlagA) {
-					string str_compare = Compare(userTypeList.back().GetName(), item.GetName());
+				string str_compare = Compare(userTypeList.back().GetName(), item.GetName());
 
-					if (str_compare == "<" || str_compare == "==")
-					{
-						this->userTypeList_sortFlagA = true;
-					}
-					else {
-						this->userTypeList_sortFlagA = false;
-					}
+				if (str_compare == "<" || str_compare == "==")
+				{
+				this->userTypeList_sortFlagA = true;
+				}
+				else {
+				this->userTypeList_sortFlagA = false;
+				}
 				}
 				if (this->userTypeList_sortFlagB) {
-					string str_compare = Compare(userTypeList.back().GetName(), item.GetName());
+				string str_compare = Compare(userTypeList.back().GetName(), item.GetName());
 
-					if (str_compare == ">" || str_compare == "==")
-					{
-						this->userTypeList_sortFlagB = true;
-					}
-					else {
-						this->userTypeList_sortFlagB = false;
-					}
+				if (str_compare == ">" || str_compare == "==")
+				{
+				this->userTypeList_sortFlagB = true;
+				}
+				else {
+				this->userTypeList_sortFlagB = false;
+				}
 				}*/
 
 				/*
 				int index = -1;
 				if (!userTypeList.Search(TypeArray<UserType*>(item.GetName()), &index))
 				{
-					ilist.push_back(2);
+				ilist.push_back(2);
 
-					userTypeList.PushBack(TypeArray<UserType*>(item.GetName()));//
-					userTypeList.Search(TypeArray<UserType*>(item.GetName()), &index);
+				userTypeList.PushBack(TypeArray<UserType*>(item.GetName()));//
+				userTypeList.Search(TypeArray<UserType*>(item.GetName()), &index);
 				}
 				*/
 				UserType* temp = new UserType(item);
@@ -604,7 +604,7 @@ namespace wiz {
 			}
 			bool SetItem(const string& name, const string& value) {
 				int index = -1;
-				
+
 				for (int i = 0; i < itemList.size(); ++i) {
 					if (itemList[i].GetName() == name)
 					{
@@ -640,7 +640,7 @@ namespace wiz {
 			}
 			bool GetLastUserTypeItemRef(const string& name, UserType*& ref) {
 				int idx = -1;
-				
+
 				for (int i = 0; i < userTypeList.size(); ++i)
 				{
 					if (name == userTypeList[i]->GetName()) {
@@ -682,13 +682,13 @@ namespace wiz {
 						Save1(stream, ut->userTypeList[userTypeListCount]);
 						stream << "\n";
 						stream << " }" << "\n";
-						
+
 						userTypeListCount++;
 					}
 				}
 			}
 			/// savw2 - for more seed loading data!
-			void Save2(ostream& stream, const UserType* ut) const  {
+			void Save2(ostream& stream, const UserType* ut) const {
 				int itemListCount = 0;
 				int userTypeListCount = 0;
 
@@ -720,7 +720,7 @@ namespace wiz {
 				}
 			}
 		public:
-			void Save1(ostream& stream) const{
+			void Save1(ostream& stream) const {
 				Save1(stream, this);
 			}
 			void Save2(ostream& stream) const {
@@ -730,7 +730,7 @@ namespace wiz {
 			{
 				string temp;
 				int itemListCount = 0;
-				
+
 				for (int i = 0; i < itemList.size(); ++i) {
 					for (int j = 0; j < itemList[itemListCount].size(); j++) {
 						if (itemList[itemListCount].GetName() != "")
@@ -835,14 +835,14 @@ namespace wiz {
 						}
 						temp += " { ";
 						temp += (userTypeList[userTypeListCount]->ToString()) + " ";
-						temp += ( string( " } " ) + " " );
-						
+						temp += (string(" } ") + " ");
+
 						userTypeListCount++;
 					}
 				}
 				return temp;
 			}
-			
+
 			friend ostream& operator<<(ostream& stream, const UserType& ut)
 			{
 				int itemListCount = 0;
@@ -914,7 +914,7 @@ namespace wiz {
 						itemList.Get(j) = Utility::ChangeStr(itemList.Get(j), target_ch, result_ch);
 					}
 				}
-				
+
 				if (userTypeListSize > 100) { ///  chk 20, ... ?
 					const int count = userTypeListSize;
 					DoThread dtA(&(temp->userTypeList), target_ch, result_ch, 0, count / 4 - 1),
@@ -961,13 +961,13 @@ namespace wiz {
 				vector< UserType* > temp;
 
 				if (!position.empty() && position[0] == '@') { position.erase(position.begin()); }
-				if (_position.empty()) { temp.push_back(global); return{ true, temp }; }
-				if (_position == ".") { temp.push_back(global); return{ true, temp }; }
-				if (_position == "/./") { temp.push_back(global); return{ true, temp }; } // chk..
-				if (_position == "/.") { temp.push_back(global); return{ true, temp }; }
-				if (String::startsWith(_position, "/." ))
+				if (position.empty()) { temp.push_back(global); return{ true, temp }; }
+				if (position == ".") { temp.push_back(global); return{ true, temp }; }
+				if (position == "/./") { temp.push_back(global); return{ true, temp }; } // chk..
+				if (position == "/.") { temp.push_back(global); return{ true, temp }; }
+				if (String::startsWith(position, "/."))
 				{
-					position = String::substring(_position, 3);
+					position = String::substring(position, 3);
 				}
 
 				StringTokenizer tokenizer(position, "/");
