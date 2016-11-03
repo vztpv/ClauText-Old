@@ -18,13 +18,18 @@ Event =
 
     $option = { REMOVE_IF_CALL_ONESELF_EVENT } # REMOVE_IF_CALL_ONESELF_EVENT.
     $parameter = { i j }
+	$local = { x } // "NOT_DEFINED"
 
-	$assign_global = {
-		dir = { @/./x }
-		data = { 3 }
+	$assign_local = {
+		dir = { $local.x }
+		data = { 9 }
+	}
+	$assign_local = {
+		dir = { $concat = { $ local.x } } // 이렇게 사용?
+ 		data = { 3 }
 	}
     $if = {
-        condition = { $COMP<EQ = { $parameter.i /./x } }
+        condition = { $COMP<EQ = { $parameter.i $local.x } }
         then = {
             $call = { id = { $concat = { x $add = { 1 1 } } } i = $parameter.i j = 1 }
             $print = { value = { \n } }
