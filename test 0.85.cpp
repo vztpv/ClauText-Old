@@ -2,6 +2,8 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
+//#include <vld.h>
+
 //#define ARRAYS_DEBUG
 #include <iostream>
 #include <vector>
@@ -913,23 +915,27 @@ string excute_module(wiz::load_data::UserType& global)
 	// data, event load..
 	wiz::ArrayStack<EventInfo> eventStack;
 	map<string, int> convert;
-	auto events = global.GetUserTypeItem("Event");
-	
-	//global.RemoveUserTypeList("Event", false);
+	auto _events = global.GetCopyUserTypeItem("Event");
+	wiz::load_data::UserType events;
+	for (int i = 0; i < _events.size(); ++i) {
+		events.LinkUserType(_events[i]);
+	}
+	global.RemoveUserTypeList("Event");
 
 	if (global.GetUserTypeItem("Main").empty())
 	{
 		cout << "do not exist Main" << endl;
 		return "ERROR -1";
 	}
-	auto Main = global.GetUserTypeItem("Main")[0]; // Main이 없으면 에러..!
-	
-	//global.RemoveUserTypeList("Main", false);
+	auto _Main = global.GetCopyUserTypeItem("Main")[0]; /// todo - main이 한개여야만 한다. Main이 없으면 에러..!
+	wiz::load_data::UserType Main;
+	Main.LinkUserType(_Main);
+	global.RemoveUserTypeList("Main");
 
 	// event table setting
-	for (int i = 0; i < events.size(); ++i)
+	for (int i = 0; i < events.GetUserTypeListSize(); ++i)
 	{
-		auto x = events[i]->GetItem("id");
+		auto x = events.GetUserTypeList(i)->GetItem("id");
 		if (!x.empty()) {
 			//cout <<	x[0] << endl;
 			convert.insert(pair<string, int>(x[0].Get(0), i));
@@ -942,7 +948,7 @@ string excute_module(wiz::load_data::UserType& global)
 	// start from Main.
 	{
 		EventInfo info;
-		info.eventUT = Main;
+		info.eventUT = Main.GetUserTypeList(0);
 		info.item_idx = 0;
 		info.userType_idx.push(0);
 		info.parameters.push_back(
@@ -951,10 +957,10 @@ string excute_module(wiz::load_data::UserType& global)
 		info.id = info.parameters[0].second;
 
 		const int no = convert.at(info.id);
-		for (int i = 0; i < events[no]->GetUserTypeListSize(); ++i) {
-			if (events[no]->GetUserTypeList(i)->GetName() == "$local") {
-				for (int j = 0; j < events[no]->GetUserTypeList(i)->GetItemListSize(); ++j) {
-					string name = events[no]->GetUserTypeList(i)->GetItemList(j).Get(0);
+		for (int i = 0; i < events.GetUserTypeList(no)->GetUserTypeListSize(); ++i) {
+			if (events.GetUserTypeList(no)->GetUserTypeList(i)->GetName() == "$local") {
+				for (int j = 0; j < events.GetUserTypeList(no)->GetUserTypeList(i)->GetItemListSize(); ++j) {
+					string name = events.GetUserTypeList(no)->GetUserTypeList(i)->GetItemList(j).Get(0);
 					string value = "";
 					info.locals.insert(make_pair(name, value));
 				}
@@ -982,7 +988,7 @@ string excute_module(wiz::load_data::UserType& global)
 
 		int state = 0;
 
-		if (info.userType_idx.size() == 1 && info.userType_idx[0] >= events[no]->GetUserTypeListSize())
+		if (info.userType_idx.size() == 1 && info.userType_idx[0] >= events.GetUserTypeList(no)->GetUserTypeListSize())
 		{
 			if (eventStack.size() == 1)
 			{
@@ -996,11 +1002,11 @@ string excute_module(wiz::load_data::UserType& global)
 		{ /// has bug!! WARNNING!!
 			wiz::load_data::UserType* val = NULL;
 			if (eventStack.top().userType_idx.size() == 1) {
-				if (events[no]->GetUserTypeListSize() > eventStack.top().userType_idx.top()) {
-					val = events[no]->GetUserTypeList(eventStack.top().userType_idx.top());
+				if (events.GetUserTypeList(no)->GetUserTypeListSize() > eventStack.top().userType_idx.top()) {
+					val = events.GetUserTypeList(no)->GetUserTypeList(eventStack.top().userType_idx.top());
 
 					if (eventStack.top().userType_idx.top() >= 1 && val->GetName() == "$else"
-						&& events[no]->GetUserTypeList(eventStack.top().userType_idx.top() - 1)->GetName() != "$if") {
+						&& events.GetUserTypeList(no)->GetUserTypeList(eventStack.top().userType_idx.top() - 1)->GetName() != "$if") {
 						return "ERROR not exist $if, front $else.";
 					}
 					if (eventStack.top().userType_idx.top() == 0 && val->GetName() == "$else") {
@@ -1034,11 +1040,11 @@ string excute_module(wiz::load_data::UserType& global)
 				}
 				else // same to else if( eventSTack.top().nowUT.empty() ), also same to else if ( 1 == eventStack.top().userType_idx.size() )
 				{
-					if (events[no]->GetUserTypeListSize() > eventStack.top().userType_idx.top()) {
-						val = events[no]->GetUserTypeList(eventStack.top().userType_idx.top());
+					if (events.GetUserTypeList(no)->GetUserTypeListSize() > eventStack.top().userType_idx.top()) {
+						val = events.GetUserTypeList(no)->GetUserTypeList(eventStack.top().userType_idx.top());
 
 						if (eventStack.top().userType_idx.top() >= 1 && val->GetName() == "$else"
-							&& events[no]->GetUserTypeList(eventStack.top().userType_idx.top() - 1)->GetName() != "$if") {
+							&& events.GetUserTypeList(no)->GetUserTypeList(eventStack.top().userType_idx.top() - 1)->GetName() != "$if") {
 							return "ERROR not exist $if, front $else.";
 						}
 						if (eventStack.top().userType_idx.top() == 0 && val->GetName() == "$else") {
@@ -1063,7 +1069,8 @@ string excute_module(wiz::load_data::UserType& global)
 					string option = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
 					
 					wiz::load_data::LoadData::SaveWizDB(global, fileName, option, "");
-
+					wiz::load_data::LoadData::SaveWizDB(Main, fileName, option, "APPEND");
+					wiz::load_data::LoadData::SaveWizDB(events, fileName, option, "APPEND");
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1082,30 +1089,9 @@ string excute_module(wiz::load_data::UserType& global)
 						eventStack.top().userType_idx.top()++;
 						break;
 					}
-					int item_count = 0;
-					int userType_count = 0;
+					
+					wiz::load_data::LoadData::SaveWizDB(global, fileName, option, "");
 
-					for (int i = 0; i < global.GetIList().size(); ++i) {
-						if (global.IsItemList(i)) {
-							auto x = global.GetItemList(item_count);
-							wiz::load_data::UserType ut;
-							ut.AddItem(x.GetName(), x.Get(0));
-							ut.Save1(outFile);
-							item_count++;
-						}
-						else { // == 2
-							wiz::load_data::UserType* x = global.GetUserTypeList(userType_count);
-							if (x->GetName() == "Event" || x->GetName() == "Main") {
-								// nothing..
-							}
-							else {
-								wiz::load_data::UserType y("", true);
-								y.LinkUserType(x);
-								y.Save1(outFile);
-							}
-							userType_count++;
-						}		
-					}
 					outFile.close();
 					{ // for eu4, last line remove!
 						ifstream inFile;
@@ -1339,7 +1325,7 @@ string excute_module(wiz::load_data::UserType& global)
 					// cf) id =  { $local.i }
 					// 추가 todo
 
-					info.eventUT = events[no];
+					info.eventUT = events.GetUserTypeList(no);
 					info.userType_idx.clear();
 					info.userType_idx.push(0);
 					info.return_value.clear();
@@ -1416,10 +1402,10 @@ string excute_module(wiz::load_data::UserType& global)
 
 					info.locals.clear();
 					const int no = convert.at(info.id);
-					for (int i = 0; i < events[no]->GetUserTypeListSize(); ++i) {
-						if (events[no]->GetUserTypeList(i)->GetName() == "$local") {
-							for (int j = 0; j < events[no]->GetUserTypeList(i)->GetItemListSize(); ++j) {
-								string name = events[no]->GetUserTypeList(i)->GetItemList(j).Get(0);
+					for (int i = 0; i < events.GetUserTypeList(no)->GetUserTypeListSize(); ++i) {
+						if (events.GetUserTypeList(no)->GetUserTypeList(i)->GetName() == "$local") {
+							for (int j = 0; j < events.GetUserTypeList(no)->GetUserTypeList(i)->GetItemListSize(); ++j) {
+								string name = events.GetUserTypeList(no)->GetUserTypeList(i)->GetItemList(j).Get(0);
 								string value = "";
 								info.locals.insert(make_pair(name, value));
 							}
@@ -1809,7 +1795,7 @@ string excute_module(wiz::load_data::UserType& global)
 							}
 
 							auto _Main = ut.GetUserTypeItem("Main");
-							if (NULL != Main && !_Main.empty())
+							if (!_Main.empty())
 							{
 								// error!
 								cout << "err" << endl;
@@ -1824,14 +1810,16 @@ string excute_module(wiz::load_data::UserType& global)
 
 					{
 						convert.clear();
-						events.clear();
-
-						events = global.GetUserTypeItem("Event");
+						auto _events = global.GetCopyUserTypeItem("Event");
+						for (int i = 0; i < _events.size(); ++i) {
+							events.LinkUserType(_events[i]);
+						}
+						global.RemoveUserTypeList("Event");
 
 						// event table setting
-						for (int i = 0; i < events.size(); ++i)
+						for (int i = 0; i < events.GetUserTypeListSize(); ++i)
 						{
-							auto x = events[i]->GetItem("id");
+							auto x = events.GetUserTypeList(i)->GetItem("id");
 							if (!x.empty()) {
 								//cout <<	x[0] << endl;
 								convert.insert(pair<string, int>(x[0].Get(0), i));
@@ -2018,8 +2006,8 @@ string excute_module(wiz::load_data::UserType& global)
 					}
 					else
 					{
-						if (eventStack.top().userType_idx.top() + 1 < events[no]->GetUserTypeListSize() &&
-							events[no]->GetUserTypeList(eventStack.top().userType_idx.top() + 1)->GetName() == "$else")
+						if (eventStack.top().userType_idx.top() + 1 < events.GetUserTypeList(no)->GetUserTypeListSize() &&
+							events.GetUserTypeList(no)->GetUserTypeList(eventStack.top().userType_idx.top() + 1)->GetName() == "$else")
 						{
 							eventStack.top().conditionStack.push(temp);
 						}
