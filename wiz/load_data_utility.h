@@ -310,7 +310,7 @@ namespace wiz {
 				}
 				return{ chk, false };
 			}
-		public:
+		private:
 			class DoThread // need to rename!
 			{
 			private:
