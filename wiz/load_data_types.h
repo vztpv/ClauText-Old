@@ -620,13 +620,26 @@ namespace wiz {
 				itemList[var_idx].Set(0, value);
 				return true;
 			}
-
+			
 			vector<UserType*> GetUserTypeItem(const string& name) const { /// chk...
 				vector<UserType*> temp;
 
 				for (int i = 0; i < userTypeList.size(); ++i) {
 					if (userTypeList[i]->GetName() == name) {
 						temp.push_back(userTypeList[i]);
+					}
+				}
+
+				return temp;
+			}
+
+			// deep copy.
+			vector<UserType*> GetCopyUserTypeItem(const string& name) const { /// chk...
+				vector<UserType*> temp;
+
+				for (int i = 0; i < userTypeList.size(); ++i) {
+					if (userTypeList[i]->GetName() == name) {
+						temp.push_back(new UserType(*userTypeList[i]));
 					}
 				}
 
