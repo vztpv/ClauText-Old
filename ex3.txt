@@ -25,7 +25,7 @@ Event =
 		data = { 9 }
 	}
 	$assign_local = {
-		dir = { $concat = { $ local.x } } // ÀÌ·¸°Ô »ç¿ë?
+		dir = { $concat = { $ local.x } } # ÀÌ·¸°Ô »ç¿ë?
  		data = { 3 }
 	}
     $if = {
