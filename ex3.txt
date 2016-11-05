@@ -18,7 +18,7 @@ Event =
 
     $option = { REMOVE_IF_CALL_ONESELF_EVENT } # REMOVE_IF_CALL_ONESELF_EVENT.
     $parameter = { i j }
-	$local = { x } # "NOT_DEFINED"
+	$local = { x } # "NOT_DEFINED"??
 
 	$assign_local = {
 		dir = { $local.x }
