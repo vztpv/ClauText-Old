@@ -57,44 +57,53 @@ namespace wiz {
 		private:
 			//std::vector<T> arr;
 			T data;
+			bool inited;
 		public:
 			ItemType(const ItemType<T>& ta) : Type(ta)
 			{
 				data = ta.data;
+				inited = false;
 			}
 			ItemType(ItemType<T>&& ta) : Type(ta)
 			{
 				data = move(ta.data);
+				inited = ta.inited;
 			}
 		public:
-			explicit ItemType(const string& name = "", const bool valid = true) : Type(name, valid) { }
+			explicit ItemType(const string& name = "", const bool valid = true) 
+				: Type(name, valid), inited(false) { }
 			virtual ~ItemType() { }
 		public:
-			void Remove() {
-				//
-			}
-			void Remove(int idx)
-			{
-				//
-			}
-			void Push(const T& val) { /// do not change..!!
+			bool Push(const T& val) { /// do not change..!!
+				if (inited) { return false; }
 				data = val;
+				inited = true;
+
+				return true;
 			}
-			void Push(T&& val) {
+			bool Push(T&& val) {
+				if (inited) { return false; }
 				data = val;
+				inited = true;
+
+				return true;
 			}
 			T& Get(const int index) {
+				if (!inited) { throw "ItemType, not inited";  }
 				return data;
 			}
 			const T& Get(const int index) const {
+				if (!inited) { throw "ItemType, not inited"; }
 				return data;
 			}
 			void Set(const int index, const T& val) {
+				if (!inited) { throw "ItemType, not inited"; }
 				data = val;
 			}
 			int size()const {
-				return 1;
+				return inited? 1 : 0;
 			}
+			bool empty()const { return !inited; }
 		public:
 			ItemType<T>& operator=(const ItemType<T>& ta)
 			{
@@ -102,6 +111,7 @@ namespace wiz {
 				ItemType<T> temp = ta;
 
 				data = std::move(temp.data);
+				inited = temp.inited;
 				return *this;
 			}
 			ItemType<T>& operator=(ItemType<T>&& ta)
@@ -110,7 +120,7 @@ namespace wiz {
 				if (data == ta.data) { return *this; }
 
 				data = std::move(ta.data);
-
+				inited = ta.inited;
 				return *this;
 			}
 			/*string ToString()const
