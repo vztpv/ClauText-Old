@@ -89,7 +89,7 @@ namespace wiz {
 					case 2:
 						if ("{" == str) {
 							nestedUT[braceNum]->AddUserTypeItem(UserType(id));
-							TypeArray<UserType*> pTemp;
+							ItemType<UserType*> pTemp;
 							nestedUT[braceNum]->GetUserTypeItemRef(id, pTemp);
 
 							braceNum++;
@@ -99,7 +99,7 @@ namespace wiz {
 								nestedUT.push_back(NULL);
 
 							/// initial new nestedUT.
-							nestedUT[braceNum] = pTemp.Get(pTemp.GetCount() - 1); /// TypeArray는 들어온 순서대로 ...
+							nestedUT[braceNum] = pTemp.Get(pTemp.GetCount() - 1); /// ItemType는 들어온 순서대로 ...
 						}
 						else {
 							val = str;
@@ -632,7 +632,7 @@ namespace wiz {
 			}
 			string GetItemListNamesData(const string& position, const string& condition)
 			{
-				return GetItemListNamesData(position, condition);
+				return GetItemListNamesData(global, position, condition);
 			}
 			string GetUserTypeListNamesData(const string& position, const string& condition)
 			{

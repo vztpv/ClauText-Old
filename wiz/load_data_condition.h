@@ -247,8 +247,8 @@ namespace wiz {
 					return "ERROR GV3";
 				}
 
-				vector<TypeArray<string>> value1;  // Item<string> <- 
-				vector<TypeArray<string>> value2;
+				vector<ItemType<string>> value1;  // Item<string> <- 
+				vector<ItemType<string>> value2;
 				
 				// added..
 				if (position1 != "~") {
@@ -259,11 +259,11 @@ namespace wiz {
 				}
 				//
 				if (position1 == "~" ) {
-					value1.push_back(TypeArray<string>(var1));
+					value1.push_back(ItemType<string>("")); // var1
 					value1[0].Push(var1);
 				}
 				if (position2 == "~") {
-					value2.push_back(TypeArray<string>(var2));
+					value2.push_back(ItemType<string>("")); // var2
 					value2[0].Push(var2);
 				}
 

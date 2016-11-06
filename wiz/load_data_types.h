@@ -53,78 +53,63 @@ namespace wiz {
 		};
 
 		template < class T >
-		class TypeArray : public Type {
+		class ItemType : public Type {
 		private:
-			std::vector<T> arr;
+			//std::vector<T> arr;
+			T data;
 		public:
-			TypeArray(const TypeArray<T>& ta) : Type(ta)
+			ItemType(const ItemType<T>& ta) : Type(ta)
 			{
-				arr = ta.arr;
+				data = ta.data;
 			}
-			TypeArray(TypeArray<T>&& ta) : Type(ta)
+			ItemType(ItemType<T>&& ta) : Type(ta)
 			{
-				arr = move(ta.arr);
+				data = move(ta.data);
 			}
 		public:
-			explicit TypeArray(const string& name = "", const bool valid = true) : Type(name, valid) { }
-			virtual ~TypeArray() { }
+			explicit ItemType(const string& name = "", const bool valid = true) : Type(name, valid) { }
+			virtual ~ItemType() { }
 		public:
 			void Remove() {
-				arr = std::vector<T>();
+				//
 			}
 			void Remove(int idx)
 			{
-				for (int i = idx + 1; i < arr.size(); ++i)
-				{
-					arr[i - 1] = move(arr[i]);
-				}
-				arr.resize(arr.size() - 1);
+				//
 			}
 			void Push(const T& val) { /// do not change..!!
-				arr.push_back(val);
+				data = val;
 			}
 			void Push(T&& val) {
-				arr.push_back(val);
+				data = val;
 			}
 			T& Get(const int index) {
-				return arr[index];
+				return data;
 			}
 			const T& Get(const int index) const {
-				// #ifdef DEBUG 
-				/*if (index < 0 || index >= count || arr.size() <= 0) {
-				std::cout << "index " << index << endl;
-				throw "index not valid";
-				}*/
-				return arr[index];
+				return data;
 			}
 			void Set(const int index, const T& val) {
-				//if (index >= 0 && index < count) {
-				arr[index] = val;
-				//}
-				//else
-				//	{
-				//		std::cout << "error " << index << " " << count << endl;
-				//	}
+				data = val;
 			}
 			int size()const {
-				return arr.size();
+				return 1;
 			}
 		public:
-			TypeArray<T>& operator=(const TypeArray<T>& ta)
+			ItemType<T>& operator=(const ItemType<T>& ta)
 			{
 				Type::operator=(ta);
-				TypeArray<T> temp = ta;
+				ItemType<T> temp = ta;
 
-				arr = std::move(temp.arr);
+				data = std::move(temp.data);
 				return *this;
 			}
-			TypeArray<T>& operator=(TypeArray<T>&& ta)
+			ItemType<T>& operator=(ItemType<T>&& ta)
 			{
 				Type::operator=(ta);
-				if (arr == ta.arr) { return *this; }
+				if (data == ta.data) { return *this; }
 
-				arr = std::move(ta.arr);
-				ta.arr.clear();
+				data = std::move(ta.data);
 
 				return *this;
 			}
@@ -149,8 +134,8 @@ namespace wiz {
 			vector<int>& GetIList() { return ilist; }
 			int GetItemListSize()const { return itemList.size(); }
 			int GetUserTypeListSize()const { return userTypeList.size(); }
-			TypeArray<string>& GetItemList(const int idx) { return itemList[idx]; }
-			const TypeArray<string>& GetItemList(const int idx) const { return itemList[idx]; }
+			ItemType<string>& GetItemList(const int idx) { return itemList[idx]; }
+			const ItemType<string>& GetItemList(const int idx) const { return itemList[idx]; }
 			UserType* GetUserTypeList(const int idx) { return userTypeList[idx]; }
 			const UserType* GetUserTypeList(const int idx) const { return const_cast<const UserType*&>(userTypeList[idx]); }
 
@@ -185,7 +170,7 @@ namespace wiz {
 				}
 			}
 
-			void AddItemList(const TypeArray<string>& strTa)
+			void AddItemList(const ItemType<string>& strTa)
 			{
 				for (int i = 0; i < strTa.size(); ++i) {
 					this->AddItem(strTa.GetName(), strTa.Get(i));
@@ -203,7 +188,7 @@ namespace wiz {
 		private:
 			UserType* parent;
 			std::vector<int> ilist;
-			std::vector< TypeArray<string> > itemList;
+			std::vector< ItemType<string> > itemList;
 			std::vector< UserType* > userTypeList;
 			bool noRemove = false;
 			//	bool userTypeList_sortFlagA; // A : sorted < , B ; sorted > , false : not sorted!
@@ -270,7 +255,7 @@ namespace wiz {
 			void _Remove()
 			{
 				ilist = vector<int>();
-				itemList = vector< TypeArray<string> >();
+				itemList = vector< ItemType<string> >();
 				RemoveUserTypeList();
 			}
 
@@ -331,7 +316,7 @@ namespace wiz {
 			void RemoveItemList(const string& varName)
 			{
 				int k = _GetIndex(ilist, 1, 0);
-				vector<TypeArray<string>> tempDic;
+				vector<ItemType<string>> tempDic;
 				for (int i = 0; i < itemList.size(); ++i) {
 					if (varName != itemList[i].GetName()) {
 						tempDic.push_back(itemList[i]);
@@ -350,7 +335,7 @@ namespace wiz {
 			}
 			void RemoveItemList() /// ALL
 			{
-				itemList = vector<TypeArray<string>>();
+				itemList = vector<ItemType<string>>();
 				//
 				vector<int> temp;
 				for (int i = 0; i < ilist.size(); ++i) {
@@ -364,7 +349,7 @@ namespace wiz {
 			void RemoveEmptyItem() // fixed..
 			{
 				int k = _GetIndex(ilist, 1, 0);
-				vector<TypeArray<string>> tempDic;
+				vector<ItemType<string>> tempDic;
 				for (int i = 0; i < itemList.size(); ++i) {
 					if (itemList[i].size() > 0) {
 						tempDic.push_back(itemList[i]);
@@ -384,7 +369,7 @@ namespace wiz {
 			{
 				/// parent->removeUserType(name); - ToDo - X
 				ilist = vector<int>();
-				itemList = vector< TypeArray<string> >();
+				itemList = vector< ItemType<string> >();
 
 				RemoveUserTypeList();
 			}
@@ -459,32 +444,32 @@ namespace wiz {
 			bool empty()const { return ilist.empty(); }
 			void AddItem(string&& name, string&& item) {
 				/*int index = -1;
-				if (!itemList.Search(TypeArray<string>(name), &index))
+				if (!itemList.Search(ItemType<string>(name), &index))
 				{
 				ilist.push_back(1);
 
-				itemList.PushBack(TypeArray<string>(name));//
-				itemList.Search(TypeArray<string>(name), &index);
+				itemList.PushBack(ItemType<string>(name));//
+				itemList.Search(ItemType<string>(name), &index);
 				}
 				itemList[index].Push(item);
 				*/
-				TypeArray<string> temp(std::move(name));
+				ItemType<string> temp(std::move(name));
 				temp.Push(std::move(item));
 				itemList.push_back(std::move(temp));
 				ilist.push_back(1);
 			}
 			void AddItem(const string& name, const string& item) {
 				/*int index = -1;
-				if (!itemList.Search(TypeArray<string>(name), &index))
+				if (!itemList.Search(ItemType<string>(name), &index))
 				{
 				ilist.push_back(1);
 
-				itemList.PushBack(TypeArray<string>(name));//
-				itemList.Search(TypeArray<string>(name), &index);
+				itemList.PushBack(ItemType<string>(name));//
+				itemList.Search(ItemType<string>(name), &index);
 				}
 				itemList[index].Push(item);
 				*/
-				TypeArray<string> temp(name);
+				ItemType<string> temp(name);
 				temp.Push(item);
 				itemList.push_back(std::move(temp));
 				ilist.push_back(1);
@@ -515,12 +500,12 @@ namespace wiz {
 
 				/*
 				int index = -1;
-				if (!userTypeList.Search(TypeArray<UserType*>(item.GetName()), &index))
+				if (!userTypeList.Search(ItemType<UserType*>(item.GetName()), &index))
 				{
 				ilist.push_back(2);
 
-				userTypeList.PushBack(TypeArray<UserType*>(item.GetName()));//
-				userTypeList.Search(TypeArray<UserType*>(item.GetName()), &index);
+				userTypeList.PushBack(ItemType<UserType*>(item.GetName()));//
+				userTypeList.Search(ItemType<UserType*>(item.GetName()), &index);
 				}
 				*/
 				UserType* temp = new UserType(std::move(item));
@@ -557,12 +542,12 @@ namespace wiz {
 
 				/*
 				int index = -1;
-				if (!userTypeList.Search(TypeArray<UserType*>(item.GetName()), &index))
+				if (!userTypeList.Search(ItemType<UserType*>(item.GetName()), &index))
 				{
 				ilist.push_back(2);
 
-				userTypeList.PushBack(TypeArray<UserType*>(item.GetName()));//
-				userTypeList.Search(TypeArray<UserType*>(item.GetName()), &index);
+				userTypeList.PushBack(ItemType<UserType*>(item.GetName()));//
+				userTypeList.Search(ItemType<UserType*>(item.GetName()), &index);
 				}
 				*/
 				UserType* temp = new UserType(item);
@@ -575,7 +560,7 @@ namespace wiz {
 			}
 
 			void AddItemAtFront(const string& name, const string& item) {
-				TypeArray<string> temp(name);
+				ItemType<string> temp(name);
 				temp.Push(item);
 
 				itemList.insert(itemList.begin(), temp);
@@ -592,8 +577,8 @@ namespace wiz {
 			}
 
 
-			vector<TypeArray<string>> GetItem(const string& name) const {
-				vector<TypeArray<string>> temp;
+			vector<ItemType<string>> GetItem(const string& name) const {
+				vector<ItemType<string>> temp;
 
 				for (int i = 0; i < itemList.size(); ++i) {
 					if (itemList[i].GetName() == name) {
@@ -917,7 +902,7 @@ namespace wiz {
 				const int userTypeListSize = temp->GetUserTypeListSize();
 
 				for (int i = 0; i < itemListSize; ++i) {
-					TypeArray<std::string>& itemList = temp->GetItemList(i);
+					ItemType<std::string>& itemList = temp->GetItemList(i);
 
 					string name = itemList.GetName();
 					name = Utility::ChangeStr(name, target_ch, result_ch);
@@ -989,7 +974,7 @@ namespace wiz {
 				pair<UserType*, int> utTemp;
 				utTemp.first = global;
 				utTemp.second = 0;
-				TypeArray<UserType*> utTemp2;
+				ItemType<UserType*> utTemp2;
 
 				for (int i = 0; i < tokenizer.countTokens(); ++i) {
 					string strTemp = tokenizer.nextToken();

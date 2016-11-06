@@ -208,11 +208,11 @@ public:
 public:
 	const T& operator[](const int idx) const
 	{
-		return que[(start + idx) % que.size()];
+		return que[(start + idx) & (que.size()-1)];
 	}
 	T& operator[](const int idx)
 	{
-		return que[(start + idx) % que.size()];
+		return que[(start + idx) & (que.size()-1)];
 	}
 public:
     void push( const T& val )
