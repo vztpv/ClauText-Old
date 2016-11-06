@@ -62,7 +62,7 @@ namespace wiz {
 			ItemType(const ItemType<T>& ta) : Type(ta)
 			{
 				data = ta.data;
-				inited = false;
+				inited = ta.inited;
 			}
 			ItemType(ItemType<T>&& ta) : Type(ta)
 			{
@@ -75,14 +75,14 @@ namespace wiz {
 			virtual ~ItemType() { }
 		public:
 			bool Push(const T& val) { /// do not change..!!
-				if (inited) { return false; }
+				if (inited) { throw "ItemType already inited"; }
 				data = val;
 				inited = true;
 
 				return true;
 			}
 			bool Push(T&& val) {
-				if (inited) { return false; }
+				if (inited) { throw "ItemType already inited"; }
 				data = val;
 				inited = true;
 
