@@ -63,7 +63,7 @@ public:
 	}
 };
 // only one exist or do not exist
-inline wiz::load_data::TypeArray<string> GetItem(const wiz::load_data::UserType* ut, const string& name) {
+inline wiz::load_data::ItemType<string> GetItem(const wiz::load_data::UserType* ut, const string& name) {
 	return ut->GetItem(name)[0];
 }
 
@@ -476,7 +476,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if (ut.IsItemList(ut.GetIList().size()-1))
 		{
-			auto x = (wiz::load_data::TypeArray<string>*)ut.GetList(ut.GetIList().size() - 1);
+			auto x = (wiz::load_data::ItemType<string>*)ut.GetList(ut.GetIList().size() - 1);
 			operandStack.push(x->Get(0));
 		}
 		else {
@@ -505,7 +505,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if (ut->IsItemList(ut->GetIList().size() - 1))
 		{
-			auto x = (wiz::load_data::TypeArray<string>*)ut->GetList(ut->GetIList().size() - 1);
+			auto x = (wiz::load_data::ItemType<string>*)ut->GetList(ut->GetIList().size() - 1);
 			operandStack.push(x->Get(0));
 			ut->RemoveItemList(ut->GetItemListSize() - 1);
 		}
@@ -526,7 +526,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if (ut.IsItemList(0))
 		{
-			auto x = (wiz::load_data::TypeArray<string>*)ut.GetList(0);
+			auto x = (wiz::load_data::ItemType<string>*)ut.GetList(0);
 			operandStack.push(x->Get(0));
 		}
 		else {
@@ -555,7 +555,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if (ut->IsItemList(0))
 		{
-			auto x = (wiz::load_data::TypeArray<string>*)ut->GetList(0);
+			auto x = (wiz::load_data::ItemType<string>*)ut->GetList(0);
 			operandStack.push(x->Get(0));
 			ut->RemoveItemList(0);
 		}
@@ -1116,14 +1116,7 @@ string excute_module(wiz::load_data::UserType& global)
 						for (size_t i = 0; i < line_size; ++i)
 						{
 							getline(inFile, temp);
-							if (temp == "") { continue; }
-							int count = 0;
-							for (const char ch : temp)
-							{
-								if (wiz::isWhitespace(ch)) { count++; }
-							}
-							if (count == temp.size()) { continue; }
-							if (inFile.eof()) { break; }
+							
 							outFile << temp;
 							//std::cout << temp << endl;
 							if (i < line_size - 1) {
@@ -1917,7 +1910,7 @@ string excute_module(wiz::load_data::UserType& global)
 					for (int i = 0; i < temp.size(); ++i)
 					{
 						if (siVec[i].iElement == 1) {
-							ut.AddItem(siVec[i].name, static_cast<wiz::load_data::TypeArray<string>*>(temp[siVec[i].idx])->Get(0));
+							ut.AddItem(siVec[i].name, static_cast<wiz::load_data::ItemType<string>*>(temp[siVec[i].idx])->Get(0));
 						}
 						else {
 							ut.AddUserTypeItem(*(static_cast<wiz::load_data::UserType*>(temp[siVec[i].idx])));
@@ -1964,7 +1957,7 @@ string excute_module(wiz::load_data::UserType& global)
 					for (int i = 0; i < temp.size(); ++i)
 					{
 						if (siVec[i].iElement == 1) {
-							ut.AddItem(siVec[i].name, static_cast<wiz::load_data::TypeArray<string>*>(temp[siVec[i].idx])->Get(0));
+							ut.AddItem(siVec[i].name, static_cast<wiz::load_data::ItemType<string>*>(temp[siVec[i].idx])->Get(0));
 						}
 						else {
 							ut.AddUserTypeItem(*(static_cast<wiz::load_data::UserType*>(temp[siVec[i].idx])));
