@@ -1268,9 +1268,9 @@ namespace wiz {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						if (false == condition.empty()) {
 							string _condition = condition;
-							if (varName == "") { _condition = wiz::String::replace(_condition, "~~", "^"); }
+							if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "^"); }
 							else
-								_condition = wiz::String::replace(_condition, "~~", varName); //
+								_condition = wiz::String::replace(_condition, "~~", _var); /// varName -> _var.
 
 							Condition cond(_condition, finded.second[i], &global);
 
@@ -1632,14 +1632,6 @@ namespace wiz {
 					for (int i = 0; i < line_size; ++i)
 					{
 						getline(inFile, temp);
-						if (temp == "") { continue; }
-						int count = 0;
-						for (const char ch : temp)
-						{
-							if (isWhitespace(ch)) { count++; }
-						}
-						if (count == temp.size()) { continue; }
-						if (inFile.eof()) { break; }
 						outFile << temp;
 						//std::cout << temp << endl;
 						if (i < line_size - 1) {
