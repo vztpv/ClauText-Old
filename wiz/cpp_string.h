@@ -167,45 +167,106 @@ namespace wiz{
         void Init( const string& str, const vector<string>& separator )
         {
             if( separator.empty() || str.empty() ) { return; }
-            std::pair<bool, size_t> idx; int k = 0;
-            int i=0; int select=-1;
-            string tempStr;
+			vector<bool> arr(str.size(), false);
+			bool noSeparator = true;
 
-            //_m_str.reserve( str.size() );
-			vector<int> arr( separator.size(), 0 );
+			for (int i = 0; i < str.size(); ++i) {
+				bool pass = false;
+				for (int j = 0; j < separator.size(); ++j) {
+					for (int k = 0; k < separator[j].size(); ++k) {
+						if (str[i] == separator[j][k]) {
+							pass = true;
+						}
+						else {
+							pass = false;
+							break;
+						}
+					}
+					if (pass) {
+						noSeparator = false;
+						for (int k = i; k < i + separator[j].size(); ++k) {
+							arr[k] = true;
+						}
+						i = i + separator[j].size() - 1;
 
-            while(true) {
-                int counter_minus1 = 0;
-                k = str.size(); /// 긴문장은 뒤로??
+						break;
+					}
+				}
+			}
+			
+			if( noSeparator )
+			{
+				_m_str.push_back(str);
+				return;
+			}
+			int state = 0;
+			int left = 0; int right = 0;
+			for (int i = 0; i < arr.size(); ++i) {
+				if (state == 0 && !arr[i]) {
+					left = i;
+					right = i;
+					state = 1;
+				}
+				else if (state == 1 && !arr[i]) {
+					right = i;
+				}
+				else if (state == 1 && arr[i]) {
+					_m_str.push_back(wiz::String::substring(str, left, right));
+					exist = true;
+					state = 0;
+				}
+			}
+			if (state == 1 && !arr[arr.size()-1]) {
+				right = arr.size() - 1;
+				_m_str.push_back(wiz::String::substring(str, left, right));
+				exist = true;
+				state = 0;
+			}
+        }
+		/*
+		void Init(const string& str, const vector<string>& separator)
+		{
+			if (separator.empty() || str.empty()) { return; }
+			std::pair<bool, size_t> idx; int k = 0;
+			int i = 0; int select = -1;
+			string tempStr;
+
+			//_m_str.reserve( str.size() );
+			vector<int> arr(separator.size(), 0);
+
+			while (true) {
+				int counter_minus1 = 0;
+				k = str.size(); /// 긴문장은 뒤로??
 				idx.first = false; idx.second = 0; select = 0; ///
-                for( int j = 0; j < separator.size(); j++ ) {
-					if (-1 == arr[j]) { 
+				for (int j = 0; j < separator.size(); j++) {
+					if (-1 == arr[j]) {
 						counter_minus1++;
 						if (counter_minus1 == separator.size()) {
 							tempStr = String::substring(str, i);
 							if (!tempStr.empty()) { _m_str.push_back(std::move(tempStr)); }
 							return;
 						}
-						continue; 
+						continue;
 					}
 
-                    idx = String::indexOf( str, separator[j], i );
-					
+					idx = String::indexOf(str, separator[j], i);
+
 					if (false == idx.first) { arr[j] = -1; }
 
-                    if( false == idx.first ) { counter_minus1++; }
-                    if( false == idx.first && counter_minus1 == separator.size() ) {
-                        tempStr = String::substring( str, i );
-                        if( !tempStr.empty() ) { _m_str.push_back( std::move(tempStr) ); }
-                        return;
-                    }
-					if (idx.first) { exist = true; if (k >= idx.second) { select = j; k = idx.second; } } 
-                }
-                tempStr = String::substring( str, i, k-1 );
-                if( !tempStr.empty() ) { _m_str.push_back( std::move(tempStr) ); }
-                i = k + separator[select].size();
-            }
-        }
+					if (false == idx.first) { counter_minus1++; }
+					if (false == idx.first && counter_minus1 == separator.size()) {
+						tempStr = String::substring(str, i);
+						if (!tempStr.empty()) { _m_str.push_back(std::move(tempStr)); }
+						return;
+					}
+					if (idx.first) { exist = true; if (k >= idx.second) { select = j; k = idx.second; } }
+				}
+				tempStr = String::substring(str, i, k - 1);
+				if (!tempStr.empty()) { _m_str.push_back(std::move(tempStr)); }
+				i = k + separator[select].size();
+			}
+		} 
+    	*/
     public:
         explicit StringTokenizer() : count(0), exist(false) { }
         explicit StringTokenizer( const string& str, const string& separator )
