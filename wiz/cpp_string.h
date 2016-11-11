@@ -197,6 +197,7 @@ namespace wiz{
 			if( noSeparator )
 			{
 				_m_str.push_back(str);
+				exist = true;
 				return;
 			}
 			int state = 0;
