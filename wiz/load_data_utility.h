@@ -532,10 +532,10 @@ namespace wiz {
 				string temp;
 				int state = 0;
 
-				//string::size_type x = str.find('\"');
-				//if (x == string::npos) { return str; }
+				string::size_type x = str.find('\"');
+				if (x == string::npos) { return str; }
 
-				//temp.reserve(str.size() * 2);
+				temp.reserve(str.size() * 2);
 
 
 				for (int i = 0; i < str.size(); ++i)
@@ -564,7 +564,7 @@ namespace wiz {
 					}
 				}
 
-				//temp.shrink_to_fit();
+				temp.shrink_to_fit();
 				return temp;
 			}
 
