@@ -166,8 +166,8 @@ namespace wiz{
     private:
         void Init( const string& str, const vector<string>& separator )
         {
-            if( separator.empty() || str.empty() ) { return; }
-			vector<bool> arr(str.size(), false);
+            if( separator.empty() || str.empty() ) { return; } // if str.empty() == false then _m_str.push_back(str); // ?
+			vector<int> arr(str.size(), 0);
 			bool noSeparator = true;
 
 			for (int i = 0; i < str.size(); ++i) {
@@ -184,9 +184,11 @@ namespace wiz{
 					}
 					if (pass) {
 						noSeparator = false;
-						for (int k = i; k < i + separator[j].size(); ++k) {
-							arr[k] = true;
-						}
+						//for (int k = i; k < i + separator[j].size(); ++k) {
+						//	arr[k] = true;
+					//	}
+						arr[i]++;
+						arr[i + separator[j].size() - 1]++;
 						i = i + separator[j].size() - 1;
 
 						break;
@@ -203,21 +205,41 @@ namespace wiz{
 			int state = 0;
 			int left = 0; int right = 0;
 			for (int i = 0; i < arr.size(); ++i) {
-				if (state == 0 && !arr[i]) {
+				if (state == 0 && 0 == arr[i]) {
 					left = i;
 					right = i;
 					state = 1;
 				}
-				else if (state == 1 && !arr[i]) {
+				else if (state == 0 && 1 == arr[i]) {
+					state = 2;
+				}
+				else if (state == 0 && 2 == arr[i]) {
+					state = 3;
+				}
+				else if (state == 1 && 0 == arr[i]) {
 					right = i;
 				}
-				else if (state == 1 && arr[i]) {
+				else if (state == 1 && 0 < arr[i]) {
 					_m_str.push_back(wiz::String::substring(str, left, right));
 					exist = true;
+					if (1 == arr[i]) {
+						state = 2;
+					}
+					else if (2 == arr[i]) {
+						state = 3;
+					}
+				}
+				else if (state == 2) {
+					if (1 == arr[i]) {
+						state = 0;
+					}
+				}
+				else if (state == 3) {
 					state = 0;
+					--i;
 				}
 			}
-			if (state == 1 && !arr[arr.size()-1]) {
+			if (state == 1 && 0 == arr[arr.size()-1]) {
 				right = arr.size() - 1;
 				_m_str.push_back(wiz::String::substring(str, left, right));
 				exist = true;
