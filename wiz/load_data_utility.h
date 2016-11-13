@@ -532,13 +532,9 @@ namespace wiz {
 				string temp;
 				int state = 0;
 
-				string::size_type x = str.find('\"');
-				if (x == string::npos) { return str; }
-
 				temp.reserve(str.size() * 2);
 
-
-				for (int i = 0; i < str.size(); ++i)
+				for (string::size_type i = 0; i < str.size(); ++i)
 				{
 					if (0 == state && i == 0 && '\"' == str[i]) {
 						state = 1;

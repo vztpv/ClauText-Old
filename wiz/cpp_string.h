@@ -221,6 +221,7 @@ namespace wiz{
 				}
 				else if (state == 1 && 0 < arr[i]) {
 					_m_str.push_back(wiz::String::substring(str, left, right));
+
 					exist = true;
 					if (1 == arr[i]) {
 						state = 2;
@@ -242,6 +243,7 @@ namespace wiz{
 			if (state == 1 && 0 == arr[arr.size()-1]) {
 				right = arr.size() - 1;
 				_m_str.push_back(wiz::String::substring(str, left, right));
+				
 				exist = true;
 				state = 0;
 			}
