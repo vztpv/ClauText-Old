@@ -536,18 +536,20 @@ namespace wiz {
 			{
 				UserType utTemp = ut;
 
-				str = Utility::ChangeStr(str, "^", "^0");
-				str = Utility::ChangeStr(str, "#", "^5");
-
+				bool chk = Utility::ChkExist(str);
+				if (chk) {
+					str = Utility::ChangeStr(str, "^", "^0");
+					str = Utility::ChangeStr(str, "#", "^5");
+				}
 				str = Utility::PassSharp(str);
 				str = Utility::AddSpace(str);
-
-				str = Utility::ChangeStr(str, " ", "^1");
-				str = Utility::ChangeStr(str, "\t", "^2");
-				str = Utility::ChangeStr(str, "\r", "^3");
-				str = Utility::ChangeStr(str, "\n", "^4");
-				/// DONE - ""안에 여백이 있을 떄 다른 것으로 대체후 다시 변경
-
+				if (chk) {
+					str = Utility::ChangeStr(str, " ", "^1");
+					str = Utility::ChangeStr(str, "\t", "^2");
+					str = Utility::ChangeStr(str, "\r", "^3");
+					str = Utility::ChangeStr(str, "\n", "^4");
+					/// DONE - ""안에 여백이 있을 떄 다른 것으로 대체후 다시 변경
+				}
 				StringTokenizer tokenizer(str, vector<string>{" ", "\t", "\r", "\n"});
 				ArrayQueue<string> strVec;
 

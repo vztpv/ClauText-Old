@@ -357,7 +357,7 @@ namespace wiz {
 				}
 				return retVal;
 			}
-		private:
+		public:
 			static bool ChkExist(const string& str) /// has bug?, unstatble?
 			{
 				int state = -1;
