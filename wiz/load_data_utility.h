@@ -357,6 +357,27 @@ namespace wiz {
 				}
 				return retVal;
 			}
+		private:
+			static bool ChkExist(const string& str) /// has bug?, unstatble?
+			{
+				int state = -1;
+
+				for (string::size_type i = 0; i < str.size(); ++i)
+				{
+					if (0 >= state && i == 0 && '\"' == str[i]) {
+						state = 1;
+					}
+					else if (0 >= state && i > 0 && '\"' == str[i] && '\\' != str[i - 1])
+					{
+						state = 1;
+					}
+					else if (1 == state && i > 0 && '\\' != str[i - 1] && '\"' == str[i]) {
+						state = 0;
+					}
+				}
+
+				return 0 == state;
+			}
 		public:
 			static pair<bool, int> Reserve2(ifstream& inFile, ArrayQueue<string>& aq, const int num = 1)
 			{
@@ -367,15 +388,21 @@ namespace wiz {
 				
 				for (int i = 0; i < num && (getline(inFile,temp)); ++i) {
 					//temp = RemoveEndSpace(temp);
-					temp = ChangeStr(temp, "^", "^0"); // 1줄에 "~~~" ?	
-					temp = Utility::ChangeStr(temp, "#", "^5");
+					bool chkStr = ChkExist(temp);
+					if (chkStr) {
+						temp = ChangeStr(temp, "^", "^0"); // 1줄에 "~~~" ?	
+						temp = Utility::ChangeStr(temp, "#", "^5");
+					}
+					
 					temp = PassSharp(temp);
 					temp = AddSpace(temp);
-
-					temp = ChangeStr(temp, " ", "^1");
-					temp = ChangeStr(temp, "\t", "^2");
-					temp = ChangeStr(temp, "\r", "^3");
-					temp = ChangeStr(temp, "\n", "^4");
+					
+					if (chkStr) {
+						temp = ChangeStr(temp, " ", "^1");
+						temp = ChangeStr(temp, "\t", "^2");
+						temp = ChangeStr(temp, "\r", "^3");
+						temp = ChangeStr(temp, "\n", "^4");
+					}
 
 					strVecTemp.push_back(temp);
 					count++;
@@ -532,7 +559,7 @@ namespace wiz {
 				string temp;
 				int state = 0;
 
-				temp.reserve(str.size() * 2);
+				//temp.reserve(str.size() * 2);
 
 				for (string::size_type i = 0; i < str.size(); ++i)
 				{
@@ -560,7 +587,7 @@ namespace wiz {
 					}
 				}
 
-				temp.shrink_to_fit();
+				//temp.shrink_to_fit();
 				return temp;
 			}
 
