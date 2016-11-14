@@ -387,6 +387,9 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		if (GetType(x) == GetType(y) && (GetType(y) == "INTEGER")) { /// only integer -> BigInteger
 			operandStack.push(wiz::toStr(atoll(x.c_str()) + atoll(y.c_str())));
 		}
+		else if (GetType(x) == GetType(y) && GetType(y) == "DOUBLE") {
+			operandStack.push(std::to_string(std::stod(x) + std::stod(y)));
+		}
 		else
 		{
 			operandStack.push("ERROR");
@@ -403,6 +406,9 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		if (GetType(x) == GetType(y) && (GetType(y) == "INTEGER")) { /// only integer -> BigInteger
 			operandStack.push(wiz::toStr(atoll(x.c_str()) * atoll(y.c_str())));
 		}
+		else if (GetType(x) == GetType(y) && GetType(y) == "DOUBLE") {
+			operandStack.push(std::to_string(std::stod(x) * std::stod(y)));  /// chk?
+		}
 		else
 		{
 			operandStack.push("ERROR");
@@ -416,6 +422,9 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if (GetType(x) == GetType(y) && (GetType(y) == "INTEGER")) { /// only integer -> BigInteger
 			operandStack.push(wiz::toStr(atoll(x.c_str()) / atoll(y.c_str())));
+		}
+		else if (GetType(x) == GetType(y) && GetType(y) == "DOUBLE") {
+			operandStack.push(std::to_string(std::stod(x) / std::stod(y)));
 		}
 		else
 		{
@@ -1450,6 +1459,10 @@ string excute_module(wiz::load_data::UserType& global)
 					string data = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
 
 					{
+						if (dir.first == "" && dir.second.size() > 1 && dir.second[0] == '@')
+						{
+							dir.second.erase(dir.second.begin());
+						}
 						if (dir.first == "" && wiz::String::startsWith(dir.second, "$local."))
 						{
 							eventStack.top().locals[wiz::String::substring(dir.second, 7)] = data;
@@ -2081,8 +2094,8 @@ int main(int argc, char* argv[])
 		fileName = string(argv[1]);
 	}
 
-	wiz::load_data::UserType global;			// 6 -> 5
-	wiz::load_data::LoadData::LoadDataFromFile(fileName, global); // "Onecard_Test/main.txt", global);
+	wiz::load_data::UserType global;			
+	wiz::load_data::LoadData::LoadDataFromFile(fileName, global);
 	
 	cout << "fileName is " << fileName << endl;
 	cout << "excute result is " << excute_module(global) << endl;
