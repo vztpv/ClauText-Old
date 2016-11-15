@@ -1,4 +1,4 @@
-
+\
 
 #define _CRT_SECURE_NO_WARNINGS
 
@@ -388,7 +388,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 			operandStack.push(wiz::toStr(atoll(x.c_str()) + atoll(y.c_str())));
 		}
 		else if (GetType(x) == GetType(y) && GetType(y) == "DOUBLE") {
-			operandStack.push(std::to_string(std::stod(x) + std::stod(y)));
+			operandStack.push(wiz::_toString(std::stod(x) + std::stod(y)));
 		}
 		else
 		{
@@ -407,7 +407,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 			operandStack.push(wiz::toStr(atoll(x.c_str()) * atoll(y.c_str())));
 		}
 		else if (GetType(x) == GetType(y) && GetType(y) == "DOUBLE") {
-			operandStack.push(std::to_string(std::stod(x) * std::stod(y)));  /// chk?
+			operandStack.push(wiz::_toString(std::stod(x) * std::stod(y)));  /// chk?
 		}
 		else
 		{
@@ -424,7 +424,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 			operandStack.push(wiz::toStr(atoll(x.c_str()) / atoll(y.c_str())));
 		}
 		else if (GetType(x) == GetType(y) && GetType(y) == "DOUBLE") {
-			operandStack.push(std::to_string(std::stod(x) / std::stod(y)));
+			operandStack.push(wiz::_toString(std::stod(x) / std::stod(y)));
 		}
 		else
 		{
