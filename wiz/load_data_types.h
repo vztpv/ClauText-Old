@@ -201,6 +201,7 @@ namespace wiz {
 			std::vector< ItemType<string> > itemList;
 			std::vector< UserType* > userTypeList;
 			bool noRemove = false;
+			bool reservedA = false;
 			//	bool userTypeList_sortFlagA; // A : sorted < , B ; sorted > , false : not sorted!
 			//	bool userTypeList_sortFlagB;
 		private:
@@ -906,7 +907,122 @@ namespace wiz {
 					}
 				}
 			};
+			class DoThread2 // need to rename!
+			{
+			private:
+				vector<UserType*>* utVec;
+				int utVecStart;
+				int utVecEnd;
+				bool val;
+			public:
+				DoThread2(vector<UserType*>* utVec, bool val, int utVecStart, int utVecEnd)
+					: utVec(utVec), val(val), utVecStart(utVecStart), utVecEnd(utVecEnd)
+				{
+				}
+				void operator() () {
+					for (int i = utVecStart; i <= utVecEnd; ++i)
+					{
+						AllReserved((*utVec)[i], val);
+					}
+				}
+			};
+			class DoThread3 // need to rename!
+			{
+			private:
+				vector<UserType*>* utVec;
+				int utVecStart;
+				int utVecEnd;
+				int* arr;
+				int idx;
+			public:
+				DoThread3(vector<UserType*>* utVec, int utVecStart, int utVecEnd, int* arr, int idx)
+					: utVec(utVec), utVecStart(utVecStart), utVecEnd(utVecEnd), arr(arr), idx(idx)
+				{
+				}
+				void operator() () {
+					bool chk = false;
+					for (int i = utVecStart; i <= utVecEnd; ++i)
+					{
+						chk = chk || ReservedA((*utVec)[i]);
+						if (chk) { break; }
+					}
+					arr[idx] = chk; 
+				}
+			};
 		public:
+			static bool ReservedA(UserType* ut)
+			{
+				const int itemListSize = ut->GetItemListSize();
+				const int userTypeListSize = ut->GetUserTypeListSize();
+				
+				bool chk = false;
+
+				for (int i = 0; i < itemListSize; ++i) {
+					ItemType<std::string>& itemList = ut->GetItemList(i);
+
+					for (int j = 0; j < itemList.size(); ++j) {
+						chk = chk || Utility::ChkExist(itemList.Get(j));
+						if( chk ) { break; }
+					}
+				}
+
+				if (false == chk && userTypeListSize > 100) { ///  chk 20, ... ?
+					const int count = userTypeListSize;
+					int arr[4] = { 0, 0, 0, 0 };
+					DoThread3 dtA(&(ut->userTypeList), 0, count / 4 - 1, arr, 0),
+						dtB(&(ut->userTypeList), count / 4, (count / 4) * 2 - 1, arr, 1),
+						dtC(&(ut->userTypeList), (count / 4) * 2, (count / 4) * 3 - 1, arr, 2),
+						dtD(&(ut->userTypeList), (count / 4) * 3, count - 1, arr, 3);
+					std::thread _threadA(dtA), _threadB(dtB), _threadC(dtC), _threadD(dtD);
+
+					_threadA.join();
+					_threadB.join();
+					_threadC.join();
+					_threadD.join();
+
+					for (int i=0; i < 4; ++i) {
+						chk = chk || arr[i];
+						if( chk ) { break; }
+					}
+				}
+				else if (false == chk) {
+					for (int i = 0; i < userTypeListSize; ++i) {
+						chk = chk || ReservedA(ut->GetUserTypeList(i));
+						if (chk) {
+							break;
+						}
+					}
+				}
+
+				ut->reservedA = !chk;
+				return chk;
+			}
+
+			static void AllReserved(UserType* ut, const bool val) {
+				const int userTypeListSize = ut->GetUserTypeListSize();
+				
+				ut->reservedA = val;
+
+				if (userTypeListSize > 100) { ///  chk 20, ... ?
+					const int count = userTypeListSize;
+					DoThread2 dtA(&(ut->userTypeList), val, 0, count / 4 - 1),
+						dtB(&(ut->userTypeList), val, count / 4, (count / 4) * 2 - 1),
+						dtC(&(ut->userTypeList), val, (count / 4) * 2, (count / 4) * 3 - 1),
+						dtD(&(ut->userTypeList), val, (count / 4) * 3, count - 1);
+					std::thread _threadA(dtA), _threadB(dtB), _threadC(dtC), _threadD(dtD);
+
+					_threadA.join();
+					_threadB.join();
+					_threadC.join();
+					_threadD.join();
+				}
+				else {
+					for (int i = 0; i < userTypeListSize; ++i) {
+						AllReserved(ut->GetUserTypeList(i), val);
+					}
+				}
+			}
+			// replace all and changeStr ( "~" )
 			static void ReplaceAll(UserType* temp, const string& target_ch, const string& result_ch) {
 				const int itemListSize = temp->GetItemListSize();
 				const int userTypeListSize = temp->GetUserTypeListSize();
@@ -938,7 +1054,9 @@ namespace wiz {
 				}
 				else {
 					for (int i = 0; i < userTypeListSize; ++i) {
-						ReplaceAll(temp->GetUserTypeList(i), target_ch, result_ch);
+						if (false == temp->GetUserTypeList(i)->reservedA) {
+							ReplaceAll(temp->GetUserTypeList(i), target_ch, result_ch);
+						}
 					}
 				}
 			}
