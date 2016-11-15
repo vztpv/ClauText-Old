@@ -515,15 +515,15 @@ namespace wiz {
 					}
 
 
-					UserType::AllReserved(&globalTemp, false);
-					UserType::ReservedA(&globalTemp);
+					//UserType::AllReserved(&globalTemp, false);
+					//UserType::ReservedA(&globalTemp);
 					UserType::ReplaceAll(&globalTemp, "^5", "#");
 					UserType::ReplaceAll(&globalTemp, "^4", "\n");
 					UserType::ReplaceAll(&globalTemp, "^3", "\r");
 					UserType::ReplaceAll(&globalTemp, "^2", "\t");
 					UserType::ReplaceAll(&globalTemp, "^1", " ");
 					UserType::ReplaceAll(&globalTemp, "^0", "^");
-					UserType::AllReserved(&globalTemp, false);
+					//UserType::AllReserved(&globalTemp, false);
 
 					inFile.close();
 				}
@@ -570,15 +570,15 @@ namespace wiz {
 						return true;
 					}
 
-					UserType::AllReserved(&utTemp, false);
-					UserType::ReservedA(&utTemp);
+					//UserType::AllReserved(&utTemp, false);
+					//UserType::ReservedA(&utTemp);
 					UserType::ReplaceAll(&utTemp, "^5", "#");
 					UserType::ReplaceAll(&utTemp, "^4", "\n");
 					UserType::ReplaceAll(&utTemp, "^3", "\r");
 					UserType::ReplaceAll(&utTemp, "^2", "\t");
 					UserType::ReplaceAll(&utTemp, "^1", " ");
 					UserType::ReplaceAll(&utTemp, "^0", "^");
-					UserType::AllReserved(&utTemp, false);
+					//UserType::AllReserved(&utTemp, false);
 				}
 				catch (Error& e) { std::cout << e << endl; return false; }
 				catch (const char* err) { std::cout << err << endl; return false; }
