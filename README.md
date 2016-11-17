@@ -1,6 +1,6 @@
 # To Do
-	2. To json or From json?
-	3. Event Group?
-	4. Event Graph?
-	5. Fix bugs. 
-	6. vector<pair<string, string>> data_and_condition.
+	1. To json or From json?
+	2. Event Group?
+	3. Event Graph?
+	4. Fix bugs. 
+	5. vector<pair<string, string>> data_and_condition.
