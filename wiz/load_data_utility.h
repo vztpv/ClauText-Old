@@ -374,6 +374,9 @@ namespace wiz {
 					else if (1 == state && i > 0 && '\\' != str[i - 1] && '\"' == str[i]) {
 						state = 0;
 					}
+					else if (0 >= state && str[i] == '#') {
+						break;
+					}
 				}
 
 				return 0 == state;
