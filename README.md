@@ -3,4 +3,4 @@
 	2. Event Group?
 	3. Event Graph?
 	4. Fix bugs. 
-	5. vector<pair<string, string>> data_and_condition.
+	5. vector<pair<string, string>> data_and_condition. - SetData?
