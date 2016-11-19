@@ -164,14 +164,22 @@ namespace wiz{
         int count;
 		bool exist;
     private:
-        void Init( const string& str, const vector<string>& separator )
+        void Init( const string& str, const vector<string>& separator ) // assumtion : separators are sorted by length?, long -> short
         {
             if( separator.empty() || str.empty() ) { return; } // if str.empty() == false then _m_str.push_back(str); // ?
-			vector<int> arr(str.size(), 0);
-			bool noSeparator = true;
+			//vector<int> arr(str.size(), 0);
+
+			int left = 0;
+			int right = 0;
+			bool chkEnd = false;
+
+			this->exist = false;
 
 			for (int i = 0; i < str.size(); ++i) {
+				right = i;
+				int _select = -1;
 				bool pass = false;
+				
 				for (int j = 0; j < separator.size(); ++j) {
 					for (int k = 0; k < separator[j].size(); ++k) {
 						if (str[i] == separator[j][k]) {
@@ -182,70 +190,26 @@ namespace wiz{
 							break;
 						}
 					}
-					if (pass) {
-						noSeparator = false;
-						//for (int k = i; k < i + separator[j].size(); ++k) {
-						//	arr[k] = true;
-					//	}
-						arr[i]++;
-						arr[i + separator[j].size() - 1]++;
-						i = i + separator[j].size() - 1;
+					if (pass) { _select = j; break; }
+				}
 
-						break;
-					}
-				}
-			}
-			
-			if( noSeparator )
-			{
-				_m_str.push_back(str);
-				//exist = true;
-				return;
-			}
-			int state = 0;
-			int left = 0; int right = 0;
-			for (int i = 0; i < arr.size(); ++i) {
-				if (state == 0 && 0 == arr[i]) {
-					left = i;
-					right = i;
-					state = 1;
-				}
-				else if (state == 0 && 1 == arr[i]) {
-					state = 2;
-				}
-				else if (state == 0 && 2 == arr[i]) {
-					state = 3;
-				}
-				else if (state == 1 && 0 == arr[i]) {
-					right = i;
-				}
-				else if (state == 1 && 0 < arr[i]) {
-					_m_str.push_back(wiz::String::substring(str, left, right));
+				if (pass) {
+					this->exist = true;
 
-					exist = true;
-					if (1 == arr[i]) {
-						state = 2;
+					string temp = wiz::String::substring(str, left, right - 1);
+					if (!temp.empty()) {
+						_m_str.push_back(std::move(temp));
 					}
-					else if (2 == arr[i]) {
-						state = 3;
+					i = i + separator[_select].size() - 1;
+					left = i + 1;
+					right = left;
+				}
+				else if (!pass && i == str.size() - 1) {
+					string temp = wiz::String::substring(str, left, right);
+					if (!temp.empty()) {
+						_m_str.push_back(std::move(temp));
 					}
 				}
-				else if (state == 2) {
-					if (1 == arr[i]) {
-						state = 0;
-					}
-				}
-				else if (state == 3) {
-					state = 0;
-					--i;
-				}
-			}
-			if (state == 1 && 0 == arr[arr.size()-1]) {
-				right = arr.size() - 1;
-				_m_str.push_back(wiz::String::substring(str, left, right));
-				
-				exist = true;
-				state = 0;
 			}
         }
 		/*
