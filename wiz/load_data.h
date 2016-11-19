@@ -1301,57 +1301,7 @@ namespace wiz {
 				}
 				return str;
 			}
-			///ToDo
-			static pair<bool, vector< pair<string, string>> > GetDataDir(UserType& global, const string& position, const string& varName, const string& condition)
-			{
-				vector< pair<string, string> > result;
-				string str;
-				bool success = false;
-				string _var = varName;
-				if (_var == " ") { _var = ""; }
 
-				auto finded = UserType::Find2(&global, position);
-				if (finded.first) {
-					for (int i = 0; i < finded.second.size(); ++i) {
-						if (false == condition.empty()) {
-							string _condition = condition;
-							if (varName == "") { _condition = wiz::String::replace(_condition, "~~", "^"); } /// chk this
-							else
-								_condition = wiz::String::replace(_condition, "~~", varName); //
-
-							Condition cond(_condition, finded.second[i].first, &global);
-
-							while (cond.Next());
-
-							if (cond.Now().size() != 1 || "TRUE" != cond.Now()[0])
-							{
-								//	std::cout << cond.Now()[0] << endl;
-								continue;
-							}
-						}
-
-						result.push_back(make_pair(finded.second[i].second.first, finded.second[i].second.second));
-						success = true;
-					}
-				}
-				return{ success, result };
-			}
-			/// todo - SetUserTypeName // 합치는 함수
-
-			/*
-			bool RemoveData(const string& position) {
-			auto finded = Find(global, position);
-			if (finded.first) {
-			for (int i = 0; i < finded.second.size(); ++i) {
-			finded.second[i]->Remove(); // todo - 내부..
-			}
-			return true;
-			}
-			else {
-			return false;
-			}
-			}
-			*/
 			static bool Remove(UserType& global, const string& position, const string& var, const string& condition) {
 				auto finded = UserType::Find(&global, position);
 				bool isTrue = false;

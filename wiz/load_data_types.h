@@ -1148,15 +1148,8 @@ namespace wiz {
 				bool exist = false;
 				while (false == utDeck.empty()) {
 					utTemp = utDeck.pop_front();
-
-					if (utTemp.second < strVec.size() && strVec[utTemp.second] == "$")
-					{
-						for (int j = utTemp.first->GetUserTypeListSize() - 1; j >= 0; --j) {
-							UserType* x = utTemp.first->GetUserTypeList(j);
-							utDeck.push_front(make_pair(x, utTemp.second + 1));
-						}
-					}
-					else if (utTemp.second < strVec.size() &&
+					
+					if (utTemp.second < strVec.size() &&
 						wiz::String::startsWith(strVec[utTemp.second], "$ut")
 						)
 					{
@@ -1167,6 +1160,13 @@ namespace wiz {
 						}
 
 						utDeck.push_front(make_pair(utTemp.first->GetUserTypeList(idx), utTemp.second + 1));
+					}
+					else if (utTemp.second < strVec.size() && strVec[utTemp.second] == "$")
+					{
+						for (int j = utTemp.first->GetUserTypeListSize() - 1; j >= 0; --j) {
+							UserType* x = utTemp.first->GetUserTypeList(j);
+							utDeck.push_front(make_pair(x, utTemp.second + 1));
+						}
 					}
 					else if (utTemp.second < strVec.size() &&
 						(utTemp.first->GetUserTypeItem(strVec[utTemp.second]).empty() == false))
@@ -1184,124 +1184,7 @@ namespace wiz {
 				}
 				if (false == exist) { return{ false, vector<UserType*>() }; }
 				return{ true, temp };
-			}
-			static std::pair<bool, vector< pair< UserType*, pair<string, string> >>> Find2(UserType* global, const string& _position) /// option, option_offset
-			{
-				string position = _position;
-				vector< UserType* > temp;
-				vector<  pair< UserType*, pair<string, string> > > strVec2;
-				string str; ///
-
-				if (!position.empty() && position[0] == '@') { position.erase(position.begin()); }
-				if (position.empty()) { temp.push_back(global); return{ true,  vector< pair< UserType*, pair<string, string> >>() }; }
-				if (position == ".") { temp.push_back(global); return{ true,  vector< pair< UserType*, pair<string, string> >>() }; }
-				if (position == "/./") { temp.push_back(global); return{ true, vector< pair< UserType*, pair<string, string> >>() }; } // chk..
-				if (position == "/.") { temp.push_back(global); return{ true,  vector< pair< UserType*, pair<string, string> >>() }; }
-				if (String::startsWith(position, "/."))
-				{
-					position = String::substring(position, 3);
-				}
-
-				StringTokenizer tokenizer(position, "/");
-				vector<string> strVec;
-				Deck<pair< UserType*, pair<int, pair<string, string>> >> utDeck;
-				pair<UserType*, pair<int, pair<string, string>>> utTemp;
-				utTemp.first = global;
-				utTemp.second.first = 0;
-				utTemp.second.second.first = "/";
-				utTemp.second.second.second = "/";
-
-				for (int i = 0; i < tokenizer.countTokens(); ++i) {
-					string strTemp = tokenizer.nextToken();
-					if (strTemp == "root" && i == 0) {
-					}
-					else {
-						strVec.push_back(strTemp);
-					}
-
-					if ((strVec.size() >= 1) && (" " == strVec[strVec.size() - 1])) /// chk!!
-					{
-						strVec[strVec.size() - 1] = "";
-					}
-				}
-
-				// maybe, has bug!
-				{
-					int count = 0;
-
-					for (int i = 0; i < strVec.size(); ++i) {
-						if (strVec[i] == "..") {
-							count++;
-						}
-						else {
-							break;
-						}
-					}
-
-					std::reverse(strVec.begin(), strVec.end());
-
-					for (int i = 0; i < count; ++i) {
-						if (utTemp.first == NULL) { // || strVec.empty()
-							return{ false, vector< pair< UserType*, pair<string, string> >>() };
-						}
-						utTemp.first = utTemp.first->GetParent();
-						strVec.pop_back();
-					}
-					std::reverse(strVec.begin(), strVec.end());
-				}
-
-				utDeck.push_front(utTemp);
-
-				bool exist = false;
-				while (false == utDeck.empty()) {
-					utTemp = utDeck.pop_front();
-
-					if (utTemp.second.first < strVec.size() && strVec[utTemp.second.first] == "$")
-					{
-						for (int j = utTemp.first->GetUserTypeListSize() - 1; j >= 0; --j) {
-							UserType* x = utTemp.first->GetUserTypeList(j);
-							utDeck.push_front(make_pair(x, make_pair(utTemp.second.first + 1, 
-								make_pair(utTemp.second.second.first + x->GetName(), wiz::toStr(j)))));
-						}
-					}
-					else if (utTemp.second.first < strVec.size() &&
-						wiz::String::startsWith(strVec[utTemp.second.first], "$ut")
-						)
-					{
-						long long idx = std::stoll(wiz::String::substring(strVec[utTemp.second.first], 3));
-
-						if (idx < 0 || idx >= utTemp.first->GetUserTypeListSize()) {
-							throw string("ERROR NOT VALID IDX");
-						}
-
-						utDeck.push_front(make_pair(utTemp.first->GetUserTypeList(idx), make_pair(utTemp.second.first + 1, 
-								make_pair(utTemp.second.second.first + utTemp.first->GetUserTypeList(idx)->GetName(), wiz::toStr(idx)))));
-					}
-					else if (utTemp.second.first < strVec.size() &&
-						(utTemp.first->GetUserTypeItem(strVec[utTemp.second.first]).empty() == false))
-					{
-						auto  x = utTemp.first->GetUserTypeItem(strVec[utTemp.second.first]);
-						for (int j = x.size() - 1; j >= 0; --j) {
-							utDeck.push_front(make_pair(x[j], make_pair(utTemp.second.first + 1, 
-								make_pair(utTemp.second.second.first + x[j]->GetName(), wiz::toStr(j)))));
-						}
-					}
-
-					if (utTemp.second.first == strVec.size()) {
-						exist = true;
-
-						pair< UserType*, pair<string, string> > temp;
-						temp.first = utTemp.first;
-						temp.second.first = utTemp.second.second.first;
-						temp.second.second = utTemp.second.second.second;
-
-						strVec2.push_back(temp);
-					}
-				}
-				
-				if (false == exist) { return{ false, vector< pair< UserType*, pair<string, string> >>() }; }
-				return{ true, strVec2 };
-			}
+			}	
 		};
 	}
 }
