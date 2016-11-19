@@ -574,14 +574,6 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 			ut->RemoveUserTypeList(0);
 		}
 	}
-	else if ("$link" == str) // removal
-	{
-		// to do...
-	}
-	else if ("$findIndex" == str) // removal
-	{
-		// todo
-	}
 	else if ("$get" == str)
 	{
 		string x = operandStack.pop();
@@ -598,14 +590,6 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 			string temp = FindLocals(info.locals, x);
 			if (!temp.empty()) { x = temp; }
 		}
-		operandStack.push(x);
-	}
-	else if ("$val" == str) // removal?
-	{
-		string x = operandStack.pop();
-
-		// todo..
-
 		operandStack.push(x);
 	}
 	else if ("$size" == str)
@@ -735,6 +719,7 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 	string result = temp;
 	wiz::ArrayStack<string> resultStack;
 	wiz::load_data::UserType ut;
+	bool chk = false;
 
 	bool flag_A = false;
 	if (result.size() > 1 && result[0] == '/')
@@ -779,11 +764,15 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 	}
 
 	{
-		result = wiz::load_data::Utility::ChangeStr(result, "^", "^0"); // in " "
-		result = wiz::load_data::Utility::ChangeStr(result, " ", "^1");
-		result = wiz::load_data::Utility::ChangeStr(result, "\t", "^2");
-		result = wiz::load_data::Utility::ChangeStr(result, "\r", "^3");
-		result = wiz::load_data::Utility::ChangeStr(result, "\n", "^4");
+		chk = wiz::load_data::Utility::ChkExist(result);
+		if (chk) {
+			result = wiz::load_data::Utility::ChangeStr(result, "^", "^0"); // in " "
+			result = wiz::load_data::Utility::ChangeStr(result, " ", "^1");
+			result = wiz::load_data::Utility::ChangeStr(result, "\t", "^2");
+			result = wiz::load_data::Utility::ChangeStr(result, "\r", "^3");
+			result = wiz::load_data::Utility::ChangeStr(result, "\n", "^4");
+			result = wiz::load_data::Utility::ChangeStr(result, "#", "^5");
+		}
 	}
 
 	{ // chk..
@@ -921,11 +910,14 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 	}
 
 	{
-		result = wiz::load_data::Utility::ChangeStr(result, "^4", "\n");
-		result = wiz::load_data::Utility::ChangeStr(result, "^3", "\r");
-		result = wiz::load_data::Utility::ChangeStr(result, "^2", "\t");
-		result = wiz::load_data::Utility::ChangeStr(result, "^1", " ");
-		result = wiz::load_data::Utility::ChangeStr(result, "^0", "^");
+		if (chk) {
+			result = wiz::load_data::Utility::ChangeStr(result, "^5", "#");
+			result = wiz::load_data::Utility::ChangeStr(result, "^4", "\n");
+			result = wiz::load_data::Utility::ChangeStr(result, "^3", "\r");
+			result = wiz::load_data::Utility::ChangeStr(result, "^2", "\t");
+			result = wiz::load_data::Utility::ChangeStr(result, "^1", " ");
+			result = wiz::load_data::Utility::ChangeStr(result, "^0", "^");
+		}
 	}
 	return result;
 }
