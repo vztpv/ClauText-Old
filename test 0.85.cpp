@@ -1,4 +1,4 @@
-\
+
 
 #define _CRT_SECURE_NO_WARNINGS
 
@@ -600,7 +600,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		}
 		operandStack.push(x);
 	}
-	else if ("$val" == str)
+	else if ("$val" == str) // removal?
 	{
 		string x = operandStack.pop();
 
@@ -616,6 +616,22 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		{
 			wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, x).second[0];
 			x = wiz::toStr(ut->GetItemListSize());
+		}
+		else
+		{
+			x = "FALSE";
+		}
+
+		operandStack.push(x);
+	}
+	else if ("$size2" == str)
+	{
+		string x = operandStack.pop();
+
+		if ('/' == x[0])
+		{
+			wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, x).second[0];
+			x = wiz::toStr(ut->GetUserTypeListSize());
 		}
 		else
 		{
@@ -733,7 +749,7 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 	wiz::load_data::LoadData::LoadDataFromString(result, ut);
 	result = ut.ToString();
 	if (result.empty()) { return result; }
-	result.pop_back();// 여백제거.
+	result.pop_back();// ?�백?�거.
 					  // chk
 	if (ut.empty()) {
 		return "";
@@ -830,9 +846,8 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 	}
 
 	//
-	wiz::ArrayStack<string> operandStack; // 피연산자
-	wiz::ArrayStack<string> operatorStack; // 연산자
-
+	wiz::ArrayStack<string> operandStack; // ?�연?�자
+	wiz::ArrayStack<string> operatorStack; // ?�산??
 	wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" });
 	vector<string> tokenVec;
 
@@ -936,7 +951,7 @@ string excute_module(wiz::load_data::UserType& global)
 		cout << "do not exist Main" << endl;
 		return "ERROR -1";
 	}
-	auto _Main = global.GetCopyUserTypeItem("Main")[0]; /// todo - main이 한개여야만 한다. Main이 없으면 에러..!
+	auto _Main = global.GetCopyUserTypeItem("Main")[0]; /// todo - main???�개?�야�??�다. Main???�으�??�러..!
 	wiz::load_data::UserType Main;
 	Main.LinkUserType(_Main);
 	global.RemoveUserTypeList("Main");
@@ -1325,7 +1340,7 @@ string excute_module(wiz::load_data::UserType& global)
 						info.id = ToBool4(global, eventStack.top().parameters, val->GetUserTypeItem("id")[0]->ToString(), eventStack.top());
 					}
 					// cf) id =  { $local.i }
-					// 추가 todo
+					// 추�? todo
 
 					info.eventUT = events.GetUserTypeList(no);
 					info.userType_idx.clear();
@@ -1475,7 +1490,7 @@ string excute_module(wiz::load_data::UserType& global)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$assign_global" == val->GetName()) // 주의!! dir=> dir/name ( dir= { name = val } } , @를 앞에 붙여야 한다. 
+				else if ("$assign_global" == val->GetName()) // 주의!! dir=> dir/name ( dir= { name = val } } , @�??�에 붙여???�다. 
 				{
 					pair<string, string> dir = Find2(&global, ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top()));
 					string data = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
@@ -1635,7 +1650,7 @@ string excute_module(wiz::load_data::UserType& global)
 				
 				/// ToDo Chk $add, $set, $remove.
 				/// ToDo Make $set - from wiz::load_data::LoadData::SetData function.
-				//	$set~ 할때, ~~가 있다면 ( set하기전의 value )로 바꾼다? - condition 문법처럼 추가하여 쓴다?
+				//	$set~ ?�때, ~~가 ?�다�?( set?�기?�의 value )�?바꾼?? - condition 문법처럼 추�??�여 ?�다?
 				//  $set_by_empty_name == val->GetName() ?
 				//	$set_by_name == val->GetName()
 					//	string dir
@@ -1769,6 +1784,7 @@ string excute_module(wiz::load_data::UserType& global)
 					
 					for (auto& ut : x.second) {
 						cout << ut->ToString();
+						cout << endl;
 					}
 
 					eventStack.top().userType_idx.top()++;
