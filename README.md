@@ -1,7 +1,7 @@
 # What is MyDEL? 
 	MyDEL consists of Data and Events.
 		Data consists of =, {, }, String.
-			String consists of all character( including digit ) except #, white space characters. 
+			String consists of all character( including digit ) except #, white space characters, and some characters. 
 			( but "#1" is allowed. and also " test wow" is allowed. )
 		Data example
 			dlc = { "power of usa" "power of rus" }
