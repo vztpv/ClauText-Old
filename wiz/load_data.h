@@ -720,7 +720,7 @@ namespace wiz {
 				if (ut->GetItem(_var).size() > 0) {
 					string _condition = condition;
 
-					if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "^"); }
+					if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "^9"); }
 					else
 						_condition = wiz::String::replace(_condition, "~~", _var); //
 					Condition cond(_condition, ut, &global);
@@ -757,7 +757,7 @@ namespace wiz {
 				if (ut->GetUserTypeItem(_var).size() > 0) {
 					string _condition = condition;
 
-					if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "^"); }
+					if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "^9"); }
 					else  _condition = wiz::String::replace(_condition, "~~", _var); //
 
 					Condition cond(_condition, ut, &global);
@@ -986,7 +986,7 @@ namespace wiz {
 								if (false == condition.empty()) {
 									string _condition = condition;
 
-									if (utName == "") { _condition = wiz::String::replace(_condition, "~~", "^"); }
+									if (utName == "") { _condition = wiz::String::replace(_condition, "~~", "^9"); }
 									else
 										_condition = wiz::String::replace(_condition, "~~", utName); //
 
@@ -1040,7 +1040,7 @@ namespace wiz {
 							for (int i = 0; i < finded.second.size(); ++i) {
 								if (false == condition.empty()) {
 									string _condition = condition;
-									if (_varName == "" || _varName == " ") { _condition = wiz::String::replace(_condition, "~~", "^"); }
+									if (_varName == "" || _varName == " ") { _condition = wiz::String::replace(_condition, "~~", "^9"); }
 									else
 										_condition = wiz::String::replace(_condition, "~~", _varName); //
 
@@ -1094,7 +1094,7 @@ namespace wiz {
 								for (int i = 0; i < finded.second.size(); ++i) {
 									if (false == condition.empty()) {
 										string _condition = condition;
-										if (_varName == "") { _condition = wiz::String::replace(_condition, "~~", "^"); }
+										if (_varName == "") { _condition = wiz::String::replace(_condition, "~~", "^9"); }
 										else
 											_condition = wiz::String::replace(_condition, "~~", _varName); //
 
@@ -1278,7 +1278,7 @@ namespace wiz {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						if (false == condition.empty()) {
 							string _condition = condition;
-							if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "^"); }
+							if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "^9"); }
 							else
 								_condition = wiz::String::replace(_condition, "~~", _var); /// varName -> _var.
 
@@ -1346,7 +1346,7 @@ namespace wiz {
 								
 								if (false == condition.empty()) {
 									string _condition = condition;
-									if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "^"); }
+									if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "^9"); }
 									else
 										_condition = wiz::String::replace(_condition, "~~", _var); //
 

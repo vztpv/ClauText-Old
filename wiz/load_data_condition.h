@@ -460,7 +460,7 @@ namespace wiz {
 
 				while (tokenizer.hasMoreTokens()) {
 					string temp = tokenizer.nextToken();
-					if (temp == "^") {
+					if (temp == "^9") {
 						temp = "";
 					}
 					tokenVec.push_back(temp);
