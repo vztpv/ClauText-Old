@@ -21,10 +21,10 @@
 		Event example
 			Event =
 			{
-			    id = 1
+				id = 1
 
-			    $option = { REMOVE_IF_CALL_ONESELF_EVENT } # REMOVE_IF_CALL_ONESELF_EVENT.
-			    $parameter = { i j }
+				$option = { REMOVE_IF_CALL_ONESELF_EVENT } # REMOVE_IF_CALL_ONESELF_EVENT.
+				$parameter = { i j }
 				$local = { x } # "NOT_DEFINED"??
 
 				$assign_local = {
@@ -35,34 +35,34 @@
 					dir = { $concat = { $ local.x } } 
 					data = { 3 }
 				}
-			    $if = {
-				condition = { $COMP<EQ = { $parameter.i $local.x } }
-				then = {
-				   	 $call = { id = { $concat = { x $add = { 1 1 } } } i = $parameter.i j = 1 }
-				   	 $print = { value = { \n } }
-				    	 $call = { id = 1 i = {$add = { $parameter.i 1 } } j = 1 }
+				$if = {
+					condition = { $COMP<EQ = { $parameter.i $local.x } }
+					then = {
+						$call = { id = { $concat = { x $add = { 1 1 } } } i = $parameter.i j = 1 }
+						$print = { value = { \n } }
+						$call = { id = 1 i = {$add = { $parameter.i 1 } } j = 1 }
 					}
-			    }
+				}
 			}
 
 			Event =
 			{
-			    id = x2
-			    $parameter = { i j }
-			    $option = { REMOVE_IF_CALL_ANY_EVENT }
+				id = x2
+				$parameter = { i j }
+				$option = { REMOVE_IF_CALL_ANY_EVENT }
 
-			    $if = {
-				condition = { $COMP<EQ = { $parameter.j 9 } }
-				then = {
-				    $print = { value = { $parameter.i } }
-				    $print = { value = { " * " } }
-				    $print = { value = { $parameter.j } }
-				    $print = { value = { " = " } }
-				    $print = { value = { $multiple = { $parameter.i $parameter.j } } }
-				    $print = { value = { \n } }
-				    $call = { id = x2 i = $parameter.i j = { $add = { $parameter.j 1 } } }
+				$if = {
+					condition = { $COMP<EQ = { $parameter.j 9 } }
+					then = {
+						$print = { value = { $parameter.i } }
+						$print = { value = { " * " } }
+						$print = { value = { $parameter.j } }
+						$print = { value = { " = " } }
+						$print = { value = { $multiple = { $parameter.i $parameter.j } } }
+						$print = { value = { \n } }
+						$call = { id = x2 i = $parameter.i j = { $add = { $parameter.j 1 } } }
+					}
 				}
-			    }
 			}
 
 	
