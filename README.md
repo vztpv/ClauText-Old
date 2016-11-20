@@ -21,6 +21,11 @@
 		Event example
 			Event =
 			{
+				id = 0
+				$call = { id = 1 i = 1 j = 1 }
+			}
+			Event =
+			{
 				id = 1
 
 				$option = { REMOVE_IF_CALL_ONESELF_EVENT } # REMOVE_IF_CALL_ONESELF_EVENT.
@@ -64,8 +69,12 @@
 					}
 				}
 			}
+		Main example
+			Main =
+			{
+			    $call = { id = 0 }
+			}
 
-	
 			
 	MyDEL support if, else statements. ( $if = { condition = {  } then = {  } } $else = { then = { } } )
 	
