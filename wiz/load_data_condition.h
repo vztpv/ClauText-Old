@@ -456,11 +456,13 @@ namespace wiz {
 				bool evalue = false;
 
 				string str = Utility::AddSpace(condition);
+				
 				StringTokenizer tokenizer(str, { " ", "\t", "\n", "\r" });
 
 				while (tokenizer.hasMoreTokens()) {
 					string temp = tokenizer.nextToken();
-					if (temp == "^9") {
+
+					if (temp == "^") { // 
 						temp = "";
 					}
 					tokenVec.push_back(temp);
