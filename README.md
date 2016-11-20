@@ -1,5 +1,5 @@
 # What is MyDEL? 
-	MyDEL consists of Data and Events.
+	MyDEL consists of Data, Event, and Main.
 		Data consists of =, {, }, String.
 			String consists of all character( including digit ) except #, white space characters, and some characters. 
 			( but "#1" is allowed. and also " test wow" is allowed. )
