@@ -1583,7 +1583,7 @@ string excute_module(wiz::load_data::UserType& global)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$make" == val->GetName()) // To Do? - make2?
+				else if ("$make" == val->GetName()) // To Do? - make2? or remake?
 				{
 					string dir;
 					bool is2 = false;
@@ -1593,7 +1593,7 @@ string excute_module(wiz::load_data::UserType& global)
 					}
 					else
 					{
-						dir = string(val->GetUserTypeList(0)->ToString());
+						dir = string(val->ToString());
 						dir = ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
 						is2 = true;
 					}
