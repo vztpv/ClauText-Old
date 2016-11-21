@@ -329,7 +329,6 @@ namespace wiz {
 						StringTokenizer tokenizer((*strVec)[i]);
 						while (tokenizer.hasMoreTokens()) {
 							string temp = tokenizer.nextToken();
-							if (temp.empty()) { continue; }
 							aq->push(std::move(temp));
 						}
 					}
