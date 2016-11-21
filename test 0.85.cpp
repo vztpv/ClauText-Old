@@ -1591,7 +1591,7 @@ string excute_module(wiz::load_data::UserType& global)
 						dir = val->GetItemList(0).Get(0);
 						dir = ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
 					}
-					else
+					else // 
 					{
 						dir = string(val->ToString());
 						dir = ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
