@@ -17,7 +17,7 @@
 					province = { 6 7 8 9 10 11 }
 				}
 			}
-		Event ( function? ) also consist of =, {, }, String.
+		Event ( function? ) also consists of =, {, }, String.
 		Event example
 			Event =
 			{
