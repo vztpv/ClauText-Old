@@ -84,7 +84,16 @@
 	1. use VisualStudio 2015 c++ project, only add "test 0.85.cpp" file to project.
 	2. in project property pages, include wiz directory.
 
-# To Do
+# How Use?
+	1. in cmd, excute_file.exe MyDEL_Source_FileName
+	2. or excute_file.exe   
+	   => FileName: MyDEL_Source_FileName
+
+# MyDEL and Paradox Game ( EU4, DHR, ... )
+	1. it can load eu4 savegames, and maybe other paradox game db or savegame files.
+	2. it`s syntax is from eu4 savegame syntax.
+
+# To Do?
 	1. To json or From json?
 	2. Event Group?
 	3. Event Graph?
