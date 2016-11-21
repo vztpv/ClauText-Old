@@ -1076,7 +1076,7 @@ string excute_module(wiz::load_data::UserType& global)
 			while (val != NULL) 
 			{
 
-				if ("$save" == val->GetName())
+				if ("$save" == val->GetName()) // save data, event, main!
 				{
 					//todo
 					// "filename" save_option(0~2)
@@ -1091,7 +1091,7 @@ string excute_module(wiz::load_data::UserType& global)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$save_data_only" == val->GetName()) // save data, event, main!
+				else if ("$save_data_only" == val->GetName())
 				{
 					//todo
 					// "filename" save_option(0~2)
@@ -1133,6 +1133,65 @@ string excute_module(wiz::load_data::UserType& global)
 						{
 							getline(inFile, temp);
 							
+							outFile << temp;
+							//std::cout << temp << endl;
+							if (i < line_size - 1) {
+								outFile << "\n";
+							}
+						}
+
+						inFile.close();
+						outFile.close();
+					}
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+
+				else if ("$save_data_only2" == val->GetName()) 
+				{
+					//todo
+					// "filename" save_option(0~2)
+					string dirName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
+					string fileName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
+					fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
+					string option = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top());
+
+					ofstream outFile;
+					outFile.open(fileName + "temp", ios::binary);
+					if (outFile.fail()) {
+						eventStack.top().userType_idx.top()++;
+						break;
+					}
+
+					wiz::load_data::UserType* utTemp = global.GetUserTypeItem(dirName)[0];
+					wiz::load_data::LoadData::SaveWizDB(*utTemp, fileName, option, "");
+
+					outFile.close();
+					{ // for eu4, last line remove!
+						ifstream inFile;
+						ofstream outFile;
+						inFile.open(fileName + "temp", ios::binary);
+						outFile.open(fileName, ios::binary);
+						if (inFile.fail()) { eventStack.top().userType_idx.top()++; break; }
+						if (outFile.fail()) { inFile.close(); eventStack.top().userType_idx.top()++; break; }
+
+						string temp;
+						size_t line_size = 0;
+						size_t line_count = 0;
+						{
+							while (getline(inFile, temp)) { line_size++; }
+							inFile.close();
+						}
+
+						//cout << "chk " << line_size << endl;
+
+						inFile.open(fileName + "temp", ios::binary);
+						if (inFile.fail()) { outFile.close(); eventStack.top().userType_idx.top()++; break; }
+						for (size_t i = 0; i < line_size; ++i)
+						{
+							getline(inFile, temp);
+
 							outFile << temp;
 							//std::cout << temp << endl;
 							if (i < line_size - 1) {
@@ -1534,7 +1593,7 @@ string excute_module(wiz::load_data::UserType& global)
 					}
 					else
 					{
-						dir = string(val->ToString());
+						dir = string(val->GetUserTypeList(0)->ToString());
 						dir = ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
 						is2 = true;
 					}
@@ -1845,6 +1904,50 @@ string excute_module(wiz::load_data::UserType& global)
 
 						// update no
 						no = convert[str];
+					}
+
+					eventStack.top().userType_idx.top()++;
+					break;
+
+				}
+				else if ("$load_only_data" == val->GetName())
+				{
+					// to do, load data and events from other file!
+					wiz::load_data::UserType ut;
+					string fileName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
+					fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
+					string dirName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
+					wiz::load_data::UserType* utTemp = global.GetUserTypeItem(dirName)[0];
+						
+					if (wiz::load_data::LoadData::LoadDataFromFile(fileName, ut)) {
+						{
+							int item_count = 0;
+							int userType_count = 0;
+
+							for (int i = 0; i < ut.GetIList().size(); ++i) {
+								if (ut.IsItemList(i)) {
+									utTemp->AddItem(std::move(ut.GetItemList(item_count).GetName()),
+										std::move(ut.GetItemList(item_count).Get(0)));
+									item_count++;
+								}
+								else {
+									utTemp->AddUserTypeItem(std::move(*ut.GetUserTypeList(userType_count)));
+									userType_count++;
+								}
+							}
+						}
+
+						auto _Main = ut.GetUserTypeItem("Main");
+						if (!_Main.empty())
+						{
+							// error!
+							cout << "err" << endl;
+
+							return "ERROR -2"; /// exit?
+						}
+					}
+					else {
+						// error!
 					}
 
 					eventStack.top().userType_idx.top()++;
