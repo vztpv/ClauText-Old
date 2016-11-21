@@ -80,6 +80,9 @@
 	
 	MyDEL does not support while directly. but support using if statements and Event Recursive Call( recursive function call ).
 
+# How Build?
+	1. use VisualStudio 2015 c++ project, only add "test 0.85.cpp" file to project.
+	2. in project property pages, include wiz directory.
 
 # To Do
 	1. To json or From json?
