@@ -328,7 +328,43 @@ namespace wiz {
 					{
 						StringTokenizer tokenizer((*strVec)[i]);
 						while (tokenizer.hasMoreTokens()) {
-							aq->push(tokenizer.nextToken());
+							string temp = tokenizer.nextToken();
+							if (temp.empty()) { continue; }
+							aq->push(std::move(temp));
+						}
+					}
+				}
+			};
+
+			class DoThread2 // need to rename!
+			{
+			private:
+				vector<string>* strVec;
+				int strVecStart;
+				int strVecEnd;
+			public:
+				DoThread2(vector<string>* strVec, int strVecStart, int strVecEnd)
+					: strVec(strVec), strVecStart(strVecStart), strVecEnd(strVecEnd)
+				{
+				}
+				void operator() () {
+					for (int i = strVecStart; i <= strVecEnd; ++i)
+					{
+						//temp = RemoveEndSpace(temp);
+						bool chkStr = ChkExist((*strVec)[i]);
+						if (chkStr) {
+							(*strVec)[i] = ChangeStr((*strVec)[i], "^", "^0"); // 1줄에 "~~~" ?	
+							(*strVec)[i] = Utility::ChangeStr((*strVec)[i], "#", "^5");
+						}
+
+						(*strVec)[i] = PassSharp((*strVec)[i]);
+						(*strVec)[i] = AddSpace((*strVec)[i]);
+
+						if (chkStr) {
+							(*strVec)[i] = ChangeStr((*strVec)[i], " ", "^1");
+							(*strVec)[i] = ChangeStr((*strVec)[i], "\t", "^2");
+							(*strVec)[i] = ChangeStr((*strVec)[i], "\r", "^3");
+							(*strVec)[i] = ChangeStr((*strVec)[i], "\n", "^4");
 						}
 					}
 				}
@@ -390,25 +426,26 @@ namespace wiz {
 				ArrayQueue<string> arrayQueue[4];
 				
 				for (int i = 0; i < num && (getline(inFile,temp)); ++i) {
-					//temp = RemoveEndSpace(temp);
-					bool chkStr = ChkExist(temp);
-					if (chkStr) {
-						temp = ChangeStr(temp, "^", "^0"); // 1줄에 "~~~" ?	
-						temp = Utility::ChangeStr(temp, "#", "^5");
-					}
-					
-					temp = PassSharp(temp);
-					temp = AddSpace(temp);
-					
-					if (chkStr) {
-						temp = ChangeStr(temp, " ", "^1");
-						temp = ChangeStr(temp, "\t", "^2");
-						temp = ChangeStr(temp, "\r", "^3");
-						temp = ChangeStr(temp, "\n", "^4");
-					}
-
+					if (temp.empty()) { continue; }
 					strVecTemp.push_back(temp);
 					count++;
+				}
+
+				if (count >= 100) { // 4 ?
+					DoThread2 dtA(&strVecTemp, 0, count / 4 - 1),
+						dtB(&strVecTemp, count / 4, (count / 4) * 2 - 1),
+						dtC(&strVecTemp, (count / 4) * 2, (count / 4) * 3 - 1),
+						dtD(&strVecTemp, (count / 4) * 3, count - 1);
+					std::thread _threadA(dtA), _threadB(dtB), _threadC(dtC), _threadD(dtD);
+
+					_threadA.join();
+					_threadB.join();
+					_threadC.join();
+					_threadD.join();
+				}
+				else if (count > 0) {
+					DoThread2 dtA(&strVecTemp, 0, count - 1);
+					dtA();
 				}
 
 				if (count >= 100) { // 4 ?

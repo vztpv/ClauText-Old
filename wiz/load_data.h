@@ -170,13 +170,13 @@ namespace wiz {
 								}
 								else {
 									var1 = Utility::Pop(strVec);
-									nestedUT[braceNum]->AddItem("", var1);
+									nestedUT[braceNum]->AddItem("", move(var1));
 									state = 0;
 								}
 							}
 							else {
 								var1 = Utility::Pop(strVec);
-								nestedUT[braceNum]->AddItem("", var1);
+								nestedUT[braceNum]->AddItem("", move(var1));
 								state = 0;
 							}
 						}
@@ -214,7 +214,7 @@ namespace wiz {
 						else {
 							val = Utility::Pop(strVec);
 
-							nestedUT[braceNum]->AddItem(var2, val);
+							nestedUT[braceNum]->AddItem(move(var2), move(val));
 							var2 = "";
 							val = "";
 
@@ -303,7 +303,7 @@ namespace wiz {
 								else {
 									// var1
 									var1 = Utility::Pop(strVec);
-									nestedUT[braceNum]->AddItem("", var1);
+									nestedUT[braceNum]->AddItem("", move(var1));
 									var1 = "";
 
 									state = 4;
@@ -313,7 +313,7 @@ namespace wiz {
 							{
 								// var1
 								var1 = Utility::Pop(strVec);
-								nestedUT[braceNum]->AddItem("", var1);
+								nestedUT[braceNum]->AddItem("", move(var1));
 								var1 = "";
 
 								state = 4;
@@ -389,7 +389,7 @@ namespace wiz {
 						else {
 							val = Utility::Pop(strVec);
 
-							nestedUT[braceNum]->AddItem(var2, val);
+							nestedUT[braceNum]->AddItem(move(var2), move(val));
 							var2 = ""; val = "";
 							if (strVec.empty())
 							{
