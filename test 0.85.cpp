@@ -1611,7 +1611,7 @@ string excute_module(wiz::load_data::UserType& global)
 
 					string condition = "TRUE";
 					if (is2 && val->GetUserTypeListSize() >= 1) {
-						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
+						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
 					}
 					else if (false == is2 && val->GetUserTypeListSize() >= 1 ) {
 						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
