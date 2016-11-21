@@ -505,7 +505,7 @@ namespace wiz {
 				ArrayQueue<string> strVec;
 
 				try {
-					InFIleReserver ifReserver(inFile);
+					InFileReserver ifReserver(inFile);
 
 					ifReserver.Num = 100000;
 					// cf) empty file..

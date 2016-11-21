@@ -13,14 +13,14 @@ using namespace std;
 
 namespace wiz {
 	namespace load_data {
-		class InFIleReserver
+		class InFileReserver
 		{
 		private:
 			ifstream* pInFile;
 		public:
 			int Num;
 		public:
-			explicit InFIleReserver(ifstream& inFile)
+			explicit InFileReserver(ifstream& inFile)
 			{
 				pInFile = &inFile;
 				Num = 1;
