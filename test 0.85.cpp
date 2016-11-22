@@ -21,6 +21,825 @@ using namespace std;
 #include <wiz/stacks.h>
 #include <wiz/cpp_string.h>
 
+#include <Windows.h>
+
+
+inline int GETCH() /// To Do - Replace..
+{
+	return _getch();
+}
+
+inline void FFLUSH()  // to  DO - 추가!!
+{
+	cin.clear();
+	cin.ignore(cin.rdbuf()->in_avail(), '\n');
+}
+
+inline void gotoxy(short x, short y)
+{
+	COORD pos = { x, y };
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
+}
+
+inline void setcolor(int color, int bgcolor)
+{
+	color = color & 0xF;
+	bgcolor = bgcolor & 0xF;
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
+		(bgcolor << 4) | color);
+}
+
+class MData
+{
+public:
+	bool isDir;
+	string varName;
+	int no; /// for UserType that has same name.!, rename?
+public:
+	explicit MData(const bool isDir = false, const string& varName = "", const int no = 0) : isDir(isDir), varName(varName), no(no)
+	{
+
+	}
+};
+
+void MStyleTest(wiz::load_data::UserType* pUt)
+{
+	std::vector<wiz::load_data::ItemType<wiz::load_data::UserType*>> utVec;
+	std::vector<MData> mdVec;
+	//std::vector<vector<MData>> mdVec2;
+	wiz::load_data::ItemType<wiz::load_data::UserType*> global;
+	wiz::load_data::UserType* utTemp = pUt;
+	std::vector<wiz::load_data::UserType*> utVec2;
+	std::vector<int> idxVec; //for store before idx
+	std::vector<string> strVec; // for value..
+	int braceNum = 0;
+	int idx = 0;
+	bool isFirst = true;
+	bool isReDraw = true;
+	int sizeOfWindow = 30;
+	int Start = 0;
+	int End = 0;
+	int state = 0;
+
+	global.Push(utTemp);
+
+	utVec.push_back(global);
+
+	utVec2.push_back(utTemp);
+
+	system("cls");
+
+	int count_userType = 0;
+	int count_item = 0;
+
+	while (true) {
+		if (isFirst) {
+			mdVec = std::vector<MData>();
+			count_userType = 0;
+			count_item = 0;
+
+			for (int h = 0; h < utVec[braceNum].size(); ++h) {
+				for (int i = 0; i < utVec[braceNum].Get(h)->GetUserTypeListSize(); ++i) {
+					MData mdTemp{ true, utVec[braceNum].Get(h)->GetUserTypeList(i)->GetName(), h };
+					if (mdTemp.varName.empty()) {
+						mdTemp.varName = " ";
+					}
+
+					mdVec.push_back(mdTemp);
+					count_userType++;
+				}
+			}
+			for (int h = 0; h < utVec[braceNum].size(); ++h) {
+				for (int i = 0; i < utVec[braceNum].Get(h)->GetItemListSize(); ++i) {
+					MData mdTemp{ false, utVec[braceNum].Get(h)->GetItemList(i).GetName(), h };
+					if (mdTemp.varName.empty()) {
+						mdTemp.varName = " ";
+					}
+					mdVec.push_back(mdTemp);
+					count_item++;
+				}
+			}
+			isFirst = false;
+		}
+		if (isReDraw) {
+			setcolor(0, 0);
+			system("cls");
+
+			End = min(Start + sizeOfWindow - 1, mdVec.size() - 1);
+			if (mdVec.empty()) {
+				End = Start - 1;
+			}
+			// draw mdVec and cursor - chk!!
+			else {
+				for (int i = Start; i <= End; ++i) {
+					if (mdVec[i].isDir) { setcolor(0, 10); }
+					else { setcolor(0, 7); }
+					if (false == mdVec[i].varName.empty()) {
+						cout << "  " << mdVec[i].varName;
+					}
+					else
+					{
+						cout << "  " << " ";
+					}
+					if (i != mdVec.size() - 1) { cout << endl; }
+				}
+
+				gotoxy(0, idx - Start);
+
+				setcolor(0, 12);
+				cout << "●";
+				setcolor(0, 0);
+				gotoxy(0, 0);
+			}
+
+			isReDraw = false;
+		}
+
+		// move and chk enterkey. - todo!!
+		{
+			char ch = GETCH();
+			FFLUSH();
+
+			if ('q' == ch) { return; }
+
+			// todo - add, remove, save
+			if (strVec.empty() && Start <= End && idx > 0 && ('w' == ch || 'W' == ch))
+			{
+				// draw mdVec and cursor - chk!!
+				if (idx == Start) {
+					system("cls");
+
+					int count = 0;
+					int newEnd = Start - 1;
+					int newStart = max(0, newEnd - sizeOfWindow + 1);
+
+					Start = newStart; End = newEnd;
+					idx--;
+
+					for (int i = Start; i <= End; ++i) {
+						if (mdVec[i].isDir) { setcolor(0, 10); }
+						else { setcolor(0, 7); }
+						cout << "  " << mdVec[i].varName;
+						if (mdVec[i].varName.empty()) { cout << " "; }
+						if (i != mdVec.size() - 1) { cout << endl; }
+						count++;
+					}
+					gotoxy(0, idx - Start);
+					setcolor(0, 12);
+					cout << "●";
+					setcolor(0, 0);
+				}
+				else {
+					gotoxy(0, idx - Start);
+					setcolor(0, 0);
+					cout << "  ";
+					idx--;
+
+					gotoxy(0, idx - Start);
+					setcolor(0, 12);
+					cout << "●";
+					setcolor(0, 0);
+				}
+			}
+			else if (
+				strVec.empty() && Start <= End && (idx < mdVec.size() - 1)
+				&& ('s' == ch || 'S' == ch)
+				)
+			{
+				if (idx == End) {
+					system("cls");
+
+					int count = 0;
+					int newStart = End + 1;
+					int newEnd = min(newStart + sizeOfWindow - 1, mdVec.size() - 1);
+
+					Start = newStart; End = newEnd;
+					idx++;
+
+					for (int i = Start; i <= End; ++i) {
+						if (mdVec[i].isDir) { setcolor(0, 10); }
+						else { setcolor(0, 7); }
+						cout << "  " << mdVec[i].varName;
+						if (i != mdVec.size() - 1) { cout << endl; }
+						count++;
+					}
+					gotoxy(0, 0);
+					setcolor(0, 12);
+					cout << "●";
+					setcolor(0, 0);
+				}
+				else {
+					gotoxy(0, idx - Start);
+					setcolor(0, 0);
+					cout << "  ";
+					idx++;
+
+					gotoxy(0, idx - Start);
+					setcolor(0, 12);
+					cout << "●";
+					setcolor(0, 0);
+				}
+			}
+			if (!strVec.empty() && Start <= End && idx > 0 && ('w' == ch || 'W' == ch))
+			{
+				// draw mdVec and cursor - chk!!
+				if (idx == Start) {
+					system("cls");
+
+					int count = 0;
+					int newEnd = Start - 1;
+					int newStart = max(0, newEnd - sizeOfWindow + 1);
+
+					Start = newStart; End = newEnd;
+					idx--;
+
+					for (int i = Start; i <= End; ++i) {
+						setcolor(0, 7);
+						cout << "  " << strVec[i];
+						if (i != strVec.size() - 1) { cout << endl; }
+						count++;
+					}
+					gotoxy(0, idx - Start);
+					setcolor(0, 12);
+					cout << "●";
+					setcolor(0, 0);
+				}
+				else {
+					gotoxy(0, idx - Start);
+					setcolor(0, 0);
+					cout << "  ";
+					idx--;
+
+					gotoxy(0, idx - Start);
+					setcolor(0, 12);
+					cout << "●";
+					setcolor(0, 0);
+				}
+			}
+			else if (
+				!strVec.empty() && Start <= End && (idx < strVec.size() - 1)
+				&& ('s' == ch || 'S' == ch)
+				)
+			{
+				if (idx == End) {
+					setcolor(0, 0);
+					system("cls");
+
+					int count = 0;
+					int newStart = End + 1;
+					int newEnd = min(newStart + sizeOfWindow - 1, strVec.size() - 1);
+
+					Start = newStart; End = newEnd;
+					idx++;
+
+					for (int i = Start; i <= End; ++i) {
+						setcolor(0, 7);
+						cout << "  " << strVec[i];
+						if (i != strVec.size() - 1) { cout << endl; }
+						count++;
+					}
+					gotoxy(0, 0);
+					setcolor(0, 12);
+					cout << "●";
+					setcolor(0, 0);
+				}
+				else {
+					gotoxy(0, idx - Start);
+					setcolor(0, 0);
+					cout << "  ";
+					idx++;
+
+					gotoxy(0, idx - Start);
+					setcolor(0, 12);
+					cout << "●";
+					setcolor(0, 0);
+				}
+			}
+			else if ('\r' == ch || '\n' == ch) {
+				/// To Do..
+				gotoxy(0, 0);
+				if (count_userType == 0 && count_item == 0)
+				{
+					//
+				}
+				else if (state == 0 && strVec.empty() && idx < count_userType) { // utVec[braceNum].Get(mdVec[idx].no)->GetUserTypeListSize()) {
+					setcolor(0, 0);
+					system("cls");
+
+					// usertypelist
+					braceNum++;
+					idxVec.push_back(idx); /// idx?
+
+					if (braceNum >= utVec.size()) {
+						utVec.push_back(wiz::load_data::ItemType<wiz::load_data::UserType*>());
+						utVec2.push_back(NULL);
+					}
+
+					wiz::load_data::ItemType< wiz::load_data::UserType*> ref;
+					ref.Push(NULL);
+					string strTemp = mdVec[idxVec[braceNum - 1]].varName;
+					if (strTemp == " ")
+					{
+						strTemp = "";
+					}
+
+					if (utVec[braceNum - 1].Get(mdVec[idxVec[braceNum - 1]].no)->GetUserTypeItemRef(idxVec[braceNum - 1], ref.Get(0)))
+					{
+						//
+					}
+					utVec[braceNum] = ref;
+
+					utVec2[braceNum - 1]->GetUserTypeItemRef(idxVec[braceNum - 1], ref.Get(0));
+					utVec2[braceNum] = ref.Get(mdVec[idxVec[braceNum - 1]].no);
+
+					Start = 0;
+					idx = 0;
+					isFirst = true;
+					isReDraw = true;
+				}
+				else
+				{
+					if (
+						!mdVec.empty() &&
+						strVec.empty()
+						)
+					{
+						setcolor(0, 0);
+						system("cls");
+
+						string strTemp = mdVec[idx].varName;
+						if (strTemp == " ") { strTemp = ""; }
+						const int count = 1; // utVec[braceNum].Get(mdVec[idx].no)->GetItem(strTemp).size();
+						setcolor(0, 7);
+
+						for (int i = 0; i < count; ++i) {
+							setcolor(0, 7);
+
+							auto x = utVec[braceNum].Get(mdVec[idx].no)->GetItemList(idx - count_userType);
+							string temp = x.Get(0);
+							cout << "  " << temp;
+							strVec.push_back(temp);
+							//}
+							if (i != count - 1) { cout << endl; }
+						}
+					}
+
+					if (state == 0) {
+						gotoxy(0, 0);
+						state = 1;
+
+						idxVec.push_back(idx);
+
+						idx = 0;
+						Start = 0;
+
+						setcolor(0, 12);
+						cout << "●";
+						setcolor(0, 0);
+					}
+					else if (state == 1) { /// cf) state = 2;
+						gotoxy(0, idx); /// chk..
+						Start = idx;
+					}
+
+
+					// idx = 0;
+					End = min(Start + sizeOfWindow - 1, strVec.size() - 1);
+					if (strVec.empty()) { End = Start - 1; }
+
+
+					// chk
+					count_userType = 0;
+					count_item = 1;
+				}
+			}
+			else if (0 == state && 'f' == ch)
+			{
+				string temp;
+				int x = 0;
+				system("cls");
+				setcolor(0, 7);
+				cout << "row input : ";
+				cin >> temp;
+				FFLUSH();
+
+				if (wiz::load_data::Utility::IsInteger(temp)) {
+					x = stoi(temp); // toInt
+					if (x < 0) { x = 0; }
+					else if (x >= mdVec.size()) {
+						x = mdVec.size() - 1;
+					}
+
+					// chk!! ToDo ?
+					idx = x;
+					x = max(0, x - sizeOfWindow / 2);
+					Start = x;
+					isReDraw = true; /// chk!! To Do - OnlyRedraw? Reset? // int + changed?
+				}
+				else
+				{
+					isReDraw = true; /// OnlyDraw = true?, no search?
+				}
+			}
+			else if (0 == state && '1' == ch)
+			{
+				int index = idx;
+				string temp = mdVec[idx].varName;
+
+				for (int i = idx - 1; i >= 0; --i) {
+					if (mdVec[i].varName == temp) {
+						index = i;
+					}
+					else
+					{
+						break;
+					}
+				}
+
+				idx = index;
+				Start = max(0, idx - sizeOfWindow / 2);
+				isReDraw = true;
+			}
+			else if (0 == state && '2' == ch)
+			{
+				int index = idx;
+				string temp = mdVec[idx].varName;
+
+				for (int i = idx + 1; i < mdVec.size(); ++i) {
+					if (mdVec[i].varName == temp) {
+						index = i;
+					}
+					else
+					{
+						break;
+					}
+				}
+
+				idx = index;
+				Start = max(0, idx - sizeOfWindow / 2);
+				isReDraw = true;
+
+			}
+			else {
+				if ('q' == ch) { return; } // quit
+				else if ('b' == ch && braceNum > 0 && strVec.empty() && state == 0) {  // back
+					braceNum--;
+
+					setcolor(0, 0);
+					system("cls");
+
+					isFirst = true;
+					isReDraw = true;
+					//Start = idxVec.back();
+
+					idx = idxVec.back();
+					idxVec.pop_back();
+
+					if (0 <= idx - sizeOfWindow / 2)
+					{
+						Start = idx - sizeOfWindow / 2;
+					}
+					else {
+						Start = 0;
+					}
+				}
+				else if ('b' == ch && !idxVec.empty()) /// state == 1 ?
+				{
+					idx = idxVec.back();
+					idxVec.pop_back();
+
+					if (0 <= idx - sizeOfWindow / 2)
+					{
+						Start = idx - sizeOfWindow / 2;
+					}
+					else {
+						Start = 0;
+					}
+
+					state = 0;
+					setcolor(0, 0);
+					system("cls");
+					strVec.clear();
+
+					isFirst = true;
+					isReDraw = true;
+				}
+				else if ('e' == ch) {
+					setcolor(0, 0);
+					system("cls");
+					setcolor(7, 0);
+
+					cout << "edit mode" << endl;
+					cout << "add - a, change - c, remove - r, save - s" << endl;
+					ch = GETCH();
+					FFLUSH();
+
+					if ('a' == ch) { // add
+						int select = -1;
+						string var;
+						string val;
+
+						setcolor(0, 7);
+						// need more test!!
+						cout << "add UserType : 1, add Item : 2, add usertype that name is \"\": 3 your input : ";
+						cin >> select;
+						FFLUSH();
+
+						// add userType?
+						if (1 == select) {
+							// name of UserType.
+							cout << "what is new UserType name? : ";
+							cin >> var;
+							FFLUSH();
+							utVec2[braceNum]->AddUserTypeItem(wiz::load_data::UserType(var));
+						}
+						// addd Item?
+						else if (2 == select) {
+							// var, val /// state에 따라?
+							cout << "var : ";
+							cin >> var;
+							cout << "val : ";
+							FFLUSH();
+							getline(cin, val);
+							utVec2[braceNum]->AddItem(var, val);
+						}
+						else if (3 == select)
+						{
+							utVec2[braceNum]->AddUserTypeItem(wiz::load_data::UserType(""));
+						}
+					}
+					else if ('c' == ch && Start <= End) { // change var or value
+														  // idx
+						if (idx < count_userType) {
+							string temp;
+							setcolor(0, 7);
+							cout << "change userType name : ";
+
+							FFLUSH();
+							getline(cin, temp);
+
+							int count = 0;
+							for (int h = 0; h < utVec[braceNum].size(); ++h) {
+								for (int i = 0; i < utVec[braceNum].Get(h)->GetUserTypeListSize(); ++i) {
+									if (count == idx) {
+										utVec[braceNum].Get(h)->GetUserTypeList(i)->SetName(temp);
+									}
+									count++;
+								}
+							}
+						}
+						else {
+							string temp;
+							setcolor(0, 7);
+
+							string name, value;
+							if (1 == state) { // val
+								cout << "change val : " << endl;
+								getline(cin, temp);
+
+								value = temp;
+
+								int count = 0;
+								int count_userType = 0;
+								for (int h = 0; h < utVec[braceNum].size(); ++h) {
+									for (int i = 0; i < utVec[braceNum].Get(h)->GetUserTypeListSize(); ++i) {
+										count++;
+										count_userType++;
+									}
+								}
+								for (int h = 0; h < utVec[braceNum].size(); ++h) {
+									for (int i = 0; i < utVec[braceNum].Get(h)->GetItemListSize(); ++i) {
+										if (idxVec.back() == count) {
+											utVec[braceNum].Get(h)->GetItemList(i).Get(idx) = value;
+										}
+										count++;
+									}
+								}
+								idx = idxVec.back();
+								idxVec.pop_back();
+								// max!
+								if (0 <= idx - sizeOfWindow / 2)
+								{
+									Start = idx - sizeOfWindow / 2;
+								}
+								else {
+									Start = 0;
+								}
+								strVec.clear();
+								state = 0;
+							}
+							else if (0 == state) { // var
+								cout << "change var : " << endl;
+								cin >> temp;
+								FFLUSH();
+								name = temp;
+								int count = 0;
+								for (int h = 0; h < utVec[braceNum].size(); ++h) {
+									for (int i = 0; i < utVec[braceNum].Get(h)->GetUserTypeListSize(); ++i) {
+										count++;
+									}
+								}
+								for (int h = 0; h < utVec[braceNum].size(); ++h) {
+									for (int i = 0; i < utVec[braceNum].Get(h)->GetItemListSize(); ++i) {
+										if (idx == count) {
+											utVec[braceNum].Get(h)->GetItemList(i).SetName(name);
+										}
+										count++;
+									}
+								}
+							}
+						}
+					}
+					else if ('r' == ch && Start <= End) { // remove
+						if (idx < count_userType)
+						{
+							int count = 0;
+							for (int h = 0; h < utVec[braceNum].size(); ++h) {
+								for (int i = 0; i < utVec[braceNum].Get(h)->GetUserTypeListSize(); ++i) {
+									if (count == idx) {
+										string temp = mdVec[idx].varName;
+										if (temp == " ") {
+											temp = "";
+										}
+										utVec[braceNum].Get(h)->RemoveUserTypeList(temp);
+									}
+									count++;
+								}
+							}
+							idx = 0;
+							Start = 0;
+						}
+						else {
+							if (state == 0) {
+								int count = 0;
+								int count_ut = 0;
+								for (int h = 0; h < utVec[braceNum].size(); ++h) {
+									for (int i = 0; i < utVec[braceNum].Get(h)->GetUserTypeListSize(); ++i) {
+										count++;
+										count_ut++;
+									}
+								}
+								for (int h = 0; h < utVec[braceNum].size(); ++h) {
+									for (int i = 0; i < utVec[braceNum].Get(h)->GetItemListSize(); ++i) {
+										if (count == idx) {
+											string temp = mdVec[idx].varName;
+											if (temp == " ") { temp = ""; }
+
+											utVec[braceNum].Get(h)->RemoveItemList(temp);
+										}
+										count++;
+									}
+								}
+								idx = 0;
+								Start = 0;
+							}
+							else if (1 == state)
+							{
+								int count = 0;
+								int count_ut = 0;
+								for (int h = 0; h < utVec[braceNum].size(); ++h) {
+									for (int i = 0; i < utVec[braceNum].Get(h)->GetUserTypeListSize(); ++i) {
+										count++;
+										count_ut++;
+									}
+								}
+								for (int h = 0; h < utVec[braceNum].size(); ++h) {
+									for (int i = 0; i < utVec[braceNum].Get(h)->GetItemListSize(); ++i) {
+										if (count == idxVec.back()) {
+											string temp = mdVec[idxVec.back()].varName;
+											if (temp == " ") { temp = ""; }
+
+											utVec[braceNum].Get(h)->GetItemList(count - count_ut).Remove(0);
+											if (utVec[braceNum].Get(h)->GetItemList(count - count_ut).size() == 0) {
+												utVec[braceNum].Get(h)->GetItemList(count - count_ut).Remove();
+												utVec[braceNum].Get(h)->RemoveEmptyItem();
+											}
+										}
+										count++;
+									}
+								}
+
+								idxVec.pop_back();
+								idx = 0;
+								// max!
+								if (0 <= idx - sizeOfWindow / 2)
+								{
+									Start = idx - sizeOfWindow / 2;
+								}
+								else {
+									Start = 0;
+								}
+								strVec.clear();
+								state = 0;
+							}
+						}
+					}
+					else if ('s' == ch) { // save total data.
+						string temp;
+
+						setcolor(0, 7);
+						cout << "save file name : ";
+						FFLUSH();
+						getline(cin, temp);
+
+						wiz::load_data::LoadData::SaveWizDB(*utTemp, temp, "1");
+					}
+
+					if (1 == state)
+					{
+						idxVec.back();
+						idxVec.pop_back();
+						idx = 0;
+						// max!
+						if (0 <= idx - sizeOfWindow / 2)
+						{
+							Start = idx - sizeOfWindow / 2;
+						}
+						else {
+							Start = 0;
+						}
+						strVec.clear();
+						state = 0;
+					}
+
+					/// else if( l? reload?
+					isFirst = true; // 
+					isReDraw = true; //
+				}
+				else if ('t' == ch  && braceNum == 0) { // pass???
+					isFirst = true;
+					isReDraw = true;
+					setcolor(0, 0);
+					system("cls");
+
+					setcolor(7, 0);
+					cout << "text edit mode" << endl;
+
+					// Add, AddUserType, Set, Remove, RemoveAll ?.
+					string temp;
+					FFLUSH();
+					getline(cin, temp);
+
+					wiz::StringTokenizer tokenizer(temp, "|");
+					vector<string> strVecTemp;
+
+					while (tokenizer.hasMoreTokens()) {
+						strVecTemp.push_back(tokenizer.nextToken());
+					}
+					if (!strVecTemp.empty()) {
+						try {
+							if ("add" == strVecTemp[0])
+							{
+								if (false == wiz::load_data::LoadData::AddData(*utTemp, strVecTemp[1], strVecTemp[2], strVecTemp[3]))
+								{
+									cout << "faile to add" << endl; /// To Do to following code.
+								}
+							}
+							else if ("addusertype" == strVecTemp[0])
+							{
+								wiz::load_data::LoadData::AddUserType(*utTemp, strVecTemp[1], strVecTemp[2], strVecTemp[3], strVecTemp[4]);
+							}
+							else if ("set" == strVecTemp[0])
+							{
+								wiz::load_data::LoadData::SetData(*utTemp, strVecTemp[1], strVecTemp[2], strVecTemp[3], strVecTemp[4]);
+							}
+							else if ("remove" == strVecTemp[0])
+							{
+								wiz::load_data::LoadData::Remove(*utTemp, strVecTemp[1], strVecTemp[2], strVecTemp[3]);
+							}
+							else if ("removenonameitem" == strVecTemp[0])
+							{
+								wiz::load_data::LoadData::RemoveNoNameItem(*utTemp, strVecTemp[1], strVecTemp[2]);
+							}
+							else if ("removeall" == strVecTemp[0])
+							{
+								wiz::load_data::LoadData::Remove(*utTemp, strVecTemp[1], strVecTemp[2]);
+							}
+							else if ("searchitem" == strVecTemp[0])
+							{
+								cout << wiz::load_data::LoadData::SearchItem(*utTemp, strVecTemp[1], strVecTemp[2]) << endl;
+								GETCH();
+							}
+							else if ("searchusertype" == strVecTemp[0])
+							{
+								cout << wiz::load_data::LoadData::SearchUserType(*utTemp, strVecTemp[1], strVecTemp[2]) << endl;
+								GETCH();
+							}
+						}
+						catch (exception& e) {}
+						catch (wiz::Error& e) {}
+						catch (const char* e) {}
+						catch (const string& e) {}
+					}
+					//
+					idx = 0;
+					Start = 0;
+				}
+			}
+		}
+	}
+}
+
 
 class EventInfo
 {
@@ -1075,8 +1894,19 @@ string excute_module(wiz::load_data::UserType& global)
 
 			while (val != NULL) 
 			{
+				if ("$edit_mode" == val->GetName())
+				{
+					MStyleTest(&global);
 
-				if ("$save" == val->GetName()) // save data, event, main!
+					system("cls");
+					
+					gotoxy(0, 0);
+					setcolor(7, 0);
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$save" == val->GetName()) // save data, event, main!
 				{
 					//todo
 					// "filename" save_option(0~2)
