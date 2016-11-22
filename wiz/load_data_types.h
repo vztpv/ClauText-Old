@@ -74,6 +74,10 @@ namespace wiz {
 				: Type(name, valid), inited(false) { }
 			virtual ~ItemType() { }
 		public:
+			void Remove(const int idx = 0)
+			{
+				data = T();
+			}
 			bool Push(const T& val) { /// do not change..!!
 				if (inited) { throw "ItemType already inited"; }
 				data = val;
