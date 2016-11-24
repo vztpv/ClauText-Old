@@ -683,7 +683,9 @@ namespace wiz {
 								stream << "\n";
 							}
 						}
-						stream << "\n";
+						if (i != ut->ilist.size() - 1) {
+							stream << "\n";
+						}
 						itemListCount++;
 					}
 					else if (ut->ilist[i] == 2) {
@@ -694,7 +696,10 @@ namespace wiz {
 						stream << "{\n";
 						Save1(stream, ut->userTypeList[userTypeListCount]);
 						stream << "\n";
-						stream << " }" << "\n";
+						stream << " }";
+						if (i != ut->ilist.size() - 1) {
+							stream << "\n";
+						}
 
 						userTypeListCount++;
 					}
@@ -715,7 +720,9 @@ namespace wiz {
 							if (j != ut->itemList[itemListCount].size() - 1)
 								stream << " ";
 						}
-						stream << "\n";
+						if (i != ut->ilist.size() - 1) {
+							stream << "\n";
+						}
 						itemListCount++;
 					}
 					else if (ut->ilist[i] == 2) {
@@ -727,7 +734,10 @@ namespace wiz {
 						stream << " {\n";
 						Save2(stream, ut->userTypeList[userTypeListCount]);
 						stream << "\n";
-						stream << " }" << "\n";
+						stream << " }";
+						if (i != ut->ilist.size() - 1) {
+							stream << "\n";
+						}
 						userTypeListCount++;
 					}
 				}
@@ -838,7 +848,9 @@ namespace wiz {
 							if (j != itemList[itemListCount].size() - 1)
 								temp += " ";
 						}
-						temp += " ";
+						if (i != ilist.size() - 1) {
+							temp += " ";
+						}
 						itemListCount++;
 					}
 					else if (ilist[i] == 2) {
@@ -848,7 +860,10 @@ namespace wiz {
 						}
 						temp += " { ";
 						temp += (userTypeList[userTypeListCount]->ToString()) + " ";
-						temp += (string(" } ") + " ");
+						temp += " }";
+						if (i != ilist.size() - 1) {
+							temp += " ";
+						}
 
 						userTypeListCount++;
 					}
@@ -871,7 +886,9 @@ namespace wiz {
 							if (j != ut.itemList[itemListCount].size() - 1)
 								stream << " ";
 						}
-						stream << "\n";
+						if (i != ut.ilist.size() - 1) {
+							stream << "\n";
+						}
 						itemListCount++;
 					}
 					else if (ut.ilist[i] == 2) {
@@ -881,7 +898,10 @@ namespace wiz {
 						}
 						stream << "{\n";
 						stream << *ut.userTypeList[userTypeListCount] << "\n";
-						stream << " }" << "\n";
+						stream << " }";
+						if (i != ut.ilist.size() - 1) {
+							stream << "\n";
+						}
 
 						userTypeListCount++;
 					}

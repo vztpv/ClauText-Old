@@ -1558,12 +1558,15 @@ namespace wiz {
 				ofstream outFile;
 				if (fileName.empty()) { return false; }
 				if (option2 == "") {
-					outFile.open(fileName + "temp", ios::binary);
+					outFile.open(fileName, ios::binary);
+					if (outFile.fail()) { return false; }
 				}
 				else {
-					outFile.open(fileName + "temp", ios::binary | ios::app);
+					outFile.open(fileName, ios::binary | ios::app);
+					if (outFile.fail()) { return false; }
+
+					outFile << "\n";
 				}
-				if (outFile.fail()) { return false; }
 
 				/// saveFile
 				if (option == "0")
@@ -1575,35 +1578,6 @@ namespace wiz {
 
 				outFile.close();
 
-				{ // for eu4, last line remove!
-					ifstream inFile;
-					ofstream outFile;
-					inFile.open(fileName + "temp", ios::binary);
-					outFile.open(fileName, ios::binary);
-
-					if (outFile.fail()) { inFile.close(); return false; }
-
-					string temp;
-					int line_size = 0;
-					int line_count = 0;
-					{
-						while (getline(inFile, temp)) { line_size++; }
-						inFile.close();
-					}
-					inFile.open(fileName + "temp", ios::binary);
-					for (int i = 0; i < line_size; ++i)
-					{
-						getline(inFile, temp);
-						outFile << temp;
-						//std::cout << temp << endl;
-						if (i < line_size - 1) {
-							outFile << "\n";
-						}
-					}
-
-					inFile.close();
-					outFile.close();
-				}
 				return true;
 			}
 
