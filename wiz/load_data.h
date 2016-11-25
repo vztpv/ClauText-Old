@@ -1569,9 +1569,7 @@ namespace wiz {
 				}
 
 				/// saveFile
-				if (option == "0")
-					outFile << global; /// SaveFile( fileName, data, use option 1 or 2 )
-				else if (option == "1") // for eu4.
+				if (option == "1") // for eu4.
 					global.Save1(outFile); // cf) friend
 				else if (option == "2")
 					global.Save2(outFile);

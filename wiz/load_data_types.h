@@ -667,7 +667,7 @@ namespace wiz {
 			}
 		private:
 			/// save1 - like EU4 savefiles.
-			void Save1(ostream& stream, const UserType* ut) const {
+			void Save1(ostream& stream, const UserType* ut, const int depth = 0) const {
 				int itemListCount = 0;
 				int userTypeListCount = 0;
 
@@ -675,7 +675,10 @@ namespace wiz {
 					//std::cout << "ItemList" << endl;
 					if (ut->ilist[i] == 1) {
 						for (int j = 0; j < ut->itemList[itemListCount].size(); j++) {
-							if (ut->itemList[itemListCount].GetName() != "") {
+							for (int k = 0; k < depth; ++k) {
+								stream << "\t";
+							}
+							if (ut->itemList[itemListCount].GetName() != "") {	
 								stream << ut->itemList[itemListCount].GetName() << "=";
 							}
 							stream << ut->itemList[itemListCount].Get(j);
@@ -690,13 +693,23 @@ namespace wiz {
 					}
 					else if (ut->ilist[i] == 2) {
 						// std::cout << "UserTypeList" << endl;
+						for (int k = 0; k < depth; ++k) {
+							stream << "\t";
+						}
+
 						if (ut->userTypeList[userTypeListCount]->GetName() != "") {
 							stream << ut->userTypeList[userTypeListCount]->GetName() << "=";
 						}
+
 						stream << "{\n";
-						Save1(stream, ut->userTypeList[userTypeListCount]);
+						
+						Save1(stream, ut->userTypeList[userTypeListCount], depth + 1);
 						stream << "\n";
-						stream << " }";
+						
+						for (int k = 0; k < depth; ++k) {
+							stream << "\t";
+						}
+						stream << "}";
 						if (i != ut->ilist.size() - 1) {
 							stream << "\n";
 						}
@@ -706,7 +719,7 @@ namespace wiz {
 				}
 			}
 			/// savw2 - for more seed loading data!
-			void Save2(ostream& stream, const UserType* ut) const {
+			void Save2(ostream& stream, const UserType* ut, const int depth = 0) const {
 				int itemListCount = 0;
 				int userTypeListCount = 0;
 
@@ -714,6 +727,9 @@ namespace wiz {
 					//std::cout << "ItemList" << endl;
 					if (ut->ilist[i] == 1) {
 						for (int j = 0; j < ut->itemList[itemListCount].size(); j++) {
+							for (int k = 0; k < depth; ++k) {
+								stream << "\t";
+							}
 							if (ut->itemList[itemListCount].GetName() != "")
 								stream << ut->itemList[itemListCount].GetName() << " = ";
 							stream << ut->itemList[itemListCount].Get(j);
@@ -731,10 +747,15 @@ namespace wiz {
 						{
 							stream << ut->userTypeList[userTypeListCount]->GetName() << " = ";
 						}
-						stream << " {\n";
-						Save2(stream, ut->userTypeList[userTypeListCount]);
+						stream << "{\n";
+						
+						Save2(stream, ut->userTypeList[userTypeListCount], depth + 1);
 						stream << "\n";
-						stream << " }";
+						
+						for (int k = 0; k < depth; ++k) {
+							stream << "\t";
+						}
+						stream << "}";
 						if (i != ut->ilist.size() - 1) {
 							stream << "\n";
 						}
@@ -871,46 +892,8 @@ namespace wiz {
 				return temp;
 			}
 
-			friend ostream& operator<<(ostream& stream, const UserType& ut)
-			{
-				int itemListCount = 0;
-				int userTypeListCount = 0;
-
-				for (int i = 0; i < ut.ilist.size(); ++i) {
-					//std::cout << "ItemList" << endl;
-					if (ut.ilist[i] == 1) {
-						for (int j = 0; j < ut.itemList[itemListCount].size(); j++) {
-							if (ut.itemList[itemListCount].GetName() != "")
-								stream << ut.itemList[itemListCount].GetName() << "=";
-							stream << ut.itemList[itemListCount].Get(j);
-							if (j != ut.itemList[itemListCount].size() - 1)
-								stream << " ";
-						}
-						if (i != ut.ilist.size() - 1) {
-							stream << "\n";
-						}
-						itemListCount++;
-					}
-					else if (ut.ilist[i] == 2) {
-						// std::cout << "UserTypeList" << endl;
-						if (ut.userTypeList[userTypeListCount]->GetName() != "") {
-							stream << ut.userTypeList[userTypeListCount]->GetName() << "=";
-						}
-						stream << "{\n";
-						stream << *ut.userTypeList[userTypeListCount] << "\n";
-						stream << " }";
-						if (i != ut.ilist.size() - 1) {
-							stream << "\n";
-						}
-
-						userTypeListCount++;
-					}
-				}
-
-				return stream;
-			}
 		private:
-			class DoThread // need to rename!
+			class DoThread /// need to rename!
 			{
 			private:
 				vector<UserType*>* utVec;
