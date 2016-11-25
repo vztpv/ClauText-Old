@@ -1943,6 +1943,7 @@ string excute_module(wiz::load_data::UserType& global)
 					fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
 					string option = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top());
 
+					// todo - for? auto x = global.GetUserTypeItem(dirName);
 					wiz::load_data::UserType* utTemp = global.GetUserTypeItem(dirName)[0];
 					wiz::load_data::LoadData::SaveWizDB(*utTemp, fileName, option, "");
 
