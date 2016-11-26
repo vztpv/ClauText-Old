@@ -17,8 +17,8 @@ private:
         T data;
     public:
         //
-        Delement(){ left = NULL; right = NULL; } // 초기화 설정.
-        Delement( T copy ){  // 기본 대입. // 얕은 복사.
+        Delement(){ left = NULL; right = NULL; } // 초기???�정.
+        Delement( T copy ){  // 기본 ?�?? // ?��? 복사.
             data = copy; // why this?
             left = NULL; right =  NULL;
         }
@@ -104,8 +104,8 @@ private:
     void init() /// first...
     {
 		N = 0;
-        Head = new Delement(); // Head,Rear 고정된 Delement를 가진다.
-        Rear = new Delement();  // 그리고 두개가 서로 가르키게 한다.
+        Head = new Delement(); // Head,Rear 고정??Delement�?가진다.
+        Rear = new Delement();  // 그리�??�개가 ?�로 가르키�??�다.
         Head->left = NULL;
         Head->right = Rear;
         Rear->left = Head;
@@ -133,27 +133,27 @@ public:
         delete Head; delete Rear;
     }
     bool isEmpty()const{
-       return ( Rear->left == Head ); // Rear의 left가 head를 가르키면 Empty.
+       return ( Rear->left == Head ); // Rear??left가 head�?가르키�?Empty.
     }
     bool empty() const{ return isEmpty(); }
     //
     void push_back( const T& p ){
 		N++;
         /////////////////////////////////////////////////////
-        // New한다.
+        // New?�다.
         Delement* temp = new Delement( p ); //
         //
         //d double linked list
-        temp->right = Rear; // 오른 쪽은 Right.!
-        temp->left  = Rear->left; // 끝부분이 가르키고 있는 값을 left에 넣는다.
-        temp->left->right = temp; // 그리고 temp의 왼쪽 element의 right에 temp를 연결한다.
+        temp->right = Rear; // ?�른 쪽�? Right.!
+        temp->left  = Rear->left; // ?��?분이 가르키�??�는 값을 left???�는??
+        temp->left->right = temp; // 그리�?temp???�쪽 element??right??temp�??�결?�다.
         Rear->left = temp;
         //////////////////////////////////////////////////////
     }//
     T pop_front(){
 		N--;
         ////////////////////////////
-        if( isEmpty() ) // 예외 검사.
+        if( isEmpty() ) // ?�외 검??
            { throw wiz::Error( "for pop, empty deck.." ); }//return NULL;
 
         Delement* temp = Head->right->right; //

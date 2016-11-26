@@ -10,6 +10,7 @@ using namespace std;
 #include <wiz/newArrays.h>
 //#include <wiz/dictionary.h>
 //#include <wiz/binary_search.h>
+#include <wiz/queues.h>
 #include <wiz/load_data_utility.h>
 
 namespace wiz {
@@ -897,7 +898,7 @@ namespace wiz {
 			{
 			private:
 				vector<UserType*>* utVec;
-				ArrayQueue<string>* aq;
+				wiz::ArrayQueue<string>* aq;
 				string target_ch;
 				string result_ch;
 				int utVecStart;
