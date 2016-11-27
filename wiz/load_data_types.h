@@ -21,6 +21,7 @@ namespace wiz {
 			string name;
 		public:
 			explicit Type(const string& name = "", const bool valid = true) : name(name) { }
+			explicit Type(string&& name) : name(name) { }
 			Type(const Type& type)
 				: name(type.name)
 			{ }
@@ -71,8 +72,13 @@ namespace wiz {
 				inited = ta.inited;
 			}
 		public:
-			explicit ItemType(const string& name = "", const bool valid = true) 
-				: Type(name, valid), inited(false) { }
+			explicit ItemType()
+				: Type("", true), inited(false) { }
+			explicit ItemType(const string& name, const string& value, const bool valid=true)
+				:Type(name, valid), data(value), inited(true)
+			{
+
+			}
 			virtual ~ItemType() { }
 		public:
 			void Remove(const int idx = 0)
@@ -128,19 +134,6 @@ namespace wiz {
 				inited = ta.inited;
 				return *this;
 			}
-			/*string ToString()const
-			{
-			string temp;
-
-			for (int i = 0; i < size(); ++i) {
-			temp = temp + arr[i].ToString();
-			if (i != size() - 1) {
-			temp = temp + "/";
-			}
-			}
-
-			return temp;
-			} */
 		};
 
 		class UserType : public Type {
@@ -459,35 +452,11 @@ namespace wiz {
 		public:
 			bool empty()const { return ilist.empty(); }
 			void AddItem(string&& name, string&& item) {
-				/*int index = -1;
-				if (!itemList.Search(ItemType<string>(name), &index))
-				{
-				ilist.push_back(1);
-
-				itemList.PushBack(ItemType<string>(name));//
-				itemList.Search(ItemType<string>(name), &index);
-				}
-				itemList[index].Push(item);
-				*/
-				ItemType<string> temp(std::move(name));
-				temp.Push(std::move(item));
-				itemList.push_back(std::move(temp));
+				itemList.emplace_back(move(name), move(item));
 				ilist.push_back(1);
 			}
 			void AddItem(const string& name, const string& item) {
-				/*int index = -1;
-				if (!itemList.Search(ItemType<string>(name), &index))
-				{
-				ilist.push_back(1);
-
-				itemList.PushBack(ItemType<string>(name));//
-				itemList.Search(ItemType<string>(name), &index);
-				}
-				itemList[index].Push(item);
-				*/
-				ItemType<string> temp(name);
-				temp.Push(item);
-				itemList.push_back(std::move(temp));
+				itemList.emplace_back(name, item);
 				ilist.push_back(1);
 			}
 			void AddUserTypeItem(UserType&& item) {
@@ -533,57 +502,32 @@ namespace wiz {
 				userTypeList.push_back(temp);
 			}
 			void AddUserTypeItem(const UserType& item) {
-				/*if (this->userTypeList_sortFlagA) {
-				string str_compare = Compare(userTypeList.back().GetName(), item.GetName());
-
-				if (str_compare == "<" || str_compare == "==")
-				{
-				this->userTypeList_sortFlagA = true;
-				}
-				else {
-				this->userTypeList_sortFlagA = false;
-				}
-				}
-				if (this->userTypeList_sortFlagB) {
-				string str_compare = Compare(userTypeList.back().GetName(), item.GetName());
-
-				if (str_compare == ">" || str_compare == "==")
-				{
-				this->userTypeList_sortFlagB = true;
-				}
-				else {
-				this->userTypeList_sortFlagB = false;
-				}
-				}*/
-
-				/*
-				int index = -1;
-				if (!userTypeList.Search(ItemType<UserType*>(item.GetName()), &index))
-				{
-				ilist.push_back(2);
-
-				userTypeList.PushBack(ItemType<UserType*>(item.GetName()));//
-				userTypeList.Search(ItemType<UserType*>(item.GetName()), &index);
-				}
-				*/
 				UserType* temp = new UserType(item);
 				temp->parent = this;
-				//temp->SetName("");
 
 				ilist.push_back(2);
 
-				userTypeList.push_back(std::move(temp));
+				userTypeList.push_back(temp);
 			}
+			void AddItemAtFront(string&& name, string&& item) {
+				itemList.emplace(itemList.begin(), name, item);
 
+				ilist.insert(ilist.begin(), 1);
+			}
 			void AddItemAtFront(const string& name, const string& item) {
-				ItemType<string> temp(name);
-				temp.Push(item);
-
-				itemList.insert(itemList.begin(), temp);
+				itemList.emplace(itemList.begin(), name, item);
 
 				ilist.insert(ilist.begin(), 1);
 			}
 			void AddUserTypeItemAtFront(const UserType& item) {
+				UserType* temp = new UserType(item);
+				temp->parent = this;
+
+				ilist.insert(ilist.begin(), 2);
+
+				userTypeList.insert(userTypeList.begin(), temp);
+			}
+			void AddUserTypeItemAtFront(UserType&& item) {
 				UserType* temp = new UserType(item);
 				temp->parent = this;
 
@@ -894,7 +838,7 @@ namespace wiz {
 			}
 
 		private:
-			class DoThread /// need to rename!
+			class DoThread // need to rename!
 			{
 			private:
 				vector<UserType*>* utVec;
@@ -958,7 +902,7 @@ namespace wiz {
 				}
 			};
 		public:
-			static bool ReservedA(UserType* ut)
+			static bool ReservedA(UserType* ut) // removal?
 			{
 				const int itemListSize = ut->GetItemListSize();
 				const int userTypeListSize = ut->GetUserTypeListSize();
@@ -1038,10 +982,6 @@ namespace wiz {
 				for (int i = 0; i < itemListSize; ++i) {
 					ItemType<std::string>& itemList = temp->GetItemList(i);
 
-					//string name = itemList.GetName();
-					//name = Utility::ChangeStr(name, target_ch, result_ch);
-					//itemList.SetName(name);
-
 					for (int j = 0; j < itemList.size(); ++j) {
 						itemList.Get(j) = Utility::ChangeStr(itemList.Get(j), target_ch, result_ch);
 					}
@@ -1077,7 +1017,7 @@ namespace wiz {
 				for (int i = 0; i < itemListSize; ++i) {
 					if (utTemp->GetItemList(i).GetName() != ""
 						&& utTemp->GetItemList(i).size() > 1) {
-						cout << utTemp->GetItemList(i).GetName() << endl;
+						//cout << utTemp->GetItemList(i).GetName() << endl;
 						return false;
 					}
 				}

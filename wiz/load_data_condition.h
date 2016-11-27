@@ -259,11 +259,11 @@ namespace wiz {
 				}
 				//
 				if (position1 == "~" ) {
-					value1.push_back(ItemType<string>("")); // var1
+					value1.push_back(ItemType<string>()); // var1
 					value1[0].Push(var1);
 				}
 				if (position2 == "~") {
-					value2.push_back(ItemType<string>("")); // var2
+					value2.push_back(ItemType<string>()); // var2
 					value2[0].Push(var2);
 				}
 

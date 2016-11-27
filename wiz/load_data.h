@@ -31,95 +31,7 @@ namespace wiz {
 		const string EQ = "=";
 
 		const int RIGHT_DO = 1;
-		/*
-		/// chk .. #\n something.... problem!!
-		// # notation
-		bool PassSharp(ifstream& inFile, const string& str) {
-			if ('#' == str[0]) {
-				string temp;
-				getline(inFile, temp); // enter key
-				return true;
-			}
-			return false;
-		}
-		pair< bool, string> GetToken(ifstream& inFile, const string& before_token, const bool use_before_token)
-		{
-			if (use_before_token) { return{ " " != before_token, before_token }; }
-			string temp;
-			bool chk = (bool)(inFile >> temp);
-			return{ chk, temp };
-		}
-
-		UserType LoadData(const string& fileName) {
-			vector< UserType* > nestedUT;
-			UserType global("global"); /// fileName을 받아와서 global를 리턴하는 dll등을 해보자
-			ifstream inFile;
-			int state = 0;
-			string id;
-			string val;
-			unsigned int braceNum = 0;
-
-			// init
-			inFile.open(fileName);
-			if (inFile.fail()) { throw "infile.fail.."; } /// throw error
-
-			nestedUT.push_back(&global);
-
-			try {
-				string str;
-				while (inFile >> str) {
-					if (PassSharp(inFile, str)) { continue; } // # notation.
-
-					switch (state)
-					{
-					case 0:
-						if ("}" == str) {
-							nestedUT[braceNum] = NULL;
-							braceNum--;
-						}
-						else {
-							id = str;
-							state = 1;
-						}
-						break;
-					case 1:
-						if ("=" != str) { throw str + " : str is not '='. "; }
-						state = 2;
-						break;
-					case 2:
-						if ("{" == str) {
-							nestedUT[braceNum]->AddUserTypeItem(UserType(id));
-							ItemType<UserType*> pTemp;
-							nestedUT[braceNum]->GetUserTypeItemRef(id, pTemp);
-
-							braceNum++;
-
-							/// new nestedUT
-							if (nestedUT.size() == braceNum) /// changed 2014.01.23..
-								nestedUT.push_back(NULL);
-
-							/// initial new nestedUT.
-							nestedUT[braceNum] = pTemp.Get(pTemp.GetCount() - 1); /// ItemType는 들어온 순서대로 ...
-						}
-						else {
-							val = str;
-							nestedUT[braceNum]->AddItem(id, val);
-						}
-						state = 0;
-						break;
-					}
-				}
-				inFile.close();
-				std::cout << "braceNum : " << braceNum << endl;
-			}
-			catch (char* err) {
-				inFile.close();  /// chk!
-				throw err;
-			}
-			return global;
-		}
-		*/
-
+		
 		class LoadData
 		{
 			/// core
@@ -517,12 +429,14 @@ namespace wiz {
 
 					//UserType::AllReserved(&globalTemp, false);
 					//UserType::ReservedA(&globalTemp);
+
 					UserType::ReplaceAll(&globalTemp, "^5", "#");
 					UserType::ReplaceAll(&globalTemp, "^4", "\n");
 					UserType::ReplaceAll(&globalTemp, "^3", "\r");
 					UserType::ReplaceAll(&globalTemp, "^2", "\t");
 					UserType::ReplaceAll(&globalTemp, "^1", " ");
 					UserType::ReplaceAll(&globalTemp, "^0", "^");
+
 					//UserType::AllReserved(&globalTemp, false);
 
 					inFile.close();
@@ -572,12 +486,15 @@ namespace wiz {
 
 					//UserType::AllReserved(&utTemp, false);
 					//UserType::ReservedA(&utTemp);
-					UserType::ReplaceAll(&utTemp, "^5", "#");
-					UserType::ReplaceAll(&utTemp, "^4", "\n");
-					UserType::ReplaceAll(&utTemp, "^3", "\r");
-					UserType::ReplaceAll(&utTemp, "^2", "\t");
-					UserType::ReplaceAll(&utTemp, "^1", " ");
-					UserType::ReplaceAll(&utTemp, "^0", "^");
+					
+					if (chk) {
+						UserType::ReplaceAll(&utTemp, "^5", "#");
+						UserType::ReplaceAll(&utTemp, "^4", "\n");
+						UserType::ReplaceAll(&utTemp, "^3", "\r");
+						UserType::ReplaceAll(&utTemp, "^2", "\t");
+						UserType::ReplaceAll(&utTemp, "^1", " ");
+						UserType::ReplaceAll(&utTemp, "^0", "^");
+					}
 					//UserType::AllReserved(&utTemp, false);
 				}
 				catch (Error& e) { std::cout << e << endl; return false; }
@@ -1472,79 +1389,6 @@ namespace wiz {
 
 			static bool LoadWizDB(UserType& global, const string& fileName) {
 				UserType globalTemp = UserType("global");
-				// preprocessing
-				//Utility::PassSharp(fileName, "output.txt");
-				//std::cout << "PassSharp End" << endl;
-				//Utility::AddSpace("output.txt", "output2.txt");
-				//std::cout << "AddSpace End" << endl;
-				/*
-				{
-				ifstream inFile;
-				ofstream outFile;
-
-				inFile.open("output2.txt");
-				outFile.open("output3.txt");
-
-				string temp;
-
-				/// chk maybe has bugs!, - "abcd" - ok, "abc""def" - not ok.
-				while (inFile >> temp)
-				{
-				if (temp.empty()) { continue; }
-				int idx = 0;
-				if ((idx = temp.find('\"')) != string::npos) {
-				if ((idx = temp.find('\"', idx + 1)) != string::npos) {
-				outFile << temp;
-				}
-				else {
-				outFile << temp;
-				outFile << '^';
-
-				while (inFile >> temp) {
-				if ((idx = temp.find('\"')) != string::npos) {
-				outFile << temp; outFile << " ";
-				break;
-				}
-				else {
-				outFile << temp;
-				outFile << '^';
-				}
-				}
-				}
-				}
-				else {
-				outFile << temp;
-				}
-				outFile << " ";
-				}
-				inFile.close();
-				outFile.close();
-				}
-				std::cout << "space in \"~\" -> ^ End" << endl;
-				*/
-				/*	{
-				ifstream inFile;
-				inFile.open("output3.txt"); // ~2
-
-				int count = 0;
-				int count2 = 0;
-				string temp;
-				while (inFile >> temp)
-				{
-				if (temp == "{") { count2++; }
-				if (temp == "}") { count2--; }
-				for (int i = 0; i < temp.size(); ++i)
-				{
-				if (temp[i] == '{') { count++; }
-				else if (temp[i] == '}') { count--; }
-				}
-				}
-				inFile.close();
-				std::cout << count << " " << count2 << endl;
-				}
-				std::cout << "chk end" << endl;
-				*/
-				//	getch();
 
 				// Scan + Parse 
 				if (false == LoadDataFromFile(fileName, globalTemp)) { return false; }
