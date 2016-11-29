@@ -272,11 +272,7 @@ namespace wiz{
         explicit StringTokenizer( const string& str )
         : count( 0 ), exist(false)
         {
-            vector<string> vec;
-            vec.push_back( " " );
-            vec.push_back( "\t" );
-            vec.push_back( "\r" );
-            vec.push_back( "\n" );
+			vector<string> vec = { " ", "\t", "\r", "\n" };
             Init( str, vec );
         }
         int countTokens()const

@@ -21,7 +21,7 @@ namespace wiz {
 			string name;
 		public:
 			explicit Type(const string& name = "", const bool valid = true) : name(name) { }
-			explicit Type(string&& name) : name(name) { }
+			explicit Type(string&& name, const bool valid = true) : name(name) { }
 			Type(const Type& type)
 				: name(type.name)
 			{ }
@@ -32,7 +32,11 @@ namespace wiz {
 			const string& GetName()const {
 				return name;
 			}
-			void SetName(string name)
+			void SetName(const string& name)
+			{
+				this->name = name;
+			}
+			void SetName(string&& name)
 			{
 				this->name = name;
 			}
@@ -76,6 +80,11 @@ namespace wiz {
 				: Type("", true), inited(false) { }
 			explicit ItemType(const string& name, const string& value, const bool valid=true)
 				:Type(name, valid), data(value), inited(true)
+			{
+
+			}
+			explicit ItemType(string&& name, string&& value, const bool valid = true) 
+				:Type(move(name), valid), data(move(value)), inited(true)
 			{
 
 			}
@@ -204,6 +213,7 @@ namespace wiz {
 			//	bool userTypeList_sortFlagB;
 		private:
 		public:
+			explicit UserType(string&& name, bool noRemove = false) : Type(move(name)), parent(NULL), noRemove(noRemove) { }
 			explicit UserType(const string& name = "", bool noRemove = false) : Type(name), parent(NULL), noRemove(noRemove) { } //, userTypeList_sortFlagA(true), userTypeList_sortFlagB(true) { }
 			UserType(const UserType& ut) : Type(ut.GetName()) {
 				Reset(ut);  // Initial
@@ -269,10 +279,49 @@ namespace wiz {
 			}
 
 		private:
-			int _GetIndex(const vector<int>& ilist, const int val, const int start = 0)
-			{
+			/// val : 1 or 2
+			int _GetIndex(const vector<int>& ilist, const int val, const int start = 0) {
 				for (int i = start; i < ilist.size(); ++i) {
 					if (ilist[i] == val) { return i; }
+				}
+				return -1;
+			}
+		// test? - need more thinking!
+			int _GetItemIndexFromIlistIndex(const vector<int>& ilist, const int ilist_idx) {
+				int idx = _GetIndex(ilist, 1, 0);
+				int item_idx = -1;
+
+				while (idx != -1) {
+					item_idx++;
+					if (ilist_idx == idx) { return item_idx; }
+					idx = _GetIndex(ilist, 1, idx + 1);
+				}
+
+				return -1;
+			}
+			int _GetUserTypeIndexFromIlistIndex(const vector<int>& ilist, const int ilist_idx) {
+				int idx = _GetIndex(ilist, 2, 0);
+				int usertype_idx = -1;
+
+				while (idx != -1) {
+					usertype_idx++;
+					if (ilist_idx == idx) { return usertype_idx; }
+					idx = _GetIndex(ilist, 2, idx + 1);
+				}
+
+				return -1;
+			}
+			/// type : 1 or 2
+			int _GetIlistIndex(const vector<int>& ilist, const int index, const int type) {
+				int count = -1;
+
+				for (int i = 0; i < ilist.size(); ++i) {
+					if (ilist[i] == type) {
+						count++;
+						if (index == count) {
+							return i;
+						}
+					}
 				}
 				return -1;
 			}
@@ -424,7 +473,7 @@ namespace wiz {
 				}
 				userTypeList = move(tempDic);
 			}
-			// todo - 
+		//			
 			void RemoveList(const int idx) // ilist_idx!
 			{
 				// chk whether item or usertype.
@@ -451,6 +500,146 @@ namespace wiz {
 			}
 		public:
 			bool empty()const { return ilist.empty(); }
+
+			// chk
+			void InsertItemByIlist(const int ilist_idx, const string& name, const string& item ) {
+				int itemIndex = _GetItemIndexFromIlistIndex(ilist, ilist_idx);
+
+				ilist.push_back(0);
+				for (int i = ilist_idx+1; i < ilist.size(); ++i) {
+					ilist[i] = ilist[i - 1];
+				}
+				ilist[ilist_idx] = 1;
+
+				itemList.emplace_back("", "");
+				for (int i = itemIndex + 1; i < itemList.size(); ++i) {
+					itemList[i] = move(itemList[i - 1]);
+				}
+				itemList[itemIndex] = ItemType<string>(name, item);
+			}
+			void InsertItemByIlist(const int ilist_idx, string&& name, string&& item) {
+				int itemIndex = _GetItemIndexFromIlistIndex(ilist, ilist_idx);
+
+				ilist.push_back(0);
+				for (int i = ilist_idx + 1; i < ilist.size(); ++i) {
+					ilist[i] = ilist[i - 1];
+				}
+				ilist[ilist_idx] = 1;
+
+				itemList.emplace_back("", "");
+				for (int i = itemIndex + 1; i < itemList.size(); ++i) {
+					itemList[i] = move(itemList[i - 1]);
+				}
+				itemList[itemIndex] = ItemType<string>(move(name), move(item));
+			}
+			// chk
+			void InsertUserTypeByIlist(const int ilist_idx, UserType&& item) {
+				int userTypeIndex = _GetItemIndexFromIlistIndex(ilist, ilist_idx);
+				UserType* temp = new UserType(std::move(item));
+
+				temp->parent = this;
+
+				ilist.push_back(0);
+				for (int i = ilist_idx + 1; i < ilist.size(); ++i) {
+					ilist[i] = ilist[i - 1];
+				}
+				ilist[ilist_idx] = 2;
+
+				userTypeList.push_back(NULL);
+				for (int i = userTypeIndex + 1; i < userTypeList.size(); ++i) {
+					userTypeList[i] = userTypeList[i - 1];
+				}
+				userTypeList[userTypeIndex] = temp;
+			}
+			void InsertUserTypeByIlist(const int ilist_idx, const UserType& item) {
+				int userTypeIndex = _GetItemIndexFromIlistIndex(ilist, ilist_idx);
+				UserType* temp = new UserType(item);
+
+				temp->parent = this;
+
+				ilist.push_back(0);
+				for (int i = ilist_idx + 1; i < ilist.size(); ++i) {
+					ilist[i] = ilist[i - 1];
+				}
+				ilist[ilist_idx] = 2;
+
+				userTypeList.push_back(NULL);
+				for (int i = userTypeIndex + 1; i < userTypeList.size(); ++i) {
+					userTypeList[i] = userTypeList[i - 1];
+				}
+				userTypeList[userTypeIndex] = temp;
+			}
+			
+			// chk
+			void InsertItem(const int item_idx, const string& name, const string& item) {
+				int ilist_idx = _GetIlistIndex(ilist, item_idx, 1);
+
+				ilist.push_back(0);
+				for (int i = ilist_idx + 1; i < ilist.size(); ++i) {
+					ilist[i] = ilist[i - 1];
+				}
+				ilist[ilist_idx] = 1;
+
+				itemList.emplace_back("", "");
+				for (int i = item_idx + 1; i < itemList.size(); ++i) {
+					itemList[i] = move(itemList[i - 1]);
+				}
+				itemList[item_idx] = ItemType<string>(name, item);
+			}
+			void InsertItem(const int item_idx, string&& name, string&& item) {
+				int ilist_idx = _GetIlistIndex(ilist, item_idx, 1);
+
+				ilist.push_back(0);
+				for (int i = ilist_idx + 1; i < ilist.size(); ++i) {
+					ilist[i] = ilist[i - 1];
+				}
+				ilist[ilist_idx] = 1;
+
+				itemList.emplace_back("", "");
+				for (int i = item_idx + 1; i < itemList.size(); ++i) {
+					itemList[i] = move(itemList[i - 1]);
+				}
+				itemList[item_idx] = ItemType<string>(move(name), move(item));
+			}
+			// chk
+			void InsertUserType(const int ut_idx, UserType&& item) {
+				int ilist_idx = _GetIlistIndex(ilist, ut_idx, 2);
+				UserType* temp = new UserType(std::move(item));
+
+				temp->parent = this;
+
+				ilist.push_back(0);
+				for (int i = ilist_idx + 1; i < ilist.size(); ++i) {
+					ilist[i] = ilist[i - 1];
+				}
+				ilist[ilist_idx] = 2;
+
+				userTypeList.push_back(NULL);
+				for (int i = ut_idx + 1; i < userTypeList.size(); ++i) {
+					userTypeList[i] = userTypeList[i - 1];
+				}
+				userTypeList[ut_idx] = temp;
+			}
+			void InsertUserType(const int ut_idx, const UserType& item) {
+				int ilist_idx = _GetIlistIndex(ilist, ut_idx, 2);
+				UserType* temp = new UserType(item);
+
+				temp->parent = this;
+
+				ilist.push_back(0);
+				for (int i = ilist_idx + 1; i < ilist.size(); ++i) {
+					ilist[i] = ilist[i - 1];
+				}
+				ilist[ilist_idx] = 2;
+
+				userTypeList.push_back(NULL);
+				for (int i = ut_idx + 1; i < userTypeList.size(); ++i) {
+					userTypeList[i] = userTypeList[i - 1];
+				}
+				userTypeList[ut_idx] = temp;
+			}
+
+			//
 			void AddItem(string&& name, string&& item) {
 				itemList.emplace_back(move(name), move(item));
 				ilist.push_back(1);
@@ -460,39 +649,6 @@ namespace wiz {
 				ilist.push_back(1);
 			}
 			void AddUserTypeItem(UserType&& item) {
-				/*if (this->userTypeList_sortFlagA) {
-				string str_compare = Compare(userTypeList.back().GetName(), item.GetName());
-
-				if (str_compare == "<" || str_compare == "==")
-				{
-				this->userTypeList_sortFlagA = true;
-				}
-				else {
-				this->userTypeList_sortFlagA = false;
-				}
-				}
-				if (this->userTypeList_sortFlagB) {
-				string str_compare = Compare(userTypeList.back().GetName(), item.GetName());
-
-				if (str_compare == ">" || str_compare == "==")
-				{
-				this->userTypeList_sortFlagB = true;
-				}
-				else {
-				this->userTypeList_sortFlagB = false;
-				}
-				}*/
-
-				/*
-				int index = -1;
-				if (!userTypeList.Search(ItemType<UserType*>(item.GetName()), &index))
-				{
-				ilist.push_back(2);
-
-				userTypeList.PushBack(ItemType<UserType*>(item.GetName()));//
-				userTypeList.Search(ItemType<UserType*>(item.GetName()), &index);
-				}
-				*/
 				UserType* temp = new UserType(std::move(item));
 				temp->parent = this;
 				//temp->SetName("");

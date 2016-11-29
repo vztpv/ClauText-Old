@@ -1354,7 +1354,7 @@ namespace wiz {
 				}
 			}
 			// cf) idx == -1 -> size()-1 ?? or RemoveBack() ??
-			static bool RemoveNoNameItem(UserType& global, const string& position, const string& value)
+			static bool RemoveItem(UserType& global, const string& position, const string& value)
 			{
 				auto finded = UserType::Find(&global, position);
 				bool isTrue = false;
