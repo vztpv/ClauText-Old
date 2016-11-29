@@ -807,10 +807,10 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 							{
 								wiz::load_data::LoadData::Remove(*utTemp, strVecTemp[1], strVecTemp[2], strVecTemp[3]);
 							}
-							else if ("removenonameitem" == strVecTemp[0])
-							{
-								wiz::load_data::LoadData::RemoveNoNameItem(*utTemp, strVecTemp[1], strVecTemp[2]);
-							}
+							//else if ("removenonameitem" == strVecTemp[0])
+							//{
+							//	wiz::load_data::LoadData::RemoveNoNameItem(*utTemp, strVecTemp[1], strVecTemp[2]);
+							//}
 							else if ("removeall" == strVecTemp[0])
 							{
 								wiz::load_data::LoadData::Remove(*utTemp, strVecTemp[1], strVecTemp[2]);
@@ -1293,6 +1293,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 	{
 		operandStack.push(info.return_value);
 	}
+	// cf) empty test!!
 	///ToDo - GetList -> // GetItemListIdxByIListIdx, GetUserTypeLisIdxtByIListIdx ?
 	else if ("$back" == str) // ex) for x  = { 0 1 2 3 .. }, for usertaypelist? and mixed? and need more test!
 	{
@@ -1312,6 +1313,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 			operandStack.push("\"" + x->ToString() + "\"");
 		}
 	}
+	// pop_back or front - remove this function?
 	else if ("$pop_back" == str) // and for usertypelist? and mixed?, usertype-> "~"
 	{
 		string x = operandStack.pop();
@@ -1960,7 +1962,8 @@ string excute_module(wiz::load_data::UserType& global)
 					wiz::load_data::UserType moduleUT;
 					wiz::load_data::LoadData::LoadDataFromFile(moduleFileName, moduleUT);
 
-					moduleMap.insert(make_pair(moduleFileName, moduleUT));
+					//moduleMap.insert(make_pair(moduleFileName, moduleUT));
+					moduleMap[moduleFileName] = move(moduleUT);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -2017,7 +2020,8 @@ string excute_module(wiz::load_data::UserType& global)
 
 					string data = objectUT.ToString();
 
-					objectMap.insert(make_pair(objectFileName, data));
+					//objectMap.insert(make_pair(objectFileName, data));
+					objectMap[objectFileName] = move(data);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -2444,21 +2448,6 @@ string excute_module(wiz::load_data::UserType& global)
 					break;
 				}
 				
-				/// ToDo Chk $add, $set, $remove.
-				/// ToDo Make $set - from wiz::load_data::LoadData::SetData function.
-				//	$set~ ? ë•Œ, ~~ê°€ ?ˆë‹¤ë©?( set?˜ê¸°?„ì˜ value )ë¡?ë°”ê¾¼?? - condition ë¬¸ë²•ì²˜ëŸ¼ ì¶”ê??˜ì—¬ ?´ë‹¤?
-				//  $set_by_empty_name == val->GetName() ?
-				//	$set_by_name == val->GetName()
-					//	string dir
-					//	string var_name
-					//  string value   : ex) value = "$multiple = { ~~ 2 }" - ToDo!!
-					//  string condition
-				//  $set_by_idx == val->GetName()
-					//	string dir
-					//	string idx
-					//	string value
-					//	string condition
-				//
 				else if ("$setElement" == val->GetName())
 				{
 					string dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
@@ -2955,6 +2944,7 @@ int main(int argc, char* argv[])
 	
 	cout << "fileName is " << fileName << endl;
 	cout << "excute result is " << excute_module(global) << endl;
+	_getch(); // pause..
 
 	return 0;
 }
