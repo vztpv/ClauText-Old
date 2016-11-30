@@ -29,7 +29,7 @@ inline int GETCH() /// To Do - Replace..
 	return _getch();
 }
 
-inline void FFLUSH()  // to  DO - Ãß°¡!!
+inline void FFLUSH()  // to  DO - �߰�!!
 {
 	cin.clear();
 	cin.ignore(cin.rdbuf()->in_avail(), '\n');
@@ -147,7 +147,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 				gotoxy(0, idx - Start);
 
 				setcolor(0, 12);
-				cout << "¡Ü";
+				cout << "��";
 				setcolor(0, 0);
 				gotoxy(0, 0);
 			}
@@ -186,7 +186,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 					}
 					gotoxy(0, idx - Start);
 					setcolor(0, 12);
-					cout << "¡Ü";
+					cout << "��";
 					setcolor(0, 0);
 				}
 				else {
@@ -197,7 +197,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 
 					gotoxy(0, idx - Start);
 					setcolor(0, 12);
-					cout << "¡Ü";
+					cout << "��";
 					setcolor(0, 0);
 				}
 			}
@@ -225,7 +225,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 					}
 					gotoxy(0, 0);
 					setcolor(0, 12);
-					cout << "¡Ü";
+					cout << "��";
 					setcolor(0, 0);
 				}
 				else {
@@ -236,7 +236,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 
 					gotoxy(0, idx - Start);
 					setcolor(0, 12);
-					cout << "¡Ü";
+					cout << "��";
 					setcolor(0, 0);
 				}
 			}
@@ -261,7 +261,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 					}
 					gotoxy(0, idx - Start);
 					setcolor(0, 12);
-					cout << "¡Ü";
+					cout << "��";
 					setcolor(0, 0);
 				}
 				else {
@@ -272,7 +272,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 
 					gotoxy(0, idx - Start);
 					setcolor(0, 12);
-					cout << "¡Ü";
+					cout << "��";
 					setcolor(0, 0);
 				}
 			}
@@ -300,7 +300,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 					}
 					gotoxy(0, 0);
 					setcolor(0, 12);
-					cout << "¡Ü";
+					cout << "��";
 					setcolor(0, 0);
 				}
 				else {
@@ -311,7 +311,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 
 					gotoxy(0, idx - Start);
 					setcolor(0, 12);
-					cout << "¡Ü";
+					cout << "��";
 					setcolor(0, 0);
 				}
 			}
@@ -394,7 +394,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 						Start = 0;
 
 						setcolor(0, 12);
-						cout << "¡Ü";
+						cout << "��";
 						setcolor(0, 0);
 					}
 					else if (state == 1) { /// cf) state = 2;
@@ -555,7 +555,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 						}
 						// addd Item?
 						else if (2 == select) {
-							// var, val /// state¿¡ µû¶ó?
+							// var, val /// state�� ����?
 							cout << "var : ";
 							cin >> var;
 							cout << "val : ";
@@ -1655,8 +1655,8 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 	}
 
 	//
-	wiz::ArrayStack<string> operandStack; // ?¼ì°?°ì
-	wiz::ArrayStack<string> operatorStack; // ?°ì°??
+	wiz::ArrayStack<string> operandStack; // ?�연?�자
+	wiz::ArrayStack<string> operatorStack; // ?�산??
 	wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" });
 	vector<string> tokenVec;
 
@@ -1763,7 +1763,7 @@ string excute_module(wiz::load_data::UserType& global)
 		cout << "do not exist Main" << endl;
 		return "ERROR -1";
 	}
-	auto _Main = global.GetCopyUserTypeItem("Main")[0]; /// todo - main???ê°?¬ì¼ë§??ë¤. Main???ì¼ë©??ë¬..!
+	auto _Main = global.GetCopyUserTypeItem("Main")[0]; /// todo - main???�개?�야�??�다. Main???�으�??�러..!
 	wiz::load_data::UserType Main;
 	Main.LinkUserType(_Main);
 	global.RemoveUserTypeList("Main");
@@ -2140,7 +2140,7 @@ string excute_module(wiz::load_data::UserType& global)
 						info.id = ToBool4(global, eventStack.top().parameters, val->GetUserTypeItem("id")[0]->ToString(), eventStack.top());
 					}
 					// cf) id =  { $local.i }
-					// ì¶ê? todo
+					// 추�? todo
 
 					info.eventUT = events.GetUserTypeList(no);
 					info.userType_idx.clear();
@@ -2290,7 +2290,7 @@ string excute_module(wiz::load_data::UserType& global)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$assign_global" == val->GetName()) // ì£¼ì!! dir=> dir/name ( dir= { name = val } } , @ë¥??ì ë¶ì¬???ë¤. 
+				else if ("$assign_global" == val->GetName()) // 주의!! dir=> dir/name ( dir= { name = val } } , @�??�에 붙여???�다. 
 				{
 					pair<string, string> dir = Find2(&global, ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top()));
 					string data = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
