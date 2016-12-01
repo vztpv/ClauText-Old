@@ -1743,31 +1743,41 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 }
 
 
-string excute_module(wiz::load_data::UserType& global)
+string excute_module(wiz::load_data::UserType& global, wiz::load_data::UserType* pEvents = NULL, EventInfo* pInfo = NULL)
 {
+	vector<EventInfo*> waits_info;
+	vector<thread*> waits;
 	map<string, string> objectMap;
 	map<string, wiz::load_data::UserType> moduleMap;
 	string module_value = "";
 	// data, event load..
 	wiz::ArrayStack<EventInfo> eventStack;
 	map<string, int> convert;
-	auto _events = global.GetCopyUserTypeItem("Event");
-	wiz::load_data::UserType events;
-	for (int i = 0; i < _events.size(); ++i) {
-		events.LinkUserType(_events[i]);
-	}
-	global.RemoveUserTypeList("Event");
-
-	if (global.GetUserTypeItem("Main").empty())
-	{
-		cout << "do not exist Main" << endl;
-		return "ERROR -1";
-	}
-	auto _Main = global.GetCopyUserTypeItem("Main")[0]; /// todo - main???œê°œ?¬ì•¼ë§??œë‹¤. Main???†ìœ¼ë©??ëŸ¬..!
+	vector<wiz::load_data::UserType*> _events;
+	wiz::load_data::UserType events; 
 	wiz::load_data::UserType Main;
-	Main.LinkUserType(_Main);
-	global.RemoveUserTypeList("Main");
 
+	if (NULL == pEvents) {
+		_events = global.GetCopyUserTypeItem("Event");
+		for (int i = 0; i < _events.size(); ++i) {
+			events.LinkUserType(_events[i]);
+		}
+		global.RemoveUserTypeList("Event");
+
+		if (global.GetUserTypeItem("Main").empty())
+		{
+			cout << "do not exist Main" << endl;
+			return "ERROR -1";
+		}
+		
+		auto _Main = global.GetCopyUserTypeItem("Main")[0];
+	
+		Main.LinkUserType(_Main);
+		global.RemoveUserTypeList("Main");
+	}
+	else {
+		events = *pEvents;
+	}
 	// event table setting
 	for (int i = 0; i < events.GetUserTypeListSize(); ++i)
 	{
@@ -1782,7 +1792,7 @@ string excute_module(wiz::load_data::UserType& global)
 	}
 
 	// start from Main.
-	{
+	if (NULL == pInfo) {
 		EventInfo info;
 		info.eventUT = Main.GetUserTypeList(0);
 		info.item_idx = 0;
@@ -1805,6 +1815,9 @@ string excute_module(wiz::load_data::UserType& global)
 		}
 
 		eventStack.push(info);
+	}
+	else {
+		eventStack.push(*pInfo);
 	}
 
 	// main loop
@@ -2139,8 +2152,6 @@ string excute_module(wiz::load_data::UserType& global)
 					else {
 						info.id = ToBool4(global, eventStack.top().parameters, val->GetUserTypeItem("id")[0]->ToString(), eventStack.top());
 					}
-					// cf) id =  { $local.i }
-					// ì¶”ê? todo
 
 					info.eventUT = events.GetUserTypeList(no);
 					info.userType_idx.clear();
@@ -2183,8 +2194,6 @@ string excute_module(wiz::load_data::UserType& global)
 										info.parameters[k].second = temp;
 									}
 								}
-								// debug 
-								//cout << temp << endl;
 							}
 						}
 						if (val->GetUserTypeListSize() > 0) {
@@ -2197,8 +2206,6 @@ string excute_module(wiz::load_data::UserType& global)
 										info.parameters[k].second = temp;
 									}
 								}
-								// debug 
-								//cout << temp << endl;
 							}
 						}
 
@@ -2211,7 +2218,7 @@ string excute_module(wiz::load_data::UserType& global)
 						}
 					}
 
-					if (eventStack.top().option == "REMOVE_IF_CALL_ANY_EVENT")
+					if (false == eventStack.empty() && eventStack.top().option == "REMOVE_IF_CALL_ANY_EVENT")
 					{
 						eventStack.pop();
 					}
@@ -2229,8 +2236,27 @@ string excute_module(wiz::load_data::UserType& global)
 							break;
 						}
 					}
+					if (waits.size() >= 4) {
+						for (int i = 0; i < waits.size(); ++i) {
+							waits[i]->join();
+							delete waits[i]; // chk ?
+						}
+						waits.resize(0);
+						for (int i = 0; i < waits_info.size(); ++i) {
+							delete waits_info[i];
+						}
+						waits_info.resize(0);
+					}
 
-					eventStack.push(info);
+					if (false == val->GetItem("option").empty() && val->GetItem("option")[0].Get(0) == "USE_THREAD") {
+						EventInfo* pinfo = new EventInfo(info);
+						thread* A = new thread(excute_module, global, &events, pinfo);
+						waits.push_back(A);
+						waits_info.push_back(pInfo);
+					}
+					else {
+						eventStack.push(info);
+					}
 
 					break;
 				}
@@ -2920,6 +2946,16 @@ string excute_module(wiz::load_data::UserType& global)
 		}
 	}
 
+	for (int i = 0; i < waits.size(); ++i) {
+		waits[i]->join();
+		delete waits[i];
+	}
+	waits.resize(0);
+
+	for (int i = 0; i < waits_info.size(); ++i) {
+		delete waits_info[i];
+	}
+	waits_info.resize(0);
 	return module_value;
 }
 
