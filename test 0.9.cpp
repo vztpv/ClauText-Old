@@ -2145,6 +2145,21 @@ string excute_module(wiz::load_data::UserType& global, wiz::load_data::UserType*
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
+				else if ("$wait" == val->GetName()) {
+					for (int i = 0; i < waits.size(); ++i) {
+						waits[i]->join();
+						delete waits[i];
+					}
+					waits.resize(0);
+
+					for (int i = 0; i < waits_info.size(); ++i) {
+						delete waits_info[i];
+					}
+					waits_info.resize(0);
+					
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
 				else if ("$call" == val->GetName()) {
 					if (!val->GetItem("id").empty()) {
 						info.id = val->GetItem("id")[0].Get(0);
