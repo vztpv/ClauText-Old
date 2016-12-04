@@ -2373,7 +2373,8 @@ string excute_module(wiz::load_data::UserType& global, wiz::load_data::UserType*
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$make" == val->GetName()) // To Do? - make2? or remake?
+				else if ("$make" == val->GetName()) // To Do? - make2? or remake? 
+													// cf) make empty ut??
 				{
 					string dir;
 					bool is2 = false;
@@ -2446,7 +2447,8 @@ string excute_module(wiz::load_data::UserType& global, wiz::load_data::UserType*
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$remove2" == val->GetName()) // remove /dir/name
+				else if ("$remove2" == val->GetName()) // remove /dir/name 
+													// if name is empty, then chk!!
 				{
 					string dir = string(val->GetItemList(0).Get(0).c_str()); // item -> userType
 					dir = ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
@@ -2573,6 +2575,7 @@ string excute_module(wiz::load_data::UserType& global, wiz::load_data::UserType*
 							}
 						}
 					}
+					// ?
 					else if (val->GetUserTypeListSize() == 1
 						&& val->GetUserTypeList(0)->GetItemListSize() == 0
 						&& val->GetUserTypeList(0)->GetUserTypeListSize() == 1)
