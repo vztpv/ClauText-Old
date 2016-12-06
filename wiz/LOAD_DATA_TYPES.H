@@ -119,7 +119,7 @@ namespace wiz {
 				return data;
 			}
 			void Set(const int index, const T& val) {
-				if (!inited) { throw "ItemType, not inited"; }
+				if (!inited) { throw "ItemType, not inited"; } // removal?
 				data = val;
 			}
 			int size()const {
@@ -1003,12 +1003,12 @@ namespace wiz {
 			private:
 				vector<UserType*>* utVec;
 				wiz::ArrayQueue<string>* aq;
-				string target_ch;
-				string result_ch;
+				vector<string> target_ch;
+				vector<string> result_ch;
 				int utVecStart;
 				int utVecEnd;
 			public:
-				DoThread(vector<UserType*>* utVec, const string& target_ch, const string& result_ch, int utVecStart, int utVecEnd)
+				DoThread(vector<UserType*>* utVec, const vector<string>& target_ch, const vector<string>& result_ch, int utVecStart, int utVecEnd)
 					: utVec(utVec), target_ch(target_ch), result_ch(result_ch), utVecStart(utVecStart), utVecEnd(utVecEnd)
 				{
 				}
@@ -1135,7 +1135,7 @@ namespace wiz {
 				}
 			}
 			// replace all and changeStr ( "~" )
-			static void ReplaceAll(UserType* temp, const string& target_ch, const string& result_ch) {
+			static void ReplaceAll(UserType* temp, const vector<string>& target_ch, const vector<string>& result_ch) {
 				const int itemListSize = temp->GetItemListSize();
 				const int userTypeListSize = temp->GetUserTypeListSize();
 

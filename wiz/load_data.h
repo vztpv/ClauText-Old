@@ -430,12 +430,12 @@ namespace wiz {
 					//UserType::AllReserved(&globalTemp, false);
 					//UserType::ReservedA(&globalTemp);
 
-					UserType::ReplaceAll(&globalTemp, "^5", "#");
-					UserType::ReplaceAll(&globalTemp, "^4", "\n");
-					UserType::ReplaceAll(&globalTemp, "^3", "\r");
-					UserType::ReplaceAll(&globalTemp, "^2", "\t");
-					UserType::ReplaceAll(&globalTemp, "^1", " ");
-					UserType::ReplaceAll(&globalTemp, "^0", "^");
+					UserType::ReplaceAll(&globalTemp, { "^5", "^4", "^3", "^2", "^1", "^0" }, { "#", "\n", "\r", "\t", " ", "^" });
+					//UserType::ReplaceAll(&globalTemp, "^4", "\n");
+					//UserType::ReplaceAll(&globalTemp, "^3", "\r");
+					//UserType::ReplaceAll(&globalTemp, "^2", "\t");
+					//UserType::ReplaceAll(&globalTemp, "^1", " ");
+					//UserType::ReplaceAll(&globalTemp, "^0", "^");
 
 					//UserType::AllReserved(&globalTemp, false);
 
@@ -457,16 +457,16 @@ namespace wiz {
 
 				bool chk = Utility::ChkExist(str);
 				if (chk) {
-					str = Utility::ChangeStr(str, "^", "^0");
-					str = Utility::ChangeStr(str, "#", "^5");
+					str = Utility::ChangeStr(str, { "^" }, { "^0" });
+					str = Utility::ChangeStr(str, { "#" }, { "^5" });
 				}
 				str = Utility::PassSharp(str);
 				str = Utility::AddSpace(str);
 				if (chk) {
-					str = Utility::ChangeStr(str, " ", "^1");
-					str = Utility::ChangeStr(str, "\t", "^2");
-					str = Utility::ChangeStr(str, "\r", "^3");
-					str = Utility::ChangeStr(str, "\n", "^4");
+					str = Utility::ChangeStr(str, { " ", "\t", "\r", "\n" }, { "^1", "^2", "^3", "^4" });
+					//str = Utility::ChangeStr(str, "\t", "^2");
+					//str = Utility::ChangeStr(str, "\r", "^3");
+					//str = Utility::ChangeStr(str, "\n", "^4");
 					/// DONE - ""안에 여백이 있을 떄 다른 것으로 대체후 다시 변경
 				}
 				StringTokenizer tokenizer(str, vector<string>{" ", "\t", "\r", "\n"});
@@ -488,12 +488,12 @@ namespace wiz {
 					//UserType::ReservedA(&utTemp);
 					
 					if (chk) {
-						UserType::ReplaceAll(&utTemp, "^5", "#");
-						UserType::ReplaceAll(&utTemp, "^4", "\n");
-						UserType::ReplaceAll(&utTemp, "^3", "\r");
-						UserType::ReplaceAll(&utTemp, "^2", "\t");
-						UserType::ReplaceAll(&utTemp, "^1", " ");
-						UserType::ReplaceAll(&utTemp, "^0", "^");
+						UserType::ReplaceAll(&utTemp, { "^5", "^4", "^3", "^2", "^1", "^0" }, { "#", "\n", "\r", "\t", " ", "^" });
+						//UserType::ReplaceAll(&utTemp, "^4", "\n");
+						//UserType::ReplaceAll(&utTemp, "^3", "\r");
+						//UserType::ReplaceAll(&utTemp, "^2", "\t");
+						//UserType::ReplaceAll(&utTemp, "^1", " ");
+						//UserType::ReplaceAll(&utTemp, "^0", "^");
 					}
 					//UserType::AllReserved(&utTemp, false);
 				}
@@ -1559,6 +1559,48 @@ namespace wiz {
 
 				return temp;
 			}
+			static void ReplaceItem(UserType& global, const string& var, const string& val, const string& condition) {
+				ReplaceItem(global, var, "root", &global, val, condition);
+			}
+		private:
+			static void ReplaceItem(UserType& global, const string& var, const string& nowPosition,
+				UserType* ut, const string& val, const string& condition)
+			{
+				string _var = var;
+				if (_var == " ") { _var = ""; }
+				
+				for( int i=0; i < ut->GetItemListSize(); ++i ){
+					if (ut->GetItemList(i).GetName() == var) {
+						string _condition = condition;
+
+						if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "^"); }
+						else
+							_condition = wiz::String::replace(_condition, "~~", _var); //
+						Condition cond(_condition, ut, &global);
+
+						while (cond.Next());
+
+						if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
+						{
+							ut->GetItemList(i).Set(0, val);
+						}
+					}
+				}
+
+				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
+					string temp = ut->GetUserTypeList(i)->GetName();
+					if (temp == "") { temp = " "; }
+					ReplaceItem(
+						global,
+						_var,
+						nowPosition + "/" + temp,
+						ut->GetUserTypeList(i),
+						val,
+						condition
+					);
+				}
+			}
+
 		};
 	}
 }
