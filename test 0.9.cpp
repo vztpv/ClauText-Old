@@ -1586,12 +1586,12 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 	{
 		chk = wiz::load_data::Utility::ChkExist(result);
 		if (chk) {
-			result = wiz::load_data::Utility::ChangeStr(result, "^", "^0"); // in " "
-			result = wiz::load_data::Utility::ChangeStr(result, " ", "^1");
-			result = wiz::load_data::Utility::ChangeStr(result, "\t", "^2");
-			result = wiz::load_data::Utility::ChangeStr(result, "\r", "^3");
-			result = wiz::load_data::Utility::ChangeStr(result, "\n", "^4");
-			result = wiz::load_data::Utility::ChangeStr(result, "#", "^5");
+			result = wiz::load_data::Utility::ChangeStr(result, { "^" }, { "^0" }); // in " "
+			result = wiz::load_data::Utility::ChangeStr(result, { " ", "\t", "\r", "\n", "#" }, { "^1", "^2", "^3", "^4", "^5" });
+			//result = wiz::load_data::Utility::ChangeStr(result, "\t", "^2");
+			//result = wiz::load_data::Utility::ChangeStr(result, "\r", "^3");
+			//result = wiz::load_data::Utility::ChangeStr(result, "\n", "^4");
+			//result = wiz::load_data::Utility::ChangeStr(result, "#", "^5");
 		}
 	}
 
@@ -1731,12 +1731,12 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 	{
 		if (chk) {
-			result = wiz::load_data::Utility::ChangeStr(result, "^5", "#");
-			result = wiz::load_data::Utility::ChangeStr(result, "^4", "\n");
-			result = wiz::load_data::Utility::ChangeStr(result, "^3", "\r");
-			result = wiz::load_data::Utility::ChangeStr(result, "^2", "\t");
-			result = wiz::load_data::Utility::ChangeStr(result, "^1", " ");
-			result = wiz::load_data::Utility::ChangeStr(result, "^0", "^");
+			result = wiz::load_data::Utility::ChangeStr(result, { "^5", "^4", "^3", "^2", "^1", "^0" }, { "#", "\n", "\r", "\t", " ", "^" });
+			//result = wiz::load_data::Utility::ChangeStr(result, "^4", "\n");
+			//result = wiz::load_data::Utility::ChangeStr(result, "^3", "\r");
+			//result = wiz::load_data::Utility::ChangeStr(result, "^2", "\t");
+			//result = wiz::load_data::Utility::ChangeStr(result, "^1", " ");
+			//result = wiz::load_data::Utility::ChangeStr(result, "^0", "^");
 		}
 	}
 	return result;
