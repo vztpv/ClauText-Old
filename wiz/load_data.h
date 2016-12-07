@@ -1567,6 +1567,14 @@ namespace wiz {
 				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
 				RemoveUserTypeTotal(global, ut_name, start_dir, ut, condition);
 			}
+			static void ReplaceDateType(UserType& global, const string& val, const string& condition, const string& start_dir) {
+				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
+				ReplaceDateType(global, start_dir, ut, val, condition);
+			}
+			static void ReplaceDateType2(UserType& global, const string& val, const string& condition, const string& start_dir) {
+				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
+				ReplaceDateType2(global, start_dir, ut, val, condition);
+			}
 		private:
 			static void ReplaceItem(UserType& global, const string& var, const string& nowPosition,
 				UserType* ut, const string& val, const string& condition)
@@ -1638,6 +1646,77 @@ namespace wiz {
 						_var,
 						nowPosition + "/" + temp,
 						ut->GetUserTypeList(i),
+						condition
+					);
+				}
+			}
+			static void ReplaceDateType(UserType& global, const string& nowPosition,
+				UserType* ut, const string& val, const string& condition)
+			{
+				for (int i = 0; i < ut->GetItemListSize(); ++i) {
+					if (Utility::IsDate(ut->GetItemList(i).GetName()) || Utility::IsDate(ut->GetItemList(i).Get(0))) {
+						string _condition = condition;
+
+						string _var = ut->GetItemList(i).GetName();
+						_condition = wiz::String::replace(_condition, "~~", _var); //
+
+						Condition cond(_condition, ut, &global);
+
+						while (cond.Next());
+
+						if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
+						{
+							if (Utility::IsDate(ut->GetItemList(i).GetName())) {
+								ut->GetItemList(i).SetName(val);
+							}
+							if (Utility::IsDate(ut->GetItemList(i).Get(0))) {
+								ut->GetItemList(i).Set(0, val);
+							}
+						}
+					}
+				}
+
+				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
+					string temp = ut->GetUserTypeList(i)->GetName();
+					if (temp == "") { temp = " "; }
+
+					ReplaceDateType(
+						global,
+						nowPosition + "/" + temp,
+						ut->GetUserTypeList(i),
+						val,
+						condition
+					);
+				}
+			}
+			static void ReplaceDateType2(UserType& global, const string& nowPosition,
+				UserType* ut, const string& val, const string& condition)
+			{
+				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
+					string temp = ut->GetUserTypeList(i)->GetName();
+					if (temp == "") { temp = " "; }
+
+					if (Utility::IsDate(temp)) {
+						string _condition = condition;
+
+						string _var = ut->GetUserTypeList(i)->GetName();
+						_condition = wiz::String::replace(_condition, "~~", _var); //
+
+						Condition cond(_condition, ut, &global);
+
+						while (cond.Next());
+
+						if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
+						{
+							ut->GetUserTypeList(i)->SetName(val);
+						}
+					}
+
+					ReplaceDateType2(
+						global,
+						nowPosition + "/" + temp,
+						ut->GetUserTypeList(i),
+						val,
 						condition
 					);
 				}
