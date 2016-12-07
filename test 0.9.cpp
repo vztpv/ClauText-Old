@@ -1743,8 +1743,9 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 }
 
 
-string excute_module(wiz::load_data::UserType& global, wiz::load_data::UserType* pEvents = NULL, EventInfo* pInfo = NULL)
+string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType* pEvents = NULL, EventInfo* pInfo = NULL)
 {
+	wiz::load_data::UserType& global = *_global;
 	vector<EventInfo*> waits_info;
 	vector<thread*> waits;
 	map<string, string> objectMap;
@@ -2068,7 +2069,7 @@ string excute_module(wiz::load_data::UserType& global, wiz::load_data::UserType*
 					wiz::load_data::UserType moduleUT = moduleMap.at(moduleFileName);
 					wiz::load_data::LoadData::AddData(moduleUT, "", input, "TRUE");
 
-					eventStack.top().return_value = excute_module(moduleUT);
+					eventStack.top().return_value = excute_module(&moduleUT);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -2088,7 +2089,7 @@ string excute_module(wiz::load_data::UserType& global, wiz::load_data::UserType*
 					wiz::load_data::LoadData::LoadDataFromFile(moduleFileName, moduleUT);
 					wiz::load_data::LoadData::AddData(moduleUT, "", input, "TRUE");
 
-					eventStack.top().return_value = excute_module(moduleUT);
+					eventStack.top().return_value = excute_module(&moduleUT);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -2125,7 +2126,7 @@ string excute_module(wiz::load_data::UserType& global, wiz::load_data::UserType*
 					wiz::load_data::UserType objectUT;
 					wiz::load_data::LoadData::LoadDataFromString(data, objectUT);
 
-					eventStack.top().return_value = excute_module(objectUT);
+					eventStack.top().return_value = excute_module(&objectUT);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -2149,7 +2150,7 @@ string excute_module(wiz::load_data::UserType& global, wiz::load_data::UserType*
 					objectUT.Remove();
 					wiz::load_data::LoadData::LoadDataFromString(data, objectUT);
 
-					eventStack.top().return_value = excute_module(objectUT);
+					eventStack.top().return_value = excute_module(&objectUT);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -2247,7 +2248,7 @@ string excute_module(wiz::load_data::UserType& global, wiz::load_data::UserType*
 					info.return_value.clear();
 					info.nowUT.clear();
 
-					EventInfo info2;
+					EventInfo info2; //
 					info2 = info;
 
 					if (info.id != eventStack.top().id) {
@@ -2338,7 +2339,7 @@ string excute_module(wiz::load_data::UserType& global, wiz::load_data::UserType*
 
 					if (false == val->GetItem("option").empty() && val->GetItem("option")[0].Get(0) == "USE_THREAD") {
 						EventInfo* pinfo = new EventInfo(info);
-						thread* A = new thread(excute_module, global, &events, pinfo);
+						thread* A = new thread(excute_module, &global, &events, pinfo);
 						waits.push_back(A);
 						waits_info.push_back(pInfo);
 					}
@@ -3070,7 +3071,7 @@ int main(int argc, char* argv[])
 	wiz::load_data::LoadData::LoadDataFromFile(fileName, global);
 	
 	cout << "fileName is " << fileName << endl;
-	cout << "excute result is " << excute_module(global) << endl;
+	cout << "excute result is " << excute_module(&global) << endl;
 	//_getch(); // pause..
 
 	return 0;
