@@ -1908,7 +1908,43 @@ string excute_module(wiz::load_data::UserType& global, wiz::load_data::UserType*
 
 			while (val != NULL) 
 			{
-				if ("$remove_usertype_total" == val->GetName()) {
+				if ("$replace_datetype" == val->GetName()) {
+					string sval = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
+					string scondition = "TRUE";
+					string start_dir = "root";
+
+					if (val->GetUserTypeListSize() >= 2)
+					{
+						scondition = val->GetUserTypeList(1)->ToString();
+					}
+					if (val->GetUserTypeListSize() >= 3) {
+						start_dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top());
+					}
+
+					wiz::load_data::LoadData::ReplaceDateType(global, sval, scondition, start_dir);
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$replace_datetype2" == val->GetName()) {
+					string sval = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
+					string scondition = "TRUE";
+					string start_dir = "root";
+
+					if (val->GetUserTypeListSize() >= 2)
+					{
+						scondition = val->GetUserTypeList(1)->ToString();
+					}
+					if (val->GetUserTypeListSize() >= 3) {
+						start_dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top());
+					}
+
+					wiz::load_data::LoadData::ReplaceDateType2(global, sval, scondition, start_dir);
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$remove_usertype_total" == val->GetName()) {
 					string ut_name = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
 					string condition = "TRUE";
 					string start_dir = "root";
