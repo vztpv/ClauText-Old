@@ -280,7 +280,7 @@ namespace wiz {
 				}
 
 				if ("COMP<" == op) {
-					if ("0" != option) { /// ToDo.. // 0. just 1-1, // 1. for any case // 2. for all case
+					if ("0" != option) { // ToDo.. // 0. just 1-1, // 1. for any case // 2. for all case
 						for (int i = 0; i < value1.size(); ++i) {
 							for (int j = 0; j < value2.size(); ++j) {
 								if (Compare(value1[i].Get(0), value2[j].Get(0)) == "< 0") {

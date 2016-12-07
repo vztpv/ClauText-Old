@@ -1531,12 +1531,12 @@ namespace wiz {
 
 			/// ToDo - global, position, var, condition + var is " "!
 			// "root" -> position.
-			static string SearchItem(UserType& global, const string& var, const string& condition)
+			static string SearchItem(UserType& global, const string& var, const string& condition, const string& start_dir = "root")
 			{
 				vector<string> positionVec;
 				string temp;
 
-				SearchItem(global, positionVec, var, "root", &global, condition);
+				SearchItem(global, positionVec, var, start_dir, &global, condition);
 
 				for (int i = 0; i < positionVec.size(); ++i)
 				{
@@ -1559,8 +1559,13 @@ namespace wiz {
 
 				return temp;
 			}
-			static void ReplaceItem(UserType& global, const string& var, const string& val, const string& condition) {
-				ReplaceItem(global, var, "root", &global, val, condition);
+			static void ReplaceItem(UserType& global, const string& var, const string& val, const string& condition, const string& start_dir) {
+				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
+				ReplaceItem(global, var, start_dir, ut, val, condition);
+			}
+			static void RemoveUserTypeTotal(UserType& global, const string& ut_name, const string& condition, const string& start_dir) {
+				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
+				RemoveUserTypeTotal(global, ut_name, start_dir, ut, condition);
 			}
 		private:
 			static void ReplaceItem(UserType& global, const string& var, const string& nowPosition,
@@ -1570,7 +1575,7 @@ namespace wiz {
 				if (_var == " ") { _var = ""; }
 				
 				for( int i=0; i < ut->GetItemListSize(); ++i ){
-					if (ut->GetItemList(i).GetName() == var) {
+					if (ut->GetItemList(i).GetName() == _var) {
 						string _condition = condition;
 
 						if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "^"); }
@@ -1596,6 +1601,43 @@ namespace wiz {
 						nowPosition + "/" + temp,
 						ut->GetUserTypeList(i),
 						val,
+						condition
+					);
+				}
+			}
+			static void RemoveUserTypeTotal(UserType& global, const string& ut_name, const string& nowPosition,
+				UserType* ut, const string& condition)
+			{
+				string _var = ut_name;
+				if (_var == " ") { _var = ""; }
+
+				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
+					if (ut->GetUserTypeList(i)->GetName() == _var) {
+						string _condition = condition;
+
+						if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "^"); }
+						else
+							_condition = wiz::String::replace(_condition, "~~", _var); //
+						Condition cond(_condition, ut, &global);
+
+						while (cond.Next());
+
+						if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
+						{
+							ut->RemoveUserTypeList(i);
+							--i;
+						}
+					}
+				}
+
+				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
+					string temp = ut->GetUserTypeList(i)->GetName();
+					if (temp == "") { temp = " "; }
+					RemoveUserTypeTotal(
+						global,
+						_var,
+						nowPosition + "/" + temp,
+						ut->GetUserTypeList(i),
 						condition
 					);
 				}

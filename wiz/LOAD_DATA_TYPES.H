@@ -357,7 +357,7 @@ namespace wiz {
 					delete userTypeList[idx];
 				}
 				// left shift start idx, to end, at itemList. and resize!
-				for (int i = idx + 1; i < GetItemListSize(); ++i) {
+				for (int i = idx + 1; i < GetUserTypeListSize(); ++i) {
 					userTypeList[i - 1] = std::move(userTypeList[i]);
 				}
 				userTypeList.resize(userTypeList.size() - 1);
