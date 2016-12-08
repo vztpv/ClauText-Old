@@ -1916,7 +1916,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 
 					if (val->GetUserTypeListSize() >= 2)
 					{
-						scondition = val->GetUserTypeList(1)->ToString();
+						scondition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
 					}
 					if (val->GetUserTypeListSize() >= 3) {
 						start_dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top());
@@ -1934,7 +1934,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 
 					if (val->GetUserTypeListSize() >= 2)
 					{
-						scondition = val->GetUserTypeList(1)->ToString();
+						scondition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
 					}
 					if (val->GetUserTypeListSize() >= 3) {
 						start_dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top());
@@ -1952,7 +1952,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 
 					if (val->GetUserTypeListSize() >= 2)
 					{
-						condition = val->GetUserTypeList(1)->ToString();
+						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
 					}
 					if (val->GetUserTypeListSize() >= 3) {
 						start_dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top());
@@ -1971,7 +1971,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 
 					if (val->GetUserTypeListSize() >= 3) 
 					{
-						scondition = val->GetUserTypeList(2)->ToString();
+						scondition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top());
 					}
 					if (val->GetUserTypeListSize() >= 4) {
 						start_dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(3)->ToString(), eventStack.top());
@@ -2175,7 +2175,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 
 					string condition = "TRUE";
 					if (val->GetUserTypeListSize() >= 2) {
-						condition = val->GetUserTypeList(1)->ToString();
+						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
 					}
 					wiz::load_data::LoadData::Remove(global, dir, ut->GetIList().size() - 1, condition);
 
@@ -2200,7 +2200,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					
 					string condition = "TRUE";
 					if (val->GetUserTypeListSize() >= 3) {
-						condition = val->GetUserTypeList(2)->ToString();
+						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top());
 					}
 					wiz::load_data::LoadData::AddDataAtFront(global, dir, value, condition);
 
@@ -2212,7 +2212,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					
 					string condition = "TRUE";
 					if (val->GetUserTypeListSize() >= 2) {
-						condition = val->GetUserTypeList(1)->ToString();
+						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
 					}
 					wiz::load_data::LoadData::Remove(global, dir, 0, condition);
 
@@ -2412,7 +2412,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 
 					string condition;
 					if (val->GetUserTypeListSize() >= 3) {
-						condition = val->GetUserTypeList(2)->ToString();
+						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top());
 					}
 					wiz::load_data::LoadData::SetData(global, dir.first, dir.second, data, condition);
 
@@ -2440,7 +2440,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 
 					string condition = "TRUE";
 					if (val->GetUserTypeListSize() >= 3) {
-						condition = val->GetUserTypeList(2)->ToString();
+						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top());
 					}
 					wiz::load_data::LoadData::AddData(global, dir, value, condition);
 
@@ -2476,10 +2476,10 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 
 					string condition = "TRUE";
 					if (is2 && val->GetUserTypeListSize() >= 2) {
-						condition = val->GetUserTypeList(1)->ToString();
+						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
 					}
 					else if (false == is2 && val->GetUserTypeListSize() >= 1 ) {
-						condition = val->GetUserTypeList(0)->ToString();
+						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
 					}
 
 					wiz::load_data::LoadData::AddUserType(global, dir, name, "", condition);
@@ -2514,7 +2514,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 
 					string condition = "TRUE";
 					if (val->GetUserTypeListSize() >= 2) {
-						condition = val->GetUserTypeList(1)->ToString();
+						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
 					}
 					wiz::load_data::LoadData::Remove(global, dir, condition);
 
@@ -2538,7 +2538,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 
 					string condition = "TRUE";
 					if (val->GetUserTypeListSize() >= 2) {
-						condition = val->GetUserTypeList(1)->ToString();
+						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
 					}
 					wiz::load_data::LoadData::Remove(global, dir, name, condition);
 
@@ -2555,7 +2555,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					string condition = "TRUE";
 
 					if (val->GetUserTypeListSize() >= 3) {
-						condition = val->GetUserTypeList(2)->ToString();
+						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top());
 					}
 
 					wiz::load_data::LoadData::Remove(global, dir, idx, condition);
@@ -2835,13 +2835,14 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 						/// if temp just one
 						eventStack[eventStack.size() - 2].return_value = temp;
 					}
-
+					
 					if (eventStack.size() == 1)
 					{
 						string temp = ToBool4(global, eventStack.top().parameters, val->ToString(), eventStack.top());
 
 						module_value = temp;
 					}
+
 					eventStack.pop();
 					break;
 				}
