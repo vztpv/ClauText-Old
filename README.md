@@ -1,4 +1,4 @@
-# Using VisualStudio 2015, Windows10, Modern C++
+# Using VisualStudio, Windows10, Modern C++
 
 # What is ClauText? 
 	ClauText consists of Data, Event, and Main.
