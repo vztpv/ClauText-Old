@@ -80,7 +80,7 @@
 			
 	ClauText support if, else statements. ( $if = { condition = {  } then = {  } } $else = { then = { } } )
 	
-	ClauText does not support while directly. but support using if statements and Event Recursive Call( recursive function call ).
+	ClauText does not support while directly. but support using if statements and Event Recursive Call( recursive function? call ).
 
 # How Build?
 	1. use VisualStudio 2015 c++ project, only add "test 0.9.cpp" file to project.
