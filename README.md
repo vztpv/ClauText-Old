@@ -1,4 +1,4 @@
-# Using VisualStudio2015, windows10, modern C++.
+# Using VisualStudio, Windows10, Modern C++
 
 # What is MyDEL? 
 	MyDEL consists of Data, Event, and Main.
