@@ -1,3 +1,5 @@
+# Using VisualStudio2015, windows10, modern C++.
+
 # What is MyDEL? 
 	MyDEL consists of Data, Event, and Main.
 		Data consists of =, {, }, String.
