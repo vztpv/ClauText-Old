@@ -1,7 +1,7 @@
 # Using VisualStudio, Windows10, Modern C++
 
-# What is MyDEL? 
-	MyDEL consists of Data, Event, and Main.
+# What is ClauText? 
+	ClauText consists of Data, Event, and Main.
 		Data consists of =, {, }, String.
 			String consists of all character( including digit ) except #, white space characters, and some characters. 
 			( but "#1" is allowed. and also " test wow" is allowed. )
@@ -78,20 +78,20 @@
 			}
 
 			
-	MyDEL support if, else statements. ( $if = { condition = {  } then = {  } } $else = { then = { } } )
+	ClauText support if, else statements. ( $if = { condition = {  } then = {  } } $else = { then = { } } )
 	
-	MyDEL does not support while directly. but support using if statements and Event Recursive Call( recursive function call ).
+	ClauText does not support while directly. but support using if statements and Event Recursive Call( recursive function call ).
 
 # How Build?
 	1. use VisualStudio 2015 c++ project, only add "test 0.9.cpp" file to project.
 	2. in project property pages, include wiz directory.
 
 # How Use?
-	1. in cmd, excute_file.exe MyDEL_Source_FileName
+	1. in cmd, excute_file.exe ClauText_Source_FileName
 	2. or excute_file.exe   
-	   => FileName: MyDEL_Source_FileName
+	   => FileName: ClauText_Source_FileName
 
-# MyDEL and Paradox Game ( EU4, DHR, ... )
+# ClauText and Paradox Game ( EU4, DHR, ... )
 	1. it can load eu4 savegames, and maybe other paradox game db or savegame files.
 	2. it`s syntax come from eu4 savegame syntax.
 
