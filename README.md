@@ -87,9 +87,9 @@
 	2. in project property pages, include wiz directory.
 
 # How Use?
-	1. in cmd, excute_file.exe ClauText_FileName
+	1. in cmd, excute_file.exe ClauText_TestFileName
 	2. or excute_file.exe   
-	   => FileName: ClauText_FileName
+	   => FileName: ClauText_TestFileName
 
 # ClauText and Paradox Game ( EU4, DHR, ... )
 	1. it can load eu4 savegames, and maybe other paradox game db or savegame files.
