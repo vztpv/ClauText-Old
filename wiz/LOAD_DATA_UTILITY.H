@@ -460,9 +460,7 @@ namespace wiz {
 					_threadD.join();
 
 					for (int i = 0; i < 4; ++i) {
-						for (int j = 0; j < arrayQueue[i].size(); ++j) {
-							aq.push(arrayQueue[i][j]);
-						}
+						aq.push(move(arrayQueue[i]));
 					}
 				}
 				else if (count > 0) {
