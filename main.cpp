@@ -29,7 +29,7 @@ inline int GETCH() /// To Do - Replace..
 	return _getch();
 }
 
-inline void FFLUSH()  // to  DO - Ãß°¡!!
+inline void FFLUSH()  // to  DO - �߰�!!
 {
 	cin.clear();
 	cin.ignore(cin.rdbuf()->in_avail(), '\n');
@@ -147,7 +147,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 				gotoxy(0, idx - Start);
 
 				setcolor(0, 12);
-				cout << "¡Ü";
+				cout << "��";
 				setcolor(0, 0);
 				gotoxy(0, 0);
 			}
@@ -186,7 +186,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 					}
 					gotoxy(0, idx - Start);
 					setcolor(0, 12);
-					cout << "¡Ü";
+					cout << "��";
 					setcolor(0, 0);
 				}
 				else {
@@ -197,7 +197,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 
 					gotoxy(0, idx - Start);
 					setcolor(0, 12);
-					cout << "¡Ü";
+					cout << "��";
 					setcolor(0, 0);
 				}
 			}
@@ -225,7 +225,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 					}
 					gotoxy(0, 0);
 					setcolor(0, 12);
-					cout << "¡Ü";
+					cout << "��";
 					setcolor(0, 0);
 				}
 				else {
@@ -236,7 +236,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 
 					gotoxy(0, idx - Start);
 					setcolor(0, 12);
-					cout << "¡Ü";
+					cout << "��";
 					setcolor(0, 0);
 				}
 			}
@@ -261,7 +261,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 					}
 					gotoxy(0, idx - Start);
 					setcolor(0, 12);
-					cout << "¡Ü";
+					cout << "��";
 					setcolor(0, 0);
 				}
 				else {
@@ -272,7 +272,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 
 					gotoxy(0, idx - Start);
 					setcolor(0, 12);
-					cout << "¡Ü";
+					cout << "��";
 					setcolor(0, 0);
 				}
 			}
@@ -300,7 +300,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 					}
 					gotoxy(0, 0);
 					setcolor(0, 12);
-					cout << "¡Ü";
+					cout << "��";
 					setcolor(0, 0);
 				}
 				else {
@@ -311,7 +311,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 
 					gotoxy(0, idx - Start);
 					setcolor(0, 12);
-					cout << "¡Ü";
+					cout << "��";
 					setcolor(0, 0);
 				}
 			}
@@ -394,7 +394,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 						Start = 0;
 
 						setcolor(0, 12);
-						cout << "¡Ü";
+						cout << "��";
 						setcolor(0, 0);
 					}
 					else if (state == 1) { /// cf) state = 2;
@@ -555,7 +555,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 						}
 						// addd Item?
 						else if (2 == select) {
-							// var, val /// state¿¡ µû¶ó?
+							// var, val /// state�� ����?
 							cout << "var : ";
 							cin >> var;
 							cout << "val : ";
@@ -1303,7 +1303,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		wiz::load_data::UserType ut;
 		wiz::load_data::LoadData::LoadDataFromString(value, ut);
 
-		if (ut.IsItemList(ut.GetIList().size()-1))
+		if (ut.IsItemList(ut.GetIList().size() - 1))
 		{
 			auto x = (wiz::load_data::ItemType<string>*)ut.GetList(ut.GetIList().size() - 1);
 			operandStack.push(x->Get(0));
@@ -1655,8 +1655,8 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 	}
 
 	//
-	wiz::ArrayStack<string> operandStack; // ?¼ì°?°ì
-	wiz::ArrayStack<string> operatorStack; // ?°ì°??
+	wiz::ArrayStack<string> operandStack; // ?�연?�자
+	wiz::ArrayStack<string> operatorStack; // ?�산??
 	wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" });
 	vector<string> tokenVec;
 
@@ -1707,7 +1707,7 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 				strVec.pop_back();
 				strVec.pop_back();
 				strVec.push_back(temp);
-				
+
 				chkBrace.pop();
 				continue;
 			}
@@ -1755,7 +1755,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 	wiz::ArrayStack<EventInfo> eventStack;
 	map<string, int> convert;
 	vector<wiz::load_data::UserType*> _events;
-	wiz::load_data::UserType events; 
+	wiz::load_data::UserType events;
 	wiz::load_data::UserType Main;
 
 	if (NULL == pEvents) {
@@ -1770,9 +1770,9 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 			cout << "do not exist Main" << endl;
 			return "ERROR -1";
 		}
-		
+
 		auto _Main = global.GetCopyUserTypeItem("Main")[0];
-	
+
 		Main.LinkUserType(_Main);
 		global.RemoveUserTypeList("Main");
 	}
@@ -1907,7 +1907,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 				}
 			}
 
-			while (val != NULL) 
+			while (val != NULL)
 			{
 				if ("$replace_datetype" == val->GetName()) {
 					string sval = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
@@ -1969,7 +1969,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					string scondition = "TRUE";
 					string start_dir = "root";
 
-					if (val->GetUserTypeListSize() >= 3) 
+					if (val->GetUserTypeListSize() >= 3)
 					{
 						scondition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top());
 					}
@@ -1987,7 +1987,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					MStyleTest(&global);
 
 					system("cls");
-					
+
 					gotoxy(0, 0);
 					setcolor(7, 0);
 
@@ -2001,7 +2001,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					string fileName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
 					fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
 					string option = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
-					
+
 					wiz::load_data::LoadData::SaveWizDB(global, fileName, option, "");
 					wiz::load_data::LoadData::SaveWizDB(Main, fileName, option, "APPEND");
 					wiz::load_data::LoadData::SaveWizDB(events, fileName, option, "APPEND");
@@ -2016,14 +2016,14 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					string fileName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
 					fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
 					string option = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
-					
+
 					wiz::load_data::LoadData::SaveWizDB(global, fileName, option, "");
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 
-				else if ("$save_data_only2" == val->GetName()) 
+				else if ("$save_data_only2" == val->GetName())
 				{
 					//todo
 					// "filename" save_option(0~2)
@@ -2119,10 +2119,10 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					string parameter;
 
 					parameter = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
-					
+
 					string data = objectMap.at(objectFileName);
 					data = data + " Main = { $call = { id = 0 } } Event = { id = 0 $call = { " + parameter + "  } } ";
-					
+
 					wiz::load_data::UserType objectUT;
 					wiz::load_data::LoadData::LoadDataFromString(data, objectUT);
 
@@ -2136,9 +2136,9 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					string objectFileName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
 					objectFileName = wiz::String::substring(objectFileName, 1, objectFileName.size() - 2);
 					string parameter;
-					
+
 					parameter = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
-					
+
 
 					wiz::load_data::UserType objectUT;
 					wiz::load_data::LoadData::LoadDataFromFile(objectFileName, objectUT);
@@ -2146,7 +2146,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					string data = objectUT.ToString();
 
 					data = data + " Main = { $call = { id = 0 } } Event = { id = 0 $call = { " + parameter + "  } } ";
-					
+
 					objectUT.Remove();
 					wiz::load_data::LoadData::LoadDataFromString(data, objectUT);
 
@@ -2197,7 +2197,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 
 
 					value = ToBool4(global, eventStack.top().parameters, value, eventStack.top());
-					
+
 					string condition = "TRUE";
 					if (val->GetUserTypeListSize() >= 3) {
 						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top());
@@ -2209,7 +2209,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 				}
 				else if ("$pop_front" == val->GetName()) {
 					string dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
-					
+
 					string condition = "TRUE";
 					if (val->GetUserTypeListSize() >= 2) {
 						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
@@ -2230,7 +2230,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 						delete waits_info[i];
 					}
 					waits_info.resize(0);
-					
+
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
@@ -2349,7 +2349,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 
 					break;
 				}
-				
+
 				else if ("$assign" == val->GetName()) /// -> assign2?
 				{
 					pair<string, string> dir = Find2(&global, val->GetItemList(0).Get(0));
@@ -2364,12 +2364,12 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				
+
 				else if ("$assign2" == val->GetName())
 				{
 					pair<string, string> dir = Find2(&global, ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top()));
 					string data = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
-					
+
 					{
 						if (dir.first == "" && wiz::String::startsWith(dir.second, "$local."))
 						{
@@ -2379,7 +2379,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 							wiz::load_data::LoadData::SetData(global, dir.first, dir.second, data, "TRUE");
 						}
 					}
-					
+
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
@@ -2405,7 +2405,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$assign_global" == val->GetName()) // ì£¼ì!! dir=> dir/name ( dir= { name = val } } , @ë¥??ì ë¶ì¬???ë¤. 
+				else if ("$assign_global" == val->GetName()) // 주의!! dir=> dir/name ( dir= { name = val } } , @�??�에 붙여???�다. 
 				{
 					pair<string, string> dir = Find2(&global, ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top()));
 					string data = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
@@ -2478,7 +2478,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					if (is2 && val->GetUserTypeListSize() >= 2) {
 						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
 					}
-					else if (false == is2 && val->GetUserTypeListSize() >= 1 ) {
+					else if (false == is2 && val->GetUserTypeListSize() >= 1) {
 						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
 					}
 
@@ -2522,7 +2522,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					break;
 				}
 				else if ("$remove2" == val->GetName()) // remove /dir/name 
-													// if name is empty, then chk!!
+													   // if name is empty, then chk!!
 				{
 					string dir = string(val->GetItemList(0).Get(0).c_str()); // item -> userType
 					dir = ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
@@ -2559,12 +2559,12 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					}
 
 					wiz::load_data::LoadData::Remove(global, dir, idx, condition);
-						// remove -> UserType::Find(&global, dir).second[0]->RemoveItemList(idx); /// change ?
+					// remove -> UserType::Find(&global, dir).second[0]->RemoveItemList(idx); /// change ?
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				
+
 				else if ("$setElement" == val->GetName())
 				{
 					string dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
@@ -2684,7 +2684,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 				{
 					string dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
 					auto x = wiz::load_data::UserType::Find(&global, dir);
-					
+
 					for (auto& ut : x.second) {
 						cout << ut->ToString();
 						cout << endl;
@@ -2724,7 +2724,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 							{
 								// error!
 								cout << "err" << endl;
-								
+
 								return "ERROR -2"; /// exit?
 							}
 						}
@@ -2770,7 +2770,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
 					string dirName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
 					wiz::load_data::UserType* utTemp = global.GetUserTypeItem(dirName)[0];
-						
+
 					if (wiz::load_data::LoadData::LoadDataFromFile(fileName, ut)) {
 						{
 							int item_count = 0;
@@ -2789,14 +2789,14 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 							}
 						}
 
-					//	auto _Main = ut.GetUserTypeItem("Main");
-					//	if (!_Main.empty())
-					//	{
-							// error!
-					//		cout << "err" << endl;
+						//	auto _Main = ut.GetUserTypeItem("Main");
+						//	if (!_Main.empty())
+						//	{
+						// error!
+						//		cout << "err" << endl;
 
-				//			return "ERROR -2"; /// exit?
-				//		}
+						//			return "ERROR -2"; /// exit?
+						//		}
 					}
 					else {
 						// error!
@@ -2835,7 +2835,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 						/// if temp just one
 						eventStack[eventStack.size() - 2].return_value = temp;
 					}
-					
+
 					if (eventStack.size() == 1)
 					{
 						string temp = ToBool4(global, eventStack.top().parameters, val->ToString(), eventStack.top());
@@ -2859,10 +2859,10 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 				else if ("$sort" == val->GetName()) {
 					// todo
 					vector<SortInfo> siVec;
-					wiz::load_data::UserType* utTemp = 
-						wiz::load_data::UserType::Find(&global, 
+					wiz::load_data::UserType* utTemp =
+						wiz::load_data::UserType::Find(&global,
 							ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top())).second[0];
-	
+
 					vector<wiz::load_data::Type*> temp;
 
 
@@ -2881,7 +2881,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					}
 
 					std::sort(siVec.begin(), siVec.end());
-					
+
 
 					wiz::load_data::UserType ut;
 					for (int i = 0; i < temp.size(); ++i)
@@ -2897,7 +2897,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					utTemp->Remove();
 
 					wiz::load_data::LoadData::AddData(*(utTemp), "", ut.ToString(), "TRUE");
-					
+
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -3030,10 +3030,10 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 				}
 
 				{
-				//	if (chkFunc(eventStack, &val)) {
-				//		eventStack.top().userType_idx.top()++;
-				//		break;
-				//	}
+					//	if (chkFunc(eventStack, &val)) {
+					//		eventStack.top().userType_idx.top()++;
+					//		break;
+					//	}
 				}
 			}
 		}
@@ -3068,9 +3068,9 @@ int main(int argc, char* argv[])
 		fileName = string(argv[1]);
 	}
 
-	wiz::load_data::UserType global;			
+	wiz::load_data::UserType global;
 	wiz::load_data::LoadData::LoadDataFromFile(fileName, global);
-	
+
 	cout << "fileName is " << fileName << endl;
 	cout << "excute result is " << excute_module(&global) << endl;
 	//_getch(); // pause..
