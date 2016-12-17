@@ -245,7 +245,7 @@ public:
 			}
 		}
 	}
-	void push(ArrayQueue<T>&& val) {
+	void push(ArrayQueue<T>&& val) { // chk..
 		if (val.empty()) { return; }
 		int newSize = this->que.size();
 
@@ -271,7 +271,7 @@ public:
 		}
 		else {
 			for (int i = 0; i < val.size(); ++i) {
-				this->push(std::move(val.que[i]));
+				this->push(std::move(val[i]));
 			}
 		}
 	}
@@ -320,7 +320,7 @@ public:
 
         que[start] = T();
 
-        start = ( start + 1 ) % (que.size());
+        start = ( start + 1 ) & (que.size()-1); // % que.size(), 2^n.
         num--;
 
         return temp;
