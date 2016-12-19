@@ -2,9 +2,14 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
-//#include <vld.h>
+// memory leak test.
+#ifdef _DEBUG 
+#include <vld.h>
+#endif
 
+// Array idx chk test.
 //#define ARRAYS_DEBUG
+
 #include <iostream>
 #include <vector>
 #include <map>
@@ -13,6 +18,7 @@
 #include <string>
 #include <ctime>
 #include <cstdlib>
+#include <memory> // for smart pointer.
 using namespace std;
 
 #include <conio.h>
@@ -1742,9 +1748,11 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 	return result;
 }
 
-string excute_module(wiz::load_data::UserType* _global)
+
+string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType* pEvents = NULL, std::shared_ptr<EventInfo> pInfo = NULL)
 {
 	wiz::load_data::UserType& global = *_global;
+	vector<thread*> waits;
 	map<string, string> objectMap;
 	map<string, wiz::load_data::UserType> moduleMap;
 	string module_value = "";
@@ -1755,12 +1763,15 @@ string excute_module(wiz::load_data::UserType* _global)
 	wiz::load_data::UserType events;
 	wiz::load_data::UserType Main;
 
-	{
+	if (NULL == pEvents) {
 		_events = global.GetCopyUserTypeItem("Event");
 		for (int i = 0; i < _events.size(); ++i) {
 			events.LinkUserType(_events[i]);
 		}
 		global.RemoveUserTypeList("Event");
+	}
+	else {
+		events = *pEvents;
 	}
 	// event table setting
 	for (int i = 0; i < events.GetUserTypeListSize(); ++i)
@@ -1776,7 +1787,7 @@ string excute_module(wiz::load_data::UserType* _global)
 	}
 
 	// start from Main.
-	{
+	if (NULL == pInfo) {
 		if (global.GetUserTypeItem("Main").empty())
 		{
 			cout << "do not exist Main" << endl;
@@ -1810,6 +1821,9 @@ string excute_module(wiz::load_data::UserType* _global)
 		}
 
 		eventStack.push(info);
+	}
+	else {
+		eventStack.push(*pInfo);
 	}
 
 	// main loop
@@ -2210,6 +2224,16 @@ string excute_module(wiz::load_data::UserType* _global)
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
+				else if ("$wait" == val->GetName()) {
+					for (int i = 0; i < waits.size(); ++i) {
+						waits[i]->join();
+						delete waits[i];
+					}
+					waits.resize(0);
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
 				else if ("$call" == val->GetName()) {
 					if (!val->GetItem("id").empty()) {
 						info.id = val->GetItem("id")[0].Get(0);
@@ -2301,8 +2325,22 @@ string excute_module(wiz::load_data::UserType* _global)
 							break;
 						}
 					}
+					if (waits.size() >= 4) {
+						for (int i = 0; i < waits.size(); ++i) {
+							waits[i]->join();
+							delete waits[i]; // chk ?
+						}
+						waits.resize(0);
+					}
 
-					eventStack.push(info);
+					if (false == val->GetItem("option").empty() && val->GetItem("option")[0].Get(0) == "USE_THREAD") {
+						std::shared_ptr<EventInfo> pInfo( new EventInfo(info) );
+						thread* A = new thread(excute_module, &global, &events, pInfo);
+						waits.push_back(A);
+					}
+					else {
+						eventStack.push(info);
+					}
 
 					break;
 				}
@@ -2985,17 +3023,21 @@ string excute_module(wiz::load_data::UserType* _global)
 						break;
 					}
 				}
+				else { //
+					cout << "it does not work. : " << val->GetName() << endl;
 
-				{
-					//	if (chkFunc(eventStack, &val)) {
-					//		eventStack.top().userType_idx.top()++;
-					//		break;
-					//	}
+					eventStack.top().userType_idx.top()++;
+					break;
 				}
 			}
 		}
 	}
 
+	for (int i = 0; i < waits.size(); ++i) {
+		waits[i]->join();
+		delete waits[i];
+	}
+	waits.resize(0);
 
 	return module_value;
 }
