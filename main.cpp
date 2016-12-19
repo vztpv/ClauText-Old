@@ -1742,12 +1742,9 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 	return result;
 }
 
-
-string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType* pEvents = NULL, EventInfo* pInfo = NULL)
+string excute_module(wiz::load_data::UserType* _global)
 {
 	wiz::load_data::UserType& global = *_global;
-	vector<EventInfo*> waits_info;
-	vector<thread*> waits;
 	map<string, string> objectMap;
 	map<string, wiz::load_data::UserType> moduleMap;
 	string module_value = "";
@@ -1758,26 +1755,12 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 	wiz::load_data::UserType events;
 	wiz::load_data::UserType Main;
 
-	if (NULL == pEvents) {
+	{
 		_events = global.GetCopyUserTypeItem("Event");
 		for (int i = 0; i < _events.size(); ++i) {
 			events.LinkUserType(_events[i]);
 		}
 		global.RemoveUserTypeList("Event");
-
-		if (global.GetUserTypeItem("Main").empty())
-		{
-			cout << "do not exist Main" << endl;
-			return "ERROR -1";
-		}
-
-		auto _Main = global.GetCopyUserTypeItem("Main")[0];
-
-		Main.LinkUserType(_Main);
-		global.RemoveUserTypeList("Main");
-	}
-	else {
-		events = *pEvents;
 	}
 	// event table setting
 	for (int i = 0; i < events.GetUserTypeListSize(); ++i)
@@ -1793,7 +1776,18 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 	}
 
 	// start from Main.
-	if (NULL == pInfo) {
+	{
+		if (global.GetUserTypeItem("Main").empty())
+		{
+			cout << "do not exist Main" << endl;
+			return "ERROR -1";
+		}
+
+		auto _Main = global.GetCopyUserTypeItem("Main")[0];
+
+		Main.LinkUserType(_Main);
+		global.RemoveUserTypeList("Main");
+
 		EventInfo info;
 		info.eventUT = Main.GetUserTypeList(0);
 		info.item_idx = 0;
@@ -1816,9 +1810,6 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 		}
 
 		eventStack.push(info);
-	}
-	else {
-		eventStack.push(*pInfo);
 	}
 
 	// main loop
@@ -2219,21 +2210,6 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$wait" == val->GetName()) {
-					for (int i = 0; i < waits.size(); ++i) {
-						waits[i]->join();
-						delete waits[i];
-					}
-					waits.resize(0);
-
-					for (int i = 0; i < waits_info.size(); ++i) {
-						delete waits_info[i];
-					}
-					waits_info.resize(0);
-
-					eventStack.top().userType_idx.top()++;
-					break;
-				}
 				else if ("$call" == val->GetName()) {
 					if (!val->GetItem("id").empty()) {
 						info.id = val->GetItem("id")[0].Get(0);
@@ -2325,27 +2301,8 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 							break;
 						}
 					}
-					if (waits.size() >= 4) {
-						for (int i = 0; i < waits.size(); ++i) {
-							waits[i]->join();
-							delete waits[i]; // chk ?
-						}
-						waits.resize(0);
-						for (int i = 0; i < waits_info.size(); ++i) {
-							delete waits_info[i];
-						}
-						waits_info.resize(0);
-					}
 
-					if (false == val->GetItem("option").empty() && val->GetItem("option")[0].Get(0) == "USE_THREAD") {
-						EventInfo* pinfo = new EventInfo(info);
-						thread* A = new thread(excute_module, &global, &events, pinfo);
-						waits.push_back(A);
-						waits_info.push_back(pInfo);
-					}
-					else {
-						eventStack.push(info);
-					}
+					eventStack.push(info);
 
 					break;
 				}
@@ -3039,16 +2996,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 		}
 	}
 
-	for (int i = 0; i < waits.size(); ++i) {
-		waits[i]->join();
-		delete waits[i];
-	}
-	waits.resize(0);
 
-	for (int i = 0; i < waits_info.size(); ++i) {
-		delete waits_info[i];
-	}
-	waits_info.resize(0);
 	return module_value;
 }
 
