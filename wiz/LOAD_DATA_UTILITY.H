@@ -325,7 +325,7 @@ namespace wiz {
 				}
 				void operator() () {
 					for (int i = strVecStart; i <= strVecEnd; ++i)
-					{
+					{	
 						StringTokenizer tokenizer((*strVec)[i]);
 						while (tokenizer.hasMoreTokens()) {
 							string temp = tokenizer.nextToken();

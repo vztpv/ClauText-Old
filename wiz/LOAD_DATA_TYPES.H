@@ -122,6 +122,10 @@ namespace wiz {
 				if (!inited) { throw "ItemType, not inited"; } // removal?
 				data = val;
 			}
+			void Set(const int index, const T&& val) {
+				if (!inited) { throw "ItemType, not inited"; } // removal?
+				data = val;
+			}
 			int size()const {
 				return inited? 1 : 0;
 			}
@@ -203,6 +207,7 @@ namespace wiz {
 			{
 				userTypeList.push_back(ut);
 				ilist.push_back(2);
+				ut->parent = this;
 			}
 		private:
 			UserType* parent;
