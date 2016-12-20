@@ -1309,13 +1309,13 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		wiz::load_data::UserType ut;
 		wiz::load_data::LoadData::LoadDataFromString(value, ut);
 
-		if (ut.IsItemList(ut.GetIList().size() - 1))
+		if (ut.IsItemList(ut.GetIListSize() - 1))
 		{
-			auto x = (wiz::load_data::ItemType<string>*)ut.GetList(ut.GetIList().size() - 1);
+			auto x = (wiz::load_data::ItemType<string>*)ut.GetList(ut.GetIListSize() - 1);
 			operandStack.push(x->Get(0));
 		}
 		else {
-			auto x = (wiz::load_data::UserType*)ut.GetList(ut.GetIList().size() - 1);
+			auto x = (wiz::load_data::UserType*)ut.GetList(ut.GetIListSize() - 1);
 			operandStack.push("\"" + x->ToString() + "\"");
 		}
 	}
@@ -1339,14 +1339,14 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		auto finded = wiz::load_data::UserType::Find(&global, x);
 		ut = finded.second[0];
 
-		if (ut->IsItemList(ut->GetIList().size() - 1))
+		if (ut->IsItemList(ut->GetIListSize() - 1))
 		{
-			auto x = (wiz::load_data::ItemType<string>*)ut->GetList(ut->GetIList().size() - 1);
+			auto x = (wiz::load_data::ItemType<string>*)ut->GetList(ut->GetIListSize() - 1);
 			operandStack.push(x->Get(0));
 			ut->RemoveItemList(ut->GetItemListSize() - 1);
 		}
 		else {
-			auto x = (wiz::load_data::UserType*)ut->GetList(ut->GetIList().size() - 1);
+			auto x = (wiz::load_data::UserType*)ut->GetList(ut->GetIListSize() - 1);
 			operandStack.push("\"" + x->ToString() + "\"");
 			ut->RemoveUserTypeList(ut->GetUserTypeListSize() - 1);
 		}
@@ -2182,7 +2182,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					if (val->GetUserTypeListSize() >= 2) {
 						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
 					}
-					wiz::load_data::LoadData::Remove(global, dir, ut->GetIList().size() - 1, condition);
+					wiz::load_data::LoadData::Remove(global, dir, ut->GetIListSize() - 1, condition);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -2701,7 +2701,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 								int item_count = 0;
 								int userType_count = 0;
 
-								for (int i = 0; i < ut.GetIList().size(); ++i) {
+								for (int i = 0; i < ut.GetIListSize(); ++i) {
 									if (ut.IsItemList(i)) {
 										global.AddItem(std::move(ut.GetItemList(item_count).GetName()),
 											std::move(ut.GetItemList(item_count).Get(0)));
@@ -2771,7 +2771,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 							int item_count = 0;
 							int userType_count = 0;
 
-							for (int i = 0; i < ut.GetIList().size(); ++i) {
+							for (int i = 0; i < ut.GetIListSize(); ++i) {
 								if (ut.IsItemList(i)) {
 									utTemp->AddItem(std::move(ut.GetItemList(item_count).GetName()),
 										std::move(ut.GetItemList(item_count).Get(0)));
@@ -2862,8 +2862,8 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 
 
 					int item_count = 0, ut_count = 0;
-					for (int i = 0; i < utTemp->GetIList().size(); ++i) {
-						if (utTemp->GetIList()[i] == 1) {
+					for (int i = 0; i < utTemp->GetIListSize(); ++i) {
+						if (utTemp->IsItemList(i)) {
 							temp.push_back(&(utTemp->GetItemList(item_count)));
 							siVec.emplace_back(utTemp->GetItemList(item_count).GetName(), 1, i);
 							item_count++;
@@ -2909,8 +2909,8 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 
 
 					int item_count = 0, ut_count = 0;
-					for (int i = 0; i < utTemp->GetIList().size(); ++i) {
-						if (utTemp->GetIList()[i] == 1) {
+					for (int i = 0; i < utTemp->GetIListSize(); ++i) {
+						if (utTemp->IsItemList(i)) {
 							temp.push_back(&(utTemp->GetItemList(item_count)));
 							siVec.emplace_back(utTemp->GetItemList(item_count).GetName(), 1, i);
 							item_count++;
