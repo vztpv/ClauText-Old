@@ -153,8 +153,7 @@ namespace wiz {
 
 		class UserType : public Type {
 		public:
-			const vector<int>& GetIList() const { return ilist; }
-			//vector<int>& GetIList() { return ilist; }
+			int GetIListSize()const { return ilist.size(); }
 			int GetItemListSize()const { return itemList.size(); }
 			int GetUserTypeListSize()const { return userTypeList.size(); }
 			ItemType<string>& GetItemList(const int idx) { return itemList[idx]; }
