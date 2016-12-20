@@ -154,7 +154,7 @@ namespace wiz {
 		class UserType : public Type {
 		public:
 			const vector<int>& GetIList() const { return ilist; }
-			vector<int>& GetIList() { return ilist; }
+			//vector<int>& GetIList() { return ilist; }
 			int GetItemListSize()const { return itemList.size(); }
 			int GetUserTypeListSize()const { return userTypeList.size(); }
 			ItemType<string>& GetItemList(const int idx) { return itemList[idx]; }
@@ -1007,7 +1007,6 @@ namespace wiz {
 			{
 			private:
 				vector<UserType*>* utVec;
-				wiz::ArrayQueue<string>* aq;
 				vector<string> target_ch;
 				vector<string> result_ch;
 				int utVecStart;
@@ -1167,9 +1166,9 @@ namespace wiz {
 				}
 				else {
 					for (int i = 0; i < userTypeListSize; ++i) {
-						if (false == temp->GetUserTypeList(i)->reservedA) {
+						//if (false == temp->GetUserTypeList(i)->reservedA) {
 							ReplaceAll(temp->GetUserTypeList(i), target_ch, result_ch);
-						}
+						//}
 					}
 				}
 			}
