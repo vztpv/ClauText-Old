@@ -177,7 +177,7 @@ namespace wiz {
 					int item_idx = -1;
 
 					for (int i = 0; i < ilist.size() && i <= idx; ++i) {
-						if (ilist[idx] == 1) { item_idx++; }
+						if (ilist[i] == 1) { item_idx++; }
 					}
 
 					return (Type*)(&itemList[item_idx]);
@@ -186,7 +186,7 @@ namespace wiz {
 					int usertype_idx = -1;
 
 					for (int i = 0; i < ilist.size() && i <= idx; ++i) {
-						if (ilist[idx] == 2) { usertype_idx++; }
+						if (ilist[i] == 2) { usertype_idx++; }
 					}
 					return (Type*)(userTypeList[usertype_idx]);
 				}
