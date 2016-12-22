@@ -381,11 +381,11 @@ namespace wiz {
 					if (strVec.size() < 10) {
 						vecReserver(strVec);
 
-						while (strVec.size() <= 1) // (strVec.empty())
+						while (strVec.empty()) // (strVec.empty())
 						{
 							vecReserver(strVec);
 							if (
-								//strVec.empty() && 
+								strVec.empty() && 
 								vecReserver.end()
 								) {
 								// throw "Err nextToken does not exist2";
@@ -467,7 +467,7 @@ namespace wiz {
 					//str = Utility::ChangeStr(str, "\t", "^2");
 					//str = Utility::ChangeStr(str, "\r", "^3");
 					//str = Utility::ChangeStr(str, "\n", "^4");
-					/// DONE - ""¾È¿¡ ¿©¹éÀÌ ÀÖÀ» ‹š ´Ù¸¥ °ÍÀ¸·Î ´ëÃ¼ÈÄ ´Ù½Ã º¯°æ
+					/// DONE - ""ï¿½È¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ù¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã¼ï¿½ï¿½ ï¿½Ù½ï¿½ ï¿½ï¿½ï¿½ï¿½
 				}
 				StringTokenizer tokenizer(str, vector<string>{" ", "\t", "\r", "\n"});
 				ArrayQueue<string> strVec;
@@ -577,7 +577,7 @@ namespace wiz {
 			auto finded = Find(global, position);
 			if (finded.first) {
 			for (int i = 0; i < finded.second.size(); ++i) {
-			finded.second[i]->Remove(); // todo - ³»ºÎ..
+			finded.second[i]->Remove(); // todo - ï¿½ï¿½ï¿½ï¿½..
 			}
 			return true;
 			}
