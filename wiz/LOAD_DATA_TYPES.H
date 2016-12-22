@@ -249,7 +249,7 @@ namespace wiz {
 				return *this;
 			}
 		private:
-			void Reset(const UserType& ut) { /// UT ÀüÃ¼¸¦ º¹»çÇÑ´Ù.
+			void Reset(const UserType& ut) { /// UT ï¿½ï¿½Ã¼ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½.
 											 //	userTypeList_sortFlagA = ut.userTypeList_sortFlagA;
 											 //userTypeList_sortFlagB = ut.userTypeList_sortFlagB;
 
@@ -346,7 +346,7 @@ namespace wiz {
 				for (int i = 0; i < ilist.size(); ++i) {
 					if (ilist[i] == 1) { count++; }
 					if (count == idx + 1) {
-						// iºÎÅÍ left shift!and resize!
+						// iï¿½ï¿½ï¿½ï¿½ left shift!and resize!
 						for (int k = i + 1; k < ilist.size(); ++k) {
 							ilist[k - 1] = std::move(ilist[k]);
 						}
@@ -370,7 +370,7 @@ namespace wiz {
 				for (int i = 0; i < ilist.size(); ++i) {
 					if (ilist[i] == 2) { count++; }
 					if (count == idx + 1) {
-						// iºÎÅÍ left shift!and resize!
+						// iï¿½ï¿½ï¿½ï¿½ left shift!and resize!
 						for (int k = i + 1; k < ilist.size(); ++k) {
 							ilist[k - 1] = std::move(ilist[k]);
 						}
@@ -491,7 +491,7 @@ namespace wiz {
 					int item_idx = -1;
 
 					for (int i = 0; i < ilist.size() && i <= idx; ++i) {
-						if (ilist[idx] == 1) { item_idx++; }
+						if (ilist[i] == 1) { item_idx++; }
 					}
 
 					RemoveItemList(item_idx);
@@ -500,7 +500,7 @@ namespace wiz {
 					int usertype_idx = -1;
 
 					for (int i = 0; i < ilist.size() && i <= idx; ++i) {
-						if (ilist[idx] == 2) { usertype_idx++; }
+						if (ilist[i] == 2) { usertype_idx++; }
 					}
 
 					RemoveUserTypeList(usertype_idx);
