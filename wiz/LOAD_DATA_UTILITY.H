@@ -311,6 +311,8 @@ namespace wiz {
 				return{ chk, false };
 			}
 		private:
+
+			// DoThread2 -> DoThread1
 			class DoThread // need to rename!
 			{
 			private:
@@ -319,14 +321,14 @@ namespace wiz {
 				int strVecStart;
 				int strVecEnd;
 			public:
-				DoThread( vector<string>* strVec, ArrayQueue<string>* aq, int strVecStart, int strVecEnd ) 
+				DoThread(vector<string>* strVec, ArrayQueue<string>* aq, int strVecStart, int strVecEnd)
 					: strVec(strVec), aq(aq), strVecStart(strVecStart), strVecEnd(strVecEnd)
 				{
 				}
 				void operator() () {
 					for (int i = strVecStart; i <= strVecEnd; ++i)
-					{	
-						StringTokenizer tokenizer((*strVec)[i]);
+					{
+						StringTokenizer tokenizer(std::move(*strVec)[i]);
 						while (tokenizer.hasMoreTokens()) {
 							string temp = tokenizer.nextToken();
 							aq->push(std::move(temp));
@@ -349,27 +351,30 @@ namespace wiz {
 				void operator() () {
 					for (int i = strVecStart; i <= strVecEnd; ++i)
 					{
-						//temp = RemoveEndSpace(temp);
-						bool chkStr = ChkExist((*strVec)[i]);
+						string temp = std::move((*strVec)[i]);
+
+						bool chkStr = ChkExist(temp);
 						if (chkStr) {
-							(*strVec)[i] = ChangeStr((*strVec)[i], { "^" }, { "^0" }); // 1줄에 "~~~" ?	
-							(*strVec)[i] = ChangeStr((*strVec)[i], { "#" }, { "^5" });
+							temp = ChangeStr(temp, { "^" }, { "^0" }); // 1줄에 "~~~" ?	
+							temp = ChangeStr(temp, { "#" }, { "^5" });
 						}
 
-						(*strVec)[i] = PassSharp((*strVec)[i]);
-						(*strVec)[i] = AddSpace((*strVec)[i]);
+						temp = PassSharp(temp);
+						temp = AddSpace(temp);
 
 						if (chkStr) {
-							(*strVec)[i] = ChangeStr((*strVec)[i], { " ", "\t", "\r", "\n" }, { "^1", "^2", "^3", "^4" });
+							temp = ChangeStr(temp, { " ", "\t", "\r", "\n" }, { "^1", "^2", "^3", "^4" });
 							//(*strVec)[i] = ChangeStr((*strVec)[i], "\t", "^2");
 							//(*strVec)[i] = ChangeStr((*strVec)[i], "\r", "^3");
 							//(*strVec)[i] = ChangeStr((*strVec)[i], "\n", "^4");
 						}
+
+						(*strVec)[i] = std::move(temp);
 					}
 				}
 			};
 		private:
-			static string RemoveEndSpace( const string& str )
+			static string RemoveEndSpace(const string& str)
 			{
 				string temp;
 				int state = 0;
@@ -423,8 +428,8 @@ namespace wiz {
 				string temp;
 				vector<string> strVecTemp;
 				ArrayQueue<string> arrayQueue[4];
-				
-				for (int i = 0; i < num && (getline(inFile,temp)); ++i) {
+
+				for (int i = 0; i < num && (getline(inFile, temp)); ++i) {
 					if (temp.empty()) { continue; }
 					strVecTemp.push_back(temp);
 					count++;
@@ -483,7 +488,7 @@ namespace wiz {
 				}
 				return{ count > 0, count };
 			}
-			
+
 			static const string& Top(const ArrayQueue<string>& strVec)
 			{
 				return strVec[0];
@@ -542,6 +547,7 @@ namespace wiz {
 				return{ false, -1 };
 			}
 
+
 		public:
 
 			// To Do
@@ -577,13 +583,13 @@ namespace wiz {
 			}
 
 			/// need testing!
-			static string PassSharp(const string& str) {
+			static string PassSharp(const string& str) { // txt file로 들어온다?
 				string temp;
 				int state = 0;
 
 				for (int i = 0; i < str.size(); ++i) {
-					if (str[i] == '#') { state = 1; }
-					else if (str[i] == '\n') { state = 0; }
+					if (str[i] == '#') { state = 1; continue; }
+					else if (str[i] == '\n') { state = 0; continue; }
 
 					if (0 == state) {
 						temp.push_back(str[i]);
@@ -596,7 +602,7 @@ namespace wiz {
 				for (string::size_type j = 0; j < changed_str.size(); ++j) {
 					if (wiz::String::Comp(changed_str[j].c_str(), str.c_str() + i, changed_str[j].size())) {
 						state = 1;
-						temp += result_str[j];
+						temp.append(result_str[j]);
 						i = i + changed_str[j].size() - 1;
 						return true;
 					}

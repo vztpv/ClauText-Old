@@ -763,10 +763,11 @@ namespace wiz {
 			bool GetLastUserTypeItemRef(const string& name, UserType*& ref) {
 				int idx = -1;
 
-				for (int i = 0; i < userTypeList.size(); ++i)
+				for (int i = userTypeList.size()-1; i >= 0; --i)
 				{
 					if (name == userTypeList[i]->GetName()) {
 						idx = i;
+						break;
 					}
 				}
 				if (idx > -1) {
@@ -972,27 +973,33 @@ namespace wiz {
 					//std::cout << "ItemList" << endl;
 					if (ilist[i] == 1) {
 						for (int j = 0; j < itemList[itemListCount].size(); j++) {
-							if (itemList[itemListCount].GetName() != "")
-								temp += itemList[itemListCount].GetName() + " = ";
-							temp += itemList[itemListCount].Get(j);
+							if (itemList[itemListCount].GetName() != "") {
+								temp.append(itemList[itemListCount].GetName());
+								temp.append(" = ");
+							}
+							temp.append(itemList[itemListCount].Get(j));
 							if (j != itemList[itemListCount].size() - 1)
-								temp += " ";
+							{
+								temp.append(" ");
+							}
 						}
 						if (i != ilist.size() - 1) {
-							temp += " ";
+							temp.append(" ");
 						}
 						itemListCount++;
 					}
 					else if (ilist[i] == 2) {
 						// std::cout << "UserTypeList" << endl;
 						if (userTypeList[userTypeListCount]->GetName() != "") {
-							temp = temp + userTypeList[userTypeListCount]->GetName() + " = ";
+							temp.append(userTypeList[userTypeListCount]->GetName());
+							temp.append(" = ");
 						}
-						temp += " { ";
-						temp += (userTypeList[userTypeListCount]->ToString()) + " ";
-						temp += " }";
+						temp.append( " { ");
+						temp.append(userTypeList[userTypeListCount]->ToString());
+						temp.append(" ");
+						temp.append(" }");
 						if (i != ilist.size() - 1) {
-							temp += " ";
+							temp.append(" ");
 						}
 
 						userTypeListCount++;

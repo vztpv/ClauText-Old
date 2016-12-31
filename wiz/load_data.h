@@ -467,7 +467,6 @@ namespace wiz {
 					//str = Utility::ChangeStr(str, "\t", "^2");
 					//str = Utility::ChangeStr(str, "\r", "^3");
 					//str = Utility::ChangeStr(str, "\n", "^4");
-					/// DONE - ""�ȿ� ������ ���� �� �ٸ� ������ ��ü�� �ٽ� ����
 				}
 				StringTokenizer tokenizer(str, vector<string>{" ", "\t", "\r", "\n"});
 				ArrayQueue<string> strVec;
