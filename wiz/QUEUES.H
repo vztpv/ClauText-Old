@@ -152,10 +152,9 @@ class ArrayQueue
 {
 public:
 	ArrayQueue(const ArrayQueue<T>& aq)
+		:que(aq.que), start(aq.start), num(aq.num)
 	{
-		this->que = aq.que;
-		this->start = aq.start;
-		this->num = aq.num;
+		//
 	}
 	ArrayQueue(ArrayQueue<T>&& aq)
 	{

@@ -20,12 +20,12 @@ namespace wiz {
 			ArrayStack<string> tokenStack;
 			string condition;
 			int i;
-			UserType* position; // need set, get ter!!
-			UserType* global;
+			UserType* position=nullptr; // need set, get ter!!
+			UserType* global=nullptr;
 			int option;
 		public:
 			explicit Condition(const string& condition, UserType* position, UserType* global, const int option = 0)
-				: braceNum(0), condition(condition), i(0), position(position), option(option)
+				: braceNum(0), condition(condition), i(0), position(position), option(option), global(global)
 			{
 				Init(condition);
 			}

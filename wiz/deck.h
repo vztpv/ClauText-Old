@@ -88,9 +88,13 @@ public: /// ToDo
     }
     Deck<T>& operator=( const Deck<T>& deck )
     {
-        Deck<T> temp = deck;
-
-        for( auto x = temp.cbegin(); x != temp.cend(); ++x )
+		if (this == *deck) { return *this; }
+		
+		while (!isEmpty()) {
+			pop_back();
+		}
+        
+		for( auto x = deck.cbegin(); x != deck.cend(); ++x )
         {
             push_back( *x );
         }

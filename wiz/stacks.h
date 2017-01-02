@@ -72,6 +72,7 @@ public:
         if( this->Rear == s.Rear ) { return *this; }
         clear();
         copy( s );
+		num = s.num;
         return *this;
     }
     Stack( Stack<T>&& s )
@@ -203,9 +204,9 @@ class ArrayStack
 {
 public:
     ArrayStack( const ArrayStack<T>& s )
-    {
-        p = s.p;
-        count = s.count;
+		:p(s.p), count(s.count)
+	{
+		//
     }
     ArrayStack<T>& operator=( const ArrayStack<T>& s )
     {

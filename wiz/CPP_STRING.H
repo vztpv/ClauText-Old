@@ -12,7 +12,7 @@ using namespace std;
 namespace wiz{
     class String{
     public:
-        static int find( const string str, const string dilim, const int start_index )
+        static int find( const string& str, const string& dilim, const int start_index )
         {
             if( str.empty() || dilim.empty() ) { return -1; }
 

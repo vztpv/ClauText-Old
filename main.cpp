@@ -606,7 +606,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 								value = temp;
 
 								int count = 0;
-								int count_userType = 0;
+								count_userType = 0; // int ~ ?
 								for (int h = 0; h < utVec[braceNum].size(); ++h) {
 									for (int i = 0; i < utVec[braceNum].Get(h)->GetUserTypeListSize(); ++i) {
 										count++;
@@ -712,9 +712,6 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 								for (int h = 0; h < utVec[braceNum].size(); ++h) {
 									for (int i = 0; i < utVec[braceNum].Get(h)->GetItemListSize(); ++i) {
 										if (count == idxVec.back()) {
-											string temp = mdVec[idxVec.back()].varName;
-											if (temp == " ") { temp = ""; }
-
 											utVec[braceNum].Get(h)->GetItemList(count - count_ut).Remove(0);
 											if (utVec[braceNum].Get(h)->GetItemList(count - count_ut).size() == 0) {
 												utVec[braceNum].Get(h)->GetItemList(count - count_ut).Remove();
@@ -852,7 +849,6 @@ class EventInfo
 public:
 	wiz::load_data::UserType* eventUT;
 	wiz::ArrayStack< wiz::load_data::UserType* > nowUT; //
-	int item_idx;
 	wiz::ArrayStack<int> userType_idx;
 	vector<pair<string, string>> parameters;
 	map<string, string> locals;
@@ -1749,7 +1745,7 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 }
 
 
-string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType* pEvents = NULL, std::shared_ptr<EventInfo> pInfo = NULL)
+string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType* pEvents = NULL, const std::shared_ptr<EventInfo>& pInfo = NULL)
 {
 	wiz::load_data::UserType& global = *_global;
 	vector<thread*> waits;
@@ -1801,7 +1797,6 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 
 		EventInfo info;
 		info.eventUT = Main.GetUserTypeList(0);
-		info.item_idx = 0;
 		info.userType_idx.push(0);
 		info.parameters.push_back(
 			make_pair("id", info.eventUT->GetUserTypeItem("$call")[0]->GetItem("id")[0].Get(0))
@@ -3052,6 +3047,7 @@ int main(int argc, char* argv[])
 	if (argc == 1) {
 		cout << "FileName: ";
 		getline(cin, fileName);
+		//fileName = "test 6.txt";
 	}
 	else
 	{

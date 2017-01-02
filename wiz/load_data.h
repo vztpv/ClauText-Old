@@ -513,8 +513,9 @@ namespace wiz {
 
 			/// need testing!
 			LoadData(const LoadData& ld)
+				: global(ld.global)
 			{
-				global = ld.global;
+				//global = ld.global;
 			}
 			virtual ~LoadData() { AllRemoveWizDB(); }
 
@@ -593,7 +594,7 @@ namespace wiz {
 				return LoadWizDB(global, fileName);
 			}
 			// SaveQuery
-			bool SaveWizDB(const string& fileName, const string option = "0") { /// , int option
+			bool SaveWizDB(const string& fileName, const string& option = "0") { /// , int option
 				return SaveWizDB(global, fileName, option);
 			}
 
