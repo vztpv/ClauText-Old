@@ -1,4 +1,4 @@
-# Using VisualStudio, Windows10, Modern C++, ( Intel TBB( in progress ) )
+# Using VisualStudio, Windows10, Modern C++, Intel TBB
 
 # What is ClauText? 
 	ClauText consists of Data, Event, and Main.
