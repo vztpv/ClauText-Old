@@ -292,6 +292,7 @@ public:
         que[(start+num) & (que.size()-1)] = val;
         num++;
     }
+	
 	void push(T&& val)
 	{
 		if (isFull())
@@ -310,6 +311,7 @@ public:
 		que[(start + num) & (que.size()-1)] = std::move(val);
 		num++;
 	}
+	
 
     T pop()
     {

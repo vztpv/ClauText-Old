@@ -311,29 +311,38 @@ namespace wiz {
 				return{ chk, false };
 			}
 		private:
-
 			// DoThread2 -> DoThread1
 			class DoThread // need to rename!
 			{
 			private:
 				vector<string>* strVec;
-				ArrayQueue<string>* aq;
-				int strVecStart;
-				int strVecEnd;
 			public:
-				DoThread(vector<string>* strVec, ArrayQueue<string>* aq, int strVecStart, int strVecEnd)
-					: strVec(strVec), aq(aq), strVecStart(strVecStart), strVecEnd(strVecEnd)
+				ArrayQueue<string> aq;
+				//int strVecStart;
+				//int strVecEnd;
+			public:
+				DoThread(vector<string>* strVec) //, ArrayQueue<string>* aq)//, int strVecStart, int strVecEnd)
+					: strVec(strVec) //, aq(aq) // , strVecStart(strVecStart), strVecEnd(strVecEnd)
 				{
+					//
 				}
-				void operator() () {
-					for (int i = strVecStart; i <= strVecEnd; ++i)
+				void operator() (const tbb::blocked_range<size_t>& r) {
+					vector<string>* strVecTemp = strVec;
+					for (size_t i = r.begin(); i != r.end(); ++i)
 					{
-						StringTokenizer tokenizer(std::move(*strVec)[i]);
+						StringTokenizer tokenizer(std::move(*strVecTemp)[i]);
 						while (tokenizer.hasMoreTokens()) {
-							string temp = tokenizer.nextToken();
-							aq->push(std::move(temp));
+							aq.push(std::move(tokenizer.nextToken()));
 						}
 					}
+				}
+				DoThread(DoThread& other, tbb::split) : strVec(other.strVec) // , aq(other.aq)
+				{
+					//
+				}
+				void join(const DoThread& other)
+				{
+					aq.push(std::move(other.aq));
 				}
 			};
 
@@ -341,15 +350,15 @@ namespace wiz {
 			{
 			private:
 				vector<string>* strVec;
-				int strVecStart;
-				int strVecEnd;
+				//int strVecStart;
+				//int strVecEnd;
 			public:
-				DoThread2(vector<string>* strVec, int strVecStart, int strVecEnd)
-					: strVec(strVec), strVecStart(strVecStart), strVecEnd(strVecEnd)
+				DoThread2(vector<string>* strVec) //, int strVecStart, int strVecEnd)
+					: strVec(strVec) // , strVecStart(strVecStart), strVecEnd(strVecEnd)
 				{
 				}
-				void operator() () {
-					for (int i = strVecStart; i <= strVecEnd; ++i)
+				void operator() (const tbb::blocked_range<size_t>& r) const {
+					for (size_t i = r.begin(); i != r.end(); ++i)
 					{
 						string temp = std::move((*strVec)[i]);
 
@@ -427,7 +436,7 @@ namespace wiz {
 				int count = 0;
 				string temp;
 				vector<string> strVecTemp;
-				ArrayQueue<string> arrayQueue[4];
+				vector<ArrayQueue<string>> arrayQueueTemp;
 
 				for (int i = 0; i < num && (getline(inFile, temp)); ++i) {
 					if (temp.empty()) { continue; }
@@ -435,6 +444,9 @@ namespace wiz {
 					count++;
 				}
 
+				tbb::parallel_for(tbb::blocked_range<size_t>(0, count), DoThread2(&strVecTemp));
+				
+				/*
 				if (count >= 100) { // 4 ?
 					DoThread2 dtA(&strVecTemp, 0, count / 4 - 1),
 						dtB(&strVecTemp, count / 4, (count / 4) * 2 - 1),
@@ -451,7 +463,13 @@ namespace wiz {
 					DoThread2 dtA(&strVecTemp, 0, count - 1);
 					dtA();
 				}
+				*/
+				DoThread doThread(&strVecTemp);
 
+				tbb::parallel_reduce(tbb::blocked_range<size_t>(0, count), doThread);
+				aq.push(doThread.aq);
+				
+				/*
 				if (count >= 100) { // 4 ?
 					DoThread dtA(&strVecTemp, &arrayQueue[0], 0, count / 4 - 1),
 						dtB(&strVecTemp, &arrayQueue[1], count / 4, (count / 4) * 2 - 1),
@@ -464,14 +482,17 @@ namespace wiz {
 					_threadC.join();
 					_threadD.join();
 
-					for (int i = 0; i < 4; ++i) {
-						aq.push(move(arrayQueue[i]));
+					for (int i = 0; i < 4; ++i)
+					{
+						aq.push(arrayQueue[i]);
 					}
 				}
 				else if (count > 0) {
 					DoThread dtA(&strVecTemp, &aq, 0, count - 1);
 					dtA();
 				}
+				*/
+				
 
 				return{ count > 0, count };
 			}

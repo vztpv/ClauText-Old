@@ -1015,17 +1015,20 @@ namespace wiz {
 				vector<UserType*>* utVec;
 				vector<string> target_ch;
 				vector<string> result_ch;
-				int utVecStart;
-				int utVecEnd;
+				//int utVecStart;
+				//int utVecEnd;
 			public:
-				DoThread(vector<UserType*>* utVec, const vector<string>& target_ch, const vector<string>& result_ch, int utVecStart, int utVecEnd)
-					: utVec(utVec), target_ch(target_ch), result_ch(result_ch), utVecStart(utVecStart), utVecEnd(utVecEnd)
+				DoThread(vector<UserType*>* utVec, const vector<string>& target_ch, const vector<string>& result_ch) //, int utVecStart, int utVecEnd)
+					: utVec(utVec), target_ch(target_ch), result_ch(result_ch) //, utVecStart(utVecStart), utVecEnd(utVecEnd)
 				{
 				}
-				void operator() () {
-					for (int i = utVecStart; i <= utVecEnd; ++i)
+				void operator() (const tbb::blocked_range<size_t>& r) const {
+					//for (int i = utVecStart; i <= utVecEnd; ++i)
+					vector<UserType*>* temp = utVec;
+					
+					for (size_t i = r.begin(); i != r.end(); ++i)
 					{
-						ReplaceAll((*utVec)[i], target_ch, result_ch);
+						ReplaceAll((*temp)[i], target_ch, result_ch);
 					}
 				}
 			};
@@ -1157,7 +1160,9 @@ namespace wiz {
 					}
 				}
 
-				if (userTypeListSize > 100) { ///  chk 20, ... ?
+				tbb::parallel_for(tbb::blocked_range<size_t>(0, userTypeListSize), DoThread(&(temp->userTypeList), target_ch, result_ch));
+
+				/* if (userTypeListSize > 100) { ///  chk 20, ... ?
 					const int count = userTypeListSize;
 					DoThread dtA(&(temp->userTypeList), target_ch, result_ch, 0, count / 4 - 1),
 						dtB(&(temp->userTypeList), target_ch, result_ch, count / 4, (count / 4) * 2 - 1),
@@ -1176,7 +1181,7 @@ namespace wiz {
 							ReplaceAll(temp->GetUserTypeList(i), target_ch, result_ch);
 						//}
 					}
-				}
+				} */
 			}
 		public:
 			/// move to UserType
