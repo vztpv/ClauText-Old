@@ -82,10 +82,6 @@
 	
 	ClauText does not support while directly. but support using if statements and Event Recursive Call( recursive function? call ).
 
-# How Build?
-	1. use VisualStudio 2015 c++ project, only add "main.cpp" file to project.
-	2. in project property pages, include wiz directory.
-
 # How Use?
 	1. in cmd, excute_file.exe ClauText_TestFileName
 	2. or excute_file.exe   
