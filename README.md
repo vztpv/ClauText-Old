@@ -82,11 +82,6 @@
 	
 	ClauText does not support while directly. but support using if statements and Event Recursive Call( recursive function? call ).
 
-# How Use?
-	1. in cmd, excute_file.exe ClauText_TestFileName
-	2. or excute_file.exe   
-	   => FileName: ClauText_TestFileName
-
 # ClauText and Paradox Game ( EU4, DHR, ... )
 	1. it can load eu4 savegames, and maybe other paradox game db or savegame files.
 	2. it`s syntax come from eu4 savegame syntax.
