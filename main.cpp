@@ -42,7 +42,7 @@ inline int GETCH() /// To Do - Replace..
 	return _getch();
 }
 
-inline void FFLUSH()  // to  DO - Ãß°¡!!
+inline void FFLUSH()  // to  DO - ì¶”ê°€!!
 {
 	cin.clear();
 	cin.ignore(cin.rdbuf()->in_avail(), '\n');
@@ -160,7 +160,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 				gotoxy(0, idx - Start);
 
 				setcolor(0, 12);
-				cout << "¡Ü";
+				cout << "â—";
 				setcolor(0, 0);
 				gotoxy(0, 0);
 			}
@@ -199,7 +199,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 					}
 					gotoxy(0, idx - Start);
 					setcolor(0, 12);
-					cout << "¡Ü";
+					cout << "â—";
 					setcolor(0, 0);
 				}
 				else {
@@ -210,7 +210,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 
 					gotoxy(0, idx - Start);
 					setcolor(0, 12);
-					cout << "¡Ü";
+					cout << "â—";
 					setcolor(0, 0);
 				}
 			}
@@ -238,7 +238,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 					}
 					gotoxy(0, 0);
 					setcolor(0, 12);
-					cout << "¡Ü";
+					cout << "â—";
 					setcolor(0, 0);
 				}
 				else {
@@ -249,7 +249,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 
 					gotoxy(0, idx - Start);
 					setcolor(0, 12);
-					cout << "¡Ü";
+					cout << "â—";
 					setcolor(0, 0);
 				}
 			}
@@ -274,7 +274,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 					}
 					gotoxy(0, idx - Start);
 					setcolor(0, 12);
-					cout << "¡Ü";
+					cout << "â—";
 					setcolor(0, 0);
 				}
 				else {
@@ -285,7 +285,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 
 					gotoxy(0, idx - Start);
 					setcolor(0, 12);
-					cout << "¡Ü";
+					cout << "â—";
 					setcolor(0, 0);
 				}
 			}
@@ -313,7 +313,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 					}
 					gotoxy(0, 0);
 					setcolor(0, 12);
-					cout << "¡Ü";
+					cout << "â—";
 					setcolor(0, 0);
 				}
 				else {
@@ -324,7 +324,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 
 					gotoxy(0, idx - Start);
 					setcolor(0, 12);
-					cout << "¡Ü";
+					cout << "â—";
 					setcolor(0, 0);
 				}
 			}
@@ -407,7 +407,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 						Start = 0;
 
 						setcolor(0, 12);
-						cout << "¡Ü";
+						cout << "â—";
 						setcolor(0, 0);
 					}
 					else if (state == 1) { /// cf) state = 2;
@@ -568,7 +568,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 						}
 						// addd Item?
 						else if (2 == select) {
-							// var, val /// state¿¡ µû¶ó?
+							// var, val /// stateì— ë”°ë¼?
 							cout << "var : ";
 							cin >> var;
 							cout << "val : ";
@@ -887,7 +887,7 @@ public:
 	// for sorting..
 	bool operator<(const SortInfo& info) const
 	{
-		return this->name < info.name; // using idx?
+		return wiz::load_data::Utility::Compare( this->name, info.name ) == "< 0"; // using idx?
 	}
 };
 // only one exist or do not exist
@@ -1664,8 +1664,8 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 	}
 
 	//
-	wiz::ArrayStack<string> operandStack; // ?¼ì—°?°ì
-	wiz::ArrayStack<string> operatorStack; // ?°ì‚°??
+	wiz::ArrayStack<string> operandStack; // ?ì‡±ë¿°?ê³—ì˜„
+	wiz::ArrayStack<string> operatorStack; // ?ê³—ê¶›??
 	wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" });
 	vector<string> tokenVec;
 
@@ -2402,7 +2402,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$assign_global" == val->GetName()) // ì£¼ì˜!! dir=> dir/name ( dir= { name = val } } , @ë¥??ì— ë¶™ì—¬???œë‹¤. 
+				else if ("$assign_global" == val->GetName()) // äºŒì‡±ì“½!! dir=> dir/name ( dir= { name = val } } , @ç‘œ??ìšë¿‰ éºìˆˆë¿¬???ì’•ë–. 
 				{
 					pair<string, string> dir = Find2(&global, ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top()));
 					string data = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
