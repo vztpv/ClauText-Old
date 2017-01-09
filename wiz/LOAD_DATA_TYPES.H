@@ -21,7 +21,7 @@ namespace wiz {
 			string name;
 		public:
 			explicit Type(const string& name = "", const bool valid = true) : name(name) { }
-			explicit Type(string&& name, const bool valid = true) : name(name) { }
+			explicit Type(string&& name, const bool valid = true) : name(move(name)) { }
 			Type(const Type& type)
 				: name(type.name)
 			{ }
@@ -72,7 +72,7 @@ namespace wiz {
 				data = ta.data;
 				inited = ta.inited;
 			}
-			ItemType(ItemType<T>&& ta) : Type(ta)
+			ItemType(ItemType<T>&& ta) : Type(move(ta))
 			{
 				data = move(ta.data);
 				inited = ta.inited;

@@ -887,7 +887,7 @@ public:
 	// for sorting..
 	bool operator<(const SortInfo& info) const
 	{
-		return this->name < info.name;
+		return this->name < info.name; // using idx?
 	}
 };
 // only one exist or do not exist

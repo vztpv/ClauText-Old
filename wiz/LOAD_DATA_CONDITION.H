@@ -30,117 +30,6 @@ namespace wiz {
 				Init(condition);
 			}
 		private:
-			string reverse(string str) { /// to std::reverse ?
-				std::reverse(str.begin(), str.end());
-				return str;
-			}
-			
-			string GetType(const string& str) {
-				if (Utility::IsInteger(str)) { return "INTEGER"; }
-				else if (Utility::IsDouble(str)) { return "DOUBLE"; }
-				else if (Utility::IsDate(str)) { return "DATE"; }
-				else return "STRING";
-			}
-			string Compare(const string& str1, const string& str2, const int type = 0)
-			{
-				string type1 = GetType(str1);
-				string type2 = GetType(str2);
-
-				if (type1 != type2) {
-					return "ERROR";
-				}
-
-				if ("STRING" == type1 || type == 1)
-				{
-					if (str1 < str2) {
-						return "< 0";
-					}
-					else if (str1 == str2) {
-						return "== 0";
-					}
-					return "> 0";
-				}
-				else if ("INTEGER" == type1)
-				{
-					if (Utility::IsMinus(str1) && !Utility::IsMinus(str2)) { return "< 0"; }
-					else if (!Utility::IsMinus(str1) && Utility::IsMinus(str2)) { return "> 0"; }
-
-					const bool minusComp = Utility::IsMinus(str1) && Utility::IsMinus(str2);
-
-					if (false == minusComp) {
-						string x = reverse(str1);
-						string y = reverse(str2);
-
-						if (x[0] == '+') { x = string(x.c_str() + 1); }
-						if (y[0] == '+') { y = string(y.c_str() + 1); }
-
-						if (x.size() < y.size()) {
-							for (int i = 0; i < y.size() - x.size(); ++i) {
-								x.push_back('0');
-							}
-						}
-						else {
-							for (int i = 0; i < x.size() - y.size(); ++i) {
-								y.push_back('0');
-							}
-						}
-						return Compare(reverse(x), reverse(y), 1);
-					}
-					else {
-						return Compare(string(str2.c_str() + 1), string(str1.c_str() + 1));
-					}
-				}
-				else if ("DOUBLE" == type1)
-				{
-					StringTokenizer tokenizer1(str1, ".");
-					StringTokenizer tokenizer2(str2, ".");
-
-					string x = tokenizer1.nextToken();
-					string y = tokenizer2.nextToken();
-
-					string z = Compare(x, y);
-					if ("= 0" == z)
-					{
-						x = tokenizer1.nextToken();
-						y = tokenizer2.nextToken();
-
-						if (x.size() < y.size()) {
-							for (int i = 0; i < y.size() - x.size(); ++i) {
-								x.push_back('0');
-							}
-						}
-						else {
-							for (int i = 0; i < x.size() - y.size(); ++i) {
-								y.push_back('0');
-							}
-						}
-						return Compare(x, y, 1);
-					}
-					else
-					{
-						return z;
-					}
-				}
-				else if ("DATE" == type1)
-				{
-					StringTokenizer tokenizer1(str1, ".");
-					StringTokenizer tokenizer2(str2, ".");
-
-					for (int i = 0; i < 3; ++i) {
-						const string x = tokenizer1.nextToken();
-						const string y = tokenizer2.nextToken();
-
-						const string comp = Compare(x, y);
-
-						if (comp == "< 0") { return comp; }
-						else if (comp == "> 0") { return comp; }
-					}
-					return "== 0";
-				}
-
-				return "ERROR";
-			}
-
 			auto Get(const string& var, const string& position, UserType* utPosition, UserType* global) {
 				string valTemp = position;
 				StringTokenizer tokenizer(position, "/");
@@ -283,7 +172,7 @@ namespace wiz {
 					if ("0" != option) { // ToDo.. // 0. just 1-1, // 1. for any case // 2. for all case
 						for (int i = 0; i < value1.size(); ++i) {
 							for (int j = 0; j < value2.size(); ++j) {
-								if (Compare(value1[i].Get(0), value2[j].Get(0)) == "< 0") {
+								if (Utility::Compare(value1[i].Get(0), value2[j].Get(0)) == "< 0") {
 									if ("1" == option) { return "TRUE"; }
 								}
 								else {
@@ -297,7 +186,7 @@ namespace wiz {
 						}
 					}
 					else {
-						if (Compare(value1[0].Get(0), value2[0].Get(0)) == "< 0") {
+						if (Utility::Compare(value1[0].Get(0), value2[0].Get(0)) == "< 0") {
 							return "TRUE";
 						}
 					}
@@ -307,7 +196,7 @@ namespace wiz {
 					if ("0" != option) { /// ToDo.. // 0. just 1-1, // 1. for any case // 2. for all case
 						for (int i = 0; i < value1.size(); ++i) {
 							for (int j = 0; j < value2.size(); ++j) {
-								string temp = Compare(value1[i].Get(0), value2[j].Get(0));
+								string temp = Utility::Compare(value1[i].Get(0), value2[j].Get(0));
 									if (temp == "< 0" || temp == "== 0") {
 										if ("1" == option) { return "TRUE"; }
 									}
@@ -322,7 +211,7 @@ namespace wiz {
 						}
 					}
 					else {
-						string temp = Compare(value1[0].Get(0), value2[0].Get(0));
+						string temp = Utility::Compare(value1[0].Get(0), value2[0].Get(0));
 						if (temp == "< 0" || temp == "== 0") {
 							return "TRUE";
 						}
@@ -333,7 +222,7 @@ namespace wiz {
 					if ("0" != option) { /// ToDo.. // 0. just 1-1, // 1. for any case // 2. for all case
 						for (int i = 0; i < value1.size(); ++i) {
 							for (int j = 0; j < value2.size(); ++j) {
-								if (Compare(value1[i].Get(0), value2[j].Get(0)) == "> 0") {
+								if (Utility::Compare(value1[i].Get(0), value2[j].Get(0)) == "> 0") {
 									if ("1" == option) { return "TRUE"; }
 								}
 								else {
@@ -347,7 +236,7 @@ namespace wiz {
 						}
 					}
 					else {
-						if (Compare(value1[0].Get(0), value2[0].Get(0)) == "> 0") {
+						if (Utility::Compare(value1[0].Get(0), value2[0].Get(0)) == "> 0") {
 							return "TRUE";
 						}
 					}
@@ -357,7 +246,7 @@ namespace wiz {
 					if ("0" != option) { /// ToDo.. // 0. just 1-1, // 1. for any case // 2. for all case
 						for (int i = 0; i < value1.size(); ++i) {
 							for (int j = 0; j < value2.size(); ++j) {
-								string temp = Compare(value1[i].Get(0), value2[j].Get(0));
+								string temp = Utility::Compare(value1[i].Get(0), value2[j].Get(0));
 								if (temp == "> 0" || temp == "== 0") {
 									if ("1" == option) { return "TRUE"; }
 								}
@@ -372,7 +261,7 @@ namespace wiz {
 						}
 					}
 					else {
-						string temp = Compare(value1[0].Get(0), value2[0].Get(0));
+						string temp = Utility::Compare(value1[0].Get(0), value2[0].Get(0));
 						if (temp == "> 0" || temp == "== 0") {
 							return "TRUE";
 						}
@@ -383,7 +272,7 @@ namespace wiz {
 					if ("0" != option) { /// ToDo.. // 0. just 1-1, // 1. for any case // 2. for all case
 						for (int i = 0; i < value1.size(); ++i) {
 							for (int j = 0; j < value2.size(); ++j) {
-								if (Compare(value1[i].Get(0), value2[j].Get(0)) == "== 0") {
+								if (Utility::Compare(value1[i].Get(0), value2[j].Get(0)) == "== 0") {
 									if ("1" == option) { return "TRUE"; }
 								}
 								else {
@@ -397,7 +286,7 @@ namespace wiz {
 						}
 					}
 					else {
-						if (Compare(value1[0].Get(0), value2[0].Get(0)) == "== 0") {
+						if (Utility::Compare(value1[0].Get(0), value2[0].Get(0)) == "== 0") {
 							return "TRUE";
 						}
 					}
@@ -407,7 +296,7 @@ namespace wiz {
 					if ("0" != option) { /// ToDo.. // 0. just 1-1, // 1. for any case // 2. for all case
 						for (int i = 0; i < value1.size(); ++i) {
 							for (int j = 0; j < value2.size(); ++j) {
-								if (Compare(value1[i].Get(0), value2[j].Get(0)) != "== 0") {
+								if (Utility::Compare(value1[i].Get(0), value2[j].Get(0)) != "== 0") {
 									if ("1" == option) { return "TRUE"; }
 								}
 								else {
@@ -421,7 +310,7 @@ namespace wiz {
 						}
 					}
 					else {
-						if (Compare(value1[0].Get(0), value2[0].Get(0)) != "== 0") {
+						if (Utility::Compare(value1[0].Get(0), value2[0].Get(0)) != "== 0") {
 							return "TRUE";
 						}
 					}
@@ -429,26 +318,6 @@ namespace wiz {
 				}
 
 				return "ERROR GV7";
-			}
-			string BoolOperation(const string& op, const string& x, const string& y)
-			{
-				if (x == "ERROR" || y == "ERROR") { return "ERROR"; }
-				if ("NOT" == op) { return x == "TRUE" ? "FALSE" : "TRUE"; }
-				else if ("AND" == op) {
-					if (x == "TRUE" && y == "TRUE") { return "TRUE"; }
-					else {
-						return "FALSE";
-					}
-				}
-				else if ("OR" == op) {
-					if (x == "TRUE" || y == "TRUE") { return "TRUE"; }
-					else {
-						return "FALSE";
-					}
-				}
-				else {
-					return "ERROR";
-				}
 			}
 
 			void Init(const string& condition)
@@ -521,7 +390,7 @@ namespace wiz {
 									tokenStack.pop();
 									tokenStack.pop();
 
-									tokenStack.push(BoolOperation(op, operand1, operand2));
+									tokenStack.push(Utility::BoolOperation(op, operand1, operand2));
 								}
 								else { // EXIST, NOTEXIST for ( ITEM or USERTYPE ) 
 									tokenStack.pop();
@@ -537,7 +406,7 @@ namespace wiz {
 
 								tokenStack.pop();
 								tokenStack.pop();
-								tokenStack.push(BoolOperation(op, operand1, operand1));
+								tokenStack.push(Utility::BoolOperation(op, operand1, operand1));
 							}
 						}
 						++i;

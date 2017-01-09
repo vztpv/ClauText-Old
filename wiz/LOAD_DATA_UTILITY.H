@@ -214,6 +214,139 @@ namespace wiz {
 			{
 				return str.empty() == false && str[0] == '-';
 			}
+
+			static string reverse(string str) { /// to std::reverse ?
+				std::reverse(str.begin(), str.end());
+				return str;
+			}
+
+			static string GetType(const string& str) {
+				if (IsInteger(str)) { return "INTEGER"; }
+				else if (IsDouble(str)) { return "DOUBLE"; }
+				else if (IsDate(str)) { return "DATE"; }
+				else return "STRING";
+			}
+			static string Compare(const string& str1, const string& str2, const int type = 0)
+			{
+				string type1 = GetType(str1);
+				string type2 = GetType(str2);
+
+				if (type1 != type2) {
+					return "ERROR";
+				}
+
+				if ("STRING" == type1 || type == 1)
+				{
+					if (str1 < str2) {
+						return "< 0";
+					}
+					else if (str1 == str2) {
+						return "== 0";
+					}
+					return "> 0";
+				}
+				else if ("INTEGER" == type1)
+				{
+					if (Utility::IsMinus(str1) && !Utility::IsMinus(str2)) { return "< 0"; }
+					else if (!Utility::IsMinus(str1) && Utility::IsMinus(str2)) { return "> 0"; }
+
+					const bool minusComp = Utility::IsMinus(str1) && Utility::IsMinus(str2);
+
+					if (false == minusComp) {
+						string x = reverse(str1);
+						string y = reverse(str2);
+
+						if (x[0] == '+') { x = string(x.c_str() + 1); }
+						if (y[0] == '+') { y = string(y.c_str() + 1); }
+
+						if (x.size() < y.size()) {
+							while (x.size() < y.size()) {
+								x.push_back('0');
+							}
+						}
+						else {
+							while (y.size() < x.size()) {
+								y.push_back('0');
+							}
+						}
+						return Compare(reverse(x), reverse(y), 1);
+					}
+					else {
+						return Compare(string(str2.c_str() + 1), string(str1.c_str() + 1));
+					}
+				}
+				else if ("DOUBLE" == type1)
+				{
+					StringTokenizer tokenizer1(str1, ".");
+					StringTokenizer tokenizer2(str2, ".");
+
+					string x = tokenizer1.nextToken();
+					string y = tokenizer2.nextToken();
+
+					string z = Compare(x, y);
+					if ("= 0" == z)
+					{
+						x = tokenizer1.nextToken();
+						y = tokenizer2.nextToken();
+
+						if (x.size() < y.size()) {
+							while (x.size() < y.size()) {
+								x.push_back('0');
+							}
+						}
+						else {
+							while (y.size() < x.size()) {
+								y.push_back('0');
+							}
+						}
+						return Compare(x, y, 1);
+					}
+					else
+					{
+						return z;
+					}
+				}
+				else if ("DATE" == type1)
+				{
+					StringTokenizer tokenizer1(str1, ".");
+					StringTokenizer tokenizer2(str2, ".");
+
+					for (int i = 0; i < 3; ++i) {
+						const string x = tokenizer1.nextToken();
+						const string y = tokenizer2.nextToken();
+
+						const string comp = Compare(x, y);
+
+						if (comp == "< 0") { return comp; }
+						else if (comp == "> 0") { return comp; }
+					}
+					return "== 0";
+				}
+
+				return "ERROR";
+			}
+
+			static string BoolOperation(const string& op, const string& x, const string& y)
+			{
+				if (x == "ERROR" || y == "ERROR") { return "ERROR"; }
+				if ("NOT" == op) { return x == "TRUE" ? "FALSE" : "TRUE"; }
+				else if ("AND" == op) {
+					if (x == "TRUE" && y == "TRUE") { return "TRUE"; }
+					else {
+						return "FALSE";
+					}
+				}
+				else if ("OR" == op) {
+					if (x == "TRUE" || y == "TRUE") { return "TRUE"; }
+					else {
+						return "FALSE";
+					}
+				}
+				else {
+					return "ERROR";
+				}
+			}
+
 			/// todo bool ,more stable!!
 			static void AddSpace(const string& file1Name, const string& file2Name) {
 				ifstream inFile;
@@ -332,7 +465,7 @@ namespace wiz {
 					{
 						StringTokenizer tokenizer(std::move(*strVecTemp)[i]);
 						while (tokenizer.hasMoreTokens()) {
-							aq.push(std::move(tokenizer.nextToken()));
+							aq.push(tokenizer.nextToken());
 						}
 					}
 				}
@@ -467,7 +600,7 @@ namespace wiz {
 				DoThread doThread(&strVecTemp);
 
 				tbb::parallel_reduce(tbb::blocked_range<size_t>(0, count), doThread);
-				aq.push(doThread.aq);
+				aq.push(std::move(doThread.aq));
 				
 				/*
 				if (count >= 100) { // 4 ?
