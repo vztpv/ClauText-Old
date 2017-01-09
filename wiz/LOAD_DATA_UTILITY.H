@@ -284,7 +284,7 @@ namespace wiz {
 					string y = tokenizer2.nextToken();
 
 					string z = Compare(x, y);
-					if ("= 0" == z)
+					if ("== 0" == z)
 					{
 						x = tokenizer1.nextToken();
 						y = tokenizer2.nextToken();

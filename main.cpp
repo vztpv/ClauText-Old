@@ -42,7 +42,7 @@ inline int GETCH() /// To Do - Replace..
 	return _getch();
 }
 
-inline void FFLUSH()  // to  DO - Ï∂îÍ∞Ä!!
+inline void FFLUSH()  // to  DO - √ﬂ∞°!!
 {
 	cin.clear();
 	cin.ignore(cin.rdbuf()->in_avail(), '\n');
@@ -160,7 +160,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 				gotoxy(0, idx - Start);
 
 				setcolor(0, 12);
-				cout << "‚óè";
+				cout << "°‹";
 				setcolor(0, 0);
 				gotoxy(0, 0);
 			}
@@ -199,7 +199,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 					}
 					gotoxy(0, idx - Start);
 					setcolor(0, 12);
-					cout << "‚óè";
+					cout << "°‹";
 					setcolor(0, 0);
 				}
 				else {
@@ -210,7 +210,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 
 					gotoxy(0, idx - Start);
 					setcolor(0, 12);
-					cout << "‚óè";
+					cout << "°‹";
 					setcolor(0, 0);
 				}
 			}
@@ -238,7 +238,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 					}
 					gotoxy(0, 0);
 					setcolor(0, 12);
-					cout << "‚óè";
+					cout << "°‹";
 					setcolor(0, 0);
 				}
 				else {
@@ -249,7 +249,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 
 					gotoxy(0, idx - Start);
 					setcolor(0, 12);
-					cout << "‚óè";
+					cout << "°‹";
 					setcolor(0, 0);
 				}
 			}
@@ -274,7 +274,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 					}
 					gotoxy(0, idx - Start);
 					setcolor(0, 12);
-					cout << "‚óè";
+					cout << "°‹";
 					setcolor(0, 0);
 				}
 				else {
@@ -285,7 +285,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 
 					gotoxy(0, idx - Start);
 					setcolor(0, 12);
-					cout << "‚óè";
+					cout << "°‹";
 					setcolor(0, 0);
 				}
 			}
@@ -313,7 +313,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 					}
 					gotoxy(0, 0);
 					setcolor(0, 12);
-					cout << "‚óè";
+					cout << "°‹";
 					setcolor(0, 0);
 				}
 				else {
@@ -324,7 +324,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 
 					gotoxy(0, idx - Start);
 					setcolor(0, 12);
-					cout << "‚óè";
+					cout << "°‹";
 					setcolor(0, 0);
 				}
 			}
@@ -407,7 +407,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 						Start = 0;
 
 						setcolor(0, 12);
-						cout << "‚óè";
+						cout << "°‹";
 						setcolor(0, 0);
 					}
 					else if (state == 1) { /// cf) state = 2;
@@ -568,7 +568,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 						}
 						// addd Item?
 						else if (2 == select) {
-							// var, val /// stateÏóê Îî∞Îùº?
+							// var, val /// stateø° µ˚∂Û?
 							cout << "var : ";
 							cin >> var;
 							cout << "val : ";
@@ -874,20 +874,31 @@ public:
 class SortInfo // need to rename
 {
 public:
-	string name;
+	string data;
 	int iElement; // 2 : userType, // 1 : item
-	size_t idx;
+	size_t idx; // for stable? - chk!!
 public:
-	SortInfo() { }
-	SortInfo(const string& name, int iElement, size_t idx)
-		: name(name), iElement(iElement), idx(idx)
+	SortInfo() : idx (-1) { }
+	SortInfo(const string& data, int iElement, size_t idx)
+		: data(data), iElement(iElement), idx(idx)
 	{
 
 	}
 	// for sorting..
 	bool operator<(const SortInfo& info) const
 	{
-		return wiz::load_data::Utility::Compare( this->name, info.name ) == "< 0"; // using idx?
+		string temp = wiz::load_data::Utility::Compare(this->data, info.data);
+		if (temp == "< 0") { return true; }
+		else if (temp == "> 0") { return false; }
+		else if (temp == "== 0") {
+			return idx < info.idx;
+		}
+		else if (temp == "ERROR") { // chk!! min(column)? or max(column)?
+			return false;
+		}
+		else {
+			throw "temp is not valid in sortinfo";
+		}
 	}
 };
 // only one exist or do not exist
@@ -1020,7 +1031,7 @@ string Compare(const string& str1, const string& str2, const int type = 0)
 		string y = tokenizer2.nextToken();
 
 		string z = Compare(x, y);
-		if ("= 0" == z)
+		if ("== 0" == z)
 		{
 			x = tokenizer1.nextToken();
 			y = tokenizer2.nextToken();
@@ -1664,8 +1675,8 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 	}
 
 	//
-	wiz::ArrayStack<string> operandStack; // ?Ïá±Îø∞?Í≥óÏòÑ
-	wiz::ArrayStack<string> operatorStack; // ?Í≥óÍ∂õ??
+	wiz::ArrayStack<string> operandStack; // ?ºÏó∞?∞Ïûê
+	wiz::ArrayStack<string> operatorStack; // ?∞ÏÇ∞??
 	wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" });
 	vector<string> tokenVec;
 
@@ -2402,7 +2413,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$assign_global" == val->GetName()) // ‰∫åÏá±ÏìΩ!! dir=> dir/name ( dir= { name = val } } , @Áëú??ÏöéÎøâ ÈÅ∫ÏààÎø¨???ÏíïÎñé. 
+				else if ("$assign_global" == val->GetName()) // Ï£ºÏùò!! dir=> dir/name ( dir= { name = val } } , @Î•??ûÏóê Î∂ôÏó¨???úÎã§. 
 				{
 					pair<string, string> dir = Find2(&global, ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top()));
 					string data = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
@@ -2853,8 +2864,8 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
+				// make sort stable.
 				else if ("$sort" == val->GetName()) {
-					// todo
 					vector<SortInfo> siVec;
 					wiz::load_data::UserType* utTemp =
 						wiz::load_data::UserType::Find(&global,
@@ -2884,7 +2895,67 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					for (int i = 0; i < temp.size(); ++i)
 					{
 						if (siVec[i].iElement == 1) {
-							ut.AddItem(siVec[i].name, static_cast<wiz::load_data::ItemType<string>*>(temp[siVec[i].idx])->Get(0));
+							ut.AddItem(siVec[i].data, static_cast<wiz::load_data::ItemType<string>*>(temp[siVec[i].idx])->Get(0));
+						}
+						else {
+							ut.AddUserTypeItem(*(static_cast<wiz::load_data::UserType*>(temp[siVec[i].idx])));
+						}
+					}
+
+					utTemp->Remove();
+					
+					//cf) chk? *utTemp = ut;
+					wiz::load_data::LoadData::AddData(*(utTemp), "", ut.ToString(), "TRUE");
+
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$sort2" == val->GetName()) { // colName -> just one! ? 
+					/// condition = has just one? in one usertype!
+					vector<SortInfo> siVec;
+					wiz::load_data::UserType* utTemp =
+						wiz::load_data::UserType::Find(&global,
+							ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top())).second[0];
+					const string colName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
+
+					vector<wiz::load_data::Type*> temp;
+
+
+					int item_count = 0, ut_count = 0;
+					for (int i = 0; i < utTemp->GetIListSize(); ++i) {
+						if (utTemp->IsItemList(i)) {
+							temp.push_back(&(utTemp->GetItemList(item_count)));
+							if (utTemp->GetItem(colName).empty())
+							{
+								siVec.emplace_back("", 1, i);
+							}
+							else {
+								siVec.emplace_back(utTemp->GetItem(colName)[0].Get(0), 1, i);
+							}
+							item_count++;
+						}
+						else {
+							temp.push_back(utTemp->GetUserTypeList(ut_count));
+							if (utTemp->GetUserTypeList(ut_count)->GetItem(colName).empty())
+							{
+								siVec.emplace_back("", 2, i);
+							}
+							else {
+								siVec.emplace_back(utTemp->GetUserTypeList(ut_count)->GetItem(colName)[0].Get(0), 2, i);
+							}
+							ut_count++;
+						}
+					}
+
+					std::sort(siVec.begin(), siVec.end());
+
+
+					wiz::load_data::UserType ut;
+					for (int i = 0; i < temp.size(); ++i)
+					{
+						if (siVec[i].iElement == 1) {
+							ut.AddItem(siVec[i].data, static_cast<wiz::load_data::ItemType<string>*>(temp[siVec[i].idx])->Get(0));
 						}
 						else {
 							ut.AddUserTypeItem(*(static_cast<wiz::load_data::UserType*>(temp[siVec[i].idx])));
@@ -2893,12 +2964,14 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 
 					utTemp->Remove();
 
+					//cf) chk? *utTemp = ut;
 					wiz::load_data::LoadData::AddData(*(utTemp), "", ut.ToString(), "TRUE");
 
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
+				// removal?
 				else if ("$stable_sort" == val->GetName()) {
 					// todo
 					// todo
@@ -2931,7 +3004,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					for (int i = 0; i < temp.size(); ++i)
 					{
 						if (siVec[i].iElement == 1) {
-							ut.AddItem(siVec[i].name, static_cast<wiz::load_data::ItemType<string>*>(temp[siVec[i].idx])->Get(0));
+							ut.AddItem(siVec[i].data, static_cast<wiz::load_data::ItemType<string>*>(temp[siVec[i].idx])->Get(0));
 						}
 						else {
 							ut.AddUserTypeItem(*(static_cast<wiz::load_data::UserType*>(temp[siVec[i].idx])));
