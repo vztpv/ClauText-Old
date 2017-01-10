@@ -888,16 +888,62 @@ public:
 	bool operator<(const SortInfo& info) const
 	{
 		string temp = wiz::load_data::Utility::Compare(this->data, info.data);
+		
+		if (this->data == "") {
+			return false;
+		}
+		if (info.data == "") {
+			return true;
+		}
+		
 		if (temp == "< 0") { return true; }
 		else if (temp == "> 0") { return false; }
 		else if (temp == "== 0") {
 			return idx < info.idx;
 		}
-		else if (temp == "ERROR") { // chk!! min(column)? or max(column)?
-			return false;
-		}
 		else {
 			throw "temp is not valid in sortinfo";
+		}
+	}
+};
+
+class SortInfo2 // need to rename, sortinfo by dsc..
+{
+public:
+	string data;
+	int iElement; // 2 : userType, // 1 : item
+	size_t idx; // for stable? - chk!!
+public:
+	SortInfo2() : idx(-1) { }
+	SortInfo2(const string& data, int iElement, size_t idx)
+		: data(data), iElement(iElement), idx(idx)
+	{
+
+	}
+	// for sorting..
+	bool operator<(const SortInfo2& info) const
+	{
+		if (this->data == "" && info.data == "") {
+			return false;
+		}
+		if (this->data == "") {
+			return true;
+		}
+
+		if (info.data == "") {
+			return false;
+		}
+
+		string temp = wiz::load_data::Utility::Compare(this->data, info.data);
+		if (temp == "< 0") { return false; }
+		else if (temp == "> 0") { return true; }
+		else if (temp == "== 0") {
+			return idx < info.idx;
+		}
+		else {
+			cout << "sortInfo2" << endl;
+			cout << data << " " << info.data << endl;
+			throw "temp is not valid in sortinfo2";
 		}
 	}
 };
@@ -2925,24 +2971,17 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					int item_count = 0, ut_count = 0;
 					for (int i = 0; i < utTemp->GetIListSize(); ++i) {
 						if (utTemp->IsItemList(i)) {
-							temp.push_back(&(utTemp->GetItemList(item_count)));
-							if (utTemp->GetItem(colName).empty())
-							{
-								siVec.emplace_back("", 1, i);
-							}
-							else {
-								siVec.emplace_back(utTemp->GetItem(colName)[0].Get(0), 1, i);
-							}
+							//
 							item_count++;
 						}
 						else {
 							temp.push_back(utTemp->GetUserTypeList(ut_count));
 							if (utTemp->GetUserTypeList(ut_count)->GetItem(colName).empty())
 							{
-								siVec.emplace_back("", 2, i);
+								siVec.emplace_back("", 2, ut_count);
 							}
 							else {
-								siVec.emplace_back(utTemp->GetUserTypeList(ut_count)->GetItem(colName)[0].Get(0), 2, i);
+								siVec.emplace_back(utTemp->GetUserTypeList(ut_count)->GetItem(colName)[0].Get(0), 2, ut_count);
 							}
 							ut_count++;
 						}
@@ -2955,14 +2994,67 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					for (int i = 0; i < temp.size(); ++i)
 					{
 						if (siVec[i].iElement == 1) {
-							ut.AddItem(siVec[i].data, static_cast<wiz::load_data::ItemType<string>*>(temp[siVec[i].idx])->Get(0));
+							//
 						}
 						else {
 							ut.AddUserTypeItem(*(static_cast<wiz::load_data::UserType*>(temp[siVec[i].idx])));
 						}
 					}
 
-					utTemp->Remove();
+					utTemp->RemoveUserTypeList();
+
+					//cf) chk? *utTemp = ut;
+					wiz::load_data::LoadData::AddData(*(utTemp), "", ut.ToString(), "TRUE");
+
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$sort2_dsc" == val->GetName()) { // colName -> just one! ? 
+													   /// condition = has just one? in one usertype!
+					vector<SortInfo2> siVec;
+					wiz::load_data::UserType* utTemp =
+						wiz::load_data::UserType::Find(&global,
+							ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top())).second[0];
+					const string colName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
+
+					vector<wiz::load_data::Type*> temp;
+
+
+					int item_count = 0, ut_count = 0;
+					for (int i = 0; i < utTemp->GetIListSize(); ++i) {
+						if (utTemp->IsItemList(i)) {
+							//
+							item_count++;
+						}
+						else {
+							temp.push_back(utTemp->GetUserTypeList(ut_count));
+							if (utTemp->GetUserTypeList(ut_count)->GetItem(colName).empty())
+							{
+								siVec.emplace_back("", 2, ut_count);
+							}
+							else {
+								siVec.emplace_back(utTemp->GetUserTypeList(ut_count)->GetItem(colName)[0].Get(0), 2, ut_count);
+							}
+							ut_count++;
+						}
+					}
+
+					std::sort(siVec.begin(), siVec.end());
+
+
+					wiz::load_data::UserType ut;
+					for (int i = 0; i < temp.size(); ++i)
+					{
+						if (siVec[i].iElement == 1) {
+							//
+						}
+						else {
+							ut.AddUserTypeItem(*(static_cast<wiz::load_data::UserType*>(temp[siVec[i].idx])));
+						}
+					}
+
+					utTemp->RemoveUserTypeList();
 
 					//cf) chk? *utTemp = ut;
 					wiz::load_data::LoadData::AddData(*(utTemp), "", ut.ToString(), "TRUE");
