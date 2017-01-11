@@ -1008,116 +1008,6 @@ pair<string, string> Find2(wiz::load_data::UserType* ut, const string& str)
 	}
 	return{ wiz::String::substring(str, 0, idx), wiz::String::substring(str,idx + 1) };
 }
-string reverse(string str) { /// to std::reverse 
-	std::reverse(str.begin(), str.end());
-	return str;
-}
-
-string GetType(const string& str) {
-	if (wiz::load_data::Utility::IsInteger(str)) { return "INTEGER"; }
-	else if (wiz::load_data::Utility::IsDouble(str)) { return "DOUBLE"; }
-	else if (wiz::load_data::Utility::IsDate(str)) { return "DATE"; }
-	else return "STRING";
-}
-string Compare(const string& str1, const string& str2, const int type = 0)
-{
-	string type1 = GetType(str1);
-	string type2 = GetType(str2);
-
-	if (type1 != type2) {
-		return "ERROR";
-	}
-
-	if ("STRING" == type1 || type == 1)
-	{
-		if (str1 < str2) {
-			return "< 0";
-		}
-		else if (str1 == str2) {
-			return "== 0";
-		}
-		return "> 0";
-	}
-	else if ("INTEGER" == type1)
-	{
-		if (wiz::load_data::Utility::IsMinus(str1) && !wiz::load_data::Utility::IsMinus(str2)) { return "< 0"; }
-		else if (!wiz::load_data::Utility::IsMinus(str1) && wiz::load_data::Utility::IsMinus(str2)) { return "> 0"; }
-
-		const bool minusComp = wiz::load_data::Utility::IsMinus(str1) && wiz::load_data::Utility::IsMinus(str2);
-
-		if (false == minusComp) {
-			string x = reverse(str1);
-			string y = reverse(str2);
-
-			if (x[0] == '+') { x = string(x.c_str() + 1); }
-			if (y[0] == '+') { y = string(y.c_str() + 1); }
-
-			if (x.size() < y.size()) {
-				for (int i = 0; i < y.size() - x.size(); ++i) {
-					x.push_back('0');
-				}
-			}
-			else {
-				for (int i = 0; i < x.size() - y.size(); ++i) {
-					y.push_back('0');
-				}
-			}
-			return Compare(reverse(x), reverse(y), 1);
-		}
-		else {
-			return Compare(string(str2.c_str() + 1), string(str1.c_str() + 1));
-		}
-	}
-	else if ("DOUBLE" == type1)
-	{
-		wiz::StringTokenizer tokenizer1(str1, ".");
-		wiz::StringTokenizer tokenizer2(str2, ".");
-
-		string x = tokenizer1.nextToken();
-		string y = tokenizer2.nextToken();
-
-		string z = Compare(x, y);
-		if ("== 0" == z)
-		{
-			x = tokenizer1.nextToken();
-			y = tokenizer2.nextToken();
-
-			if (x.size() < y.size()) {
-				for (int i = 0; i < y.size() - x.size(); ++i) {
-					x.push_back('0');
-				}
-			}
-			else {
-				for (int i = 0; i < x.size() - y.size(); ++i) {
-					y.push_back('0');
-				}
-			}
-			return Compare(x, y, 1);
-		}
-		else
-		{
-			return z;
-		}
-	}
-	else if ("DATE" == type1)
-	{
-		wiz::StringTokenizer tokenizer1(str1, ".");
-		wiz::StringTokenizer tokenizer2(str2, ".");
-
-		for (int i = 0; i < 3; ++i) {
-			const string x = tokenizer1.nextToken();
-			const string y = tokenizer2.nextToken();
-
-			const string comp = Compare(x, y);
-
-			if (comp == "< 0") { return comp; }
-			else if (comp == "> 0") { return comp; }
-		}
-		return "== 0";
-	}
-
-	return "ERROR";
-}
 
 inline string FindParameters(const vector<pair<string, string>>& parameters, const string& operand)
 {
@@ -1213,7 +1103,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		x = operandStack.pop();
 		y = operandStack.pop();
 
-		if (Compare(x, y) == "< 0") {
+		if (wiz::load_data::Utility::Compare(x, y) == "< 0") {
 			operandStack.push("TRUE");
 		}
 		else
@@ -1227,7 +1117,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		x = operandStack.pop();
 		y = operandStack.pop();
 
-		if (Compare(x, y) == "> 0") {
+		if (wiz::load_data::Utility::Compare(x, y) == "> 0") {
 			operandStack.push("TRUE");
 		}
 		else
@@ -1241,7 +1131,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		x = operandStack.pop();
 		y = operandStack.pop();
 
-		if (Compare(x, y) == "< 0" || Compare(x, y) == "== 0") {
+		if (wiz::load_data::Utility::Compare(x, y) == "< 0" || wiz::load_data::Utility::Compare(x, y) == "== 0") {
 			operandStack.push("TRUE");
 		}
 		else
@@ -1255,7 +1145,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		x = operandStack.pop();
 		y = operandStack.pop();
 
-		if (Compare(x, y) == "> 0" || Compare(x, y) == "== 0") {
+		if (wiz::load_data::Utility::Compare(x, y) == "> 0" || wiz::load_data::Utility::Compare(x, y) == "== 0") {
 			operandStack.push("TRUE");
 		}
 		else
@@ -1269,10 +1159,10 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		x = operandStack.pop();
 		y = operandStack.pop();
 
-		if (GetType(x) == GetType(y) && (GetType(y) == "INTEGER")) { /// only integer -> BigInteger
+		if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && (wiz::load_data::Utility::GetType(y) == "INTEGER")) { /// only integer -> BigInteger
 			operandStack.push(wiz::toStr(atoll(x.c_str()) + atoll(y.c_str())));
 		}
-		else if (GetType(x) == GetType(y) && GetType(y) == "DOUBLE") {
+		else if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && wiz::load_data::Utility::GetType(y) == "DOUBLE") {
 			operandStack.push(wiz::_toString(std::stod(x) + std::stod(y)));
 		}
 		else
@@ -1288,10 +1178,10 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 
 
-		if (GetType(x) == GetType(y) && (GetType(y) == "INTEGER")) { /// only integer -> BigInteger
+		if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && (wiz::load_data::Utility::GetType(y) == "INTEGER")) { /// only integer -> BigInteger
 			operandStack.push(wiz::toStr(atoll(x.c_str()) * atoll(y.c_str())));
 		}
-		else if (GetType(x) == GetType(y) && GetType(y) == "DOUBLE") {
+		else if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && wiz::load_data::Utility::GetType(y) == "DOUBLE") {
 			operandStack.push(wiz::_toString(std::stod(x) * std::stod(y)));  /// chk?
 		}
 		else
@@ -1305,10 +1195,10 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		x = operandStack.pop();
 		y = operandStack.pop();
 
-		if (GetType(x) == GetType(y) && (GetType(y) == "INTEGER")) { /// only integer -> BigInteger
+		if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && (wiz::load_data::Utility::GetType(y) == "INTEGER")) { /// only integer -> BigInteger
 			operandStack.push(wiz::toStr(atoll(x.c_str()) / atoll(y.c_str())));
 		}
-		else if (GetType(x) == GetType(y) && GetType(y) == "DOUBLE") {
+		else if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && wiz::load_data::Utility::GetType(y) == "DOUBLE") {
 			operandStack.push(wiz::_toString(std::stod(x) / std::stod(y)));
 		}
 		else
@@ -1322,7 +1212,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		x = operandStack.pop();
 		y = operandStack.pop();
 
-		if (GetType(x) == GetType(y) && (GetType(y) == "INTEGER")) { /// only integer -> BigInteger
+		if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && (wiz::load_data::Utility::GetType(y) == "INTEGER")) { /// only integer -> BigInteger
 			operandStack.push(wiz::toStr(atoll(x.c_str()) % atoll(y.c_str())));
 		}
 		else
@@ -1336,7 +1226,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		x = operandStack.pop();
 		y = operandStack.pop();
 
-		if (GetType(x) == GetType(y) && (GetType(y) == "INTEGER")) { /// only integer -> BigInteger
+		if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && (wiz::load_data::Utility::GetType(y) == "INTEGER")) { /// only integer -> BigInteger
 			long long _x = atoll(x.c_str());
 			long long _y = atoll(y.c_str());
 			long long _z = rand() % (_y - _x + 1) + _x;
