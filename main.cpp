@@ -802,7 +802,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 							{
 								if (false == wiz::load_data::LoadData::AddData(*utTemp, strVecTemp[1], strVecTemp[2], strVecTemp[3]))
 								{
-									cout << "faile to add" << endl; /// To Do to following code.
+									cout << "fail to add" << endl; /// To Do to following code.
 								}
 							}
 							else if ("addusertype" == strVecTemp[0])
