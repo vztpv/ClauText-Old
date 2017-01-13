@@ -463,7 +463,7 @@ namespace wiz {
 					vector<string>* strVecTemp = strVec;
 					for (size_t i = r.begin(); i != r.end(); ++i)
 					{
-						StringTokenizer tokenizer(std::move(*strVecTemp)[i]);
+						StringTokenizer tokenizer(std::move( (*strVecTemp)[i] ) );
 						while (tokenizer.hasMoreTokens()) {
 							aq.push(tokenizer.nextToken());
 						}
