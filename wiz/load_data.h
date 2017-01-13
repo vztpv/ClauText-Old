@@ -454,19 +454,21 @@ namespace wiz {
 			static bool LoadDataFromString(string str, UserType& ut)
 			{
 				UserType utTemp = ut;
-
+				string temp;
 				bool chk = Utility::ChkExist(str);
 				if (chk) {
-					str = Utility::ChangeStr(str, { "^" }, { "^0" });
-					str = Utility::ChangeStr(str, { "#" }, { "^5" });
+					Utility::ChangeStr(str, { "^" }, { "^0" }, temp);
+					Utility::ChangeStr(temp, { "#" }, { "^5" }, str);
 				}
-				str = Utility::PassSharp(str);
-				str = Utility::AddSpace(str);
+				Utility::PassSharp(str, temp);
+				Utility::AddSpace(temp, str);
+
 				if (chk) {
-					str = Utility::ChangeStr(str, { " ", "\t", "\r", "\n" }, { "^1", "^2", "^3", "^4" });
+					Utility::ChangeStr(str, { " ", "\t", "\r", "\n" }, { "^1", "^2", "^3", "^4" }, temp);
 					//str = Utility::ChangeStr(str, "\t", "^2");
 					//str = Utility::ChangeStr(str, "\r", "^3");
 					//str = Utility::ChangeStr(str, "\n", "^4");
+					str = std::move(temp);
 				}
 				StringTokenizer tokenizer(str, vector<string>{" ", "\t", "\r", "\n"});
 				ArrayQueue<string> strVec;

@@ -1156,7 +1156,9 @@ namespace wiz {
 					ItemType<std::string>& itemList = temp->GetItemList(i);
 
 					for (int j = 0; j < itemList.size(); ++j) {
-						itemList.Get(j) = Utility::ChangeStr(itemList.Get(j), target_ch, result_ch);
+						string temp;
+						Utility::ChangeStr(itemList.Get(j), target_ch, result_ch, temp);
+						itemList.Get(j) = temp;
 					}
 				}
 

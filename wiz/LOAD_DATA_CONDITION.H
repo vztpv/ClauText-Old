@@ -324,7 +324,8 @@ namespace wiz {
 			{
 				bool evalue = false;
 
-				string str = Utility::AddSpace(condition);
+				string str;
+				Utility::AddSpace(condition, str);
 				
 				StringTokenizer tokenizer(str, { " ", "\t", "\n", "\r" });
 
