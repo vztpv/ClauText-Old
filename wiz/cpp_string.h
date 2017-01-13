@@ -198,7 +198,9 @@ namespace wiz{
 					this->exist = true;
 
 					if (right-1 - left + 1 > 0) {
-						str[right] = '\0';
+						if (right <= str.size() - 1) {
+							str[right] = '\0';
+						}
 						_m_str.emplace_back(str.c_str() + left);
 					}
 					i = i + separator[_select].size() - 1;
