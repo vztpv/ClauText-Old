@@ -165,7 +165,7 @@ namespace wiz{
 		bool exist;
 		const vector<string> whitespaces = { " ", "\t", "\r", "\n" };
 	private:
-		void Init(const string& str, const vector<string>& separator) // assumtion : separators are sorted by length?, long -> short
+		void Init(string str, const vector<string>& separator) // assumtion : separators are sorted by length?, long -> short
 		{
 			if (separator.empty() || str.empty()) { return; } // if str.empty() == false then _m_str.push_back(str); // ?
 			//vector<int> arr(str.size(), 0);
@@ -197,23 +197,22 @@ namespace wiz{
 				if (pass) {
 					this->exist = true;
 
-					string temp = wiz::String::substring(str, left, right - 1);
-					if (!temp.empty()) {
-						_m_str.push_back(std::move(temp));
+					if (right-1 - left + 1 > 0) {
+						str[right] = '\0';
+						_m_str.emplace_back(str.c_str() + left);
 					}
 					i = i + separator[_select].size() - 1;
 					left = i + 1;
 					right = left;
 				}
 				else if (!pass && i == str.size() - 1) {
-					string temp = wiz::String::substring(str, left, right);
-					if (!temp.empty()) {
-						_m_str.push_back(std::move(temp));
+					if (right - left + 1 > 0) {
+						_m_str.emplace_back(str.c_str() + left);
 					}
 				}
 			}
 		}
-
+		/*
 		void Init(string&& str, const vector<string>& separator) // assumtion : separators are sorted by length?, long -> short
 		{
 			if (separator.empty() || str.empty()) { return; } // if str.empty() == false then _m_str.push_back(str); // ?
@@ -262,6 +261,7 @@ namespace wiz{
 				}
 			}
 		}
+		*/
 		/*
 		void Init(const string& str, const vector<string>& separator)
 		{
