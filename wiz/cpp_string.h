@@ -180,10 +180,10 @@ namespace wiz{
 				right = i;
 				int _select = -1;
 				bool pass = false;
-
+				
 				for (int j = 0; j < separator.size(); ++j) {
 					for (int k = 0; k < separator[j].size(); ++k) {
-						if (str[i] == separator[j][k]) {
+						if (str[i + k] == separator[j][k]) {
 							pass = true;
 						}
 						else {
