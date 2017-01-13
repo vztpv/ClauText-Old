@@ -248,7 +248,7 @@ namespace wiz{
 
 					string temp = wiz::String::substring(str, left, right - 1);
 					if (!temp.empty()) {
-						_m_str.emplace_back(std::move(temp));
+						_m_str.push_back(std::move(temp));
 					}
 					i = i + separator[_select].size() - 1;
 					left = i + 1;
@@ -257,7 +257,7 @@ namespace wiz{
 				else if (!pass && i == str.size() - 1) {
 					string temp = wiz::String::substring(str, left, right);
 					if (!temp.empty()) {
-						_m_str.emplace_back(std::move(temp));
+						_m_str.push_back(std::move(temp));
 					}
 				}
 			}
