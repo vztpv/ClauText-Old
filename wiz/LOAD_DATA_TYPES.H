@@ -169,28 +169,6 @@ namespace wiz {
 			{
 				return ilist[idx] == 2;
 			}
-			//todo - bool IsItemList? IsUserTypeList? by ilist_idx
-			//		Type* GetList( const int idx )
-			Type* GetList(const int idx)
-			{
-				if (ilist[idx] == 1) {
-					int item_idx = -1;
-
-					for (int i = 0; i < ilist.size() && i <= idx; ++i) {
-						if (ilist[i] == 1) { item_idx++; }
-					}
-
-					return (Type*)(&itemList[item_idx]);
-				}
-				else {
-					int usertype_idx = -1;
-
-					for (int i = 0; i < ilist.size() && i <= idx; ++i) {
-						if (ilist[i] == 2) { usertype_idx++; }
-					}
-					return (Type*)(userTypeList[usertype_idx]);
-				}
-			}
 
 			void AddItemList(const ItemType<string>& strTa)
 			{

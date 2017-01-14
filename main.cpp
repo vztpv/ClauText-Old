@@ -1261,11 +1261,11 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if (ut.IsItemList(ut.GetIListSize() - 1))
 		{
-			auto x = (wiz::load_data::ItemType<string>*)ut.GetList(ut.GetIListSize() - 1);
-			operandStack.push(x->Get(0));
+			auto x = ut.GetItemList(ut.GetItemListSize() - 1);
+			operandStack.push(x.Get(0));
 		}
 		else {
-			auto x = (wiz::load_data::UserType*)ut.GetList(ut.GetIListSize() - 1);
+			auto x = ut.GetUserTypeList(ut.GetUserTypeListSize() - 1);
 			operandStack.push("\"" + x->ToString() + "\"");
 		}
 	}
@@ -1291,12 +1291,12 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if (ut->IsItemList(ut->GetIListSize() - 1))
 		{
-			auto x = (wiz::load_data::ItemType<string>*)ut->GetList(ut->GetIListSize() - 1);
-			operandStack.push(x->Get(0));
+			auto x = ut->GetItemList(ut->GetItemListSize() - 1);
+			operandStack.push(x.Get(0));
 			ut->RemoveItemList(ut->GetItemListSize() - 1);
 		}
 		else {
-			auto x = (wiz::load_data::UserType*)ut->GetList(ut->GetIListSize() - 1);
+			auto x = ut->GetUserTypeList(ut->GetUserTypeListSize() - 1);
 			operandStack.push("\"" + x->ToString() + "\"");
 			ut->RemoveUserTypeList(ut->GetUserTypeListSize() - 1);
 		}
@@ -1312,11 +1312,11 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if (ut.IsItemList(0))
 		{
-			auto x = (wiz::load_data::ItemType<string>*)ut.GetList(0);
-			operandStack.push(x->Get(0));
+			auto x = ut.GetItemList(0);
+			operandStack.push(x.Get(0));
 		}
 		else {
-			auto x = (wiz::load_data::UserType*)ut.GetList(0);
+			auto x = ut.GetUserTypeList(0);
 			operandStack.push("\"" + x->ToString() + "\"");
 		}
 	}
@@ -1341,12 +1341,12 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if (ut->IsItemList(0))
 		{
-			auto x = (wiz::load_data::ItemType<string>*)ut->GetList(0);
-			operandStack.push(x->Get(0));
+			auto x = ut->GetItemList(0);
+			operandStack.push(x.Get(0));
 			ut->RemoveItemList(0);
 		}
 		else {
-			auto x = (wiz::load_data::UserType*)ut->GetList(0);
+			auto x = ut->GetUserTypeList(0);
 			operandStack.push("\"" + x->ToString() + "\"");
 			ut->RemoveUserTypeList(0);
 		}

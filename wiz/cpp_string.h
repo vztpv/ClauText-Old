@@ -163,7 +163,7 @@ namespace wiz{
 		vector<string> _m_str;
 		int count;
 		bool exist;
-		const vector<string> whitespaces = { " ", "\t", "\r", "\n" };
+		static const vector<string> whitespaces;
 	private:
 		void Init(string str, const vector<string>& separator) // assumtion : separators are sorted by length?, long -> short
 		{
@@ -353,6 +353,7 @@ namespace wiz{
 		}
 
 	};
+	const vector<string> StringTokenizer::whitespaces = { " ", "\t", "\r", "\n" };
 
 }
 #endif // CPP_STRING_H_INCLUDED
