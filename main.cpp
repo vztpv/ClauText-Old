@@ -345,11 +345,11 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 
 					if (braceNum >= utVec.size()) {
 						utVec.push_back(wiz::load_data::ItemType<wiz::load_data::UserType*>());
-						utVec2.push_back(NULL);
+						utVec2.push_back(nullptr);
 					}
 
 					wiz::load_data::ItemType< wiz::load_data::UserType*> ref;
-					ref.Push(NULL);
+					ref.Push(nullptr);
 					string strTemp = mdVec[idxVec[braceNum - 1]].varName;
 					if (strTemp == " ")
 					{
@@ -865,7 +865,7 @@ public:
 	string return_value;
 	string option;
 public:
-	EventInfo() : eventUT(NULL), return_value("")
+	EventInfo() : eventUT(nullptr), return_value("")
 	{
 
 	}
@@ -1285,7 +1285,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if (x.empty()) { x = "."; }
 
-		wiz::load_data::UserType* ut = NULL;
+		wiz::load_data::UserType* ut = nullptr;
 		auto finded = wiz::load_data::UserType::Find(&global, x);
 		ut = finded.second[0];
 
@@ -1335,7 +1335,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		if (x.empty()) { x = "."; }
 
-		wiz::load_data::UserType* ut = NULL;
+		wiz::load_data::UserType* ut = nullptr;
 		auto finded = wiz::load_data::UserType::Find(&global, x);
 		ut = finded.second[0];
 
@@ -1702,7 +1702,7 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 }
 
 
-string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType* pEvents = NULL, const std::shared_ptr<EventInfo>& pInfo = NULL)
+string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType* pEvents = nullptr, const std::shared_ptr<EventInfo>& pInfo = nullptr)
 {
 	wiz::load_data::UserType& global = *_global;
 	vector<thread*> waits;
@@ -1716,7 +1716,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 	wiz::load_data::UserType events;
 	wiz::load_data::UserType Main;
 
-	if (NULL == pEvents) {
+	if (nullptr == pEvents) {
 		_events = global.GetCopyUserTypeItem("Event");
 		for (int i = 0; i < _events.size(); ++i) {
 			events.LinkUserType(_events[i]);
@@ -1740,7 +1740,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 	}
 
 	// start from Main.
-	if (NULL == pInfo) {
+	if (nullptr == pInfo) {
 		if (global.GetUserTypeItem("Main").empty())
 		{
 			cout << "do not exist Main" << endl;
@@ -1807,7 +1807,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 		}
 
 		{ /// has bug!! WARNNING!!
-			wiz::load_data::UserType* val = NULL;
+			wiz::load_data::UserType* val = nullptr;
 			if (eventStack.top().userType_idx.size() == 1) {
 				if (events.GetUserTypeList(no)->GetUserTypeListSize() > eventStack.top().userType_idx.top()) {
 					val = events.GetUserTypeList(no)->GetUserTypeList(eventStack.top().userType_idx.top());
@@ -1821,7 +1821,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					}
 				}
 				else {
-					val = NULL;
+					val = nullptr;
 				}
 			}
 			else
@@ -1859,12 +1859,12 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 						}
 					}
 					else {
-						val = NULL;
+						val = nullptr;
 					}
 				}
 			}
 
-			while (val != NULL)
+			while (val != nullptr)
 			{
 				if ("$replace_datetype" == val->GetName()) {
 					string sval = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
@@ -2126,7 +2126,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 				// done - ($push_back-insert!) $pop_back, $push_front, $pop_front ($front?, $back?)
 				else if ("$pop_back" == val->GetName()) {
 					string dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
-					wiz::load_data::UserType* ut = NULL;
+					wiz::load_data::UserType* ut = nullptr;
 					auto finded = wiz::load_data::UserType::Find(&global, dir);
 					ut = finded.second[0];
 
@@ -3105,9 +3105,10 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 
 int main(int argc, char* argv[])
 {
-	srand(time(NULL)); // 
+	srand(time(nullptr)); // 
 
 	string fileName;
+
 
 	if (argc == 1) {
 		cout << "FileName: ";
@@ -3119,12 +3120,14 @@ int main(int argc, char* argv[])
 		fileName = string(argv[1]);
 	}
 
-	wiz::load_data::UserType global;
-	wiz::load_data::LoadData::LoadDataFromFile(fileName, global);
+	{
+		wiz::load_data::UserType global;
+		wiz::load_data::LoadData::LoadDataFromFile(fileName, global);
 
-	cout << "fileName is " << fileName << endl;
-	cout << "excute result is " << excute_module(&global) << endl;
-	//_getch(); // pause..
+		cout << "fileName is " << fileName << endl;
+		cout << "excute result is " << excute_module(&global) << endl;
+		//_getch(); // pause..
+	}
 
 	return 0;
 }

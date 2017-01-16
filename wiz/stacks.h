@@ -39,7 +39,7 @@ class Stack
         explicit Element( const T& d=T() )
         {  // Í∏∞Î≥∏ ?Ä?? // ?ïÏ? Î≥µÏÇ¨.
             data = d; // why this?
-            next = NULL;
+            next = nullptr;
         }
     };
 private:
@@ -48,13 +48,13 @@ private:
         /// this->clear();
         Element* pE = s.Rear;
         Stack<T> temp;
-        while( NULL != pE )
+        while( nullptr != pE )
         {
             temp.push( pE->data );
             pE = pE->next;
         }
         pE = temp.Rear;
-        while( NULL != pE )
+        while( nullptr != pE )
         {
             this->push( pE->data );
             pE = pE->next;
@@ -64,7 +64,7 @@ public:
     Stack( const Stack<T>& s )
     {
         num = 0;
-        Rear = NULL;
+        Rear = nullptr;
         copy( s );
     }
     Stack<T>& operator=( const Stack<T>& s )
@@ -80,7 +80,7 @@ public:
         Rear = s.Rear;
         num = s.num;
 
-        s.Rear = NULL;
+        s.Rear = nullptr;
         s.num = 0;
     }
     Stack<T>& operator=( Stack<T>&& s )
@@ -90,7 +90,7 @@ public:
         Rear = s.Rear;
         num = s.num;
 
-        s.Rear = NULL;
+        s.Rear = nullptr;
         s.num = 0;
         return *this;
     }
@@ -98,7 +98,7 @@ private:
     Element* Rear;// Íº¨Î¶¨???∞Ïù¥?∞Î? ?£Îäî??
     int num;  // for toArray
 public:
-    explicit Stack() : Rear( NULL ), num( 0 ) { }
+    explicit Stack() : Rear( nullptr ), num( 0 ) { }
     ~Stack(){
         clear();
     }
@@ -108,7 +108,7 @@ public:
         }
     }
     bool isEmpty()const{ // ÎπÑÏóà?? //
-        return NULL == Rear; // num <= 0
+        return nullptr == Rear; // num <= 0
     }
     bool empty() const{ return isEmpty(); }
     //

@@ -67,10 +67,9 @@ namespace wiz {
 			T data;
 			bool inited;
 		public:
-			ItemType(const ItemType<T>& ta) : Type(ta)
+			ItemType(const ItemType<T>& ta) : Type(ta), data(ta.data), inited(ta.inited)
 			{
-				data = ta.data;
-				inited = ta.inited;
+
 			}
 			ItemType(ItemType<T>&& ta) : Type(move(ta))
 			{
@@ -763,16 +762,19 @@ namespace wiz {
 					//std::cout << "ItemList" << endl;
 					if (ut->ilist[i] == 1) {
 						for (int j = 0; j < ut->itemList[itemListCount].size(); j++) {
+							string temp;
 							for (int k = 0; k < depth; ++k) {
-								stream << "\t";
+								temp += "\t";
 							}
 							if (ut->itemList[itemListCount].GetName() != "") {	
-								stream << ut->itemList[itemListCount].GetName() << "=";
+								temp += ut->itemList[itemListCount].GetName();
+								temp += "=";
 							}
-							stream << ut->itemList[itemListCount].Get(j);
+							temp += ut->itemList[itemListCount].Get(j);
 							if (j != ut->itemList[itemListCount].size() - 1) {
-								stream << "\n";
+								temp += "\n";
 							}
+							stream << temp;
 						}
 						if (i != ut->ilist.size() - 1) {
 							stream << "\n";
@@ -1136,7 +1138,7 @@ namespace wiz {
 					for (int j = 0; j < itemList.size(); ++j) {
 						string temp;
 						Utility::ChangeStr(itemList.Get(j), target_ch, result_ch, temp);
-						itemList.Get(j) = temp;
+						itemList.Get(j) = std::move(temp);
 					}
 				}
 

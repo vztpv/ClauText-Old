@@ -667,9 +667,19 @@ namespace wiz {
 				}
 				return -1;
 			}
-
+			static const string& Back(const ArrayQueue<string>& strVec)
+			{
+				return strVec[strVec.size() - 1];
+			}
+			static string PopBack(ArrayQueue<string>& strVec)
+			{
+				return strVec.pop_back();
+			}
 			static pair<bool, string> LookUp(const ArrayQueue<string>& strVec, const int idx = 1)
 			{
+				if (idx < 0) {
+					return { true, strVec[strVec.size() - 1 + idx] };
+				}
 				if (strVec.size() <= idx)
 				{
 					return{ false, "" };
@@ -678,7 +688,7 @@ namespace wiz {
 			}
 			/// must strVec[start] == up or down
 			/// now not use!!
-			static pair<bool, int> IsMatched(const ArrayQueue<string>& strVec, const string& up, const string& down, const int start = 0, const int start_num = 0, int* pidx = NULL, int*pnum = NULL)
+			static pair<bool, int> IsMatched(const ArrayQueue<string>& strVec, const string& up, const string& down, const int start = 0, const int start_num = 0, int* pidx = nullptr, int*pnum = nullptr)
 			{
 				int num = start_num;
 				int count = 0;

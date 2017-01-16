@@ -39,18 +39,18 @@ private:
         explicit Element( const T d = T() )
         {
             data = d;
-            next =  NULL;
+            next =  nullptr;
         }
     };
 private:
     Element* Head; //
     Element* Rear; //
 public:
-    explicit Queue() : Head( NULL ), Rear( NULL ) { Head = new Element(); Rear = Head; }
+    explicit Queue() : Head( nullptr ), Rear( nullptr ) { Head = new Element(); Rear = Head; }
 
     virtual ~Queue(){
         clear();
-        delete Head; Head = Rear = NULL;
+        delete Head; Head = Rear = nullptr;
     }
     void clear()
     {
@@ -60,7 +60,7 @@ public:
      }
     bool isEmpty() const
     {
-        return NULL == Head->next; /// size == 0, empty..
+        return nullptr == Head->next; /// size == 0, empty..
     }
     bool empty() const { return isEmpty(); }
     //
@@ -69,7 +69,7 @@ public:
         Element* temp = new Element(p); //
         //
         Rear->next = temp;//
-        temp->next = NULL;// auto look def of Element
+        temp->next = nullptr;// auto look def of Element
         Rear = Rear->next; //
     }//
     void push( const T& p ) { addq( p ); }
@@ -82,7 +82,7 @@ public:
         Element* temp = Head->next;//
         Head->next = temp->next;
         //Rear 처리
-        if( NULL == Head->next )
+        if( nullptr == Head->next )
             Rear = Head;
         T returnTemp = temp->data;
         delete temp;
@@ -100,7 +100,7 @@ private:
 
         Element* qTemp = q.Head->next;
 
-        while( qTemp != NULL )
+        while( qTemp != nullptr )
         {
             addq( qTemp->data );
             qTemp = qTemp->next;
@@ -108,7 +108,7 @@ private:
     }
 public:
     //
-    Queue( const Queue<T>& q ) : Head( NULL ), Rear( NULL )
+    Queue( const Queue<T>& q ) : Head( nullptr ), Rear( nullptr )
     {// clear();
         Head = new Element(); Rear = Head;
         copy( q );
@@ -130,7 +130,7 @@ public:
         Rear = q.Rear;
 
         /// do-empty..
-        q.Head->next = NULL;
+        q.Head->next = nullptr;
         q.Rear = q.Head;
     }
     Queue<T>& operator=( Queue<T>&& q )
@@ -140,7 +140,7 @@ public:
         Head->next = q.Head->next;
         Rear = q.Rear;
 
-q.Head->next = NULL;
+q.Head->next = nullptr;
 q.Rear = q.Head;
 return *this;
 	}
@@ -223,7 +223,7 @@ public:
 		}
 		if (newSize != this->que.size()) {
 			// expand array queue.
-			ArrayQueue temp(newSize);
+			ArrayQueue<T> temp(newSize);
 			temp.start = 0;
 			//
 			for (int i = 0; i < this->size(); ++i) {
@@ -317,15 +317,27 @@ public:
     {
         if( isEmpty() ) { throw QueueEmptyError(); }
 
-        T temp = que[start];
+        T temp = std::move(que[start]);
 
-        que[start] = T();
+        //que[start] = T();
 
         start = ( start + 1 ) & (que.size()-1); // % que.size(), 2^n.
         num--;
 
         return temp;
     }
+
+	T pop_back()
+	{
+		if (isEmpty()) { throw QueueEmptyError(); }
+		T temp = std::move((*this)[num - 1]);
+
+		//(*this)[num - 1] = T();
+		
+		num--;
+
+		return temp;
+	}
 
     bool isFull()const
     {

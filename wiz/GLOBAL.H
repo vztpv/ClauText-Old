@@ -215,7 +215,7 @@ namespace wiz{
 		WrapForInfinity<T> operator+(const WrapForInfinity<T>& other)const
 		{
 			if (other.op == this->op) {
-				return WrapForInfinity<T>(this->val + ohter.val, this->op);
+				return WrapForInfinity<T>(this->val + other.val, this->op);
 			}
 			else if (this->op == MIF && other.op == GR) {
 				return WrapForInfinity<T>::GetMinusInfinity();

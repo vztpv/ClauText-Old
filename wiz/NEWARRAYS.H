@@ -21,7 +21,7 @@ private:
 private:
     void resetP( const T* p )
     {
-        if( NULL != this->p && NULL != p )
+        if( nullptr != this->p && nullptr != p )
         {
             for( int i=0;i< N;i++ ){
                 this->p[i] = p[i];
@@ -43,11 +43,11 @@ public:
         explicit Iter( T* _pt, T* p, int N, T* pBegin, T* pEnd ) : _pt(_pt),
         p(p), N(N), pBegin(pBegin), pEnd(pEnd)
         {
-            if( NULL == _pt ) { throw wiz::Error( "NULL == _pt in Iter" ); }
+            if( nullptr == _pt ) { throw wiz::Error( "nullptr == _pt in Iter" ); }
         }
         //
         void left() {
-            // p == NULL -> err.
+            // p == nullptr -> err.
             if( p == _pt ) { _pt = pBegin; }
             else if( _pt == pBegin ) { throw wiz::Error( " _pt == pBegin in left " ); }
             else if( _pt == pEnd ) { _pt = p+N-1; }
@@ -56,7 +56,7 @@ public:
             }
         }
         void right() {
-            // p == NULL -> err.
+            // p == nullptr -> err.
             if( p+N-1 == _pt ) { _pt = pEnd; }
             else if( _pt == pEnd ) { throw wiz::Error( " _pt == pEnd in right " ); }
             else if( _pt == pBegin ) { _pt = p; }
@@ -65,7 +65,7 @@ public:
             }
         }
         T data()const { return *_pt; }
-        bool isNULL()const { return NULL == _pt; }
+        bool isnullptr()const { return nullptr == _pt; }
         bool operator!=( const Iter& x ) const
         {
             return x._pt != this->_pt;
@@ -93,11 +93,11 @@ public:
         explicit ConstIter( T* _pt, T* p, int N, T* pBegin, T* pEnd ) : _pt(_pt),
         p(p), N(N), pBegin(pBegin), pEnd(pEnd)
         {
-            if( NULL == _pt ) { throw wiz::Error( "NULL == _pt in ConstIter" ); }
+            if( nullptr == _pt ) { throw wiz::Error( "nullptr == _pt in ConstIter" ); }
         }
         //
         void left() {
-            // p == NULL -> err.
+            // p == nullptr -> err.
             if( p == _pt ) { _pt = pBegin; }
             else if( _pt == pBegin ) { throw wiz::Error( " _pt == pBegin in left " ); }
             else if( _pt == pEnd ) { _pt = p+N-1; }
@@ -106,7 +106,7 @@ public:
             }
         }
         void right() {
-            // p == NULL -> err.
+            // p == nullptr -> err.
             if( p+N-1 == _pt ) { _pt = pEnd; }
             else if( _pt == pEnd ) { throw wiz::Error( " _pt == pEnd in right " ); }
             else if( _pt == pBegin ) { _pt = p; }
@@ -115,7 +115,7 @@ public:
             }
         }
         T data()const { return *_pt; }
-        bool isNULL()const { return NULL == _pt; }
+        bool isnullptr()const { return nullptr == _pt; }
         bool operator!=( const ConstIter& x ) const
         {
             return x._pt != this->_pt;
@@ -154,7 +154,7 @@ public:
         wiz::checkUnderError( 1, N, 0 );
         #endif
 
-        if( 0 == N ) { p = NULL; return; }
+        if( 0 == N ) { p = nullptr; return; }
         p = new T[N];
 
         int count = 0;
@@ -171,14 +171,14 @@ public:
         if( p == arr.p ) { return *this; }
 
         if( p ) { delete[] p; }
-        p = arr.p; arr.p = NULL;
+        p = arr.p; arr.p = nullptr;
         N = arr.N; arr.N = 0;
 
         return *this;
     }
     Array( Array<T>&& arr )
     {
-        p = arr.p; arr.p = NULL;
+        p = arr.p; arr.p = nullptr;
         N = arr.N; arr.N = 0;
     }
 
@@ -201,11 +201,11 @@ public:
 	}
 
     Array( const Array<T>& _arr )
-    : p(NULL), N(0)
+    : p(nullptr), N(0)
     {
         *this = _arr;
     }
-    explicit Array() : p(NULL), N(0)
+    explicit Array() : p(nullptr), N(0)
     { }
 
     virtual ~Array()
@@ -228,7 +228,7 @@ public:
         return this->p != arr.p;
     }
     /// cf) isSameValues?
-    template<class IS_SAME_VALUE=EE<T>> /// need more thinking..
+    template<class IS_SAME_VALUE=EQ<T>> /// need more thinking..
     bool isSameValue( const Array<T>& arr ) const
     {
         if( arr.size() != size() ) { return false; }
@@ -261,13 +261,13 @@ public:
     {
         if( _p.p == p ) { return *this; }
 
-        if( NULL != p && size() != _p.size() )
+        if( nullptr != p && size() != _p.size() )
         {
             delete[] p;
-            p = NULL;
+            p = nullptr;
         }
 
-		if( NULL == p && NULL != _p.p )
+		if( nullptr == p && nullptr != _p.p )
         {
             p = new T[_p.N];
         }
@@ -281,7 +281,7 @@ public:
 
     bool empty()const
     {
-    	return NULL == p;
+    	return nullptr == p;
     }
     bool isValid()const
     {
@@ -290,13 +290,13 @@ public:
     void DoEmpty()
     {
         if( p ) delete[] p;
-        p = NULL;
+        p = nullptr;
         N = 0;
     }
 public:
 	void expand()
 	{
-		if( NULL != p )
+		if( nullptr != p )
 		{
 		    // 2012.5.8
 			const int newN = 2 * N;
@@ -365,14 +365,14 @@ private:
 private:
     void Delete() /// to public??
     {
-		if( NULL != p )
+		if( nullptr != p )
         {
 			for( int i=0;i< row_N;i++ )
 			{
-				if( p[i] ){ delete p[i]; p[i] = NULL; }
+				if( p[i] ){ delete p[i]; p[i] = nullptr; }
 			}
 			delete[] p;//
-            p = NULL;
+            p = nullptr;
         }
         row_N = 0; column_N = 0;
     }
@@ -390,7 +390,7 @@ private:
 
 public:
     explicit SecondArray()
-	:  p( NULL ), row_N( 0 ), column_N( 0 )
+	:  p( nullptr ), row_N( 0 ), column_N( 0 )
 	{
         //
 	}
@@ -415,7 +415,7 @@ public:
     }
     // 최대 크기를 받는다.
     SecondArray( const SecondArray<T>& dap )
-    : p( NULL ), row_N( 0 ), column_N( 0 )
+    : p( nullptr ), row_N( 0 ), column_N( 0 )
     {
         *this = dap;
     }
@@ -424,20 +424,20 @@ public:
     {
         if( dap.p == p ) { return *this; }
 
-        /// NULL != p && NULL == dap.p -> ( NULL!=p && other size ) is true.
-        if( NULL != p && ( row_N != dap.row_N || column_N != dap.column_N ) )
-        /// NULL != p && NULL == dap.p
-        /// NULL != p && NULL != dap.p && ( different row_size or different col_size )
+        /// nullptr != p && nullptr == dap.p -> ( nullptr!=p && other size ) is true.
+        if( nullptr != p && ( row_N != dap.row_N || column_N != dap.column_N ) )
+        /// nullptr != p && nullptr == dap.p
+        /// nullptr != p && nullptr != dap.p && ( different row_size or different col_size )
         {
             for( int i=0; i < this->row_N; ++i )
             {
                 delete p[i];
             }
             delete[] p;
-            p = NULL;
+            p = nullptr;
         }
 
-    	if( NULL == p && NULL != dap.p )
+    	if( nullptr == p && nullptr != dap.p )
         {
             p = new Array<T>*[dap.row_N];
             for( int i=0;i< dap.row_N;i++ )
@@ -445,8 +445,8 @@ public:
                 p[i] = new Array<T>( *(dap.p[i]) );
             }
         }
-        else /// else if( NULL != p && NULL != dap.p && same row_size && same col_size )
-             /// else if( NULL == p && NULL == dap.p ) -> dap.row_N == 0.
+        else /// else if( nullptr != p && nullptr != dap.p && same row_size && same col_size )
+             /// else if( nullptr == p && nullptr == dap.p ) -> dap.row_N == 0.
         {
             for( int i=0; i < dap.row_N; i++ )
             {
@@ -468,14 +468,14 @@ public:
         row_N = arr.row_N;
         column_N = arr.column_N;
 
-        arr.p = NULL;
+        arr.p = nullptr;
         arr.row_N = 0;
         arr.column_N = 0;
         return *this;
     }
     SecondArray( SecondArray<T>&& arr )
     {
-        p = arr.p; arr.p = NULL;
+        p = arr.p; arr.p = nullptr;
         row_N = arr.row_N; arr.row_N = 0;
         column_N = arr.column_N; arr.column_N = 0;
     }
@@ -532,11 +532,11 @@ public:
 
     bool empty() const
     {
-        return NULL == p;
+        return nullptr == p;
     }
 	bool isValid()const
     {
-    	return NULL != p;
+    	return nullptr != p;
     }
    //Array<T> getColumnArray( const int columnNo );
    //Array<T> getRowArray( const int rowNo );
@@ -554,7 +554,7 @@ public:
     void row_expand()
     {
         if( isSquareSecondArray() ) { return; } /// throw err.?
-        if( NULL != p ) {
+        if( nullptr != p ) {
             const int new_row_size = 2 * row_N;
             Array<T>** temp = new Array<T>*[new_row_size];
 
