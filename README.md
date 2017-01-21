@@ -86,8 +86,5 @@
 	1. it can load eu4 savegames, and maybe other paradox game db or savegame files.
 	2. it`s syntax come from eu4 savegame syntax.
 
-# To Do?
-	1. To json or From json?
-	2. Event Group?
-	3. Event Graph?
-	4. Fix bugs. 
+# To Do
+	1. add SQL-like functions?
