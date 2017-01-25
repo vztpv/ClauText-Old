@@ -196,12 +196,12 @@ namespace wiz {
 			//	bool userTypeList_sortFlagB;
 		private:
 		public:
-			explicit UserType(string&& name, bool noRemove = false) : Type(move(name)), parent(NULL), noRemove(noRemove) { }
-			explicit UserType(const string& name = "", bool noRemove = false) : Type(name), parent(NULL), noRemove(noRemove) { } //, userTypeList_sortFlagA(true), userTypeList_sortFlagB(true) { }
+			explicit UserType(string&& name, bool noRemove = false) : Type(move(name)), parent(nullptr), noRemove(noRemove) { }
+			explicit UserType(const string& name = "", bool noRemove = false) : Type(name), parent(nullptr), noRemove(noRemove) { } //, userTypeList_sortFlagA(true), userTypeList_sortFlagB(true) { }
 			UserType(const UserType& ut) : Type(ut.GetName()) {
 				Reset(ut);  // Initial
 			}
-			UserType(UserType&& ut) : Type(ut.GetName()) {
+			UserType(UserType&& ut) : Type(move(ut.GetName())) {
 				Reset2(std::move(ut));
 			}
 			virtual ~UserType() {
@@ -243,13 +243,13 @@ namespace wiz {
 				//std::swap( userTypeList_sortFlagB, ut.userTypeList_sortFlagB );
 
 				parent = ut.parent;
-				ut.parent = NULL; /// chk..
+				ut.parent = nullptr; /// chk..
 				ilist = std::move(ut.ilist);
 				itemList = std::move(ut.itemList);
 
 				for (int i = 0; i < ut.userTypeList.size(); ++i) {
 					userTypeList.push_back(move(ut.userTypeList[i]));
-					ut.userTypeList[i] = NULL;
+					ut.userTypeList[i] = nullptr;
 				}
 				ut.userTypeList.clear();
 			}
@@ -418,9 +418,9 @@ namespace wiz {
 			}
 			void RemoveUserTypeList() { /// chk memory leak test!!
 				for (int i = 0; i < userTypeList.size(); i++) {
-					if (NULL != userTypeList[i]) {
+					if (nullptr != userTypeList[i]) {
 						delete userTypeList[i]; //
-						userTypeList[i] = NULL;
+						userTypeList[i] = nullptr;
 					}
 				}
 				// DO Empty..
@@ -530,7 +530,7 @@ namespace wiz {
 				}
 				ilist[ilist_idx] = 2;
 
-				userTypeList.push_back(NULL);
+				userTypeList.push_back(nullptr);
 				for (int i = userTypeIndex + 1; i < userTypeList.size(); ++i) {
 					userTypeList[i] = userTypeList[i - 1];
 				}
@@ -548,7 +548,7 @@ namespace wiz {
 				}
 				ilist[ilist_idx] = 2;
 
-				userTypeList.push_back(NULL);
+				userTypeList.push_back(nullptr);
 				for (int i = userTypeIndex + 1; i < userTypeList.size(); ++i) {
 					userTypeList[i] = userTypeList[i - 1];
 				}
@@ -599,7 +599,7 @@ namespace wiz {
 				}
 				ilist[ilist_idx] = 2;
 
-				userTypeList.push_back(NULL);
+				userTypeList.push_back(nullptr);
 				for (int i = ut_idx + 1; i < userTypeList.size(); ++i) {
 					userTypeList[i] = userTypeList[i - 1];
 				}
@@ -617,7 +617,7 @@ namespace wiz {
 				}
 				ilist[ilist_idx] = 2;
 
-				userTypeList.push_back(NULL);
+				userTypeList.push_back(nullptr);
 				for (int i = ut_idx + 1; i < userTypeList.size(); ++i) {
 					userTypeList[i] = userTypeList[i - 1];
 				}
@@ -1239,7 +1239,7 @@ namespace wiz {
 					std::reverse(strVec.begin(), strVec.end());
 
 					for (int i = 0; i < count; ++i) {
-						if (utTemp.first == NULL) {
+						if (utTemp.first == nullptr) {
 							return{ false, vector< UserType* >() };
 						}
 						utTemp.first = utTemp.first->GetParent();

@@ -2288,6 +2288,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					if (false == val->GetItem("option").empty() && val->GetItem("option")[0].Get(0) == "USE_THREAD") {
 						std::shared_ptr<EventInfo> pInfo( new EventInfo(info) );
 						thread* A = new thread(excute_module, &global, &events, pInfo);
+						
 						waits.push_back(A);
 					}
 					else {
@@ -2369,7 +2370,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					break;
 				}
 				/// cf) insert3? - any position?
-				else if ("push_back" == val->GetName() || "$insert" == val->GetName() || "$insert2" == val->GetName())
+				else if ("$push_back" == val->GetName() || "$insert" == val->GetName() || "$insert2" == val->GetName())
 				{
 					string value = val->GetUserTypeList(1)->ToString();
 					string dir;
@@ -2717,6 +2718,8 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
 					string dirName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
 					wiz::load_data::UserType* utTemp = global.GetUserTypeItem(dirName)[0];
+
+					
 
 					if (wiz::load_data::LoadData::LoadDataFromFile(fileName, ut)) {
 						{
@@ -3120,13 +3123,16 @@ int main(int argc, char* argv[])
 		fileName = string(argv[1]);
 	}
 
-	{
+	try {
 		wiz::load_data::UserType global;
 		wiz::load_data::LoadData::LoadDataFromFile(fileName, global);
 
 		cout << "fileName is " << fileName << endl;
 		cout << "excute result is " << excute_module(&global) << endl;
 		//_getch(); // pause..
+	}
+	catch (...) {
+		cout << "Error.." << endl;
 	}
 
 	return 0;

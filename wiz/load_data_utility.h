@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include <string>
 #include <fstream>
 #include <thread>
 #include <algorithm>
@@ -192,23 +193,146 @@ namespace wiz {
 						else return false;
 						break;
 					case 2:
-						if (str[i] >= '0' && str[i] <= '9') { state = 2; }
-						else if (str[i] == '.') {
-							state = 3;
-						}
+						if (str[i] >= '0' && str[i] <= '9') { state = 3; }
 						else return false;
 						break;
 					case 3:
-						if (str[i] >= '0' && str[i] <= '9') { state = 4; }
+						if (str[i] >= '0' && str[i] <= '9') { state = 3; }
+						else if (str[i] == '.') {
+							state = 4;
+						}
 						else return false;
 						break;
 					case 4:
-						if (str[i] >= '0' && str[i] <= '9') { state = 4; }
+						if (str[i] >= '0' && str[i] <= '9') { state = 5; }
+						else return false;
+						break;
+					case 5:
+						if (str[i] >= '0' && str[i] <= '9') { state = 5; }
 						else return false;
 						break;
 					}
 				}
-				return 4 == state;
+				return 5 == state;
+			}
+			static bool IsDateTimeA(const string& str) // yyyy.MM.dd.hh
+			{
+				int state = 0;
+				for (int i = 0; i < str.size(); ++i) {
+					switch (state)
+					{
+					case 0:
+						if (str[i] >= '0' && str[i] <= '9')
+						{
+							state = 1;
+						}
+						else return false;
+						break;
+					case 1:
+						if (str[i] >= '0' && str[i] <= '9') {
+							state = 1;
+						}
+						else if (str[i] == '.') {
+							state = 2;
+						}
+						else return false;
+						break;
+					case 2:
+						if (str[i] >= '0' && str[i] <= '9') { state = 3; }
+						else return false;
+						break;
+					case 3:
+						if (str[i] >= '0' && str[i] <= '9') { state = 3; }
+						else if (str[i] == '.') {
+							state = 4;
+						}
+						else return false;
+						break;
+					case 4:
+						if (str[i] >= '0' && str[i] <= '9') { state = 5; }
+						else return false;
+						break;
+					case 5:
+						if (str[i] >= '0' && str[i] <= '9') { state = 5; }
+						else if (str[i] == '.') { state = 6; }
+						else return false;
+						break;
+					case 6:
+						if (str[i] >= '0' && str[i] <= '9') { state = 7; }
+						else return false;
+						break;
+					case 7:
+						if (str[i] >= '0' && str[i] <= '9') { state = 7; }
+						else return false;
+						break;
+					}
+				}
+				return 7 == state;
+			}
+			static bool IsDateTimeB(const string& str) // yyyy.MM.dd.hh.mm
+			{
+				int state = 0;
+				for (int i = 0; i < str.size(); ++i) {
+					switch (state)
+					{
+					case 0:
+						if (str[i] >= '0' && str[i] <= '9')
+						{
+							state = 1;
+						}
+						else return false;
+						break;
+					case 1:
+						if (str[i] >= '0' && str[i] <= '9') {
+							state = 1;
+						}
+						else if (str[i] == '.') {
+							state = 2;
+						}
+						else return false;
+						break;
+					case 2:
+						if (str[i] >= '0' && str[i] <= '9') { state = 3; }
+						else return false;
+						break;
+					case 3:
+						if (str[i] >= '0' && str[i] <= '9') { state = 3; }
+						else if (str[i] == '.') {
+							state = 4;
+						}
+						else return false;
+						break;
+					case 4:
+						if (str[i] >= '0' && str[i] <= '9') { state = 5; }
+						else return false;
+						break;
+					case 5:
+						if (str[i] >= '0' && str[i] <= '9') { state = 5; }
+						else if (str[i] == '.') { state = 6; }
+						else return false;
+						break;
+					case 6:
+						if (str[i] >= '0' && str[i] <= '9') { state = 7; }
+						else return false;
+						break;
+					case 7:
+						if (str[i] >= '0' && str[i] <= '9') { state = 7; }
+						else if (str[i] == '.') {
+							state = 8;
+						}
+						else return false;
+						break;
+					case 8:
+						if (str[i] >= '0' && str[i] <= '9') { state = 9; }
+						else return false;
+						break;
+					case 9:
+						if (str[i] >= '0' && str[i] <= '9') { state = 9; }
+						else return false;
+						break;
+					}
+				}
+				return 9 == state;
 			}
 			static bool IsMinus(const string& str)
 			{
@@ -223,6 +347,8 @@ namespace wiz {
 			static string GetType(const string& str) {
 				if (IsInteger(str)) { return "INTEGER"; }
 				else if (IsDouble(str)) { return "DOUBLE"; }
+				else if (IsDateTimeB(str)) { return "DATETIMEB"; }
+				else if (IsDateTimeA(str)) { return "DATETIMEA"; }
 				else if (IsDate(str)) { return "DATE"; }
 				else return "STRING";
 			}
@@ -322,7 +448,36 @@ namespace wiz {
 					}
 					return "== 0";
 				}
+				else if ("DATETIMEA" == type1) {
+					StringTokenizer tokenizer1(str1, ".");
+					StringTokenizer tokenizer2(str2, ".");
 
+					for (int i = 0; i < 4; ++i) {
+						const string x = tokenizer1.nextToken();
+						const string y = tokenizer2.nextToken();
+
+						const string comp = Compare(x, y);
+
+						if (comp == "< 0") { return comp; }
+						else if (comp == "> 0") { return comp; }
+					}
+					return "== 0";
+				}
+				else if ("DATETIMEB" == type2) {
+					StringTokenizer tokenizer1(str1, ".");
+					StringTokenizer tokenizer2(str2, ".");
+
+					for (int i = 0; i < 5; ++i) {
+						const string x = tokenizer1.nextToken();
+						const string y = tokenizer2.nextToken();
+
+						const string comp = Compare(x, y);
+
+						if (comp == "< 0") { return comp; }
+						else if (comp == "> 0") { return comp; }
+					}
+					return "== 0";
+				}
 				return "ERROR";
 			}
 
@@ -461,9 +616,10 @@ namespace wiz {
 				}
 				void operator() (const tbb::blocked_range<size_t>& r) {
 					vector<string>* strVecTemp = strVec;
-					for (size_t i = r.begin(); i != r.end(); ++i)
+
+					for (size_t x = r.begin(); x != r.end(); ++x)
 					{
-						StringTokenizer tokenizer(std::move( (*strVecTemp)[i] ) );
+						StringTokenizer tokenizer(std::move( (*strVecTemp)[x] ) );
 						while (tokenizer.hasMoreTokens()) {
 							aq.push(tokenizer.nextToken());
 						}
@@ -473,7 +629,7 @@ namespace wiz {
 				{
 					//
 				}
-				void join(const DoThread& other)
+				void join(DoThread& other) 
 				{
 					aq.push(std::move(other.aq));
 				}
@@ -491,9 +647,10 @@ namespace wiz {
 				{
 				}
 				void operator() (const tbb::blocked_range<size_t>& r) const {
-					for (size_t i = r.begin(); i != r.end(); ++i)
+
+					for (auto x = r.begin(); x != r.end(); ++x)
 					{
-						string temp = std::move((*strVec)[i]);
+						string temp = std::move((*strVec)[x]);
 						string temp2;
 						bool chkStr = ChkExist(temp);
 						if (chkStr) {
@@ -512,7 +669,8 @@ namespace wiz {
 							temp = std::move(temp2);
 						}
 
-						(*strVec)[i] = std::move(temp);
+						(*strVec)[x] = std::move(temp);
+						
 					}
 				}
 			};
