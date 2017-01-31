@@ -1866,8 +1866,10 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 
 			while (val != nullptr)
 			{
+				// add option! for "".support eu3, eu4.
 				if ("$replace_datetype" == val->GetName()) {
 					string sval = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
+					
 					string scondition = "TRUE";
 					string start_dir = "root";
 
@@ -1889,6 +1891,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					string scondition = "TRUE";
 					string start_dir = "root";
 
+					
 					if (val->GetUserTypeListSize() >= 2)
 					{
 						scondition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());

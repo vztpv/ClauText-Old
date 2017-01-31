@@ -19,6 +19,7 @@ namespace wiz {
 		class Utility
 		{
 		public:
+			// private: ??
 			static bool IsInteger(const string& str) {
 				int state = 0;
 				for (int i = 0; i < str.size(); ++i) {
@@ -170,8 +171,13 @@ namespace wiz {
 				}
 				return 3 == state || 6 == state;
 			}
-			static bool IsDate(const string& str)
+			static bool IsDate(string str) /// chk!!
 			{
+				if (str.size() > 2 && str[0] == str.back() && str[0] == '\"')
+				{
+					str = str.substr(1, str.size() - 2);
+				}
+
 				int state = 0;
 				for (int i = 0; i < str.size(); ++i) {
 					switch (state)
@@ -343,8 +349,12 @@ namespace wiz {
 				std::reverse(str.begin(), str.end());
 				return str;
 			}
-
-			static string GetType(const string& str) {
+			// public: ??
+			static string GetType(string str) {
+				if (str.size() > 2 && str[0] == str.back() && str[0] == '\"') {
+					str = str.substr(1, str.size() - 2);
+				}
+				//
 				if (IsInteger(str)) { return "INTEGER"; }
 				else if (IsDouble(str)) { return "DOUBLE"; }
 				else if (IsDateTimeB(str)) { return "DATETIMEB"; }
@@ -352,8 +362,17 @@ namespace wiz {
 				else if (IsDate(str)) { return "DATE"; }
 				else return "STRING";
 			}
-			static string Compare(const string& str1, const string& str2, const int type = 0)
+			static string Compare(string str1, string str2, const int type = 0)
 			{
+				if (str1.size() > 2 && str1[0] == str1.back() && str1[0] == '\"')
+				{
+					str1 = str1.substr(1, str1.size() - 2);
+				}
+				if (str2.size() > 2 && str2[0] == str2.back() && str2[0] == '\"')
+				{
+					str2 = str2.substr(1, str2.size() - 2);
+				}
+
 				string type1 = GetType(str1);
 				string type2 = GetType(str2);
 
