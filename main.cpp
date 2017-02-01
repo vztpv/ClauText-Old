@@ -1163,7 +1163,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 			operandStack.push(wiz::toStr(atoll(x.c_str()) + atoll(y.c_str())));
 		}
 		else if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && wiz::load_data::Utility::GetType(y) == "DOUBLE") {
-			operandStack.push(wiz::_toString(std::stod(x) + std::stod(y)));
+			operandStack.push(wiz::_toString(std::stold(x) + std::stold(y)));
 		}
 		else
 		{
@@ -1182,7 +1182,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 			operandStack.push(wiz::toStr(atoll(x.c_str()) * atoll(y.c_str())));
 		}
 		else if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && wiz::load_data::Utility::GetType(y) == "DOUBLE") {
-			operandStack.push(wiz::_toString(std::stod(x) * std::stod(y)));  /// chk?
+			operandStack.push(wiz::_toString(std::stold(x) * std::stold(y)));  /// chk?
 		}
 		else
 		{
@@ -1199,7 +1199,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 			operandStack.push(wiz::toStr(atoll(x.c_str()) / atoll(y.c_str())));
 		}
 		else if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && wiz::load_data::Utility::GetType(y) == "DOUBLE") {
-			operandStack.push(wiz::_toString(std::stod(x) / std::stod(y)));
+			operandStack.push(wiz::_toString(std::stold(x) / std::stod(y)));
 		}
 		else
 		{
@@ -2340,10 +2340,10 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					string data = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
 
 					{
-						if (dir.first == "" && dir.second.size() > 1 && dir.second[0] == '@')
-						{
-							dir.second.erase(dir.second.begin());
-						}
+					//	if (dir.first == "" && dir.second.size() > 1 && dir.second[0] == '@')
+					//	{
+					//		dir.second.erase(dir.second.begin());
+					//	}
 						if (dir.first == "" && wiz::String::startsWith(dir.second, "$local."))
 						{
 							eventStack.top().locals[wiz::String::substring(dir.second, 7)] = data;

@@ -19,8 +19,10 @@ namespace wiz {
 		class Utility
 		{
 		public:
-			// private: ??
-			static bool IsInteger(const string& str) {
+			static bool IsInteger(string str) {
+				if (str.size() > 2 && str[0] == str.back() && str[0] == '\"') {
+					str = str.substr(1, str.size() - 2);
+				}
 				int state = 0;
 				for (int i = 0; i < str.size(); ++i) {
 					switch (state)
@@ -44,8 +46,11 @@ namespace wiz {
 				}
 				return 1 == state; /// chk..
 			}
-			static bool IsNumberInJson(const string& str)
+			static bool IsNumberInJson(string str)
 			{
+				if (str.size() > 2 && str[0] == str.back() && str[0] == '\"') {
+					str = str.substr(1, str.size() - 2);
+				}
 				int state = 0;
 				for (int i = 0; i < str.size(); ++i) {
 					switch (state)
@@ -109,7 +114,10 @@ namespace wiz {
 				}
 				return 3 == state || 6 == state;
 			}
-			static bool IsDouble(const string& str) {
+			static bool IsDouble(string str) {
+				if (str.size() > 2 && str[0] == str.back() && str[0] == '\"') {
+					str = str.substr(1, str.size() - 2);
+				}
 				int state = 0;
 				for (int i = 0; i < str.size(); ++i) {
 					switch (state)
@@ -173,11 +181,9 @@ namespace wiz {
 			}
 			static bool IsDate(string str) /// chk!!
 			{
-				if (str.size() > 2 && str[0] == str.back() && str[0] == '\"')
-				{
+				if (str.size() > 2 && str[0] == str.back() && str[0] == '\"') {
 					str = str.substr(1, str.size() - 2);
 				}
-
 				int state = 0;
 				for (int i = 0; i < str.size(); ++i) {
 					switch (state)
@@ -221,8 +227,11 @@ namespace wiz {
 				}
 				return 5 == state;
 			}
-			static bool IsDateTimeA(const string& str) // yyyy.MM.dd.hh
+			static bool IsDateTimeA(string str) // yyyy.MM.dd.hh
 			{
+				if (str.size() > 2 && str[0] == str.back() && str[0] == '\"') {
+					str = str.substr(1, str.size() - 2);
+				}
 				int state = 0;
 				for (int i = 0; i < str.size(); ++i) {
 					switch (state)
@@ -275,8 +284,11 @@ namespace wiz {
 				}
 				return 7 == state;
 			}
-			static bool IsDateTimeB(const string& str) // yyyy.MM.dd.hh.mm
+			static bool IsDateTimeB(string str) // yyyy.MM.dd.hh.mm
 			{
+				if (str.size() > 2 && str[0] == str.back() && str[0] == '\"') {
+					str = str.substr(1, str.size() - 2);
+				}
 				int state = 0;
 				for (int i = 0; i < str.size(); ++i) {
 					switch (state)
@@ -340,8 +352,11 @@ namespace wiz {
 				}
 				return 9 == state;
 			}
-			static bool IsMinus(const string& str)
+			static bool IsMinus(string str)
 			{
+				if (str.size() > 2 && str[0] == str.back() && str[0] == '\"') {
+					str = str.substr(1, str.size() - 2);
+				}
 				return str.empty() == false && str[0] == '-';
 			}
 
@@ -349,12 +364,7 @@ namespace wiz {
 				std::reverse(str.begin(), str.end());
 				return str;
 			}
-			// public: ??
 			static string GetType(string str) {
-				if (str.size() > 2 && str[0] == str.back() && str[0] == '\"') {
-					str = str.substr(1, str.size() - 2);
-				}
-				//
 				if (IsInteger(str)) { return "INTEGER"; }
 				else if (IsDouble(str)) { return "DOUBLE"; }
 				else if (IsDateTimeB(str)) { return "DATETIMEB"; }
