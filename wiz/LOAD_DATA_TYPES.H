@@ -488,10 +488,12 @@ namespace wiz {
 			
 			// chk
 			void InsertItemByIlist(const int ilist_idx, const string& name, const string& item ) {
+				ilist.push_back(1);
+
 				int itemIndex = _GetItemIndexFromIlistIndex(ilist, ilist_idx);
 
-				ilist.push_back(0);
-				for (int i = ilist.size()-1; i > 0; --i) {
+				
+				for (int i = ilist.size()-1; i > ilist_idx; --i) {
 					ilist[i] = ilist[i - 1];
 				}
 				ilist[ilist_idx] = 1;
@@ -510,10 +512,12 @@ namespace wiz {
 				
 			}
 			void InsertItemByIlist(const int ilist_idx, string&& name, string&& item) {
+				ilist.push_back(1);
+
 				int itemIndex = _GetItemIndexFromIlistIndex(ilist, ilist_idx);
 
-				ilist.push_back(0);
-				for (int i = ilist.size() - 1; i > 0; --i) {
+				
+				for (int i = ilist.size() - 1; i > ilist_idx; --i) {
 					ilist[i] = ilist[i - 1];
 				}
 				ilist[ilist_idx] = 1;
@@ -533,13 +537,13 @@ namespace wiz {
 			}
 			// chk
 			void InsertUserTypeByIlist(const int ilist_idx, UserType&& item) {
+				ilist.push_back(2);
 				int userTypeIndex = _GetUserTypeIndexFromIlistIndex(ilist, ilist_idx);
 				UserType* temp = new UserType(std::move(item));
 
 				temp->parent = this;
 
-				ilist.push_back(0);
-				for (int i = ilist.size() - 1; i > 0; --i) {
+				for (int i = ilist.size() - 1; i > ilist_idx; --i) {
 					ilist[i] = ilist[i - 1];
 				}
 				ilist[ilist_idx] = 2;
@@ -557,13 +561,14 @@ namespace wiz {
 				
 			}
 			void InsertUserTypeByIlist(const int ilist_idx, const UserType& item) {
+				ilist.push_back(2);
 				int userTypeIndex = _GetUserTypeIndexFromIlistIndex(ilist, ilist_idx);
 				UserType* temp = new UserType(item);
 
 				temp->parent = this;
 
-				ilist.push_back(0);
-				for (int i = ilist.size() - 1; i > 0; --i) {
+				
+				for (int i = ilist.size() - 1; i > ilist_idx; --i) {
 					ilist[i] = ilist[i - 1];
 				}
 				ilist[ilist_idx] = 2;
