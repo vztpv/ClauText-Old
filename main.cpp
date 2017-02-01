@@ -1245,6 +1245,14 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		operandStack.push(x + y);
 	}
+	else if ("$concat2" == str) /// with space
+	{
+		string x, y;
+		x = operandStack.pop();
+		y = operandStack.pop();
+
+		operandStack.push(x + " " + y);
+	}
 	else if ("$return_value" == str)
 	{
 		operandStack.push(info.return_value);
@@ -2394,6 +2402,32 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top());
 					}
 					wiz::load_data::LoadData::AddData(global, dir, value, condition);
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$insert_by_idx" == val->GetName())
+				{
+					string value = val->GetUserTypeList(2)->ToString();
+					long long idx = atoll(ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top()).c_str());
+					string dir;
+					if (val->GetUserTypeList(0)->GetItemListSize() > 0) {
+						dir = val->GetUserTypeList(0)->GetItemList(0).Get(0);
+						dir = ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
+					}
+					else ///val->Ge
+					{
+						dir = string(val->GetUserTypeList(0)->ToString());
+						dir = ToBool4(global, eventStack.top().parameters, dir, eventStack.top());
+					}
+
+					value = ToBool4(global, eventStack.top().parameters, value, eventStack.top());
+
+					string condition = "TRUE";
+					if (val->GetUserTypeListSize() >= 4) {
+						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(3)->ToString(), eventStack.top());
+					}
+					wiz::load_data::LoadData::Insert(global, dir, idx, value, condition);
 
 					eventStack.top().userType_idx.top()++;
 					break;

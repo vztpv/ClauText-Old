@@ -491,28 +491,29 @@ namespace wiz {
 				int itemIndex = _GetItemIndexFromIlistIndex(ilist, ilist_idx);
 
 				ilist.push_back(0);
-				for (int i = ilist_idx+1; i < ilist.size(); ++i) {
+				for (int i = ilist.size()-1; i > 0; --i) {
 					ilist[i] = ilist[i - 1];
 				}
 				ilist[ilist_idx] = 1;
 
 				itemList.emplace_back("", "");
-				for (int i = itemIndex + 1; i < itemList.size(); ++i) {
+				for (int i = itemList.size() - 1; i > itemIndex; --i) {
 					itemList[i] = move(itemList[i - 1]);
 				}
+
 				itemList[itemIndex] = ItemType<string>(name, item);
 			}
 			void InsertItemByIlist(const int ilist_idx, string&& name, string&& item) {
 				int itemIndex = _GetItemIndexFromIlistIndex(ilist, ilist_idx);
 
 				ilist.push_back(0);
-				for (int i = ilist_idx + 1; i < ilist.size(); ++i) {
+				for (int i = ilist.size() - 1; i > 0; --i) {
 					ilist[i] = ilist[i - 1];
 				}
 				ilist[ilist_idx] = 1;
 
 				itemList.emplace_back("", "");
-				for (int i = itemIndex + 1; i < itemList.size(); ++i) {
+				for (int i = itemList.size() - 1; i > itemIndex; --i) {
 					itemList[i] = move(itemList[i - 1]);
 				}
 				itemList[itemIndex] = ItemType<string>(move(name), move(item));
@@ -525,14 +526,14 @@ namespace wiz {
 				temp->parent = this;
 
 				ilist.push_back(0);
-				for (int i = ilist_idx + 1; i < ilist.size(); ++i) {
+				for (int i = ilist.size() - 1; i > 0; --i) {
 					ilist[i] = ilist[i - 1];
 				}
 				ilist[ilist_idx] = 2;
 
 				userTypeList.push_back(nullptr);
-				for (int i = userTypeIndex + 1; i < userTypeList.size(); ++i) {
-					userTypeList[i] = userTypeList[i - 1];
+				for (int i = userTypeList.size() - 1; i > userTypeIndex; --i) {
+					userTypeList[i] = move(userTypeList[i - 1]);
 				}
 				userTypeList[userTypeIndex] = temp;
 			}
@@ -543,14 +544,14 @@ namespace wiz {
 				temp->parent = this;
 
 				ilist.push_back(0);
-				for (int i = ilist_idx + 1; i < ilist.size(); ++i) {
+				for (int i = ilist.size() - 1; i > 0; --i) {
 					ilist[i] = ilist[i - 1];
 				}
 				ilist[ilist_idx] = 2;
 
 				userTypeList.push_back(nullptr);
-				for (int i = userTypeIndex + 1; i < userTypeList.size(); ++i) {
-					userTypeList[i] = userTypeList[i - 1];
+				for (int i = userTypeList.size() - 1; i > userTypeIndex; --i) {
+					userTypeList[i] = move(userTypeList[i - 1]);
 				}
 				userTypeList[userTypeIndex] = temp;
 			}

@@ -811,6 +811,54 @@ namespace wiz {
 					return false;
 				}
 			}
+			static bool Insert(UserType& global, const string& position, const int idx, const string& data, const string& condition = "") {
+				UserType utTemp = UserType("global");
+				bool isTrue = false;
+
+				if (false == LoadDataFromString(data, utTemp))
+				{
+					return false;
+				}
+				auto finded = UserType::Find(&global, position);
+				if (finded.first) {
+					for (int i = 0; i < finded.second.size(); ++i) {
+						int item_n = utTemp.GetIListSize();
+						int user_n = utTemp.GetIListSize();
+
+						/// chk temp test codes - > using flag 1->Exist 2->Comparision
+						//if (finded.second[i]->GetItem("base_tax").GetCount() > 0) { continue; }
+						///~end
+						if (false == condition.empty()) {
+							Condition cond(condition, finded.second[i], &global);
+
+							while (cond.Next());
+
+							if (cond.Now().size() != 1 || "TRUE" != cond.Now()[0]) // || cond.Now().size()  != 1
+							{
+								//std::cout << cond.Now()[0] << endl;
+								continue;
+							}
+						}
+
+						for (int k = utTemp.GetIListSize() - 1; k >= 0; --k) {
+							if (utTemp.IsItemList(k)) {
+								finded.second[i]->InsertItemByIlist(idx, utTemp.GetItemList(item_n - 1).GetName(),
+									utTemp.GetItemList(item_n - 1).Get(0));
+								item_n--;
+							}
+							else {
+								finded.second[i]->InsertUserTypeByIlist(idx, *utTemp.GetUserTypeList(user_n - 1));
+								user_n--;
+							}
+						}
+						isTrue = true;
+					}
+					return isTrue;
+				}
+				else {
+					return false;
+				}
+			}
 			static bool AddNoNameUserType(UserType& global, const string& position, const string& data, const string& condition = "")
 			{
 				UserType utTemp = UserType("");
