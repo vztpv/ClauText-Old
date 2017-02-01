@@ -2406,7 +2406,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$insert_by_idx" == val->GetName())
+				/*else if ("$insert_by_idx" == val->GetName())
 				{
 					string value = val->GetUserTypeList(2)->ToString();
 					long long idx = atoll(ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top()).c_str());
@@ -2431,7 +2431,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 
 					eventStack.top().userType_idx.top()++;
 					break;
-				}
+				}*/
 				else if ("$make" == val->GetName()) // To Do? - make2? or remake? 
 													// cf) make empty ut??
 				{

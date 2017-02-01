@@ -811,7 +811,7 @@ namespace wiz {
 					return false;
 				}
 			}
-			static bool Insert(UserType& global, const string& position, const int idx, const string& data, const string& condition = "") {
+		/*	static bool Insert(UserType& global, const string& position, const int idx, const string& data, const string& condition = "") {
 				UserType utTemp = UserType("global");
 				bool isTrue = false;
 
@@ -858,7 +858,7 @@ namespace wiz {
 				else {
 					return false;
 				}
-			}
+			}*/
 			static bool AddNoNameUserType(UserType& global, const string& position, const string& data, const string& condition = "")
 			{
 				UserType utTemp = UserType("");

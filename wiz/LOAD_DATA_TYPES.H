@@ -485,7 +485,7 @@ namespace wiz {
 			}
 		public:
 			bool empty()const { return ilist.empty(); }
-
+			/*
 			// chk
 			void InsertItemByIlist(const int ilist_idx, const string& name, const string& item ) {
 				int itemIndex = _GetItemIndexFromIlistIndex(ilist, ilist_idx);
@@ -555,6 +555,7 @@ namespace wiz {
 				}
 				userTypeList[userTypeIndex] = temp;
 			}
+			*/
 			/*
 			// chk
 			void InsertItem(const int item_idx, const string& name, const string& item) {
