@@ -485,7 +485,7 @@ namespace wiz {
 			}
 		public:
 			bool empty()const { return ilist.empty(); }
-			/*
+			
 			// chk
 			void InsertItemByIlist(const int ilist_idx, const string& name, const string& item ) {
 				int itemIndex = _GetItemIndexFromIlistIndex(ilist, ilist_idx);
@@ -497,11 +497,17 @@ namespace wiz {
 				ilist[ilist_idx] = 1;
 
 				itemList.emplace_back("", "");
-				for (int i = itemList.size() - 1; i > itemIndex; --i) {
-					itemList[i] = move(itemList[i - 1]);
-				}
 
-				itemList[itemIndex] = ItemType<string>(name, item);
+				if (itemIndex != -1) {
+					for (int i = itemList.size() - 1; i > itemIndex; --i) {
+						itemList[i] = move(itemList[i - 1]);
+					}
+					itemList[itemIndex] = ItemType<string>(name, item);
+				}
+				else {
+					itemList[0] = ItemType<string>(name, item);
+				}
+				
 			}
 			void InsertItemByIlist(const int ilist_idx, string&& name, string&& item) {
 				int itemIndex = _GetItemIndexFromIlistIndex(ilist, ilist_idx);
@@ -513,10 +519,17 @@ namespace wiz {
 				ilist[ilist_idx] = 1;
 
 				itemList.emplace_back("", "");
-				for (int i = itemList.size() - 1; i > itemIndex; --i) {
-					itemList[i] = move(itemList[i - 1]);
+				if (itemIndex != -1) {
+					for (int i = itemList.size() - 1; i > itemIndex; --i) {
+						itemList[i] = move(itemList[i - 1]);
+					}
+					itemList[itemIndex] = ItemType<string>(move(name), move(item));
 				}
-				itemList[itemIndex] = ItemType<string>(move(name), move(item));
+				else {
+					itemList[0] = ItemType<string>(move(name), move(item));
+				}
+
+				
 			}
 			// chk
 			void InsertUserTypeByIlist(const int ilist_idx, UserType&& item) {
@@ -532,10 +545,16 @@ namespace wiz {
 				ilist[ilist_idx] = 2;
 
 				userTypeList.push_back(nullptr);
-				for (int i = userTypeList.size() - 1; i > userTypeIndex; --i) {
-					userTypeList[i] = move(userTypeList[i - 1]);
+				if (userTypeIndex != -1) {
+					for (int i = userTypeList.size() - 1; i > userTypeIndex; --i) {
+						userTypeList[i] = move(userTypeList[i - 1]);
+					}
+					userTypeList[userTypeIndex] = temp;
 				}
-				userTypeList[userTypeIndex] = temp;
+				else {
+					userTypeList[0] = temp;
+				}
+				
 			}
 			void InsertUserTypeByIlist(const int ilist_idx, const UserType& item) {
 				int userTypeIndex = _GetUserTypeIndexFromIlistIndex(ilist, ilist_idx);
@@ -550,12 +569,17 @@ namespace wiz {
 				ilist[ilist_idx] = 2;
 
 				userTypeList.push_back(nullptr);
-				for (int i = userTypeList.size() - 1; i > userTypeIndex; --i) {
-					userTypeList[i] = move(userTypeList[i - 1]);
+				if (userTypeIndex != -1) {
+					for (int i = userTypeList.size() - 1; i > userTypeIndex; --i) {
+						userTypeList[i] = move(userTypeList[i - 1]);
+					}
+					userTypeList[userTypeIndex] = temp;
 				}
-				userTypeList[userTypeIndex] = temp;
+				else {
+					userTypeList[0] = temp;
+				}
 			}
-			*/
+			
 			/*
 			// chk
 			void InsertItem(const int item_idx, const string& name, const string& item) {
