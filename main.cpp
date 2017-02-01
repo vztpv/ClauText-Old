@@ -1199,7 +1199,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 			operandStack.push(wiz::toStr(atoll(x.c_str()) / atoll(y.c_str())));
 		}
 		else if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && wiz::load_data::Utility::GetType(y) == "DOUBLE") {
-			operandStack.push(wiz::_toString(std::stold(x) / std::stod(y)));
+			operandStack.push(wiz::_toString(std::stold(x) / std::stold(y)));
 		}
 		else
 		{
