@@ -1,0 +1,40 @@
+
+
+Main = {
+	$call = { id = 0 }
+}
+
+test = {  LEFT = { } RIGHT = { } }
+
+Event = {
+	id = 0
+	
+	$call = { id = 1 i = 0 }
+	
+	$print2 = { dir = { /./test } }
+	$print = { value = { \n } }
+	$_getch = { }
+}
+
+Event = {
+	id = 1
+	
+	$parameter = { i }
+	$option = { REMOVE_IF_CALL_ANY_EVENT }
+	
+	$if = { 
+		condition = { 
+			$COMP< = { $parameter.i 9 } 
+		}
+		then = {
+			$insert_by_idx = {
+				dir = { /./test }
+				idx = { $rand = { 0 $size = { /./test } } } 
+				val = { $parameter.i } 
+			}
+			$call = { id = 1 i = { $add = { $parameter.i 1 } } }
+		}
+	}
+}
+
+
