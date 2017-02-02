@@ -164,6 +164,7 @@ namespace wiz{
 		int count;
 		bool exist;
 		static const vector<string> whitespaces;
+		int option;
 	private:
 		void Init(string str, const vector<string>& separator) // assumtion : separators are sorted by length?, long -> short
 		{
@@ -173,7 +174,7 @@ namespace wiz{
 			int left = 0;
 			int right = 0;
 			bool chkEnd = false;
-
+			int state = 0;
 			this->exist = false;
 
 			for (int i = 0; i < str.size(); ++i) {
@@ -181,6 +182,19 @@ namespace wiz{
 				int _select = -1;
 				bool pass = false;
 				
+				/// chk!! option == 1
+				if (option == 1 && str[i] == '\"') {
+					state = 1; 
+					continue;
+				}
+				if (option == 1 && state == 1) {
+					continue;
+				}
+				if (option == 1 && state == 1 && str[i] == '\"') {
+					state = 0; 
+					continue;
+				}
+
 				for (int j = 0; j < separator.size(); ++j) {
 					for (int k = 0; k < separator[j].size(); ++k) {
 						if (str[i + k] == separator[j][k]) {
@@ -309,25 +323,25 @@ namespace wiz{
 		}
 		*/
 	public:
-		explicit StringTokenizer() : count(0), exist(false) { }
-		explicit StringTokenizer(const string& str, const string& separator)
-			: count(0), exist(false)
+		explicit StringTokenizer() : count(0), exist(false), option(0) { }
+		explicit StringTokenizer(const string& str, const string& separator, int option=0)
+			: count(0), exist(false), option(option)
 		{
 			vector<string> vec; vec.push_back(separator);
 			Init(str, vec);
 		}
-		explicit StringTokenizer(const string& str, const vector<string>& separator)
-			: count(0), exist(false)
+		explicit StringTokenizer(const string& str, const vector<string>& separator, int option = 0)
+			: count(0), exist(false), option(option)
 		{
 			Init(str, separator);
 		}
-		explicit StringTokenizer(const string& str)
-			: count(0), exist(false)
+		explicit StringTokenizer(const string& str, int option = 0)
+			: count(0), exist(false), option(option)
 		{
 			Init(str, whitespaces);
 		}
-		explicit StringTokenizer(string&& str)
-			: count(0), exist(false)
+		explicit StringTokenizer(string&& str, int option = 0)
+			: count(0), exist(false), option(option)
 		{
 			Init(std::move(str), whitespaces);
 		}

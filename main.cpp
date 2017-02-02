@@ -1031,6 +1031,7 @@ inline string FindLocals(map<string, string>& locals, const string& operand)
 }
 //need to renewal. add $AND $OR $NOT
 /// remove /, parameter chk!!
+string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& temp, EventInfo info);
 void operation(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& str, wiz::ArrayStack<string>& operandStack, EventInfo  info)
 {
 	if (!operandStack.empty() && operandStack.top() == "ERROR") { return; }
@@ -1449,6 +1450,27 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 			operandStack.push("ERROR in $regex");
 		}
 	}
+	else if ("$eval" == str) {
+		string str = operandStack.pop();
+
+		bool chk = wiz::load_data::Utility::ChkExist(str);
+		if (chk) {
+			string temp;
+			wiz::load_data::Utility::ChangeStr(str, { "^5", "^4", "^3", "^2", "^1", "^0" }, { "#", "\n", "\r", "\t", " ", "^" }, temp);
+			str = std::move(temp);
+			//result = wiz::load_data::Utility::ChangeStr(result, "^4", "\n");
+			//result = wiz::load_data::Utility::ChangeStr(result, "^3", "\r");
+			//result = wiz::load_data::Utility::ChangeStr(result, "^2", "\t");
+			//result = wiz::load_data::Utility::ChangeStr(result, "^1", " ");
+			//result = wiz::load_data::Utility::ChangeStr(result, "^0", "^");
+		}
+		else {
+			operandStack.push("ERROR in $eval, must be \" \" ");
+			return;
+		}
+		str = str.substr(1, str.size() - 2);
+		operandStack.push(ToBool4(global, parameters, str, info));
+	}
 }
 
 string ToBool3(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& temp, EventInfo info) /// has bug!
@@ -1583,7 +1605,8 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 	}
 
 	{ // chk..
-		wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r", "{", "=", "}" });
+		// tokenizer and option! - "" 안에는 나누지 않는다?
+		wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r", "{", "=", "}" }, 1);
 		wiz::StringTokenizer tokenizer2(result, { " ", "\n", "\t", "\r" });
 		vector<string> tokenVec;
 		vector<string> tokenVec2;
@@ -1624,14 +1647,15 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		result = "";
 
-		int j = tokenVec.size();
-		for (int i = tokenVec2.size() - 1; i >= 0; --i) {
-			if (tokenVec2[i] == "{" || tokenVec2[i] == "}" || tokenVec2[i] == "=") {
+		int j = tokenVec.size() - 1;
+		for (int i = tokenVec2.size() - 1; i >= 0 && j >= 0; --i) {
+			if (tokenVec2[i] == "{" || tokenVec2[i] == "}" || tokenVec2[i] == "=" || 
+				( tokenVec2[i].size() > 2 && tokenVec2[i][0] == tokenVec2[i].back() && tokenVec2[i][0] == '\"' ) ) {
 				continue;
 			}
 			else {
-				--j;
 				tokenVec2[i] = tokenVec[j];
+				--j;
 			}
 		}
 

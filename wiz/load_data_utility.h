@@ -749,7 +749,7 @@ namespace wiz {
 					}
 				}
 
-				return 0 == state;
+				return 0 == state; // exist and valid !! chk - todo!
 			}
 		public:
 			static pair<bool, int> Reserve2(ifstream& inFile, ArrayQueue<string>& aq, const int num = 1)
