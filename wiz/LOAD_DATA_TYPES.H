@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <regex>
 using namespace std;
 
 #include <wiz/newArrays.h>
@@ -12,6 +13,7 @@ using namespace std;
 //#include <wiz/binary_search.h>
 #include <wiz/queues.h>
 #include <wiz/load_data_utility.h>
+#include <wiz/cpp_string.h>
 
 namespace wiz {
 	namespace load_data {
@@ -506,7 +508,7 @@ namespace wiz {
 					itemList[itemIndex] = ItemType<string>(name, item);
 				}
 				else {
-					itemList[0] = ItemType<string>(name, item);
+					itemList[0] = ItemType<string>(name, item); // chk!!
 				}
 				
 			}
@@ -1301,6 +1303,18 @@ namespace wiz {
 						for (int j = utTemp.first->GetUserTypeListSize() - 1; j >= 0; --j) {
 							UserType* x = utTemp.first->GetUserTypeList(j);
 							utDeck.push_front(make_pair(x, utTemp.second + 1));
+						}
+					}
+					else if (utTemp.second < strVec.size() && String::startsWith(strVec[utTemp.second], "$.")) /// $."abc"
+					{
+						string rex_str = strVec[utTemp.second].substr(3, strVec[utTemp.second].size() - 4);
+						std::regex rgx(rex_str);
+
+						for (int j = utTemp.first->GetUserTypeListSize() - 1; j >= 0; --j) {
+							if (std::regex_match(utTemp.first->GetUserTypeList(j)->GetName(), rgx)) {
+								UserType* x = utTemp.first->GetUserTypeList(j);
+								utDeck.push_front(make_pair(x, utTemp.second + 1));
+							}
 						}
 					}
 					else if (utTemp.second < strVec.size() &&

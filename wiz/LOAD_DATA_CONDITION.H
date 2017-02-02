@@ -316,7 +316,35 @@ namespace wiz {
 					}
 					return "FALSE";
 				}
+				else if ("REGEX" == op) {
+					if ("0" != option) { /// ToDo.. // 0. just 1-1, // 1. for any case // 2. for all case
+						for (int i = 0; i < value1.size(); ++i) {
+							for (int j = 0; j < value2.size(); ++j) {
+								std::regex rex(value2[j].Get(0).substr(1, value2[j].Get(0).size() - 2));
 
+								if (std::regex_match(value1[i].Get(0), rex)) {
+									if ("1" == option) { return "TRUE"; }
+								}
+								else {
+									if ("2" == option) { return "FALSE"; }
+								}
+							}
+						}
+						if ("1" == option) { return "FALSE"; }
+						else if ("2" == option) {
+							return "TRUE";
+						}
+					}
+					else {
+						std::regex rex(value2[0].Get(0).substr(1, value2[0].Get(0).size() - 2));
+
+						if (std::regex_match(value1[0].Get(0), rex)) {
+							return "TRUE";
+						}
+					}
+					return "FALSE";
+				}
+				
 				return "ERROR GV7";
 			}
 
@@ -364,7 +392,9 @@ namespace wiz {
 								|| "COMP>" == tokenStack[tokenStack.size() - 6]
 								|| "COMP>EQ" == tokenStack[tokenStack.size() - 6]
 								|| "EQ" == tokenStack[tokenStack.size() - 6]
-								|| "NOTEQ" == tokenStack[tokenStack.size() - 6]))
+								|| "NOTEQ" == tokenStack[tokenStack.size() - 6]
+								|| "REGEX" == tokenStack[tokenStack.size() - 6]
+								))
 							{
 								const string op = tokenStack[tokenStack.size() - 6];
 								const string var1 = tokenStack[tokenStack.size() - 5];
@@ -393,7 +423,7 @@ namespace wiz {
 
 									tokenStack.push(Utility::BoolOperation(op, operand1, operand2));
 								}
-								else { // EXIST, NOTEXIST for ( ITEM or USERTYPE ) 
+								else { // EXIST, NOTEXIST for ( ITEM or USERTYPE ), regex
 									tokenStack.pop();
 									tokenStack.pop();
 									tokenStack.pop();

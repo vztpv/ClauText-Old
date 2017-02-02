@@ -19,6 +19,8 @@
 #include <ctime>
 #include <cstdlib>
 #include <memory> // for smart pointer.
+
+#include <regex> //
 using namespace std;
 
 #include <conio.h>
@@ -1229,7 +1231,7 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && (wiz::load_data::Utility::GetType(y) == "INTEGER")) { /// only integer -> BigInteger
 			long long _x = atoll(x.c_str());
 			long long _y = atoll(y.c_str());
-			long long _z = rand() % (_y - _x + 1) + _x;
+			long long _z = rand() % (_y - _x + 1) + _x; // _x <= _z <= _y
 			operandStack.push(wiz::toStr(_z));
 		}
 		else
@@ -1426,6 +1428,26 @@ void operation(wiz::load_data::UserType& global, const vector<pair<string, strin
 		}
 
 		operandStack.push(x);
+	}
+	else if ("$regex" == str) {
+		string str = operandStack.pop();
+		string rgx_str = operandStack.pop();
+
+		// " ~ " , "Á¦°Å?
+		if (rgx_str.size() > 2 && rgx_str[0] == rgx_str.back() && rgx_str[0] == '\"') {
+			std::regex rgx(rgx_str.substr(1, rgx_str.size() - 2));
+
+			if (std::regex_match(str, rgx))
+			{
+				operandStack.push("TRUE");
+			}
+			else {
+				operandStack.push("FALSE");
+			}
+		}
+		else {
+			operandStack.push("ERROR in $regex");
+		}
 	}
 }
 
@@ -1875,7 +1897,70 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 			while (val != nullptr)
 			{
 				// add option! for "".support eu3, eu4.
-				if ("$replace_datetype" == val->GetName()) {
+				if ("$replace_datatype1" == val->GetName()) { // name
+					string rex = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
+					rex = rex.substr(1, rex.size() - 2);
+					string sval = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
+
+					string scondition = "TRUE";
+					string start_dir = "root";
+
+					if (val->GetUserTypeListSize() >= 3)
+					{
+						scondition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top());
+					}
+					if (val->GetUserTypeListSize() >= 4) {
+						start_dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(3)->ToString(), eventStack.top());
+					}
+
+					wiz::load_data::LoadData::ReplaceDataType1(global, rex, sval, scondition, start_dir);
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$replace_datatype1_2" == val->GetName()) { //val
+					string rex = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
+					rex = rex.substr(1, rex.size() - 2);
+					string sval = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
+
+					string scondition = "TRUE";
+					string start_dir = "root";
+
+					if (val->GetUserTypeListSize() >= 3)
+					{
+						scondition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top());
+					}
+					if (val->GetUserTypeListSize() >= 4) {
+						start_dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(3)->ToString(), eventStack.top());
+					}
+
+					wiz::load_data::LoadData::ReplaceDataType1_2(global, rex, sval, scondition, start_dir);
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$replace_datatype2" == val->GetName()) { // usertype name
+					string rex = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
+					rex = rex.substr(1, rex.size() - 2);
+					string sval = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
+
+					string scondition = "TRUE";
+					string start_dir = "root";
+
+					if (val->GetUserTypeListSize() >= 3)
+					{
+						scondition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top());
+					}
+					if (val->GetUserTypeListSize() >= 4) {
+						start_dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(3)->ToString(), eventStack.top());
+					}
+
+					wiz::load_data::LoadData::ReplaceDataType2(global, rex, sval, scondition, start_dir);
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$replace_datetype" == val->GetName()) {
 					string sval = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
 					
 					string scondition = "TRUE";

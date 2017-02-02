@@ -4,7 +4,7 @@ Main = {
 	$call = { id = 0 }
 }
 
-test = {  LEFT = { } RIGHT = { } }
+test = { }
 
 Event = {
 	id = 0
@@ -25,11 +25,12 @@ Event = {
 	$if = { 
 		condition = { 
 			$COMP< = { $parameter.i 9 } 
+			#$regex = { $parameter.i "[0-9]" }
 		}
 		then = {
 			$insert_by_idx = {
 				dir = { /./test }
-				idx = { $rand = { 0 $size = { /./test } } } 
+				idx = { $rand = { 0 $add = { $size = { /./test } $size2 = { /./test } } } }
 				val = { $parameter.i } 
 			}
 			$call = { id = 1 i = { $add = { $parameter.i 1 } } }
