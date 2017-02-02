@@ -183,18 +183,18 @@ namespace wiz{
 				bool pass = false;
 				
 				/// chk!! option == 1
-				if (option == 1 && str[i] == '\"') {
+				if (option == 1 && state == 0 && str[i] == '\"') {
 					state = 1; 
 					continue;
 				}
-				if (option == 1 && state == 1) {
+				if (option == 1 && state == 1 && str[i] != '\"') {
 					continue;
 				}
 				if (option == 1 && state == 1 && str[i] == '\"') {
 					state = 0; 
 					continue;
 				}
-
+				
 				for (int j = 0; j < separator.size(); ++j) {
 					for (int k = 0; k < separator[j].size(); ++k) {
 						if (str[i + k] == separator[j][k]) {
@@ -227,6 +227,7 @@ namespace wiz{
 					}
 				}
 			}
+			//cout << "str is " << str <<  " state  is " << state << endl;
 		}
 		/*
 		void Init(string&& str, const vector<string>& separator) // assumtion : separators are sorted by length?, long -> short

@@ -13,9 +13,11 @@ Event = {
 	
 	$print2 = { dir = { /./test } }
 	$print = { value = { \n } }
+	
 	## $print -> ( \" => " ) chk!!
 	$print = { value = { $eval = { "$concat = { test 3 }" } } }  # chk!!
 	$print = { value = { \n } }
+	
  	$_getch = { }
 }
 

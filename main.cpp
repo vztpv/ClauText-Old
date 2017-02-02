@@ -1606,13 +1606,17 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 	{ // chk..
 		// tokenizer and option! - "" 안에는 나누지 않는다?
-		wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r", "{", "=", "}" }, 1);
+		int option = 0;
+		if (chk) { option = 1; }
+		//cout << "result " << result << " chk " << (int)chk << endl;
+		wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r", "{", "=", "}" }, option);
 		wiz::StringTokenizer tokenizer2(result, { " ", "\n", "\t", "\r" });
 		vector<string> tokenVec;
 		vector<string> tokenVec2;
 
 		while (tokenizer.hasMoreTokens()) {
 			tokenVec.push_back(tokenizer.nextToken());
+			//cout << "chk is " <<  tokenVec.back() << endl;
 		}
 
 		for (int i = tokenVec.size() - 1; i >= 0; --i)
@@ -1649,8 +1653,7 @@ string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, strin
 
 		int j = tokenVec.size() - 1;
 		for (int i = tokenVec2.size() - 1; i >= 0 && j >= 0; --i) {
-			if (tokenVec2[i] == "{" || tokenVec2[i] == "}" || tokenVec2[i] == "=" || 
-				( tokenVec2[i].size() > 2 && tokenVec2[i][0] == tokenVec2[i].back() && tokenVec2[i][0] == '\"' ) ) {
+			if (tokenVec2[i] == "{" || tokenVec2[i] == "}" || tokenVec2[i] == "=" ) { //cout << "chk " << tokenVec2[i] << endl;
 				continue;
 			}
 			else {
@@ -1979,6 +1982,8 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 						start_dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(3)->ToString(), eventStack.top());
 					}
 
+					//cout << scondition << endl;
+					 
 					wiz::load_data::LoadData::ReplaceDataType2(global, rex, sval, scondition, start_dir);
 
 					eventStack.top().userType_idx.top()++;
