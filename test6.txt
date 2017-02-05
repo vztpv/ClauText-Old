@@ -2,6 +2,8 @@
 Main =
 {
 	$call = { id = 0 }
+	# thread num set?
+	# total thread num set?
 } 
 
 Test = { x = { y = { z = { 1 3 }  5 4 3 } w = 1 a = { 7 3  } } k = 1 }
@@ -96,10 +98,11 @@ Event =
 	$wait = { }
 	
 	$replace_datatype2 = {
-		rex = { "[0-9]+ '.' [0-9]+ '.' [0-9]+" }
-		val = { test1234 }
+		rgx = { "^[0-9]+\.[0-9]+\.[0-9]+$" }
+		val = { @$eval = { " $concat = { ~~ test! } " } }  # using @/~~
+		
 		condition = {
-			REGEX = { ~~ ~ "1821.1.1" ~ 0 } # option : 0, 1, 2 ??
+			REGEX = { ~~ ~ "^1821\.1\.1$" ~ 0 } # option : 0, 1, 2 ?? - chk!!
 		}
 		start_dir = { /eu3Game }
 	}

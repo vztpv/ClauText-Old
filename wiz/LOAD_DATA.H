@@ -31,6 +31,105 @@ namespace wiz {
 		const string EQ = "=";
 
 		const int RIGHT_DO = 1;
+	
+
+		class EventInfo
+		{
+		public:
+			wiz::load_data::UserType* eventUT;
+			wiz::ArrayStack< wiz::load_data::UserType* > nowUT; //
+			wiz::ArrayStack<int> userType_idx;
+			vector<pair<string, string>> parameters;
+			map<string, string> locals;
+			string id; //
+			wiz::ArrayStack<string> conditionStack;
+			wiz::ArrayStack<int> state;
+			string return_value;
+			string option;
+		public:
+			EventInfo() : eventUT(nullptr), return_value("")
+			{
+
+			}
+		};
+
+		class SortInfo // need to rename
+		{
+		public:
+			string data;
+			int iElement; // 2 : userType, // 1 : item
+			size_t idx; // for stable? - chk!!
+		public:
+			SortInfo() : idx(-1) { }
+			SortInfo(const string& data, int iElement, size_t idx)
+				: data(data), iElement(iElement), idx(idx)
+			{
+
+			}
+			// for sorting..
+			bool operator<(const SortInfo& info) const
+			{
+				string temp = wiz::load_data::Utility::Compare(this->data, info.data);
+
+				if (this->data == "") {
+					return false;
+				}
+				if (info.data == "") {
+					return true;
+				}
+
+				if (temp == "< 0") { return true; }
+				else if (temp == "> 0") { return false; }
+				else if (temp == "== 0") {
+					return idx < info.idx;
+				}
+				else {
+					throw "temp is not valid in sortinfo";
+				}
+			}
+		};
+
+		class SortInfo2 // need to rename, sortinfo by dsc..
+		{
+		public:
+			string data;
+			int iElement; // 2 : userType, // 1 : item
+			size_t idx; // for stable? - chk!!
+		public:
+			SortInfo2() : idx(-1) { }
+			SortInfo2(const string& data, int iElement, size_t idx)
+				: data(data), iElement(iElement), idx(idx)
+			{
+
+			}
+			// for sorting..
+			bool operator<(const SortInfo2& info) const
+			{
+				if (this->data == "" && info.data == "") {
+					return false;
+				}
+				if (this->data == "") {
+					return true;
+				}
+
+				if (info.data == "") {
+					return false;
+				}
+
+				string temp = wiz::load_data::Utility::Compare(this->data, info.data);
+				if (temp == "< 0") { return false; }
+				else if (temp == "> 0") { return true; }
+				else if (temp == "== 0") {
+					return idx < info.idx;
+				}
+				else {
+					cout << "sortInfo2" << endl;
+					cout << data << " " << info.data << endl;
+					throw "temp is not valid in sortinfo2";
+				}
+			}
+		};
+		string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& temp, wiz::load_data::EventInfo info);
 
 		class LoadData
 		{
@@ -1812,10 +1911,11 @@ namespace wiz {
 					string temp = ut->GetUserTypeList(i)->GetName();
 					if (temp == "") { temp = " "; }
 
-					ReplaceDateType(
+					ReplaceDataType1(
 						global,
 						nowPosition + "/" + temp,
 						ut->GetUserTypeList(i),
+						rgx_str,
 						val,
 						condition
 					);
@@ -1848,17 +1948,18 @@ namespace wiz {
 					string temp = ut->GetUserTypeList(i)->GetName();
 					if (temp == "") { temp = " "; }
 
-					ReplaceDateType(
+					ReplaceDataType1_2(
 						global,
 						nowPosition + "/" + temp,
 						ut->GetUserTypeList(i),
+						rgx_str,
 						val,
 						condition
 					);
 				}
 			}
 			static void ReplaceDataType2(UserType& global, const string& nowPosition,
-				UserType* ut, const string& rgx_str, const string& val, const string& condition)
+				UserType* ut, const string& rgx_str, const string& val, const string& condition) // first val test
 			{
 				std::regex rgx(rgx_str);
 
@@ -1868,24 +1969,29 @@ namespace wiz {
 
 					if (std::regex_match(temp, rgx)) {
 						string _condition = condition;
-
+						string _val = val;
 						string _var = ut->GetUserTypeList(i)->GetName();
 						_condition = wiz::String::replace(_condition, "~~", _var); //
-
+						if (_val[0] == '@') { _val.erase(_val.begin()); } // removal?
+						
+						_val = wiz::String::replace(_val, "~~", _var);
+						_val = ToBool4(*ut, vector<pair<string, string>>(), _val, EventInfo());
+					
 						Condition cond(_condition, ut, &global);
 
 						while (cond.Next());
 
 						if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
 						{
-							ut->GetUserTypeList(i)->SetName(val);
+							ut->GetUserTypeList(i)->SetName(_val);
 						}
 					}
 
-					ReplaceDateType2(
+					ReplaceDataType2(
 						global,
 						nowPosition + "/" + temp,
 						ut->GetUserTypeList(i),
+						rgx_str,
 						val,
 						condition
 					);
@@ -1893,6 +1999,841 @@ namespace wiz {
 			}
 
 		};
+
+		// only one exist or do not exist
+		inline wiz::load_data::ItemType<string> GetItem(const wiz::load_data::UserType* ut, const string& name) {
+			return ut->GetItem(name)[0];
+		}
+
+		inline vector<wiz::load_data::UserType*> GetUserType(const wiz::load_data::UserType* ut, const string& name)
+		{
+			return ut->GetUserTypeItem(name);
+		}
+		string Find(wiz::load_data::UserType* ut, const string& str)
+		{
+			int count = 0;
+			int idx = -1;
+			for (int i = str.size() - 1; i >= 0; --i) {
+				if ('/' == str[i]) {
+					if (count == 0) {
+						idx = i;
+					}
+					count++;
+				}
+			}
+
+			if (count == 1)
+			{
+				return "";
+			}
+			else {
+				auto x = wiz::load_data::UserType::Find(ut,
+					wiz::String::substring(str, 0, idx));
+				if (x.first == false) { return ""; }
+				else if (x.second[0]->GetItem(wiz::String::substring(str, idx + 1)).empty())
+				{
+					if ((x = wiz::load_data::UserType::Find(ut, str)).first)
+					{
+						return str;
+					}
+					else
+					{
+						return "";
+					}
+				}
+				else { return x.second[0]->GetItem(wiz::String::substring(str, idx + 1))[0].Get(0); }
+			}
+		}
+		inline bool Exist(wiz::load_data::UserType* ut, const string& dir)
+		{
+			auto x = wiz::load_data::UserType::Find(ut, dir);
+			return x.first;
+		}
+		// to do - rename!
+		pair<string, string> Find2(wiz::load_data::UserType* ut, const string& str)
+		{
+			int idx = -1;
+			for (int i = str.size() - 1; i >= 0; --i) {
+				if ('/' == str[i]) {
+					idx = i;
+					break;
+				}
+			}
+			return{ wiz::String::substring(str, 0, idx), wiz::String::substring(str,idx + 1) };
+		}
+
+		inline string FindParameters(const vector<pair<string, string>>& parameters, const string& operand)
+		{
+			for (int i = 0; i < parameters.size(); ++i) {
+				if (wiz::String::startsWith(operand, "$parameter.")
+					&& wiz::String::substring(operand, 11) == parameters[i].first) {
+					return parameters[i].second;
+				}
+			}
+			return "";
+		}
+		inline string FindLocals(map<string, string>& locals, const string& operand)
+		{
+			if (wiz::String::startsWith(operand, "$local.") && locals.end() != locals.find(wiz::String::substring(operand, 7)))
+			{
+				return locals[wiz::String::substring(operand, 7)];
+			}
+			return "";
+		}
+		//need to renewal. add $AND $OR $NOT
+		/// remove /, parameter chk!!
+		string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& temp, wiz::load_data::EventInfo info);
+		void operation(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& str, wiz::ArrayStack<string>& operandStack, wiz::load_data::EventInfo  info)
+		{
+			if (!operandStack.empty() && operandStack.top() == "ERROR") { return; }
+
+			if ("$EQ" == str) {
+				string x, y;
+				int idx = -1;
+				x = operandStack.pop();
+				y = operandStack.pop();
+
+				if (x == y) {
+					operandStack.push("TRUE");
+				}
+				else {
+					operandStack.push("FALSE");
+				}
+			}
+			else if ("$NOTEQ" == str)
+			{
+				string x, y;
+				x = operandStack.pop();
+				y = operandStack.pop();
+
+				if (x != y) {
+					operandStack.push("TRUE");
+				}
+				else {
+					operandStack.push("FALSE");
+				}
+			}
+			else if ("$AND" == str)
+			{
+				string x, y;
+				x = operandStack.pop();
+				y = operandStack.pop();
+
+				if (x == "TRUE" && y == "TRUE") {
+					operandStack.push("TRUE");
+				}
+				else {
+					operandStack.push("FALSE");
+				}
+			}
+			else if ("$OR" == str)
+			{
+				string x, y;
+				x = operandStack.pop();
+				y = operandStack.pop();
+
+				if (x == "TRUE" || y == "TRUE") {
+					operandStack.push("TRUE");
+				}
+				else {
+					operandStack.push("FALSE");
+				}
+			}
+			else if ("$NOT" == str)
+			{
+				string x;
+				x = operandStack.pop();
+
+				if (x == "TRUE") {
+					operandStack.push("FALSE");
+				}
+				else {
+					operandStack.push("TRUE");
+				}
+			}
+			else if ("$COMP<" == str)
+			{
+				string x, y;
+				x = operandStack.pop();
+				y = operandStack.pop();
+
+				if (wiz::load_data::Utility::Compare(x, y) == "< 0") {
+					operandStack.push("TRUE");
+				}
+				else
+				{
+					operandStack.push("FALSE");
+				}
+			}
+			else if ("$COMP>" == str)
+			{
+				string x, y;
+				x = operandStack.pop();
+				y = operandStack.pop();
+
+				if (wiz::load_data::Utility::Compare(x, y) == "> 0") {
+					operandStack.push("TRUE");
+				}
+				else
+				{
+					operandStack.push("FALSE");
+				}
+			}
+			else if ("$COMP<EQ" == str)
+			{
+				string x, y;
+				x = operandStack.pop();
+				y = operandStack.pop();
+
+				if (wiz::load_data::Utility::Compare(x, y) == "< 0" || wiz::load_data::Utility::Compare(x, y) == "== 0") {
+					operandStack.push("TRUE");
+				}
+				else
+				{
+					operandStack.push("FALSE");
+				}
+			}
+			else if ("$COMP>EQ" == str)
+			{
+				string x, y;
+				x = operandStack.pop();
+				y = operandStack.pop();
+
+				if (wiz::load_data::Utility::Compare(x, y) == "> 0" || wiz::load_data::Utility::Compare(x, y) == "== 0") {
+					operandStack.push("TRUE");
+				}
+				else
+				{
+					operandStack.push("FALSE");
+				}
+			}
+			else if ("$add" == str)
+			{
+				string x, y;
+				x = operandStack.pop();
+				y = operandStack.pop();
+
+				if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && (wiz::load_data::Utility::GetType(y) == "INTEGER")) { /// only integer -> BigInteger
+					operandStack.push(wiz::toStr(atoll(x.c_str()) + atoll(y.c_str())));
+				}
+				else if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && wiz::load_data::Utility::GetType(y) == "DOUBLE") {
+					operandStack.push(wiz::_toString(std::stold(x) + std::stold(y)));
+				}
+				else
+				{
+					operandStack.push("ERROR");
+				}
+			}
+			else if ("$multiple" == str)
+			{
+				string x, y;
+				x = operandStack.pop();
+				y = operandStack.pop();
+
+
+
+				if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && (wiz::load_data::Utility::GetType(y) == "INTEGER")) { /// only integer -> BigInteger
+					operandStack.push(wiz::toStr(atoll(x.c_str()) * atoll(y.c_str())));
+				}
+				else if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && wiz::load_data::Utility::GetType(y) == "DOUBLE") {
+					operandStack.push(wiz::_toString(std::stold(x) * std::stold(y)));  /// chk?
+				}
+				else
+				{
+					operandStack.push("ERROR");
+				}
+			}
+			else if ("$divide" == str)
+			{
+				string x, y;
+				x = operandStack.pop();
+				y = operandStack.pop();
+
+				if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && (wiz::load_data::Utility::GetType(y) == "INTEGER")) { /// only integer -> BigInteger
+					operandStack.push(wiz::toStr(atoll(x.c_str()) / atoll(y.c_str())));
+				}
+				else if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && wiz::load_data::Utility::GetType(y) == "DOUBLE") {
+					operandStack.push(wiz::_toString(std::stold(x) / std::stold(y)));
+				}
+				else
+				{
+					operandStack.push("ERROR");
+				}
+			}
+			else if ("$modular" == str)
+			{
+				string x, y;
+				x = operandStack.pop();
+				y = operandStack.pop();
+
+				if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && (wiz::load_data::Utility::GetType(y) == "INTEGER")) { /// only integer -> BigInteger
+					operandStack.push(wiz::toStr(atoll(x.c_str()) % atoll(y.c_str())));
+				}
+				else
+				{
+					operandStack.push("ERROR");
+				}
+			}
+			else if ("$rand" == str)
+			{
+				string x, y;
+				x = operandStack.pop();
+				y = operandStack.pop();
+
+				if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && (wiz::load_data::Utility::GetType(y) == "INTEGER")) { /// only integer -> BigInteger
+					long long _x = atoll(x.c_str());
+					long long _y = atoll(y.c_str());
+					long long _z = rand() % (_y - _x + 1) + _x; // _x <= _z <= _y
+					operandStack.push(wiz::toStr(_z));
+				}
+				else
+				{
+					operandStack.push("ERROR");
+				}
+			}
+			else if ("$concat" == str)
+			{
+				string x, y;
+				x = operandStack.pop();
+				y = operandStack.pop();
+
+				operandStack.push(x + y);
+			}
+			else if ("$concat2" == str) /// with space
+			{
+				string x, y;
+				x = operandStack.pop();
+				y = operandStack.pop();
+
+				operandStack.push(x + " " + y);
+			}
+			else if ("$return_value" == str)
+			{
+				operandStack.push(info.return_value);
+			}
+			// cf) empty test!!
+			///ToDo - GetList -> // GetItemListIdxByIListIdx, GetUserTypeLisIdxtByIListIdx ?
+			else if ("$back" == str) // ex) for x  = { 0 1 2 3 .. }, for usertaypelist? and mixed? and need more test!
+			{
+				string x = operandStack.pop();
+
+				string value = wiz::load_data::LoadData::GetItemListData(global, x, "TRUE");
+				wiz::load_data::UserType ut;
+				wiz::load_data::LoadData::LoadDataFromString(value, ut);
+
+				if (ut.IsItemList(ut.GetIListSize() - 1))
+				{
+					auto x = ut.GetItemList(ut.GetItemListSize() - 1);
+					operandStack.push(x.Get(0));
+				}
+				else {
+					auto x = ut.GetUserTypeList(ut.GetUserTypeListSize() - 1);
+					operandStack.push("\"" + x->ToString() + "\"");
+				}
+			}
+			// pop_back or front - remove this function?
+			else if ("$pop_back" == str) // and for usertypelist? and mixed?, usertype-> "~"
+			{
+				string x = operandStack.pop();
+				string name;
+				for (int i = x.size() - 1; i >= 0; --i)
+				{
+					if (x[i] == '/' && i != 0) {
+						name = wiz::String::substring(x, i + 1);
+						x = wiz::String::substring(x, 0, i - 1);
+						break;
+					}
+				}
+
+				if (x.empty()) { x = "."; }
+
+				wiz::load_data::UserType* ut = nullptr;
+				auto finded = wiz::load_data::UserType::Find(&global, x);
+				ut = finded.second[0];
+
+				if (ut->IsItemList(ut->GetIListSize() - 1))
+				{
+					auto x = ut->GetItemList(ut->GetItemListSize() - 1);
+					operandStack.push(x.Get(0));
+					ut->RemoveItemList(ut->GetItemListSize() - 1);
+				}
+				else {
+					auto x = ut->GetUserTypeList(ut->GetUserTypeListSize() - 1);
+					operandStack.push("\"" + x->ToString() + "\"");
+					ut->RemoveUserTypeList(ut->GetUserTypeListSize() - 1);
+				}
+			}
+			// todo - $front, pop-front.
+			else if ("$front" == str)
+			{
+				string x = operandStack.pop();
+
+				string value = wiz::load_data::LoadData::GetItemListData(global, x, "TRUE");
+				wiz::load_data::UserType ut;
+				wiz::load_data::LoadData::LoadDataFromString(value, ut);
+
+				if (ut.IsItemList(0))
+				{
+					auto x = ut.GetItemList(0);
+					operandStack.push(x.Get(0));
+				}
+				else {
+					auto x = ut.GetUserTypeList(0);
+					operandStack.push("\"" + x->ToString() + "\"");
+				}
+			}
+			else if ("$pop_front" == str)
+			{
+				string x = operandStack.pop();
+				string name;
+				for (int i = x.size() - 1; i >= 0; --i)
+				{
+					if (x[i] == '/' && i != 0) {
+						name = wiz::String::substring(x, i + 1);
+						x = wiz::String::substring(x, 0, i - 1);
+						break;
+					}
+				}
+
+				if (x.empty()) { x = "."; }
+
+				wiz::load_data::UserType* ut = nullptr;
+				auto finded = wiz::load_data::UserType::Find(&global, x);
+				ut = finded.second[0];
+
+				if (ut->IsItemList(0))
+				{
+					auto x = ut->GetItemList(0);
+					operandStack.push(x.Get(0));
+					ut->RemoveItemList(0);
+				}
+				else {
+					auto x = ut->GetUserTypeList(0);
+					operandStack.push("\"" + x->ToString() + "\"");
+					ut->RemoveUserTypeList(0);
+				}
+			}
+			else if ("$get" == str)
+			{
+				string x = operandStack.pop();
+
+				if ('/' == x[0])
+				{
+					string temp = Find(&global, x); if (!temp.empty()) { x = temp; }
+				}
+				{
+					string temp = FindParameters(parameters, x);
+					if (!temp.empty()) { x = temp; }
+				}
+				{
+					string temp = FindLocals(info.locals, x);
+					if (!temp.empty()) { x = temp; }
+				}
+				operandStack.push(x);
+			}
+			else if ("$size" == str)
+			{
+				string x = operandStack.pop();
+
+				if ('/' == x[0])
+				{
+					wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, x).second[0];
+					x = wiz::toStr(ut->GetItemListSize());
+				}
+				else
+				{
+					x = "FALSE";
+				}
+
+				operandStack.push(x);
+			}
+			else if ("$size2" == str)
+			{
+				string x = operandStack.pop();
+
+				if ('/' == x[0])
+				{
+					wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, x).second[0];
+					x = wiz::toStr(ut->GetUserTypeListSize());
+				}
+				else
+				{
+					x = "FALSE";
+				}
+
+				operandStack.push(x);
+			}
+			else if ("$element" == str) // for list
+			{
+				string x = operandStack.pop(); // list_name
+				string y = operandStack.pop(); // idx
+				long long idx = atoll(y.c_str());
+
+				if ('/' == x[0])
+				{
+					wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, x).second[0];
+					x = ut->GetItemList(idx).Get(0);
+				}
+				else
+				{
+					x = "NONE";
+				}
+
+				operandStack.push(x);
+			}
+			else if ("$regex" == str) {
+				string str = operandStack.pop();
+				string rgx_str = operandStack.pop();
+
+				// " ~ " , "제거?
+				if (rgx_str.size() > 2 && rgx_str[0] == rgx_str.back() && rgx_str[0] == '\"') {
+					std::regex rgx(rgx_str.substr(1, rgx_str.size() - 2));
+
+					if (std::regex_match(str, rgx))
+					{
+						operandStack.push("TRUE");
+					}
+					else {
+						operandStack.push("FALSE");
+					}
+				}
+				else {
+					operandStack.push("ERROR in $regex");
+				}
+			}
+			else if ("$eval" == str) {
+				string str = operandStack.pop();
+
+				bool chk = wiz::load_data::Utility::ChkExist(str);
+				if (chk) { /// chk with tobool4
+					string temp;
+					wiz::load_data::Utility::ChangeStr(str, { "^5", "^4", "^3", "^2", "^1", "^0" }, { "#", "\n", "\r", "\t", " ", "^" }, temp);
+					str = std::move(temp);
+					//result = wiz::load_data::Utility::ChangeStr(result, "^4", "\n");
+					//result = wiz::load_data::Utility::ChangeStr(result, "^3", "\r");
+					//result = wiz::load_data::Utility::ChangeStr(result, "^2", "\t");
+					//result = wiz::load_data::Utility::ChangeStr(result, "^1", " ");
+					//result = wiz::load_data::Utility::ChangeStr(result, "^0", "^");
+				}
+				else {
+					operandStack.push("ERROR in $eval, must be \" \" ");
+					return;
+				}
+				str = str.substr(1, str.size() - 2);
+				operandStack.push(ToBool4(global, parameters, str, info));
+			}
+		}
+
+		string ToBool3(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& temp, wiz::load_data::EventInfo info) /// has bug!
+		{
+			wiz::StringTokenizer tokenizer(temp, vector<string>{ "/" });
+			vector<string> tokenVec;
+			string result;
+
+			while (tokenizer.hasMoreTokens()) {
+				tokenVec.push_back(tokenizer.nextToken());
+			}
+
+			for (int i = 0; i < tokenVec.size(); ++i)
+			{
+				result = result + "/";
+				if (wiz::String::startsWith(tokenVec[i], "$parameter.")) {
+					int last = -1;
+					for (int j = 0; j < tokenVec[i].size(); ++j)
+					{
+						if (tokenVec[i][j] == ' ' || tokenVec[i][j] == '{' || tokenVec[i][j] == '}' || tokenVec[i][j] == '=') {
+							last = j - 1;
+							break;
+						}
+					}
+					if (last != -1)
+					{
+						string temp = FindParameters(parameters, wiz::String::substring(tokenVec[i], 0, last));
+
+						if (!temp.empty()) {
+							tokenVec[i] = wiz::String::replace(wiz::String::substring(tokenVec[i], 0, last), wiz::String::substring(tokenVec[i], 0, last), temp)
+								+ wiz::String::substring(tokenVec[i], last + 1);
+						}
+					}
+					else
+					{
+						string temp = FindParameters(parameters, tokenVec[i]);
+						if (!temp.empty()) {
+							tokenVec[i] = temp;
+						}
+					}
+				}
+				else if (wiz::String::startsWith(tokenVec[i], "$local.")) {
+					int last = -1;
+					for (int j = 0; j < tokenVec[i].size(); ++j)
+					{
+						if (tokenVec[i][j] == ' ' || tokenVec[i][j] == '{' || tokenVec[i][j] == '}' || tokenVec[i][j] == '=') {
+							last = j - 1;
+							break;
+						}
+					}
+					if (last != -1)
+					{
+						string temp = FindLocals(info.locals, wiz::String::substring(tokenVec[i], 0, last));
+
+						if (!temp.empty()) {
+							tokenVec[i] = wiz::String::replace(wiz::String::substring(tokenVec[i], 0, last), wiz::String::substring(tokenVec[i], 0, last), temp)
+								+ wiz::String::substring(tokenVec[i], last + 1);
+						}
+					}
+					else
+					{
+						string temp = FindLocals(info.locals, tokenVec[i]);
+						if (!temp.empty()) {
+							tokenVec[i] = temp;
+						}
+					}
+				}
+
+				result = result + tokenVec[i];
+			}
+			return result;
+		}
+		string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& temp, wiz::load_data::EventInfo info)
+		{
+			string result = temp;
+			wiz::ArrayStack<string> resultStack;
+			wiz::load_data::UserType ut;
+			bool chk = false;
+
+			bool flag_A = false;
+			if (result.size() > 1 && result[0] == '/')
+			{
+				flag_A = true;
+			}
+			result = ToBool3(global, parameters, result, info);
+			if (result.empty()) { return ""; }
+			if (!flag_A) {
+				result = string(result.c_str() + 1);
+			}
+			wiz::load_data::LoadData::LoadDataFromString(result, ut);
+			result = ut.ToString();
+			if (result.empty()) { return result; }
+
+			if (ut.empty()) {
+				return "";
+			}
+			if (ut.GetUserTypeListSize() == 0 && ut.GetItemListSize() == 1) /// chk
+			{
+				if ('/' == result[0] && result.size() > 1)
+				{
+					string temp = Find(&global, result);
+					if (!temp.empty()) {
+						result = temp;
+					}
+				}
+				else if (wiz::String::startsWith(result, "$local.")) {
+					string _temp = FindLocals(info.locals, result);
+					if (!_temp.empty()) {
+						result = _temp;
+					}
+				}
+				else if (wiz::String::startsWith(result, "$parameter.")) {
+					string _temp = FindParameters(parameters, result);
+					if (!_temp.empty()) {
+						result = _temp;
+					}
+				}
+				return result;
+			}
+
+			{
+				chk = wiz::load_data::Utility::ChkExist(result);
+				if (chk) {
+					string temp;
+					wiz::load_data::Utility::ChangeStr(result, { "^" }, { "^0" }, temp); // in " "
+					wiz::load_data::Utility::ChangeStr(temp, { " ", "\t", "\r", "\n", "#" }, { "^1", "^2", "^3", "^4", "^5" }, result);
+					//result = wiz::load_data::Utility::ChangeStr(result, "\t", "^2");
+					//result = wiz::load_data::Utility::ChangeStr(result, "\r", "^3");
+					//result = wiz::load_data::Utility::ChangeStr(result, "\n", "^4");
+					//result = wiz::load_data::Utility::ChangeStr(result, "#", "^5");
+				}
+			}
+
+			{ // chk..
+			  // tokenizer and option! - "" 안에는 나누지 않는다?
+				int option = 0;
+				if (chk) { option = 1; }
+				//cout << "result " << result << " chk " << (int)chk << endl;
+				wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r", "{", "=", "}" }, option);
+				wiz::StringTokenizer tokenizer2(result, { " ", "\n", "\t", "\r" });
+				vector<string> tokenVec;
+				vector<string> tokenVec2;
+
+				while (tokenizer.hasMoreTokens()) {
+					tokenVec.push_back(tokenizer.nextToken());
+					//cout << "chk is " <<  tokenVec.back() << endl;
+				}
+
+				for (int i = tokenVec.size() - 1; i >= 0; --i)
+				{
+					string before = tokenVec[i];
+					if ('/' == tokenVec[i][0] && tokenVec[i].size() > 1)
+					{
+						string _temp = Find(&global, tokenVec[i]);
+						if ("" != _temp) {
+							tokenVec[i] = _temp;
+						}
+
+
+					}
+					else if (wiz::String::startsWith(tokenVec[i], "$local.")) {
+						string _temp = FindLocals(info.locals, tokenVec[i]);
+						if (!_temp.empty()) {
+							tokenVec[i] = _temp;
+						}
+					}
+					else if (wiz::String::startsWith(tokenVec[i], "$parameter.")) {
+						string _temp = FindParameters(parameters, tokenVec[i]);
+						if (!_temp.empty()) {
+							tokenVec[i] = _temp;
+						}
+					}
+				}
+
+				while (tokenizer2.hasMoreTokens()) {
+					tokenVec2.push_back(tokenizer2.nextToken());
+				}
+
+				result = "";
+
+				int j = tokenVec.size() - 1;
+				for (int i = tokenVec2.size() - 1; i >= 0 && j >= 0; --i) {
+					if (tokenVec2[i] == "{" || tokenVec2[i] == "}" || tokenVec2[i] == "=") { //cout << "chk " << tokenVec2[i] << endl;
+						continue;
+					}
+					else {
+						tokenVec2[i] = tokenVec[j];
+						--j;
+					}
+				}
+
+				for (int i = 0; i < tokenVec2.size(); ++i) {
+					if (i != 0) { result = result + " "; }
+					result = result + tokenVec2[i];
+				}
+			}
+
+			//
+			wiz::ArrayStack<string> operandStack; 
+			wiz::ArrayStack<string> operatorStack; // 반대로 들어간다.
+			wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" });
+			vector<string> tokenVec;
+
+			while (tokenizer.hasMoreTokens()) {
+				tokenVec.push_back(tokenizer.nextToken());
+			}
+
+			for (int i = tokenVec.size() - 1; i >= 0; --i)
+			{
+				if ('/' == tokenVec[i][0] && tokenVec[i].size() > 1)
+				{
+					string temp = Find(&global, tokenVec[i]);
+					if (!temp.empty()) {
+						tokenVec[i] = temp;
+					}
+				}
+
+				if ('$' != tokenVec[i][0] || ('$' == tokenVec[i][0] && tokenVec[i].size() == 1)) {
+					operandStack.push(tokenVec[i]);
+				}
+				else
+				{
+					operandStack.pop();
+					operandStack.pop();
+					operatorStack.push(tokenVec[i]);
+					operation(global, parameters, tokenVec[i], operandStack, info);
+					operandStack[operandStack.size() - 2] = operandStack[operandStack.size() - 1];
+					operandStack.pop();
+				}
+			}
+
+
+			// ex) A = { B = 1 $C = { 3 } } D = { E }
+			// =>  A = { B = 1 $C = 3  }  D = E
+			// =>  A = { B = 1 $C = { 3 } } D = E  : ToDo! 
+			
+			vector<string> strVec;
+			stack<int> chkBrace;
+
+			chkBrace.push(0);
+
+			for (int i = operandStack.size() - 1; i >= 0; --i)
+			{
+				if (operandStack[i] == "}") {
+					chkBrace.top()++;
+					if (chkBrace.top() == 2)
+					{
+						string temp = strVec.back();
+						strVec.pop_back();
+						strVec.pop_back();
+						strVec.push_back(temp);
+
+						chkBrace.pop();
+						continue;
+					}
+					chkBrace.pop();
+				}
+				else if (operandStack[i] == "{") {
+					chkBrace.top()++;
+					chkBrace.push(0);
+				}
+				else {
+					chkBrace.top()++;
+				}
+				strVec.push_back(operandStack[i]);
+			}
+
+			result = "";
+			for (int i = 0; i < strVec.size(); ++i) {
+				if (i != 0) { result = result + " "; }
+				result = result + strVec[i] + " "; // add space!
+			}
+
+			// todo!  $C = 3 => $C = { 3 } 
+			{
+				StringTokenizer tokenizer(result);
+				result = "";
+
+				while (tokenizer.hasMoreTokens()) {
+					string temp = tokenizer.nextToken();
+
+					if (temp.size() >= 2 && String::startsWith(temp, "$.")) {
+						result = result + temp + " ";
+					}
+					else if ((temp.size() >= 2 && temp[0] == '$') || (temp.size() >=3 && temp[0] == '@' && temp[1] == '$')) {
+						tokenizer.nextToken(); // = 
+						string temp2 = tokenizer.nextToken();
+						result = result + temp + " = { " + temp2 + " } ";
+					}
+					else {
+						result = result + temp + " ";
+					}
+				}
+			}
+
+			result.erase(result.begin() + result.size() - 1);
+			
+			{
+				if (chk) {
+					string temp;
+					wiz::load_data::Utility::ChangeStr(result, { "^5", "^4", "^3", "^2", "^1", "^0" }, { "#", "\n", "\r", "\t", " ", "^" }, temp);
+					result = std::move(temp);
+					//result = wiz::load_data::Utility::ChangeStr(result, "^4", "\n");
+					//result = wiz::load_data::Utility::ChangeStr(result, "^3", "\r");
+					//result = wiz::load_data::Utility::ChangeStr(result, "^2", "\t");
+					//result = wiz::load_data::Utility::ChangeStr(result, "^1", " ");
+					//result = wiz::load_data::Utility::ChangeStr(result, "^0", "^");
+				}
+			}
+			return result;
+		}
+
 	}
 }
 
