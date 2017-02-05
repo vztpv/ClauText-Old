@@ -403,6 +403,28 @@ namespace wiz{
 		return strs.str();
 	}
 	template <>
+	inline string _toString(const long double x)
+	{
+		std::stringstream strs;
+		strs << x;
+		string temp = strs.str();
+		size_t idx = temp.find('.');
+		if (idx == temp.size()-1) {
+			temp.push_back('0');
+		}
+		else if (idx == string::npos) {
+			temp.push_back('.');
+			temp.push_back('0');
+		}
+		return temp;
+	}
+
+	template <>
+	inline string _toString(const long long x)
+	{
+		return str(x);
+	}
+	template <>
 	inline string _toString(const int x)
 	{
 		return str(x);

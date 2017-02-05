@@ -1905,7 +1905,7 @@ namespace wiz {
 							if (_val[0] == '@') { _val.erase(_val.begin()); }
 							_val = wiz::String::replace(_val, "~~", _var);
 							_val = ToBool4(*ut, vector<pair<string, string>>(), _val, EventInfo());
-						
+							
 							ut->GetItemList(i).SetName(_val);
 						}
 					}
@@ -2215,7 +2215,7 @@ namespace wiz {
 					operandStack.push("FALSE");
 				}
 			}
-			else if ("$add" == str)
+			else if ("$add" == str) // todo! = int operator double => double operator double!
 			{
 				string x, y;
 				x = operandStack.pop();
@@ -2232,7 +2232,7 @@ namespace wiz {
 					operandStack.push("ERROR");
 				}
 			}
-			else if ("$multiple" == str)
+			else if ("$multiple" == str) // todo! = int operator double => double operator double!
 			{
 				string x, y;
 				x = operandStack.pop();
@@ -2251,7 +2251,7 @@ namespace wiz {
 					operandStack.push("ERROR");
 				}
 			}
-			else if ("$divide" == str)
+			else if ("$divide" == str) // todo! = int operator double => double operator double!
 			{
 				string x, y;
 				x = operandStack.pop();
