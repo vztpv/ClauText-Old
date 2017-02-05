@@ -1895,15 +1895,17 @@ namespace wiz {
 						string _val = val;
 						string _var = ut->GetItemList(i).GetName();
 						_condition = wiz::String::replace(_condition, "~~", _var); //
-						if (_val[0] == '@') { _val.erase(_val.begin()); }
-						_val = wiz::String::replace(_val, "~~", _var);
-						_val = ToBool4(*ut, vector<pair<string, string>>(), _val, EventInfo());
+					
 						Condition cond(_condition, ut, &global);
 
 						while (cond.Next());
 
 						if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
 						{
+							if (_val[0] == '@') { _val.erase(_val.begin()); }
+							_val = wiz::String::replace(_val, "~~", _var);
+							_val = ToBool4(*ut, vector<pair<string, string>>(), _val, EventInfo());
+						
 							ut->GetItemList(i).SetName(_val);
 						}
 					}
@@ -1935,15 +1937,16 @@ namespace wiz {
 
 						string _var = ut->GetItemList(i).GetName();
 						_condition = wiz::String::replace(_condition, "~~", _var); //
-						if (_val[0] == '@') { _val.erase(_val.begin()); }
-						_val = wiz::String::replace(_val, "~~", _var);
-						_val = ToBool4(*ut, vector<pair<string, string>>(), _val, EventInfo());
+						
 						Condition cond(_condition, ut, &global);
 
 						while (cond.Next());
 
 						if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
 						{
+							if (_val[0] == '@') { _val.erase(_val.begin()); }
+							_val = wiz::String::replace(_val, "~~", _var);
+							_val = ToBool4(*ut, vector<pair<string, string>>(), _val, EventInfo());
 							ut->GetItemList(i).Set(0, _val);
 						}
 					}
@@ -1977,10 +1980,6 @@ namespace wiz {
 						string _val = val;
 						string _var = ut->GetUserTypeList(i)->GetName();
 						_condition = wiz::String::replace(_condition, "~~", _var); //
-						if (_val[0] == '@') { _val.erase(_val.begin()); } // removal?
-						
-						_val = wiz::String::replace(_val, "~~", _var);
-						_val = ToBool4(*ut, vector<pair<string, string>>(), _val, EventInfo());
 					
 						Condition cond(_condition, ut, &global);
 
@@ -1988,6 +1987,10 @@ namespace wiz {
 
 						if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
 						{
+							if (_val[0] == '@') { _val.erase(_val.begin()); } // removal?
+						
+							_val = wiz::String::replace(_val, "~~", _var);
+							_val = ToBool4(*ut, vector<pair<string, string>>(), _val, EventInfo());
 							ut->GetUserTypeList(i)->SetName(_val);
 						}
 					}

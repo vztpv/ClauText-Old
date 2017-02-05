@@ -97,12 +97,19 @@ Event =
 	$call = { id = replaceB option = USE_THREAD }
 	$wait = { }
 	
-	$replace_datatype2 = {
-		rgx = { "^[0-9]+\.[0-9]+\.[0-9]+$" }
-		val = { @$eval = { " $concat = { ~~ test! } " } }  # using @/~~
-		
+	$replace_datatype1 = {
+		#rgx = { "^[0-9]+\.[0-9]+\.[0-9]+$" }
+		#val = { @$eval = { " $concat = { /~~/university test! } " } }  # using @/~~
+		#rgx = { "[0-9]+\.[0-9]+" }
+		rgx = { "[a-zA-Z0-9_]+" }
+		# ToDo - condition == TRUE, then chk val! # /./name?
+		val = { @$eval = { " $concat = { $concat = {$add = { 1.000 /./~~ } chk_base_tax } /./~~ } " } }
 		condition = {
-			REGEX = { ~~ ~ "^1821\.1\.1$" ~ 0 } # option : 0, 1, 2 ?? - chk!!
+			#REGEX = { ~~ ~ "^1821\.1\.1$" ~ 0 } # option : 0, 1, 2 ?? - chk!!
+			AND = { 
+				EQ = { ~~ ~ base_tax ~ 1 }
+				COMP> = { ~~ / 5.000 ~ 0 }
+			}
 		}
 		start_dir = { /eu3Game }
 	}
