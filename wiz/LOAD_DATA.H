@@ -1906,7 +1906,7 @@ namespace wiz {
 							_val = wiz::String::replace(_val, "~~", _var);
 							_val = ToBool4(*ut, vector<pair<string, string>>(), _val, EventInfo());
 							
-							ut->GetItemList(i).SetName(_val);
+							ut->GetItemList(i).Set(0, _val);
 						}
 					}
 				}

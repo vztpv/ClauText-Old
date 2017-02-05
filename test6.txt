@@ -101,7 +101,7 @@ Event =
 		#rgx = { "^[0-9]+\.[0-9]+\.[0-9]+$" }
 		#val = { @$eval = { " $concat = { /~~/university test! } " } }  # using @/~~
 		#rgx = { "[0-9]+\.[0-9]+" }
-		rgx = { "[a-zA-Z0-9_]+" }
+		rgx = { "base_tax" } #"[a-zA-Z0-9_]+" }
 		# ToDo - condition == TRUE, then chk val! # /./name?
 		val = { @$eval = { " $concat = { $concat = {$add = { 1.000 /./~~ } chk_base_tax } /./~~ } " } }
 		condition = {
