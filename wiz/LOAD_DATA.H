@@ -1892,17 +1892,19 @@ namespace wiz {
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
 					if (std::regex_match(ut->GetItemList(i).GetName(), rgx)) { // || Utility::IsDate(ut->GetItemList(i).Get(0))) {
 						string _condition = condition;
-
+						string _val = val;
 						string _var = ut->GetItemList(i).GetName();
 						_condition = wiz::String::replace(_condition, "~~", _var); //
-
+						if (_val[0] == '@') { _val.erase(_val.begin()); }
+						_val = wiz::String::replace(_val, "~~", _var);
+						_val = ToBool4(*ut, vector<pair<string, string>>(), _val, EventInfo());
 						Condition cond(_condition, ut, &global);
 
 						while (cond.Next());
 
 						if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
 						{
-							ut->GetItemList(i).SetName(val);
+							ut->GetItemList(i).SetName(_val);
 						}
 					}
 				}
@@ -1929,17 +1931,20 @@ namespace wiz {
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
 					if (std::regex_match(ut->GetItemList(i).Get(0), rgx)) {
 						string _condition = condition;
+						string _val = val;
 
 						string _var = ut->GetItemList(i).GetName();
 						_condition = wiz::String::replace(_condition, "~~", _var); //
-
+						if (_val[0] == '@') { _val.erase(_val.begin()); }
+						_val = wiz::String::replace(_val, "~~", _var);
+						_val = ToBool4(*ut, vector<pair<string, string>>(), _val, EventInfo());
 						Condition cond(_condition, ut, &global);
 
 						while (cond.Next());
 
 						if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
 						{
-							ut->GetItemList(i).Set(0, val);
+							ut->GetItemList(i).Set(0, _val);
 						}
 					}
 				}
