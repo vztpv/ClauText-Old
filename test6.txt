@@ -97,7 +97,7 @@ Event =
 	$call = { id = replaceB option = USE_THREAD }
 	$wait = { }
 	
-	$replace_datatype1 = {
+	$replace_datatype1_2 = {
 		#rgx = { "^[0-9]+\.[0-9]+\.[0-9]+$" }
 		#val = { @$eval = { " $concat = { /~~/university test! } " } }  # using @/~~
 		#rgx = { "[0-9]+\.[0-9]+" }

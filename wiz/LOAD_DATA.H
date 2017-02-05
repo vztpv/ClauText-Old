@@ -1895,6 +1895,47 @@ namespace wiz {
 						string _val = val;
 						string _var = ut->GetItemList(i).GetName();
 						_condition = wiz::String::replace(_condition, "~~", _var); //
+
+						Condition cond(_condition, ut, &global);
+
+						while (cond.Next());
+
+						if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
+						{
+							if (_val[0] == '@') { _val.erase(_val.begin()); }
+							_val = wiz::String::replace(_val, "~~", _var);
+							_val = ToBool4(*ut, vector<pair<string, string>>(), _val, EventInfo());
+
+							ut->GetItemList(i).SetName(_val);
+						}
+					}
+				}
+
+				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
+					string temp = ut->GetUserTypeList(i)->GetName();
+					if (temp == "") { temp = " "; }
+
+					ReplaceDataType1(
+						global,
+						nowPosition + "/" + temp,
+						ut->GetUserTypeList(i),
+						rgx_str,
+						val,
+						condition
+					);
+				}
+			}
+			static void ReplaceDataType1_2(UserType& global, const string& nowPosition,
+				UserType* ut, const string& rgx_str, const string& val, const string& condition)
+			{
+				std::regex rgx(rgx_str);
+
+				for (int i = 0; i < ut->GetItemListSize(); ++i) {
+					if (std::regex_match(ut->GetItemList(i).GetName(), rgx)) { // || Utility::IsDate(ut->GetItemList(i).Get(0))) {
+						string _condition = condition;
+						string _val = val;
+						string _var = ut->GetItemList(i).GetName();
+						_condition = wiz::String::replace(_condition, "~~", _var); //
 					
 						Condition cond(_condition, ut, &global);
 
@@ -1915,7 +1956,7 @@ namespace wiz {
 					string temp = ut->GetUserTypeList(i)->GetName();
 					if (temp == "") { temp = " "; }
 
-					ReplaceDataType1(
+					ReplaceDataType1_2(
 						global,
 						nowPosition + "/" + temp,
 						ut->GetUserTypeList(i),
@@ -1925,7 +1966,7 @@ namespace wiz {
 					);
 				}
 			}
-			static void ReplaceDataType1_2(UserType& global, const string& nowPosition,
+			static void ReplaceDataType1_3(UserType& global, const string& nowPosition,
 				UserType* ut, const string& rgx_str, const string& val, const string& condition)
 			{
 				std::regex rgx(rgx_str);
@@ -1956,7 +1997,7 @@ namespace wiz {
 					string temp = ut->GetUserTypeList(i)->GetName();
 					if (temp == "") { temp = " "; }
 
-					ReplaceDataType1_2(
+					ReplaceDataType1_3(
 						global,
 						nowPosition + "/" + temp,
 						ut->GetUserTypeList(i),
