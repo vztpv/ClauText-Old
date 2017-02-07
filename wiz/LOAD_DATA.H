@@ -1728,15 +1728,18 @@ namespace wiz {
 			}
 			static void ReplaceDataType1(UserType& global, const string& rex, const string& val, const string& condition, const string& start_dir) {
 				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
-				ReplaceDataType1(global, start_dir, ut, rex, val, condition);
+				std::regex rgx(rex);
+				ReplaceDataType1(global, start_dir, ut, rgx, val, condition);
 			}
 			static void ReplaceDataType1_2(UserType& global, const string& rex, const string& val, const string& condition, const string& start_dir) {
 				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
-				ReplaceDataType1_2(global, start_dir, ut, rex, val, condition);
+				std::regex rgx(rex);
+				ReplaceDataType1_2(global, start_dir, ut, rgx, val, condition);
 			}
 			static void ReplaceDataType2(UserType& global, const string& rex, const string& val, const string& condition, const string& start_dir) {
 				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
-				ReplaceDataType2(global, start_dir, ut, rex, val, condition);
+				std::regex rgx(rex);
+				ReplaceDataType2(global, start_dir, ut, rgx, val, condition);
 			}
 		private:
 			static void ReplaceItem(UserType& global, const string& var, const string& nowPosition,
@@ -1885,10 +1888,8 @@ namespace wiz {
 				}
 			}
 			static void ReplaceDataType1(UserType& global, const string& nowPosition,
-				UserType* ut, const string& rgx_str, const string& val, const string& condition)
+				UserType* ut, const std::regex& rgx, const string& val, const string& condition)
 			{
-				std::regex rgx(rgx_str);
-
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
 					if (std::regex_match(ut->GetItemList(i).GetName(), rgx)) { // || Utility::IsDate(ut->GetItemList(i).Get(0))) {
 						string _condition = condition;
@@ -1919,16 +1920,15 @@ namespace wiz {
 						global,
 						nowPosition + "/" + temp,
 						ut->GetUserTypeList(i),
-						rgx_str,
+						rgx,
 						val,
 						condition
 					);
 				}
 			}
 			static void ReplaceDataType1_2(UserType& global, const string& nowPosition,
-				UserType* ut, const string& rgx_str, const string& val, const string& condition)
+				UserType* ut, const std::regex& rgx, const string& val, const string& condition)
 			{
-				std::regex rgx(rgx_str);
 
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
 					if (std::regex_match(ut->GetItemList(i).GetName(), rgx)) { // || Utility::IsDate(ut->GetItemList(i).Get(0))) {
@@ -1960,17 +1960,15 @@ namespace wiz {
 						global,
 						nowPosition + "/" + temp,
 						ut->GetUserTypeList(i),
-						rgx_str,
+						rgx,
 						val,
 						condition
 					);
 				}
 			}
 			static void ReplaceDataType1_3(UserType& global, const string& nowPosition,
-				UserType* ut, const string& rgx_str, const string& val, const string& condition)
+				UserType* ut, const std::regex& rgx, const string& val, const string& condition)
 			{
-				std::regex rgx(rgx_str);
-
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
 					if (std::regex_match(ut->GetItemList(i).Get(0), rgx)) {
 						string _condition = condition;
@@ -2001,17 +1999,15 @@ namespace wiz {
 						global,
 						nowPosition + "/" + temp,
 						ut->GetUserTypeList(i),
-						rgx_str,
+						rgx,
 						val,
 						condition
 					);
 				}
 			}
 			static void ReplaceDataType2(UserType& global, const string& nowPosition,
-				UserType* ut, const string& rgx_str, const string& val, const string& condition) // first val test
+				UserType* ut, const std::regex& rgx, const string& val, const string& condition) // first val test
 			{
-				std::regex rgx(rgx_str);
-
 				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
 					string temp = ut->GetUserTypeList(i)->GetName();
 					if (temp == "") { temp = " "; }
@@ -2040,7 +2036,7 @@ namespace wiz {
 						global,
 						nowPosition + "/" + temp,
 						ut->GetUserTypeList(i),
-						rgx_str,
+						rgx,
 						val,
 						condition
 					);
