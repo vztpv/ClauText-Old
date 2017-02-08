@@ -2851,6 +2851,9 @@ namespace wiz {
 					if (temp.size() >= 2 && String::startsWith(temp, "$.")) {
 						result = result + temp + " ";
 					}
+					else if (temp.size() >= 8 && String::startsWith(temp, "$local.")) {
+						result = result + temp + " ";
+					}
 					else if ((temp.size() >= 2 && temp[0] == '$') || (temp.size() >=3 && temp[0] == '@' && temp[1] == '$')) {
 						tokenizer.nextToken(); // = 
 						string temp2 = tokenizer.nextToken();
