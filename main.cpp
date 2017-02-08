@@ -1557,10 +1557,10 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					string data = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
 
 					{
-					//	if (dir.first == "" && dir.second.size() > 1 && dir.second[0] == '@')
-					//	{
-					//		dir.second.erase(dir.second.begin());
-					//	}
+						if (dir.first == "" && dir.second.size() > 1 && dir.second[0] == '@')
+						{
+							dir.second.erase(dir.second.begin());
+						}
 						if (dir.first == "" && wiz::String::startsWith(dir.second, "$local."))
 						{
 							eventStack.top().locals[wiz::String::substring(dir.second, 7)] = data;
