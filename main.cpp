@@ -1017,8 +1017,19 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 
 			while (val != nullptr)
 			{
+				if ("$do" == val->GetName()) { // chk?
+					wiz::load_data::UserType subGlobal;
+					wiz::load_data::LoadData::LoadDataFromString(val->ToString(), subGlobal);
+
+			
+					eventStack.top().return_value = excute_module(&subGlobal); // return ?
+				
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
 				// add option! for "".support eu3, eu4.
-				if ("$replace_datatype1" == val->GetName()) { // name
+				else if ("$replace_datatype1" == val->GetName()) { // name
 					string rex = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
 					rex = rex.substr(1, rex.size() - 2);
 					string sval = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
