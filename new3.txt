@@ -1,0 +1,64 @@
+
+# Data
+x = 9
+y = 9
+list = { }
+
+# main and events.
+Main = {
+	$call = { id = 0 }
+}
+
+Event = {
+	id = 0
+
+	$call = { id = 1 i = 1 j = 1 }
+	
+	$insert = {
+		dir = { /./list }
+		data = { $return_value = { } }
+	}
+	
+	$print2 = { dir = { /./ } }
+	
+	$_getch = { } # pause
+}
+
+Event =
+{
+    id = 1
+
+    $option = { REMOVE_IF_CALL_ONESELF_EVENT } # REMOVE_IF_CALL_ONESELF_EVENT.
+    $parameter = { i j }
+	
+    $if = {
+        condition = { $COMP<EQ = { $parameter.i /./x } }
+        then = {
+			$call = { id = { $concat = { x $add = { 1 1 } } } i = $parameter.i j = 1 }
+			$call = { id = 1 i = { $add = { $parameter.i 1 } } j = 1 }
+        }
+    }
+	
+	$return = { abc = 1 def = { 2 3 } }  # $non-functtion-name ?
+}
+
+Event =
+{
+    id = x2
+    $parameter = { i j }
+    $option = { REMOVE_IF_CALL_ANY_EVENT }
+
+    $if = {
+        condition = { $COMP<EQ = { $parameter.j /./y } }
+        then = {
+            $print = { value = { $parameter.i } }
+            $print = { value = { " * " } }
+            $print = { value = { $parameter.j } }
+            $print = { value = { " = " } }
+            $print = { value = { $multiple = { $parameter.i $parameter.j } } }
+            $print = { value = { \n } }
+            $call = { id = x2 i = $parameter.i j = { $add = { $parameter.j 1 } } }
+        }
+    }
+	$print = { value = { \n } }
+}

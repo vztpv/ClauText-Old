@@ -355,7 +355,7 @@ namespace wiz{
 			if (hasMoreTokens())
 				return _m_str[count++];
 			else
-				return "";
+				throw "error in nextToken!";
 		}
 		bool hasMoreTokens()const
 		{

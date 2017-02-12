@@ -2005,6 +2005,9 @@ namespace wiz {
 					);
 				}
 			}
+
+			// cf) replacedatatype1_4  match value, change var_name?
+
 			static void ReplaceDataType2(UserType& global, const string& nowPosition,
 				UserType* ut, const std::regex& rgx, const string& val, const string& condition) // first val test
 			{
@@ -2848,7 +2851,7 @@ namespace wiz {
 				while (tokenizer.hasMoreTokens()) {
 					string temp = tokenizer.nextToken();
 
-					if (temp.size() >= 2 && String::startsWith(temp, "$.")) {
+					if (temp.size() >= 3 && String::startsWith(temp, "$.")) {
 						result = result + temp + " ";
 					}
 					else if (temp.size() >= 8 && String::startsWith(temp, "$local.")) {
