@@ -2671,23 +2671,24 @@ namespace wiz {
 				if ('/' == result[0] && result.size() > 1)
 				{
 					string temp = Find(&global, result);
+
 					if (!temp.empty()) {
 						result = temp;
-					}
+					}return result;
 				}
 				else if (wiz::String::startsWith(result, "$local.")) {
 					string _temp = FindLocals(info.locals, result);
 					if (!_temp.empty()) {
 						result = _temp;
-					}
+					}return result;
 				}
 				else if (wiz::String::startsWith(result, "$parameter.")) {
 					string _temp = FindParameters(parameters, result);
 					if (!_temp.empty()) {
 						result = _temp;
-					}
+					}return result;
 				}
-				return result;
+				
 			}
 
 			{

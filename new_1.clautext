@@ -3,19 +3,25 @@ Main = {
 	$call = { id = 1 }
 }
 
+x = 1
+
 Event = {
 	id = 1
 
 	
 	$do = { 
-		Main = { $call = { id = 1 }  }
-		Event = { 
-			id = 1
-			
-			$print = { str = { "Hello World!" } }
-			$print = { str = { \n } }
-			
-			$return = { test }
+		input = { x = { y = /./x } }
+		doing = {
+			Main = { $call = { id = 1 }  }  # find Main, $call <- using ToBool4?
+			Event = { 
+				id = 1
+				
+				$print = { str = { "Hello World! : " } }
+				$print = { str = { /./x/y } }
+				$print = { str = { \n } }
+				
+				$return = { test }
+			}
 		}
 	}
 	

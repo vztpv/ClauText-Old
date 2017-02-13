@@ -852,8 +852,20 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 	}
 }
 
+// chk..
+void ChkBool4(wiz::load_data::UserType* ut, wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const wiz::load_data::EventInfo& info) {
+	for (int i = 0; i < ut->GetItemListSize(); ++i) {
+		ut->GetItemList(i).SetName(ToBool4(global, parameters, ut->GetItemList(i).GetName(), info));
+		ut->GetItemList(i).Set(0, ToBool4(global, parameters, ut->GetItemList(i).Get(0), info));
+	}
+	for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
+		ut->GetUserTypeList(i)->SetName(ToBool4(global, parameters, ut->GetUserTypeList(i)->GetName(), info));
+		ChkBool4(ut->GetUserTypeList(i), global, parameters, info);
+	}
+}
 
-string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType* pEvents = nullptr, const std::shared_ptr<wiz::load_data::EventInfo>& pInfo = nullptr)
+string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType* pEvents = nullptr, 
+	const std::shared_ptr<wiz::load_data::EventInfo>& pInfo = nullptr)
 {
 	wiz::load_data::UserType& global = *_global;
 	vector<thread*> waits;
@@ -1019,11 +1031,18 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 			{
 				if ("$do" == val->GetName()) { // chk?
 					wiz::load_data::UserType subGlobal;
-					wiz::load_data::LoadData::LoadDataFromString(val->ToString(), subGlobal);
+					wiz::load_data::LoadData::LoadDataFromString(val->GetUserTypeList(1)->ToString(), subGlobal);
+					wiz::load_data::UserType inputUT;
+					wiz::load_data::LoadData::LoadDataFromString(ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top()), inputUT);
 
-			
+
+					//ChkBool4(&inputUT, global, eventStack.top().parameters, eventStack.top());
+
+					wiz::load_data::LoadData::AddData(subGlobal, "/./", inputUT.ToString(), "TRUE");
+
+
 					eventStack.top().return_value = excute_module(&subGlobal); // return ?
-				
+
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -2387,6 +2406,15 @@ int main(int argc, char* argv[])
 		cout << "fileName is " << fileName << endl;
 		cout << "excute result is " << excute_module(&global) << endl;
 		//_getch(); // pause..
+	}
+	catch (const char* str) {
+		cout << str << endl;
+	}
+	catch (const string& str) {
+		cout << str << endl;
+	}
+	catch (const wiz::Error& e) {
+		cout << e << endl;
 	}
 	catch (...) {
 		cout << "Error.." << endl;
