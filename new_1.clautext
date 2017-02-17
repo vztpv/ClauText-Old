@@ -3,28 +3,42 @@ Main = {
 	$call = { id = 1 }
 }
 
-x = 1
-
+x = test
+x = { y z }
 Event = {
 	id = 1
 
 	
 	$do = { 
-		input = { x = { y = /./x } }
+		input = { x = /./x }
 		doing = {
 			Main = { $call = { id = 1 }  }  # find Main, $call <- using ToBool4?
 			Event = { 
 				id = 1
 				
 				$print = { str = { "Hello World! : " } }
-				$print = { str = { /./x/y } }
+				$print = { str = { /./x } }
 				$print = { str = { \n } }
 				
 				$return = { test }
 			}
 		}
 	}
+	$call = { id = 2 i = 0 }
 	
 	$_getch = { }
 }
 
+Event = {
+	id = 2
+	
+	$parameter = { i }
+	
+	$print = { str = {  $parameter.i } }
+	
+	$print = { value = { /./$."x" } } 
+	
+	$print = { str = { \n } }
+	
+	$print = { str = { $get = { $concat = { $ parameter.i } } } }
+}

@@ -2398,9 +2398,9 @@ int main(int argc, char* argv[])
 	{
 		fileName = string(argv[1]);
 	}
-
+	wiz::load_data::UserType global;
 	try {
-		wiz::load_data::UserType global;
+		
 		wiz::load_data::LoadData::LoadDataFromFile(fileName, global);
 
 		cout << "fileName is " << fileName << endl;
@@ -2420,6 +2420,6 @@ int main(int argc, char* argv[])
 		cout << "Error.." << endl;
 	}
 
-	return 0;
+   	return 0;
 }
 

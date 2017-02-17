@@ -1943,7 +1943,7 @@ namespace wiz {
 
 						if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
 						{
-							if (_val[0] == '@') { _val.erase(_val.begin()); }
+							if (_val[0] == '@') { _val.erase(_val.begin()); } // chk, same do(chk @) to other functions?
 							_val = wiz::String::replace(_val, "~~", _var);
 							_val = ToBool4(*ut, vector<pair<string, string>>(), _val, EventInfo());
 							
@@ -2769,7 +2769,7 @@ namespace wiz {
 			}
 
 			//
-			wiz::ArrayStack<string> operandStack; 
+			wiz::ArrayStack<string> operandStack;
 			wiz::ArrayStack<string> operatorStack; // 반대로 들어간다.
 			wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" });
 			vector<string> tokenVec;
@@ -2806,7 +2806,7 @@ namespace wiz {
 			// ex) A = { B = 1 $C = { 3 } } D = { E }
 			// =>  A = { B = 1 $C = 3  }  D = E
 			// =>  A = { B = 1 $C = { 3 } } D = E  : ToDo! 
-			
+
 			vector<string> strVec;
 			stack<int> chkBrace;
 
@@ -2852,10 +2852,14 @@ namespace wiz {
 				while (tokenizer.hasMoreTokens()) {
 					string temp = tokenizer.nextToken();
 
-					if (temp.size() >= 3 && String::startsWith(temp, "$.")) {
+					// chk!!
+					if (temp.size() >= 3 && String::startsWith(temp, "$.")) { // cf) @$. ?
 						result = result + temp + " ";
 					}
-					else if (temp.size() >= 8 && String::startsWith(temp, "$local.")) {
+					else if (temp.size() >= 12 && String::startsWith(temp, "$parameter.") || (temp.size()) >= 13 && String::startsWith(temp, "@$parameter.")) {
+						result = result + temp + " ";
+					}
+					else if (temp.size() >= 8 && String::startsWith(temp, "$local.") || (temp.size()>=9 && String::startsWith(temp, "@$local."))) {
 						result = result + temp + " ";
 					}
 					else if ((temp.size() >= 2 && temp[0] == '$') || (temp.size() >=3 && temp[0] == '@' && temp[1] == '$')) {
