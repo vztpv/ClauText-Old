@@ -2862,7 +2862,7 @@ namespace wiz {
 					else if (temp.size() >= 8 && String::startsWith(temp, "$local.") || (temp.size()>=9 && String::startsWith(temp, "@$local."))) {
 						result = result + temp + " ";
 					}
-					else if ((temp.size() >= 2 && temp[0] == '$') || (temp.size() >=3 && temp[0] == '@' && temp[1] == '$')) {
+					else if ((temp.size() >=3 && temp[0] == '@' && temp[1] == '$')) {
 						tokenizer.nextToken(); // = 
 						string temp2 = tokenizer.nextToken();
 						result = result + temp + " = { " + temp2 + " } ";
