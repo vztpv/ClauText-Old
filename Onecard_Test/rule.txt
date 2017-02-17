@@ -123,7 +123,7 @@ Event = {
 
 	$call = { id  = 1000 i = 0 }
 }
-	#Onecard main rule Event : CanPut?
+	#Onecard main rule Event : CanPut
 Event = {
 	id = 1005
 
@@ -340,7 +340,7 @@ Event = {
 	# card -> card_function_no ( access table )
 	$assign = { $local.card_function_no value = { $element = { /FunctionNo $parameter.card } } }
 
-	# function_dir <= Functions/i/ # can?? $get?
+	# function_dir <= Functions/i/ # can $get
 	$assign = { $local.function_dir value = { $concat = { /Functions $concat = { / $local.card_function_no } } } }
 
 	$print = { vallue = { $local.function_dir } }
@@ -350,19 +350,19 @@ Event = {
 			$call = { id = 1010 point = { $get = { $concat = { $local.function_dir $concat = { / attack_point } } } } }
 		}
 	}
-	#			   + change_sha = yes ? 
+	#			   + change_sha = yes  
 	$if = { $condition = { $EQ = { $get = { $concat = { $local.function_dir $concat = { / change_sha } } } yes } } 
 		$then = {
 			$call = { id = 1015 }
 		}
 	}
-	#			   + jump = yes?
+	#			   + jump = yes
  	$if = { $condition = { $EQ = { $get = { $concat = { $local.function_dir $concat = { / jump } } } yes } } 
 		$then = {
 			$call = { id = 1016 i = 0 }
 		}
 	}
-	#			   + back = yes?
+	#			   + back = yes
 	$if = { $condition = { $EQ = { $get = { $concat = { $local.function_dir $concat = { / back } } } yes } } 
 		$then = {
 			$call = { id = 1017 }
@@ -382,8 +382,8 @@ Event = {
 Event = {
 	id = 1015
 
-	# person? - $input = { } # todo!
-	# computer? - random!
+	# person - $input = { } # todo!
+	# computer - random!
 	$if = { $condition = { $EQ = { /Turn/now /State/person_stream } } # start at 1
 		$then = {
 			# todo - person play!
@@ -431,7 +431,7 @@ Event = {
 
 # AttackPoint
 AttackPoint = { total_point = 0 now_point = 0 }
-	# point incerase - id 1010?
+	# point incerase - id 1010
 Event = {
 	id = 1010
 
@@ -441,7 +441,7 @@ Event = {
 	$assign = { /AttackPoint/total_point value = { $add = { /AttackPoint/total_point $parameter.point } } }
 	$assign = { /State/mode value = { /Mode/ATTACK_MODE } }
 }
-	# point reset - id 1011?
+	# point reset - id 1011
 Event = {
 	id = 1011
 

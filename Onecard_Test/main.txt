@@ -10,21 +10,21 @@ Main =
 }
 
 
-# Total?
+# Total
 Event =
 {
 	id = 0
 	$local = { result }
 	#Action
 
-	$load = { "Onecard_Test/global.txt" 
-			  "Onecard_Test/card.txt" 
-	          "Onecard_Test/cardList.txt" 
-	          "Onecard_Test/init.txt" 
-	          "Onecard_Test/print.txt"
-	          "Onecard_Test/putcard.txt" 
-			  "Onecard_Test/turn.txt" 
-			  "Onecard_Test/rule.txt" }
+	$load = { "global.txt" 
+			  "card.txt" 
+	          "cardList.txt" 
+	          "init.txt" 
+	          "print.txt"
+	          "putcard.txt" 
+			  "turn.txt" 
+			  "rule.txt" }
 	 
 
 	$if = { $condition = { FALSE }
@@ -57,10 +57,11 @@ Event =
 			$call = { id = 3001 }
 			$call = { id = 3003 }
 			$call = { id = 1007 }
-			#// main call?
+			#// main call
 			$call = { id = 4001 }
 		}
 	}
+	$_getch = { }
 }
 
 Event = {
@@ -83,7 +84,7 @@ Event = {
 	$local = { card idx }
 
 		#$clear_screen = { } # system( "cls" ); # in windows.
-	$clear_screen = { }
+	#$clear_screen = { }
 		# print turn
 	$print = { value = { /Turn/now } }
 	$print = { value = { \n } }
@@ -95,16 +96,16 @@ Event = {
 		# print putCard
 	$call = { id = 52 card = /PutCard/cardId }
 	$print = { value = { \n } }
-		# print ?.
-			#$print = { value = { "? : " } }
+		# print .
+			#$print = { value = { " : " } }
 			# input = 먹는다. 0, 그외 1~n
-			# input = $getch = { } # ?
-		# Card Put or Eat # <- state/action_state == PUT or EAT?
+			# input = $getch = { } # 
+		# Card Put or Eat # <- state/action_state == PUT or EAT
 	$if = { # computer
 		$condition = { $NOTEQ = { /Turn/now /State/person_stream } }
 		$then = {
 			$assign = { /State/action_state  value = { EAT } }
-			$call = { id = 4010 i = 0 n = 20 } # replace??
+			$call = { id = 4010 i = 0 n = 20 } # replace
 			#$print = { value = { $local.card } }
 
 			$if = { 
@@ -125,7 +126,7 @@ Event = {
 
 	$print = { value = { /State/action_state } }
 	$if = {
-		$condition = { $EQ = { /State/action_state PUT } } # action_state initial event??
+		$condition = { $EQ = { /State/action_state PUT } } # action_state initial event
 		$then = {
 			$assign = { /State/action_state value = { -1 } }
 			
@@ -133,7 +134,7 @@ Event = {
 			$if = {
 				$condition = { $EQ = { FALSE $return_value = { } } }
 				$then =  {
-					// for person!
+					# for person!
 					$return = { /State/mode }
 				}
 			}
@@ -171,6 +172,8 @@ Event = {
 			$if = {
 				$condition = { $EQ = { 0 $size = { $concat = { /PlayerCardList $concat = { / $add = { -1 /Turn/now } } } } } }
 				$then = {
+					# print player`s cards - $parameter = { id i n }  # n==i
+					$call = { id = 50 i = 0 }
 					$assign = { /State/mode value = { /Mode/GAME_END_MODE } }
 					$return = { /State/mode }
 				}
@@ -217,6 +220,7 @@ Event = {
 					$if = {
 						$condition = { $EQ = { /Temp/count 2 } }
 						$then = { 
+							$print = {  data = { "game end just one" } }
 							$assign = { /State/mode value = { /Mode/GAME_END_MODE } }
 							$return = { /State/mode }
 						}
@@ -239,15 +243,15 @@ Event = {
 			}
 		}
 	}
-		# print some string?
-		# $getch() = { } # ?
-	$_getch = { }
+		# print some string
+		# $getch() = { } # 
+	#$_getch = { }
 		# Next Turn...
 	$call = { id = 1016 i = 0 }
 	$return = { /State/mode }
 }
 
-Temp = # ???
+Temp = # 
 {
 	count = 0
 }
@@ -347,24 +351,25 @@ Event =
 	}
 	
 	$if = {
-		$condition = { $NOTEQ = { $local.select $rand = { 1 3 } } } // fail 
+		$condition = { $NOTEQ = { $local.select $rand = { 1 3 } } } # fail 
 		$then = { 
 			$call = { id = 4013 i= 0 n = /Info/ONE_CARD_FAIL_CARD_NUM }
-			# chk error?? - todo.. 
+			# chk error - todo..  - removal??
 
 			
-			# 1명만 살아 남은 경우
-			$assign = { /Temp/count value = { 0 } }
-			$call = { id = 4014 i = 0 n = /Info/PLAYER_NUM }
-
-			$if = {
-				$condition = { $EQ = { /Temp/count 2 } }
-				$then = { 
-					$assign = { /State/mode value = { /Mode/GAME_END_MODE } }
-					$return = { /State/mode }
-				}
-			}
-			$assign = { /Temp/count value = { 0 } }
+			## 1명만 살아 남은 경우
+		#$assign = { /Temp/count value = { 0 } }
+		#	$call = { id = 4014 i = 0 n = /Info/PLAYER_NUM }
+#
+#			$if = {
+#				$condition = { $EQ = { /Temp/count 2 } }
+#				$then = { 
+#					$print = { data = { "error chk.." } }
+#					$assign = { /State/mode value = { /Mode/GAME_END_MODE } }
+#					$return = { /State/mode }
+#				}
+#			}
+#			$assign = { /Temp/count value = { 0 } }
 		}
 	}
 	$else = { # oneca success
@@ -372,7 +377,7 @@ Event =
 			# end of change sha
 			$if = {
 				$condition = { $EQ = { /State/mode /Mode/CHANGE_SHA_MODE } }
-				$then = {
+				$then = {                 
 					$assign = { /State/mode value = { /Mode/GENERAL_MODE } }
 				}
 			}

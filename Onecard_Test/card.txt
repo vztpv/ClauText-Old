@@ -11,7 +11,7 @@ Event = { # just one!
 					$then = { $make = { /Card } }
 				}
 				$make = { /Card/$parameter.i }
-				$insert2 = { dir = { /Card/$parameter.i } value = { sha = { $divide ={$parameter.i 13} } num = { $modular={$parameter.i 13} } # no ???
+				$insert2 = { dir = { /Card/$parameter.i } value = { sha = { $divide ={$parameter.i 13} } num = { $modular={$parameter.i 13} } # no 
 					isBlackJoker = no isColorJoker = no } }
 				$call = { id = 101 i = { $add = { $parameter.i 1  } } }
 		}
@@ -19,7 +19,7 @@ Event = { # just one!
 }
 Event = { # just one!
 	id = 3
-	$call = { id = 101 i = 0 } # using stack? + 몇번쨰까�??�는가?
+	$call = { id = 101 i = 0 } # using stack + 몇번쨰까찈는가
 	# insert two joker
 	$make = { $concat = { /Card $concat = { / /Info/CARDNUM } } }
 	$make = { $concat = { /Card $concat = { / $add = { /Info/CARDNUM 1 } } } } 
@@ -56,7 +56,7 @@ CardStringImage =
 }
 Event = 
 {
-	// $name?
+	// $name
 	id = 100
 
 	$parameter = { sha num isBlackJoker isColorJoker }
