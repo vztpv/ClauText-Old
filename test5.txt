@@ -1,6 +1,8 @@
 
+
 Main =
 {
+
 	$call = { id = 0 }
 }
 
@@ -8,7 +10,7 @@ Event =
 {
 	id = 0
 
-	$call ={ id = 1 i = 1 n = 1}
+	$call ={ id = { $add = { 0 1 } } i = 1 n = 1}
 
 	$return = { $return_value = { } }
 }
@@ -17,10 +19,10 @@ Event =
 {
 	id = 1
 	$parameter = { i n }
-	
+
 	$option = { REMOVE_IF_CALL_ANY_EVENT }
 
-	$if = { $condition = { $COMP<EQ = { $parameter.i /input/n } } # /$input/n ??
+	$if = { $condition = { $COMP<EQ = { $parameter.i /./input } }
 		$then = {
 			$print = { value = { $parameter.n } }
 			$print = { value = { \n } }

@@ -1,4 +1,7 @@
 
+
+// change to char chk. (from addspace, chk #, chk " ") - 2016.02.17 
+
 #ifndef LOAD_DATA_UTILITY_H
 #define LOAD_DATA_UTILITY_H
 
@@ -11,7 +14,6 @@
 using namespace std;
 
 #include <wiz/cpp_string.h>
-//#include <wiz/load_data_types.h> /// 
 
 namespace wiz {
 	namespace load_data {
@@ -531,104 +533,7 @@ namespace wiz {
 				}
 			}
 
-			/// todo bool ,more stable!!
-			static void AddSpace(const string& file1Name, const string& file2Name) {
-				ifstream inFile;
-				ofstream outFile;
-
-				inFile.open(file1Name);
-				outFile.open(file2Name);
-
-				string temp;
-				vector<string> strVec;
-
-				while (getline(inFile, temp))
-				{
-					if (temp.empty() || temp == " ") { continue; }
-
-					for (int j = 0; j < temp.size(); ++j)
-					{
-						if (temp[j] == '{') {
-							outFile << " {\n";
-						}
-						else if (temp[j] == '}') {
-							outFile << " }\n";
-						}
-						else if (temp[j] == '=') {
-							outFile << " = ";
-						}
-						else
-						{
-							outFile << temp[j];
-						}
-					}
-					outFile << " ";
-					outFile << "\n";
-				}
-
-				inFile.close();
-				outFile.close();
-			}
-			static bool PassSharp(const string& file1Name, const string& file2Name)
-			{
-				ifstream inFile;
-				ofstream outFile;
-
-				inFile.open(file1Name);
-				if (inFile.fail()) { return false; }
-				outFile.open(file2Name);
-				if (outFile.fail()) { inFile.close(); return false; }
-
-				string temp;
-
-				while (getline(inFile, temp))
-				{
-					StringTokenizer tokenizer(temp, "#");
-
-					if (tokenizer.countTokens() == 1 && tokenizer.isFindExist())
-					{
-						//
-					}
-					else if (tokenizer.countTokens() >= 1)
-					{
-						temp = tokenizer.nextToken();
-						if (false == temp.empty())
-						{
-							outFile << temp << "\n";
-						}
-					}
-				}
-
-				inFile.close();
-				outFile.close();
-				return true;
-			}
-
-			static pair< bool, bool > PassSharp(ifstream& inFile, ArrayQueue<string>& strVec)
-			{
-				string temp;
-				bool chk = (bool)getline(inFile, temp);
-				if (chk) {
-					StringTokenizer tokenizer(temp, "#");
-
-					if (tokenizer.countTokens() == 1 && tokenizer.isFindExist())
-					{
-						//
-					}
-					else if (tokenizer.countTokens() >= 1)
-					{
-						temp = tokenizer.nextToken();
-						if (false == temp.empty())
-						{
-							strVec.push(temp);
-							return{ true, true };
-						}
-					}
-				}
-				return{ chk, false };
-			}
 		private:
-			// DoThread2 -> DoThread1
 			class DoThread // need to rename!
 			{
 			private:
@@ -644,16 +549,100 @@ namespace wiz {
 					//
 				}
 				void operator() (const tbb::blocked_range<size_t>& r) {
-					vector<string>* strVecTemp = strVec;
+					vector<string>* strVecTemp = strVec; // enterkey 기준으로 나뉘어져있다고 가정한다.
 
 					for (size_t x = r.begin(); x != r.end(); ++x)
 					{
-						StringTokenizer tokenizer(std::move( (*strVecTemp)[x] ) );
-						while (tokenizer.hasMoreTokens()) {
-							aq.push(tokenizer.nextToken());
+						//StringTokenizer tokenizer(std::move( (*strVecTemp)[x] ) );
+						//while (tokenizer.hasMoreTokens()) {
+						//	aq.push(tokenizer.nextToken());
+						//}
+						string statement = (*strVecTemp)[x];
+						int token_first = 0, token_last = 0; // idx of token in statement.
+						int state = 0;
+
+						for (int i = 0; i < statement.size(); ++i) {
+							if (0 == state && '\"' == statement[i]) {
+								token_last = i - 1;
+								if (token_last >= 0 && token_last - token_first + 1 > 0) {
+									string temp = statement.substr(token_first, token_last - token_first + 1);
+									if (!temp.empty()) {
+										aq.push(move(temp));
+									}
+								}
+								state = 1;
+							}
+							else if (1 == state && '\"' == statement[i]) {
+								state = 0; token_last = i;
+								
+								aq.push(statement.substr(token_first, token_last - token_first + 1));
+								token_first = i + 1;
+							}
+
+							if (0 == state && '=' == statement[i]) {
+								token_last = i - 1;
+								if (token_last >= 0 && token_last - token_first + 1 > 0) {
+									string temp = statement.substr(token_first, token_last - token_first + 1);
+									if (!temp.empty()) {
+										aq.push(move(temp));
+									}
+								}
+								aq.push("=");
+								token_first = i + 1;
+							}
+							else if (0 == state && isWhitespace(statement[i])) { // isspace ' ' \t \r \n , etc... ?
+								token_last = i - 1;
+								if (token_last >= 0 && token_last - token_first + 1 > 0) {
+									string temp = statement.substr(token_first, token_last - token_first + 1);
+									if (!temp.empty()) {
+										aq.push(move(temp));
+									}
+								}
+								token_first = i + 1;
+							}
+							else if (0 == state && '{' == statement[i]) {
+								token_last = i - 1;
+								if (token_last >= 0 && token_last - token_first + 1 > 0) {
+									string temp = statement.substr(token_first, token_last - token_first + 1);
+									if (!temp.empty()) {
+										aq.push(move(temp));
+									}
+								}
+								aq.push("{");
+								token_first = i + 1;
+							}
+							else if (0 == state && '}' == statement[i]) {
+								token_last = i - 1;
+								if (token_last >= 0 && token_last - token_first + 1 > 0) {
+									string temp = statement.substr(token_first, token_last - token_first + 1);
+									if (!temp.empty()) {
+										aq.push(move(temp));
+									}
+								}
+								aq.push("}");
+								token_first = i + 1;
+							}
+
+							if (0 == state && '#' == statement[i]) {
+								token_last = i - 1;
+								if (token_last >= 0 && token_last - token_first + 1 > 0) {
+									aq.push(statement.substr(token_first, token_last - token_first + 1));
+								}
+								token_first = statement.size();
+								break;
+							}
+						}
+
+						if (token_first < statement.size())
+						{
+							string temp = statement.substr(token_first);
+							if (!temp.empty()) {
+								aq.push(move(temp));
+							}
 						}
 					}
 				}
+
 				DoThread(DoThread& other, tbb::split) : strVec(other.strVec) // , aq(other.aq)
 				{
 					//
@@ -663,94 +652,6 @@ namespace wiz {
 					aq.push(std::move(other.aq));
 				}
 			};
-
-			class DoThread2 // need to rename!
-			{
-			private:
-				vector<string>* strVec;
-				//int strVecStart;
-				//int strVecEnd;
-			public:
-				DoThread2(vector<string>* strVec) //, int strVecStart, int strVecEnd)
-					: strVec(strVec) // , strVecStart(strVecStart), strVecEnd(strVecEnd)
-				{
-				}
-				void operator() (const tbb::blocked_range<size_t>& r) const {
-
-					for (auto x = r.begin(); x != r.end(); ++x)
-					{
-						string temp = std::move((*strVec)[x]);
-						string temp2;
-						bool chkStr = ChkExist(temp);
-						if (chkStr) {
-							ChangeStr(temp, { "^" }, { "^0" }, temp2); // 1줄에 "~~~" ?	
-							ChangeStr(temp2, { "#" }, { "^5" }, temp);
-						}
-
-						PassSharp(temp, temp2);
-						AddSpace(temp2, temp);
-
-						if (chkStr) {
-							ChangeStr(temp, { " ", "\t", "\r", "\n" }, { "^1", "^2", "^3", "^4" }, temp2);
-							//(*strVec)[i] = ChangeStr((*strVec)[i], "\t", "^2");
-							//(*strVec)[i] = ChangeStr((*strVec)[i], "\r", "^3");
-							//(*strVec)[i] = ChangeStr((*strVec)[i], "\n", "^4");
-							temp = std::move(temp2);
-						}
-
-						(*strVec)[x] = std::move(temp);
-						
-					}
-				}
-			};
-		private:
-			static string RemoveEndSpace(const string& str)
-			{
-				string temp;
-				int state = 0;
-
-				for (int i = str.size() - 1; i >= 0; --i) {
-					if (state == 0 && wiz::isWhitespace(str[i]))
-					{
-						continue;
-					}
-					else {
-						state = 1;
-					}
-
-					temp.push_back(str[i]);
-				}
-				// reverse..
-				string retVal;
-				for (int i = temp.size() - 1; i >= 0; --i) {
-					retVal.push_back(temp[i]);
-				}
-				return retVal;
-			}
-		public:
-			static bool ChkExist(const string& str) /// has bug?, unstatble?
-			{
-				int state = -1;
-
-				for (string::size_type i = 0; i < str.size(); ++i)
-				{
-					if (0 >= state && i == 0 && '\"' == str[i]) {
-						state = 1;
-					}
-					else if (0 >= state && i > 0 && '\"' == str[i] && '\\' != str[i - 1])
-					{
-						state = 1;
-					}
-					else if (1 == state && i > 0 && '\\' != str[i - 1] && '\"' == str[i]) {
-						state = 0;
-					}
-					else if (0 >= state && str[i] == '#') {
-						break;
-					}
-				}
-
-				return 0 == state; // exist and valid !! chk - todo!
-			}
 		public:
 			static pair<bool, int> Reserve2(ifstream& inFile, ArrayQueue<string>& aq, const int num = 1)
 			{
@@ -765,54 +666,11 @@ namespace wiz {
 					count++;
 				}
 
-				tbb::parallel_for(tbb::blocked_range<size_t>(0, count), DoThread2(&strVecTemp));
 				
-				/*
-				if (count >= 100) { // 4 ?
-					DoThread2 dtA(&strVecTemp, 0, count / 4 - 1),
-						dtB(&strVecTemp, count / 4, (count / 4) * 2 - 1),
-						dtC(&strVecTemp, (count / 4) * 2, (count / 4) * 3 - 1),
-						dtD(&strVecTemp, (count / 4) * 3, count - 1);
-					std::thread _threadA(dtA), _threadB(dtB), _threadC(dtC), _threadD(dtD);
-
-					_threadA.join();
-					_threadB.join();
-					_threadC.join();
-					_threadD.join();
-				}
-				else if (count > 0) {
-					DoThread2 dtA(&strVecTemp, 0, count - 1);
-					dtA();
-				}
-				*/
 				DoThread doThread(&strVecTemp);
 
 				tbb::parallel_reduce(tbb::blocked_range<size_t>(0, count), doThread);
 				aq.push(std::move(doThread.aq));
-				
-				/*
-				if (count >= 100) { // 4 ?
-					DoThread dtA(&strVecTemp, &arrayQueue[0], 0, count / 4 - 1),
-						dtB(&strVecTemp, &arrayQueue[1], count / 4, (count / 4) * 2 - 1),
-						dtC(&strVecTemp, &arrayQueue[2], (count / 4) * 2, (count / 4) * 3 - 1),
-						dtD(&strVecTemp, &arrayQueue[3], (count / 4) * 3, count - 1);
-					std::thread _threadA(dtA), _threadB(dtB), _threadC(dtC), _threadD(dtD);
-
-					_threadA.join();
-					_threadB.join();
-					_threadC.join();
-					_threadD.join();
-
-					for (int i = 0; i < 4; ++i)
-					{
-						aq.push(arrayQueue[i]);
-					}
-				}
-				else if (count > 0) {
-					DoThread dtA(&strVecTemp, &aq, 0, count - 1);
-					dtA();
-				}
-				*/
 				
 
 				return{ count > 0, count };
@@ -835,9 +693,9 @@ namespace wiz {
 			{
 				return strVec[0];
 			}
-			static string Pop(ArrayQueue<string>& strVec)
+			static void Pop(ArrayQueue<string>& strVec, string* str = nullptr)
 			{
-				return strVec.pop();
+				strVec.pop(str);
 			}
 			static int GetIndex(const ArrayQueue<string>& strVec, const string& str)
 			{
@@ -873,36 +731,32 @@ namespace wiz {
 				}
 				return{ true, strVec[idx] };
 			}
-			/// must strVec[start] == up or down
-			/// now not use!!
-			static pair<bool, int> IsMatched(const ArrayQueue<string>& strVec, const string& up, const string& down, const int start = 0, const int start_num = 0, int* pidx = nullptr, int*pnum = nullptr)
+		public:
+			//
+			static bool ChkExist(const string& str) /// has bug?, unstatble?
 			{
-				int num = start_num;
-				int count = 0;
-				int state = 0;
-				int idx = -1;
+				int state = -1;
 
-				for (int i = start; i < strVec.size(); ++i) {
-					if (strVec[i] == up) { state = 1; num++; }
-					else if (strVec[i] == down) { state = 1;  num--; }
-					if (state == 1 && num == 0)
-					{
-						if (pidx) { *pidx = i; }
-						if (pnum) { *pnum = num; }
-						return{ true, count };
+				for (string::size_type i = 0; i < str.size(); ++i)
+				{
+					if (0 >= state && i == 0 && '\"' == str[i]) {
+						state = 1;
 					}
-					count++;
-					idx = i;
+					else if (0 >= state && i > 0 && '\"' == str[i] && '\\' != str[i - 1])
+					{
+						state = 1;
+					}
+					else if (1 == state && i > 0 && '\\' != str[i - 1] && '\"' == str[i]) {
+						state = 0;
+					}
+					else if (0 >= state && str[i] == '#') {
+						break;
+					}
 				}
-				if (pidx) { *pidx = idx; }
-				if (pnum) { *pnum = num; }
-				return{ false, -1 };
+
+				return 0 == state; // exist and valid !! chk - todo!
 			}
 
-
-		public:
-
-			// To Do
 			// AddSpace : return string
 			static void AddSpace(const string& str, string& temp)
 			{
@@ -973,7 +827,7 @@ namespace wiz {
 						state = 1;
 						temp.push_back(str[i]);
 					}
-					else if (0 == state && i > 0 && '\"' == str[i] && '\\' != str[i-1])
+					else if (0 == state && i > 0 && '\"' == str[i] && '\\' != str[i - 1])
 					{
 						state = 1;
 						temp.push_back(str[i]);
@@ -981,21 +835,20 @@ namespace wiz {
 					else if (1 == state  && _ChangeStr(str, changed_str, result_str, i, state, temp)) {
 						//
 					}
-					else if ((1 == state && i > 0 && '\\' != str[i-1] && '\"' == str[i])) {
+					else if ((1 == state && i > 0 && '\\' != str[i - 1] && '\"' == str[i])) {
 						state = 0;
 						temp.push_back('\"');
 					}
-					else 
+					else
 					{
 						temp.push_back(str[i]);
 					}
 				}
-				
+
 				//return temp;
 			}
 
 		};
-
 	}
 }
 

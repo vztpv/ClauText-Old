@@ -712,7 +712,7 @@ namespace wiz {
 
 			vector<ItemType<string>> GetItem(const string& name) const {
 				vector<ItemType<string>> temp;
-
+			
 				for (int i = 0; i < itemList.size(); ++i) {
 					if (itemList[i].GetName() == name) {
 						temp.push_back(itemList[i]);
@@ -1019,7 +1019,6 @@ namespace wiz {
 				}
 				return temp;
 			}
-
 		private:
 			class DoThread // need to rename!
 			{
@@ -1037,128 +1036,15 @@ namespace wiz {
 				void operator() (const tbb::blocked_range<size_t>& r) const {
 					//for (int i = utVecStart; i <= utVecEnd; ++i)
 					vector<UserType*>* temp = utVec;
-					
+
 					for (size_t i = r.begin(); i != r.end(); ++i)
 					{
 						ReplaceAll((*temp)[i], target_ch, result_ch);
 					}
 				}
 			};
-			class DoThread2 // need to rename!
-			{
-			private:
-				vector<UserType*>* utVec;
-				int utVecStart;
-				int utVecEnd;
-				bool val;
-			public:
-				DoThread2(vector<UserType*>* utVec, bool val, int utVecStart, int utVecEnd)
-					: utVec(utVec), val(val), utVecStart(utVecStart), utVecEnd(utVecEnd)
-				{
-				}
-				void operator() () {
-					for (int i = utVecStart; i <= utVecEnd; ++i)
-					{
-						AllReserved((*utVec)[i], val);
-					}
-				}
-			};
-			class DoThread3 // need to rename!
-			{
-			private:
-				vector<UserType*>* utVec;
-				int utVecStart;
-				int utVecEnd;
-				int* arr;
-				int idx;
-			public:
-				DoThread3(vector<UserType*>* utVec, int utVecStart, int utVecEnd, int* arr, int idx)
-					: utVec(utVec), utVecStart(utVecStart), utVecEnd(utVecEnd), arr(arr), idx(idx)
-				{
-				}
-				void operator() () {
-					bool chk = false;
-					for (int i = utVecStart; i <= utVecEnd; ++i)
-					{
-						chk = chk || ReservedA((*utVec)[i]);
-						if (chk) { break; }
-					}
-					arr[idx] = chk; 
-				}
-			};
 		public:
-			static bool ReservedA(UserType* ut) // removal?
-			{
-				const int itemListSize = ut->GetItemListSize();
-				const int userTypeListSize = ut->GetUserTypeListSize();
-				
-				bool chk = false;
-
-				for (int i = 0; i < itemListSize; ++i) {
-					ItemType<std::string>& itemList = ut->GetItemList(i);
-
-					for (int j = 0; j < itemList.size(); ++j) {
-						chk = chk || Utility::ChkExist(itemList.Get(j));
-						if( chk ) { break; }
-					}
-				}
-
-				if (false == chk && userTypeListSize > 100) { ///  chk 20, ... ?
-					const int count = userTypeListSize;
-					int arr[4] = { 0, 0, 0, 0 };
-					DoThread3 dtA(&(ut->userTypeList), 0, count / 4 - 1, arr, 0),
-						dtB(&(ut->userTypeList), count / 4, (count / 4) * 2 - 1, arr, 1),
-						dtC(&(ut->userTypeList), (count / 4) * 2, (count / 4) * 3 - 1, arr, 2),
-						dtD(&(ut->userTypeList), (count / 4) * 3, count - 1, arr, 3);
-					std::thread _threadA(dtA), _threadB(dtB), _threadC(dtC), _threadD(dtD);
-
-					_threadA.join();
-					_threadB.join();
-					_threadC.join();
-					_threadD.join();
-
-					for (int i=0; i < 4; ++i) {
-						chk = chk || arr[i];
-						if( chk ) { break; }
-					}
-				}
-				else if (false == chk) {
-					for (int i = 0; i < userTypeListSize; ++i) {
-						chk = chk || ReservedA(ut->GetUserTypeList(i));
-						if (chk) {
-							break;
-						}
-					}
-				}
-
-				ut->reservedA = !chk;
-				return chk;
-			}
-
-			static void AllReserved(UserType* ut, const bool val) {
-				const int userTypeListSize = ut->GetUserTypeListSize();
-				
-				ut->reservedA = val;
-
-				if (userTypeListSize > 100) { ///  chk 20, ... ?
-					const int count = userTypeListSize;
-					DoThread2 dtA(&(ut->userTypeList), val, 0, count / 4 - 1),
-						dtB(&(ut->userTypeList), val, count / 4, (count / 4) * 2 - 1),
-						dtC(&(ut->userTypeList), val, (count / 4) * 2, (count / 4) * 3 - 1),
-						dtD(&(ut->userTypeList), val, (count / 4) * 3, count - 1);
-					std::thread _threadA(dtA), _threadB(dtB), _threadC(dtC), _threadD(dtD);
-
-					_threadA.join();
-					_threadB.join();
-					_threadC.join();
-					_threadD.join();
-				}
-				else {
-					for (int i = 0; i < userTypeListSize; ++i) {
-						AllReserved(ut->GetUserTypeList(i), val);
-					}
-				}
-			}
+			//
 			// replace all and changeStr ( "~" )
 			static void ReplaceAll(UserType* temp, const vector<string>& target_ch, const vector<string>& result_ch) {
 				const int itemListSize = temp->GetItemListSize();
@@ -1175,47 +1061,6 @@ namespace wiz {
 				}
 
 				tbb::parallel_for(tbb::blocked_range<size_t>(0, userTypeListSize), DoThread(&(temp->userTypeList), target_ch, result_ch));
-
-				/* if (userTypeListSize > 100) { ///  chk 20, ... ?
-					const int count = userTypeListSize;
-					DoThread dtA(&(temp->userTypeList), target_ch, result_ch, 0, count / 4 - 1),
-						dtB(&(temp->userTypeList), target_ch, result_ch, count / 4, (count / 4) * 2 - 1),
-						dtC(&(temp->userTypeList), target_ch, result_ch, (count / 4) * 2, (count / 4) * 3 - 1),
-						dtD(&(temp->userTypeList), target_ch, result_ch, (count / 4) * 3, count - 1);
-					std::thread _threadA(dtA), _threadB(dtB), _threadC(dtC), _threadD(dtD);
-
-					_threadA.join();
-					_threadB.join();
-					_threadC.join();
-					_threadD.join();
-				}
-				else {
-					for (int i = 0; i < userTypeListSize; ++i) {
-						//if (false == temp->GetUserTypeList(i)->reservedA) {
-							ReplaceAll(temp->GetUserTypeList(i), target_ch, result_ch);
-						//}
-					}
-				} */
-			}
-		public:
-			/// move to UserType
-			static bool ChkData(const UserType* utTemp)
-			{
-				bool chk = true;
-				const int itemListSize = utTemp->GetItemListSize();
-				for (int i = 0; i < itemListSize; ++i) {
-					if (utTemp->GetItemList(i).GetName() != ""
-						&& utTemp->GetItemList(i).size() > 1) {
-						//cout << utTemp->GetItemList(i).GetName() << endl;
-						return false;
-					}
-				}
-				const int UserTypeSize = utTemp->GetUserTypeListSize();
-				for (int i = 0; i < UserTypeSize; ++i) {
-					chk = chk && ChkData(utTemp->GetUserTypeList(i));
-				}
-
-				return chk;
 			}
 			// find userType! not itemList!,// this has bug
 			static std::pair<bool, vector< UserType*> > Find(UserType* global, const string& _position) /// option, option_offset

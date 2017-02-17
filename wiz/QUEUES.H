@@ -312,20 +312,20 @@ public:
 		num++;
 	}
 	
+	void pop(T* t = nullptr) {
+		if (isEmpty()) { throw QueueEmptyError(); }
 
-    T pop()
-    {
-        if( isEmpty() ) { throw QueueEmptyError(); }
+		T temp = std::move(que[start]);
 
-        T temp = std::move(que[start]);
+		//que[start] = T();
 
-        //que[start] = T();
+		start = (start + 1) & (que.size() - 1); // % que.size(), 2^n.
+		num--;
 
-        start = ( start + 1 ) & (que.size()-1); // % que.size(), 2^n.
-        num--;
-
-        return temp;
-    }
+		if (nullptr != t) {
+			*t = move(temp);
+		}
+	}
 
 	T pop_back()
 	{

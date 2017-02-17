@@ -133,6 +133,11 @@ namespace wiz {
 
 		class LoadData
 		{
+		private:
+			static bool isState0(const int state_reserve)
+			{
+				return 1 == state_reserve;
+			}
 			/// core
 		public:
 			template <class Reserver>
@@ -140,8 +145,7 @@ namespace wiz {
 			{
 				int state = 0;
 				int braceNum = 0;
-				stack<int> state_reserve;
-				stack<int> do_reserve;
+				long long state_reserve=0;
 				vector< UserType* > nestedUT(1);
 				string var1, var2, val;
 
@@ -163,30 +167,30 @@ namespace wiz {
 					}
 				}
 
+				
 				while (false == strVec.empty()) {
 					switch (state)
 					{
 					case 0:
 						if (LEFT == Utility::Top(strVec)) {
-							//Utility::Pop(strVec);
 							state = 2;
 						}
 						else {
 							pair<bool, string> bsPair = Utility::LookUp(strVec, 1);
 							if (bsPair.first) {
 								if (EQ == bsPair.second) {
-									var2 = Utility::Pop(strVec);
+									Utility::Pop(strVec, &var2);
 									Utility::Pop(strVec);
 									state = 2;
 								}
 								else {
-									var1 = Utility::Pop(strVec);
+									Utility::Pop(strVec, &var1);
 									nestedUT[braceNum]->AddItem("", move(var1));
 									state = 0;
 								}
 							}
 							else {
-								var1 = Utility::Pop(strVec);
+								Utility::Pop(strVec, &var1);
 								nestedUT[braceNum]->AddItem("", move(var1));
 								state = 0;
 							}
@@ -223,7 +227,7 @@ namespace wiz {
 							state = 3;
 						}
 						else {
-							val = Utility::Pop(strVec);
+							Utility::Pop(strVec, &val);
 
 							nestedUT[braceNum]->AddItem(move(var2), move(val));
 							var2 = "";
@@ -242,23 +246,9 @@ namespace wiz {
 							state = 0;
 						}
 						else {
-							/*
-							pair<bool, int> biPair = IsMatched(strVec, "{", "}", 0, 1);
-							if (false == biPair.first) {
-							bool biPair2 = vecReserver(strVec);
-
-							while (!biPair.first && biPair2)
-							{
-							biPair2 = vecReserver(strVec);
-							biPair = IsMatched(strVec, "{", "}", 0, 1);
-							}
-							}
-							if (biPair.first)
-							*/
 							{
 								/// uisng struct
-								state_reserve.push(0);
-								do_reserve.push(RIGHT_DO);
+								state_reserve++;
 								state = 4;
 							}
 							//else
@@ -292,11 +282,9 @@ namespace wiz {
 						}
 						else if (RIGHT == Utility::Top(strVec)) {
 							Utility::Pop(strVec);
-							state = state_reserve.top();
-							state_reserve.pop();
-							const int do_id = do_reserve.top();
-							do_reserve.pop();
-							//if (do_id == RIGHT_DO)
+							state = isState0(state_reserve) ? 0 : 4;
+							state_reserve--;
+
 							{
 								nestedUT[braceNum] = nullptr;
 								braceNum--;
@@ -307,13 +295,13 @@ namespace wiz {
 							if (bsPair.first) {
 								if (EQ == bsPair.second) {
 									// var2
-									var2 = Utility::Pop(strVec);
+									Utility::Pop(strVec, &var2);
 									Utility::Pop(strVec); // pass EQ
 									state = 6;
 								}
 								else {
 									// var1
-									var1 = Utility::Pop(strVec);
+									Utility::Pop(strVec, &var1);
 									nestedUT[braceNum]->AddItem("", move(var1));
 									var1 = "";
 
@@ -323,7 +311,7 @@ namespace wiz {
 							else
 							{
 								// var1
-								var1 = Utility::Pop(strVec);
+								Utility::Pop(strVec, &var1);
 								nestedUT[braceNum]->AddItem("", move(var1));
 								var1 = "";
 
@@ -347,26 +335,10 @@ namespace wiz {
 							int idx = -1;
 							int num = -1;
 
-							/*(pair<bool, int> biPair = IsMatched(strVec, "{", "}", 0, 1, &idx, &num);
-							if (false == biPair.first) {
-							bool biPair2 = vecReserver(strVec);
-
-							while (!biPair.first && biPair2)
-							{
-							biPair2 = vecReserver(strVec);
-
-							biPair = IsMatched(strVec, "{", "}", idx + 1, num, &idx, &num);
-							}
-							}
-							if (biPair.first)
-							*/
+							
 							{
 								/// uisng struct
-								state_reserve.push(4);
-
-								{
-									do_reserve.push(RIGHT_DO);
-								}
+								state_reserve++;
 								state = 4;
 							}
 							//else
@@ -398,7 +370,7 @@ namespace wiz {
 							state = 7;
 						}
 						else {
-							val = Utility::Pop(strVec);
+							Utility::Pop(strVec, &val);
 
 							nestedUT[braceNum]->AddItem(move(var2), move(val));
 							var2 = ""; val = "";
@@ -410,11 +382,9 @@ namespace wiz {
 								Utility::Pop(strVec);
 
 								{
-									state = state_reserve.top();
-									state_reserve.pop();
-									const int do_id = do_reserve.top();
-									do_reserve.pop();
-									//if (do_id == RIGHT_DO)
+									state = isState0(state_reserve)? 0 : 4;
+									state_reserve--;
+
 									{
 										nestedUT[braceNum] = nullptr;
 										braceNum--;
@@ -442,26 +412,11 @@ namespace wiz {
 						else {
 							int idx = -1;
 							int num = -1;
-							/*
-							pair<bool, int> biPair = IsMatched(strVec, "{", "}", 0, 1, &idx, &num);
-							if (false == biPair.first) {
-							bool biPair2 = vecReserver(strVec);
-
-							while (!biPair.first && biPair2)
-							{
-							biPair2 = vecReserver(strVec);
-
-							biPair = IsMatched(strVec, "{", "}", idx + 1, num, &idx, &num);
-							}
-							}
-							if (biPair.first) */
+							
 							{
 								/// uisng struct
-								state_reserve.push(4);
+								state_reserve++;
 
-								{
-									do_reserve.push(RIGHT_DO);
-								}
 								state = 4;
 							}
 							//else
@@ -499,7 +454,7 @@ namespace wiz {
 				if (braceNum != 0) {
 					throw string("chk braceNum is ") + toStr(braceNum);
 				}
-
+				
 				return true;
 			}
 
@@ -525,19 +480,6 @@ namespace wiz {
 						return true;
 					}
 
-
-					//UserType::AllReserved(&globalTemp, false);
-					//UserType::ReservedA(&globalTemp);
-
-					UserType::ReplaceAll(&globalTemp, { "^5", "^4", "^3", "^2", "^1", "^0" }, { "#", "\n", "\r", "\t", " ", "^" });
-					//UserType::ReplaceAll(&globalTemp, "^4", "\n");
-					//UserType::ReplaceAll(&globalTemp, "^3", "\r");
-					//UserType::ReplaceAll(&globalTemp, "^2", "\t");
-					//UserType::ReplaceAll(&globalTemp, "^1", " ");
-					//UserType::ReplaceAll(&globalTemp, "^0", "^");
-
-					//UserType::AllReserved(&globalTemp, false);
-
 					inFile.close();
 				}
 				catch (Error e) { std::cout << e << endl; inFile.close(); return false; }
@@ -550,32 +492,96 @@ namespace wiz {
 				return true;
 			}
 
-			static bool LoadDataFromString(string str, UserType& ut)
+			static bool LoadDataFromString(const string& str, UserType& ut)
 			{
 				UserType utTemp = ut;
-				string temp;
-				bool chk = Utility::ChkExist(str);
-				if (chk) {
-					Utility::ChangeStr(str, { "^" }, { "^0" }, temp);
-					Utility::ChangeStr(temp, { "#" }, { "^5" }, str);
-				}
-				Utility::PassSharp(str, temp);
-				Utility::AddSpace(temp, str);
-
-				if (chk) {
-					Utility::ChangeStr(str, { " ", "\t", "\r", "\n" }, { "^1", "^2", "^3", "^4" }, temp);
-					//str = Utility::ChangeStr(str, "\t", "^2");
-					//str = Utility::ChangeStr(str, "\r", "^3");
-					//str = Utility::ChangeStr(str, "\n", "^4");
-					str = std::move(temp);
-				}
-				StringTokenizer tokenizer(str, vector<string>{" ", "\t", "\r", "\n"});
 				ArrayQueue<string> strVec;
 
-				while (tokenizer.hasMoreTokens())
-				{
-					strVec.push(tokenizer.nextToken());
+				string statement = str;
+				int token_first = 0, token_last = 0; // idx of token in statement.
+				int state = 0;
+
+				for (int i = 0; i < statement.size(); ++i) {
+					if (0 == state && '\"' == statement[i]) {
+						token_last = i - 1;
+						if (token_last >= 0 && token_last - token_first + 1 > 0) {
+							string temp = statement.substr(token_first, token_last - token_first + 1);
+							if (!temp.empty()) {
+								strVec.push(move(temp));
+							}
+						}
+						state = 1;
+						token_first = i; token_last = i;
+					}
+					else if (1 == state && '\"' == statement[i]) {
+						state = 0; token_last = i;
+
+						strVec.push(statement.substr(token_first, token_last - token_first + 1));
+						token_first = i + 1;
+					}
+
+					if (0 == state && '=' == statement[i]) {
+						token_last = i - 1;
+						if (token_last >= 0 && token_last - token_first + 1 > 0) {
+							string temp = statement.substr(token_first, token_last - token_first + 1);
+							if (!temp.empty()) {
+								strVec.push(move(temp));
+							}
+						}
+						strVec.push("=");
+						token_first = i + 1;
+					}
+					else if (0 == state && isWhitespace(statement[i])) { // isspace ' ' \t \r \n , etc... ?
+						token_last = i - 1;
+						if (token_last >= 0 && token_last - token_first + 1 > 0) {
+							string temp = statement.substr(token_first, token_last - token_first + 1);
+							if (!temp.empty()) {
+								strVec.push(move(temp));
+							}
+						}
+						token_first = i + 1;
+					}
+					else if (0 == state && '{' == statement[i]) {
+						token_last = i - 1;
+						if (token_last >= 0 && token_last - token_first + 1 > 0) {
+							string temp = statement.substr(token_first, token_last - token_first + 1);
+							if (!temp.empty()) {
+								strVec.push(move(temp));
+							}
+						}
+						strVec.push("{");
+						token_first = i + 1;
+					}
+					else if (0 == state && '}' == statement[i]) {
+						token_last = i - 1;
+						if (token_last >= 0 && token_last - token_first + 1 > 0) {
+							string temp = statement.substr(token_first, token_last - token_first + 1);
+							if (!temp.empty()) {
+								strVec.push(move(temp));
+							}
+						}
+						strVec.push("}");
+						token_first = i + 1;
+					}
+
+					if (0 == state && '#' == statement[i]) {
+						token_last = i - 1;
+						if (token_last >= 0 && token_last - token_first + 1 > 0) {
+							strVec.push(statement.substr(token_first, token_last - token_first + 1));
+						}
+						token_first = statement.size();
+						break;
+					}
 				}
+
+				if (token_first < statement.size())
+				{
+					string temp = statement.substr(token_first);
+					if (!temp.empty()) {
+						strVec.push(move(temp));
+					}
+				}
+
 				try {
 					// empty string!
 					NoneReserver nonReserver;
@@ -583,19 +589,6 @@ namespace wiz {
 					{
 						return true;
 					}
-
-					//UserType::AllReserved(&utTemp, false);
-					//UserType::ReservedA(&utTemp);
-
-					if (chk) {
-						UserType::ReplaceAll(&utTemp, { "^5", "^4", "^3", "^2", "^1", "^0" }, { "#", "\n", "\r", "\t", " ", "^" });
-						//UserType::ReplaceAll(&utTemp, "^4", "\n");
-						//UserType::ReplaceAll(&utTemp, "^3", "\r");
-						//UserType::ReplaceAll(&utTemp, "^2", "\t");
-						//UserType::ReplaceAll(&utTemp, "^1", " ");
-						//UserType::ReplaceAll(&utTemp, "^0", "^");
-					}
-					//UserType::AllReserved(&utTemp, false);
 				}
 				catch (Error& e) { std::cout << e << endl; return false; }
 				catch (const char* err) { std::cout << err << endl; return false; }
@@ -705,10 +698,6 @@ namespace wiz {
 			bool ExistData(const string& position, const string& varName, const string& condition) // 
 			{
 				return ExistData(global, position, varName, condition);
-			}
-			bool ChkData()
-			{
-				return UserType::ChkData(&global);
 			}
 
 			/// ToDo - recursive function
@@ -1675,11 +1664,6 @@ namespace wiz {
 				return 0 != count;
 			}
 
-			static bool ChkData(UserType& global)
-			{
-				return UserType::ChkData(&global);
-			}
-
 			/// ToDo - global, position, var, condition + var is " "!
 			// "root" -> position.
 			static string SearchItem(UserType& global, const string& var, const string& condition, const string& start_dir = "root")
@@ -2080,7 +2064,7 @@ namespace wiz {
 				if (x.first == false) { return ""; }
 				else if (x.second[0]->GetItem(wiz::String::substring(str, idx + 1)).empty())
 				{
-					if ((x = wiz::load_data::UserType::Find(ut, str)).first)
+					if ((x = wiz::load_data::UserType::Find(ut, str)).first) //
 					{
 						return str;
 					}
@@ -2465,6 +2449,9 @@ namespace wiz {
 			{
 				string x = operandStack.pop();
 
+				if ('@' == x[0]) {
+					x.erase(x.begin());
+				}
 				if ('/' == x[0])
 				{
 					string temp = Find(&global, x); if (!temp.empty()) { x = temp; }
@@ -2852,7 +2839,7 @@ namespace wiz {
 				while (tokenizer.hasMoreTokens()) {
 					string temp = tokenizer.nextToken();
 
-					// chk!!
+					// chk!! @$paramter - removal? @$. (for regex)??
 					if (temp.size() >= 3 && String::startsWith(temp, "$.")) { // cf) @$. ?
 						result = result + temp + " ";
 					}
@@ -2862,7 +2849,7 @@ namespace wiz {
 					else if (temp.size() >= 8 && String::startsWith(temp, "$local.") || (temp.size()>=9 && String::startsWith(temp, "@$local."))) {
 						result = result + temp + " ";
 					}
-					else if ((temp.size() >=3 && temp[0] == '@' && temp[1] == '$')) {
+					else if ((temp.size() >= 3 && temp[0] == '@' && temp[1] == '$')) {
 						tokenizer.nextToken(); // = 
 						string temp2 = tokenizer.nextToken();
 						result = result + temp + " = { " + temp2 + " } ";

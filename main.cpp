@@ -1878,8 +1878,10 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 						&& val->GetUserTypeList(0)->GetItemListSize() == 0
 						&& val->GetUserTypeList(0)->GetUserTypeListSize() == 1)
 					{
+						string temp = val->GetUserTypeList(0)->ToString();
+
 						string name = ToBool4(global, eventStack.top().parameters,
-							val->GetUserTypeList(0)->ToString(), eventStack.top());
+							temp, eventStack.top());
 						cout << name;
 					}
 					else

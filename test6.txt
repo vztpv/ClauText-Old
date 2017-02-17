@@ -9,7 +9,7 @@ Main =
 Test = { x = { y = { z = { 1 3 }  5 4 3 } w = 1 a = { 7 3  } } k = 1 }
 Test = { x = { y = 1 w = 0 } k = 0 } # "test test	test  !!" }
 Test2 = { { no = BBB } }
-x = 1
+x = 6
 
 Event =
 {
@@ -29,6 +29,7 @@ Event =
 
 	$assign = { $local.x value = { $concat = { Test2/$ut $concat = { 0 /no } } } }
 	$assign_global = { dir = { $concat = { / $local.x } } value = { CCC } condition = { TRUE } }
+	$assign_global = { dir = { $concat = { / $local.x } } value = { CCCA } condition = { TRUE } }
 	$print = { value = { /Test2/$ut0/no } } # chk! $ut0 - todo/done list? cf) @ + dir
 	$print = { value = { \n } }
 
@@ -36,7 +37,7 @@ Event =
 	$register_module = { name = { "test5.txt" } }
 	
 	
-	$call_registered_module = { name = { "test5.txt" } value=  { input = 5 } }
+	$call_registered_module = { name = { "test5.txt" } value=  { input=/./x  } }
 	$print = { value = { $return_value = { } } }
 	$print = { value = { \n } }
 
@@ -59,7 +60,7 @@ Event =
 	$print = { value = { "-----------------" } }
 	$print = { value = { \n } }
 	$print = { str = {  "TEST " } }
-	$print2 = { value = { @/$/$."x"/$local.y } }  # $떄문에  @를 추가?, $ : any, all.  
+	$print2 = { value = { $concat = { @/$/$. $concat = { "x" /y } } }  }# $떄문에  @를 추가?, $ : any, all.  
 											# $."[0-9]" - regular expression?
 	$print = { value = { \n } }
 	
@@ -101,9 +102,9 @@ Event =
 		#rgx = { "^[0-9]+\.[0-9]+\.[0-9]+$" }
 		#val = { @$eval = { " $concat = { /~~/university test! } " } }  # using @/~~
 		#rgx = { "[0-9]+\.[0-9]+" }
-		rgx = { "base_tax" } #"[a-zA-Z0-9_]+" }
+		rgx = { "base_tax" } # "[a-zA-Z0-9_]+" }
 		# ToDo - condition == TRUE, then chk val! # /./name?
-		val = { @$eval = { " $concat = { $concat = {$add = { 1.000 /./~~ } chk_base_tax } /./~~ } " } }
+		val = { @$eval = { " $concat = { $concat = { $add = { 1.000 /./~~ } chk_base_tax } /./~~ } " } }
 		condition = {
 			#REGEX = { ~~ ~ "^1821\.1\.1$" ~ 0 } # option : 0, 1, 2 ?? - chk!!
 			AND = { 
@@ -128,7 +129,8 @@ Event =
 	$replace_datetype = {
 		val = { 1821.1.1 }
 		condition = { 
-			COMP> = { ~~ ~ 1821.1.1 ~ 0 }
+			COMP> = { ~~ ~ 1821.1.1 
+			~ 0 }
 		}
 		start_dir = { /eu3Game }
 	}
