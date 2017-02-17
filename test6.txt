@@ -60,7 +60,7 @@ Event =
 	$print = { value = { "-----------------" } }
 	$print = { value = { \n } }
 	$print = { str = {  "TEST " } }
-	$print2 = { value = { $concat = { @/$/$. $concat = { "x" /y } } }  }# $떄문에  @를 추가?, $ : any, all.  
+	$print = { value = { $get = { $concat = { @/$/$. $concat = { "x" /y } } } } }# $떄문에  @를 추가?, $ : any, all.  
 											# $."[0-9]" - regular expression?
 	$print = { value = { \n } }
 	

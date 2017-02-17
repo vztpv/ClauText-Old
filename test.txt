@@ -14,14 +14,14 @@ Mode = { JUMP_MODE = 6 BACK_MODE = 7 MORE_ONE_MODE = 8 CHANGE_SHA_MODE = 3
 		 GAME_END_MODE = 4 GAME_OVER_MODE = 5 ATTACK_MODE = 1 GENERAL_MODE = 0 }
 
 # Turn
-Turn = { dir=true start=1 end=4 n=4 now=4 } # ÃÊ±âÈ­ Event µû·Î
+Turn = { dir = true start=1 end=4 n=4 now=4 } # ï¿½Ê±ï¿½È­ Event ï¿½ï¿½ï¿½ï¿½
 
 Event = {
 	# No
-	id=1
+	id = 1
 	# Action
 	$if = { $condition = { $EQ = { /Turn/dir true } }
-		$then = { 
+		$then = {  
 			$assign = { /Turn/now value = { $add = { $modular = { /Turn/now /Turn/n } 1 } } }
 		}
 	}
@@ -72,7 +72,7 @@ Event = { # just one!
 }
 Event = { # just one!
 	id = 3
-	$call = { id = 101 i = 0 } # using stack + ¸î¹ø¤Š±îÂî Çß´Â°¡
+	$call = { id = 101 i = 0 } # using stack + ï¿½ï¿½ï¿½ï¿½?ï¿½ï¿½ï¿½ï¿½ ï¿½ß´Â°ï¿½
 	# insert two joker
 	$make = { $concat = { /Card $concat = { / /Info/CARDNUM } } }
 	$make = { $concat = { /Card $concat = { / $add = { /Info/CARDNUM 1 } } } } 
@@ -93,7 +93,7 @@ Event = {
 }
 
 # Card String Image
-##"¢»","¡ß","¢¾","¢¿",  "¡Ù","¡Ú"
+##"ï¿½ï¿½","ï¿½ï¿½","ï¿½ï¿½","ï¿½ï¿½",  "ï¿½ï¿½","ï¿½ï¿½"
 ## 0    1     2    3     4    5
 ## K->A->.....->J->Q
 ## 0  1        11 12
@@ -101,11 +101,11 @@ CardStringImage =
 {
 	num = { K A 2 3 4 5 6 7 8 9 10 J Q }
 	sha = { 
-		sha_image = { ¢» ¡ß ¢¾ ¢¿ }
+		sha_image = { ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ }
 		sha_name = { spade dia heart clover }
 	}
-	blackJoker = { ¡Ù }
-	colorJoker = { ¡Ú }
+	blackJoker = { ï¿½ï¿½ }
+	colorJoker = { ï¿½ï¿½ }
 }
 Event = 
 {
@@ -826,16 +826,16 @@ Event =
 		$then = {
 			$call = { 
 				id = 100
-				sha = { $get= {$concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /sha } } }
-				num = { $get= {$concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /num } } }
-				isBlackJoker = { $get= {$concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /isBlackJoker } } } 
-				isColorJoker = { $get= {$concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /isColorJoker } } }
+				sha = { $get = {$concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /sha } } }
+				num = { $get = {$concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /num } } }
+				isBlackJoker = { $get = {$concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /isBlackJoker } } } 
+				isColorJoker = { $get = {$concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /isColorJoker } } }
 			}
 			$print = { value = { "/" } }		
 			$call = {
 				id = 51
 				i = $parameter.i
-				j = { $add= { $parameter.j 1 } }
+				j = { $add = { $parameter.j 1 } }
 			}
 		}
 	}
@@ -948,11 +948,13 @@ Event = {
 	$print = { value = { \n } }
 		# print .
 			#$print = { value = { " : " } }
-			# input = ¸Ô´Â´Ù. 0, ±×¿Ü 1~n
+			# input = ï¿½Ô´Â´ï¿½. 0, ï¿½×¿ï¿½ 1~n
 			# input = $getch = { } # 
 		# Card Put or Eat # <- state/action_state == PUT or EAT
 	$if = { # computer
-		$condition = { $NOTEQ = { /Turn/now /State/person_stream } }
+		$condition = {
+			$NOTEQ = { /Turn/now /State/person_stream } 
+		 }
 		$then = {
 			$assign = { /State/action_state  value = { EAT } }
 			$call = { id = 4010 i = 0 n = 20 } # replace
@@ -1057,11 +1059,11 @@ Event = {
 					$call = { id = 4013 i = 0 n = 1 }
 				}
 			}
-			# °ÔÀÓ¿À¹ö Ã¼Å© + ÀüÃ¼°ÔÀÓ¿À¹ö Ã¼Å©
+			# ï¿½ï¿½ï¿½Ó¿ï¿½ï¿½ï¿½ Ã¼Å© + ï¿½ï¿½Ã¼ï¿½ï¿½ï¿½Ó¿ï¿½ï¿½ï¿½ Ã¼Å©
 			$if = {
 				$condition = { $COMP< = { $add = { /Info/GAME_OVER_CARD_NUM -1 } $size = { $concat = { /PlayerCardList $concat = { / $add = { /Turn/now -1 } } } } } }
 				$then = {
-					# 1¸í¸¸ »ì¾Æ ³²Àº °æ¿ì
+					# 1ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 					$assign = { /Temp/count value = { 0 } }
 					$call = { id = 4014 i = 0 n = /Info/PLAYER_NUM }
 
@@ -1074,14 +1076,14 @@ Event = {
 					}
 					$assign = { /Temp/count value = { 0 } }
 					
-					# set gameOver to yes! #ÁÖÀÇ  TRUE FALSE / yes no / true false
+					# set gameOver to yes! #ï¿½ï¿½ï¿½ï¿½  TRUE FALSE / yes no / true false
 					$setElement = { 
 						dir = { /PlayerGameOverList } 
 						idx = { $add = { -1 /Turn/now } } 
 						value = { yes } 
 					}
 					
-					# Ä«µå¸¦ Ä«µå¸®½ºÆ®¿¡ ³Ö´Â´Ù.
+					# Ä«ï¿½å¸¦ Ä«ï¿½å¸®ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½Ö´Â´ï¿½.
 					$call = { id = 4015 }
 					
 					# mix
@@ -1204,7 +1206,7 @@ Event =
 			# chk error - todo.. 
 
 			
-			# 1¸í¸¸ »ì¾Æ ³²Àº °æ¿ì
+			# 1ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			$assign = { /Temp/count value = { 0 } }
 			$call = { id = 4014 i = 0 n = /Info/PLAYER_NUM }
 

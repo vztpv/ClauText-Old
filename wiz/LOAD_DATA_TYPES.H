@@ -712,14 +712,26 @@ namespace wiz {
 
 			vector<ItemType<string>> GetItem(const string& name) const {
 				vector<ItemType<string>> temp;
-			
-				for (int i = 0; i < itemList.size(); ++i) {
-					if (itemList[i].GetName() == name) {
-						temp.push_back(itemList[i]);
+				if (String::startsWith(name, "$.") && name.size() >= 5) {
+					string str = name.substr(3, name.size() - 4);
+					regex rgx(str);
+
+					for (int i = 0; i < itemList.size(); ++i) {
+						if (regex_match(itemList[i].GetName(), rgx)) {
+							temp.push_back(itemList[i]);
+						}
+					}
+				}
+				else {
+					for (int i = 0; i < itemList.size(); ++i) {
+						if (itemList[i].GetName() == name) {
+							temp.push_back(itemList[i]);
+						}
 					}
 				}
 				return temp;
 			}
+			// regex to SetItem?
 			bool SetItem(const string& name, const string& value) {
 				int index = -1;
 

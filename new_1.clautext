@@ -36,8 +36,8 @@ Event = {
 	
 	$print = { str = {  $parameter.i } }
 	
-	$print2 = { value = { $get = { $concat = {  @/./$. "x" }  } } }
-	
+	$print = { value = { $get = { $concat = {  @/./$. "x" }  } } }
+ 	
 	$print = { str = { \n } }
 	
 	$print = { str = { $concat = { $ add } } } 

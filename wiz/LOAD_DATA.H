@@ -564,12 +564,19 @@ namespace wiz {
 						token_first = i + 1;
 					}
 
-					if (0 == state && '#' == statement[i]) {
+					if (0 == state && '#' == statement[i]) { // different from load_data_from_file
 						token_last = i - 1;
 						if (token_last >= 0 && token_last - token_first + 1 > 0) {
 							strVec.push(statement.substr(token_first, token_last - token_first + 1));
 						}
-						token_first = statement.size();
+						int j=0;
+						for (j = i; j < statement.size(); ++j) {
+							if (statement[j] == '\n')
+							{
+								break;
+							}
+						}
+						token_first = j + 1;
 						break;
 					}
 				}
@@ -2042,7 +2049,7 @@ namespace wiz {
 			return ut->GetUserTypeItem(name);
 		}
 		string Find(wiz::load_data::UserType* ut, const string& str)
-		{
+		{ // string 대신 vector<string> ??
 			int count = 0;
 			int idx = -1;
 			for (int i = str.size() - 1; i >= 0; --i) {
@@ -2053,7 +2060,8 @@ namespace wiz {
 					count++;
 				}
 			}
-
+			
+			string result;
 			if (count == 1)
 			{
 				return "";
@@ -2062,19 +2070,20 @@ namespace wiz {
 				auto x = wiz::load_data::UserType::Find(ut,
 					wiz::String::substring(str, 0, idx));
 				if (x.first == false) { return ""; }
-				else if (x.second[0]->GetItem(wiz::String::substring(str, idx + 1)).empty())
-				{
-					if ((x = wiz::load_data::UserType::Find(ut, str)).first) //
-					{
-						return str;
-					}
-					else
-					{
-						return "";
+				for (int i = 0; i < x.second.size(); ++i) {
+					auto temp = x.second[i]->GetItem(wiz::String::substring(str, idx + 1));
+					if (!temp.empty()) {
+						for (int j = 0; j < temp.size(); ++j) {
+							result += temp[j].Get(0);
+							if (j < temp.size() - 1)
+							{
+								result += "\n";
+							}
+						}
 					}
 				}
-				else { return x.second[0]->GetItem(wiz::String::substring(str, idx + 1))[0].Get(0); }
 			}
+			return result;
 		}
 		inline bool Exist(wiz::load_data::UserType* ut, const string& dir)
 		{
@@ -2315,8 +2324,14 @@ namespace wiz {
 				if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && (wiz::load_data::Utility::GetType(y) == "INTEGER")) { /// only integer -> BigInteger
 					long long _x = atoll(x.c_str());
 					long long _y = atoll(y.c_str());
-					long long _z = rand() % (_y - _x + 1) + _x; // _x <= _z <= _y
-					operandStack.push(wiz::toStr(_z));
+					if (_y - _x + 1 <= 0) {
+						operandStack.push("ERROR x / 0");
+
+					}
+					else {
+						long long _z = rand() % (_y - _x + 1) + _x; // _x <= _z <= _y
+						operandStack.push(wiz::toStr(_z));
+					}
 				}
 				else
 				{
@@ -2449,7 +2464,7 @@ namespace wiz {
 			{
 				string x = operandStack.pop();
 
-				if ('@' == x[0]) {
+				if ('@' == x[0]) { // chk..
 					x.erase(x.begin());
 				}
 				if ('/' == x[0])
