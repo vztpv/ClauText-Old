@@ -2075,16 +2075,15 @@ namespace wiz {
 					if (!temp.empty()) {
 						for (int j = 0; j < temp.size(); ++j) {
 							result += temp[j].Get(0);
-							result += " ";
+							if (j < temp.size() - 1) {
+								result += " ";
+							}
 						}
 						if (i < x.second.size() - 1) {
 							result += "\n";
 						}
 					}
 				}
-			}
-			if (result.back() == ' ') {
-				result.erase(result.begin() + result.size() - 1);
 			}
 			return result;
 		}
