@@ -46,7 +46,7 @@ Event =
 	$print = { value = { $return_value = { } } }
 	$print = { value = { \n } }
 	
-	$print = { value = { $size2 = { /Test/x/y } } }
+	$print = { value = { $size2 = { $concat = { / $concat = { Test/ x/y } } } } }
 	$print = { value = { \n } }
 
 	#$print2 = { value = { /Test } }
@@ -104,7 +104,7 @@ Event =
 		#rgx = { "[0-9]+\.[0-9]+" }
 		rgx = { "base_tax" } # "[a-zA-Z0-9_]+" }
 		# ToDo - condition == TRUE, then chk val! # /./name?
-		val = { @$eval = { " $concat = { $concat = { $add = { 1.000 /./~~ } chk_base_tax } /./~~ } " } }
+		val = { @$eval = { " $concat = { $concat = { $add = { 1.500 /./~~ } chk_base_tax } /./~~ } " } }
 		condition = {
 			#REGEX = { ~~ ~ "^1821\.1\.1$" ~ 0 } # option : 0, 1, 2 ?? - chk!!
 			AND = { 

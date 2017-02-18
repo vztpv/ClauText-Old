@@ -1,0 +1,25 @@
+# data
+
+x = 1
+
+x = {  }
+
+
+
+# main and events.
+
+Main = {  $call = { id = 0 } }
+
+Event = {
+
+        id = 0
+
+		$insert = { dir = { /./x } data = { y = 1 } } # 제대로 동작되지 않는다.
+        # => $insert = { dir = { 1 } data = { y  = 1 } } 과 같다.
+		$print2 = { dir  = { $concat = { / ./x } } }
+		
+        $insert  = { dir = { $concat = { / ./x } } data = { y  } } # 제대로 동작된다.
+
+        $print2 = { dir  = { $concat = { / ./x } } }
+		$_getch = { }
+}

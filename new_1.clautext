@@ -3,8 +3,10 @@ Main = {
 	$call = { id = 1 }
 }
 
-x = test
+x = "test # test"
 x = { y z }
+k = { }
+
 Event = {
 	id = 1
 
@@ -41,4 +43,8 @@ Event = {
 	$print = { str = { \n } }
 	
 	$print = { str = { $concat = { $ add } } } 
+	$print = { str = { \n } }
+	
+	$insert = { dir = { $concat = { / ./k } } value = { c } }
+	$print2 = { data = { $concat = { / ./k } } }
 }
