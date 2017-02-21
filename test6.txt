@@ -109,7 +109,6 @@ Event =
 			#REGEX = { ~~ ~ "^1821\.1\.1$" ~ 0 } # option : 0, 1, 2 ?? - chk!!
 			AND = { 
 				EQ = { ~~ ~ base_tax ~ 1 }
-				
 				COMP> = { ~~ / 5.000 ~ 0 }
 			}
 		}
