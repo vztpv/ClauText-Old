@@ -625,8 +625,9 @@ namespace wiz {
 
 							if (0 == state && '#' == statement[i]) {
 								token_last = i - 1;
-								if (token_last >= 0 && token_last - token_first + 1 > 0) {
-									aq.push(statement.substr(token_first, token_last - token_first + 1));
+								string temp = statement.substr(token_first, token_last - token_first + 1);
+								if (!temp.empty()) {
+									aq.push(move(temp));
 								}
 								token_first = statement.size();
 								break;
@@ -668,11 +669,10 @@ namespace wiz {
 
 				
 				DoThread doThread(&strVecTemp);
-
+				//doThread(tbb::blocked_range<size_t>(0, count));
 				tbb::parallel_reduce(tbb::blocked_range<size_t>(0, count), doThread);
 				aq.push(std::move(doThread.aq));
 				
-
 				return{ count > 0, count };
 			}
 

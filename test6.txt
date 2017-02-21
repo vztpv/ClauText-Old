@@ -60,7 +60,7 @@ Event =
 	$print = { value = { "-----------------" } }
 	$print = { value = { \n } }
 	$print = { str = {  "TEST " } }
-	$print = { value = { $get = { $concat = { @/$/$. $concat = { "x" /y } } } } }# $떄문에  @를 추가?, $ : any, all.  
+	$print = { value = { $get = { $concat_all = { @/$/$. "x" /y } } } } # $떄문에  @를 추가?, $ : any, all.  
 											# $."[0-9]" - regular expression?
 	$print = { value = { \n } }
 	
@@ -94,9 +94,9 @@ Event =
 	#$print = { value= { "remove_usertype_total end" } }
 	#$print = { value = { \n } }
 
-	$call = { id = replaceA option = USE_THREAD }
-	$call = { id = replaceB option = USE_THREAD }
-	$wait = { }
+	#$call = { id = replaceA option = USE_THREAD }
+	#$call = { id = replaceB option = USE_THREAD }
+	#$wait = { }
 	
 	$replace_datatype1_2 = {
 		#rgx = { "^[0-9]+\.[0-9]+\.[0-9]+$" }
@@ -104,11 +104,12 @@ Event =
 		#rgx = { "[0-9]+\.[0-9]+" }
 		rgx = { "base_tax" } # "[a-zA-Z0-9_]+" }
 		# ToDo - condition == TRUE, then chk val! # /./name?
-		val = { @$eval = { " $concat = { $concat = { $add = { 1.500 /./~~ } chk_base_tax } /./~~ } " } }
+		val = { @$eval = { " $concat_all = { $add = { 1.700 /./~~ } chk_base_tax  /./~~ } " } }
 		condition = {
 			#REGEX = { ~~ ~ "^1821\.1\.1$" ~ 0 } # option : 0, 1, 2 ?? - chk!!
 			AND = { 
 				EQ = { ~~ ~ base_tax ~ 1 }
+				
 				COMP> = { ~~ / 5.000 ~ 0 }
 			}
 		}

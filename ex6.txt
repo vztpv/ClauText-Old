@@ -21,5 +21,6 @@ Event = {
         $insert  = { dir = { $concat = { / ./x } } data = { y  } } # 제대로 동작된다.
 
         $print2 = { dir  = { $concat = { / ./x } } }
-		$_getch = { }
+		
+ 		$_getch = { }
 }

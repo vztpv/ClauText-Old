@@ -2071,16 +2071,27 @@ namespace wiz {
 					wiz::String::substring(str, 0, idx));
 				if (x.first == false) { return ""; }
 				for (int i = 0; i < x.second.size(); ++i) {
-					auto temp = x.second[i]->GetItem(wiz::String::substring(str, idx + 1));
-					if (!temp.empty()) {
-						for (int j = 0; j < temp.size(); ++j) {
-							result += temp[j].Get(0);
-							if (j < temp.size() - 1) {
-								result += " ";
-							}
-						}
+					string itemName = wiz::String::substring(str, idx + 1);
+					if (wiz::String::startsWith(itemName, "$it") && itemName.size() >= 4 ){
+						int itemIdx = stoi(wiz::String::substring(itemName, 3));
+						
+						result += x.second[i]->GetItemList(itemIdx).Get(0);
 						if (i < x.second.size() - 1) {
 							result += "\n";
+						}
+					}
+					else {
+						auto temp = x.second[i]->GetItem(itemName);
+						if (!temp.empty()) {
+							for (int j = 0; j < temp.size(); ++j) {
+								result += temp[j].Get(0);
+								if (j < temp.size() - 1) {
+									result += " ";
+								}
+							}
+							if (i < x.second.size() - 1) {
+								result += "\n";
+							}
 						}
 					}
 				}
@@ -2125,10 +2136,24 @@ namespace wiz {
 		}
 		//need to renewal. add $AND $OR $NOT
 		/// remove /, parameter chk!!
-		string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& temp, wiz::load_data::EventInfo info);
-		void operation(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& str, wiz::ArrayStack<string>& operandStack, wiz::load_data::EventInfo  info)
+		string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& temp, 
+			 wiz::load_data::EventInfo info);
+		void operation(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& str,
+			wiz::ArrayStack<string>& operandStack, wiz::load_data::EventInfo info)
 		{
 			if (!operandStack.empty() && operandStack.top() == "ERROR") { return; }
+
+			int operandNum = 0;
+			{
+				for (int i = operandStack.size() - 1; i >= 0; --i) {
+					if ("}" == operandStack[i]) {
+						break;
+					}
+					else {
+						operandNum++;
+					}
+				}
+			}
 
 			if ("$EQ" == str) {
 				string x, y;
@@ -2356,6 +2381,27 @@ namespace wiz {
 
 				operandStack.push(x + " " + y);
 			}
+			else if ("$concat_all" == str)
+			{
+				string result;
+
+				for (int i = 0; i < operandNum; ++i) {
+					result += operandStack.pop();
+				}
+				operandStack.push(result);
+			}
+			else if ("$concat_all2" == str)
+			{
+				string result;
+
+				for (int i = 0; i < operandNum; ++i) {
+					result += operandStack.pop();
+					if (i < operandNum - 1) {
+						result += " ";
+					}
+				}
+				operandStack.push(result);
+			}
 			else if ("$return_value" == str)
 			{
 				operandStack.push(info.return_value);
@@ -2561,11 +2607,6 @@ namespace wiz {
 					string temp;
 					wiz::load_data::Utility::ChangeStr(str, { "^5", "^4", "^3", "^2", "^1", "^0" }, { "#", "\n", "\r", "\t", " ", "^" }, temp);
 					str = std::move(temp);
-					//result = wiz::load_data::Utility::ChangeStr(result, "^4", "\n");
-					//result = wiz::load_data::Utility::ChangeStr(result, "^3", "\r");
-					//result = wiz::load_data::Utility::ChangeStr(result, "^2", "\t");
-					//result = wiz::load_data::Utility::ChangeStr(result, "^1", " ");
-					//result = wiz::load_data::Utility::ChangeStr(result, "^0", "^");
 				}
 				else {
 					operandStack.push("ERROR in $eval, must be \" \" ");
@@ -2576,7 +2617,8 @@ namespace wiz {
 			}
 		}
 
-		string ToBool3(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& temp, wiz::load_data::EventInfo info) /// has bug!
+		string ToBool3(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& temp, 
+			 wiz::load_data::EventInfo info) /// has bug!
 		{
 			wiz::StringTokenizer tokenizer(temp, vector<string>{ "/" });
 			vector<string> tokenVec;
@@ -2646,8 +2688,9 @@ namespace wiz {
 			}
 			return result;
 		}
-		string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& temp, wiz::load_data::EventInfo info)
-		{
+		string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& temp, 
+			 wiz::load_data::EventInfo info)
+		{ 
 			string result = temp;
 			wiz::ArrayStack<string> resultStack;
 			wiz::load_data::UserType ut;
@@ -2701,18 +2744,14 @@ namespace wiz {
 					string temp;
 					wiz::load_data::Utility::ChangeStr(result, { "^" }, { "^0" }, temp); // in " "
 					wiz::load_data::Utility::ChangeStr(temp, { " ", "\t", "\r", "\n", "#" }, { "^1", "^2", "^3", "^4", "^5" }, result);
-					//result = wiz::load_data::Utility::ChangeStr(result, "\t", "^2");
-					//result = wiz::load_data::Utility::ChangeStr(result, "\r", "^3");
-					//result = wiz::load_data::Utility::ChangeStr(result, "\n", "^4");
-					//result = wiz::load_data::Utility::ChangeStr(result, "#", "^5");
 				}
 			}
 
-			{ // chk..
-			  // tokenizer and option! - "" 안에는 나누지 않는다?
-				int option = 0;
-				if (chk) { option = 1; }
-				//cout << "result " << result << " chk " << (int)chk << endl;
+			{
+				int option = 0; // chk!!
+				if (chk) {
+					option = 1;
+				}
 				wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r", "{", "=", "}" }, option);
 				wiz::StringTokenizer tokenizer2(result, { " ", "\n", "\t", "\r" });
 				vector<string> tokenVec;
@@ -2729,22 +2768,45 @@ namespace wiz {
 					if ('/' == tokenVec[i][0] && tokenVec[i].size() > 1)
 					{
 						string _temp = Find(&global, tokenVec[i]);
+
 						if ("" != _temp) {
-							tokenVec[i] = _temp;
+							bool test = Utility::ChkExist(_temp);
+							chk = chk || test;
+
+							if (test) {
+								string temp;
+								wiz::load_data::Utility::ChangeStr(_temp, { "^" }, { "^0" }, temp); // in " "
+								wiz::load_data::Utility::ChangeStr(temp, { " ", "\t", "\r", "\n", "#" }, { "^1", "^2", "^3", "^4", "^5" }, _temp);
+							}
+							tokenVec[i] = move(_temp);
 						}
-
-
 					}
-					else if (wiz::String::startsWith(tokenVec[i], "$local.")) {
+					else if (wiz::String::startsWith(tokenVec[i], "$local.")) { // && length?
 						string _temp = FindLocals(info.locals, tokenVec[i]);
 						if (!_temp.empty()) {
-							tokenVec[i] = _temp;
+							bool test = Utility::ChkExist(_temp);
+							chk = chk || test;
+
+							if (test) {
+								string temp;
+								wiz::load_data::Utility::ChangeStr(_temp, { "^" }, { "^0" }, temp); // in " "
+								wiz::load_data::Utility::ChangeStr(temp, { " ", "\t", "\r", "\n", "#" }, { "^1", "^2", "^3", "^4", "^5" }, _temp);
+							}
+							tokenVec[i] = move(_temp);
 						}
 					}
-					else if (wiz::String::startsWith(tokenVec[i], "$parameter.")) {
+					else if (wiz::String::startsWith(tokenVec[i], "$parameter.")) { // && length?
 						string _temp = FindParameters(parameters, tokenVec[i]);
 						if (!_temp.empty()) {
-							tokenVec[i] = _temp;
+							bool test = Utility::ChkExist(_temp);
+							chk = chk || test;
+
+							if (test) {
+								string temp;
+								wiz::load_data::Utility::ChangeStr(_temp, { "^" }, { "^0" }, temp); // in " "
+								wiz::load_data::Utility::ChangeStr(temp, { " ", "\t", "\r", "\n", "#" }, { "^1", "^2", "^3", "^4", "^5" }, _temp);
+							}
+							tokenVec[i] = move(_temp);
 						}
 					}
 				}
@@ -2757,7 +2819,7 @@ namespace wiz {
 
 				int j = tokenVec.size() - 1;
 				for (int i = tokenVec2.size() - 1; i >= 0 && j >= 0; --i) {
-					if (tokenVec2[i] == "{" || tokenVec2[i] == "}" || tokenVec2[i] == "=") { //cout << "chk " << tokenVec2[i] << endl;
+					if (tokenVec2[i] == "{" || tokenVec2[i] == "}" || tokenVec2[i] == "=") { 
 						continue;
 					}
 					else {
@@ -2768,13 +2830,14 @@ namespace wiz {
 
 				for (int i = 0; i < tokenVec2.size(); ++i) {
 					if (i != 0) { result = result + " "; }
+					
 					result = result + tokenVec2[i];
 				}
 			}
 
 			//
 			wiz::ArrayStack<string> operandStack;
-			wiz::ArrayStack<string> operatorStack; // 반대로 들어간다.
+			wiz::ArrayStack<string> operatorStack; 
 			wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" });
 			vector<string> tokenVec;
 
@@ -2784,25 +2847,17 @@ namespace wiz {
 
 			for (int i = tokenVec.size() - 1; i >= 0; --i)
 			{
-				if ('/' == tokenVec[i][0] && tokenVec[i].size() > 1)
-				{
-					string temp = Find(&global, tokenVec[i]);
-					if (!temp.empty()) {
-						tokenVec[i] = temp;
-					}
-				}
-
 				if ('$' != tokenVec[i][0] || ('$' == tokenVec[i][0] && tokenVec[i].size() == 1)) {
 					operandStack.push(tokenVec[i]);
 				}
 				else
 				{
-					operandStack.pop();
-					operandStack.pop();
+					operandStack.pop(); // =
+					operandStack.pop(); // {
 					operatorStack.push(tokenVec[i]);
 					operation(global, parameters, tokenVec[i], operandStack, info);
 					operandStack[operandStack.size() - 2] = operandStack[operandStack.size() - 1];
-					operandStack.pop();
+					operandStack.pop(); // } ?
 				}
 			}
 
@@ -2884,11 +2939,6 @@ namespace wiz {
 					string temp;
 					wiz::load_data::Utility::ChangeStr(result, { "^5", "^4", "^3", "^2", "^1", "^0" }, { "#", "\n", "\r", "\t", " ", "^" }, temp);
 					result = std::move(temp);
-					//result = wiz::load_data::Utility::ChangeStr(result, "^4", "\n");
-					//result = wiz::load_data::Utility::ChangeStr(result, "^3", "\r");
-					//result = wiz::load_data::Utility::ChangeStr(result, "^2", "\t");
-					//result = wiz::load_data::Utility::ChangeStr(result, "^1", " ");
-					//result = wiz::load_data::Utility::ChangeStr(result, "^0", "^");
 				}
 			}
 			return result;
