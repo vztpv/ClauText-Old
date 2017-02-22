@@ -86,5 +86,3 @@
 	1. it can load eu4 savegames, and maybe other paradox game db or savegame files.
 	2. it`s syntax come from eu4 savegame syntax.
 
-# To Do
-	1. add SQL-like functions?
