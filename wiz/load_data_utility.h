@@ -539,12 +539,12 @@ namespace wiz {
 			private:
 				vector<string>* strVec;
 			public:
-				ArrayQueue<string> aq;
+				ArrayQueue<string>* aq;
 				//int strVecStart;
 				//int strVecEnd;
 			public:
-				DoThread(vector<string>* strVec) //, ArrayQueue<string>* aq)//, int strVecStart, int strVecEnd)
-					: strVec(strVec) //, aq(aq) // , strVecStart(strVecStart), strVecEnd(strVecEnd)
+				DoThread(vector<string>* strVec, ArrayQueue<string>* aq) //, ArrayQueue<string>* aq)//, int strVecStart, int strVecEnd)
+					: strVec(strVec), aq(aq) // , strVecStart(strVecStart), strVecEnd(strVecEnd)
 				{
 					//
 				}
@@ -567,7 +567,7 @@ namespace wiz {
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									string temp = statement.substr(token_first, token_last - token_first + 1);
 									if (!temp.empty()) {
-										aq.push(move(temp));
+										aq->push(move(temp));
 									}
 								}
 								state = 1;
@@ -575,7 +575,7 @@ namespace wiz {
 							else if (1 == state && '\"' == statement[i]) {
 								state = 0; token_last = i;
 								
-								aq.push(statement.substr(token_first, token_last - token_first + 1));
+								aq->push(statement.substr(token_first, token_last - token_first + 1));
 								token_first = i + 1;
 							}
 
@@ -584,10 +584,10 @@ namespace wiz {
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									string temp = statement.substr(token_first, token_last - token_first + 1);
 									if (!temp.empty()) {
-										aq.push(move(temp));
+										aq->push(move(temp));
 									}
 								}
-								aq.push("=");
+								aq->push("=");
 								token_first = i + 1;
 							}
 							else if (0 == state && isWhitespace(statement[i])) { // isspace ' ' \t \r \n , etc... ?
@@ -595,7 +595,7 @@ namespace wiz {
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									string temp = statement.substr(token_first, token_last - token_first + 1);
 									if (!temp.empty()) {
-										aq.push(move(temp));
+										aq->push(move(temp));
 									}
 								}
 								token_first = i + 1;
@@ -605,10 +605,10 @@ namespace wiz {
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									string temp = statement.substr(token_first, token_last - token_first + 1);
 									if (!temp.empty()) {
-										aq.push(move(temp));
+										aq->push(move(temp));
 									}
 								}
-								aq.push("{");
+								aq->push("{");
 								token_first = i + 1;
 							}
 							else if (0 == state && '}' == statement[i]) {
@@ -616,10 +616,10 @@ namespace wiz {
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									string temp = statement.substr(token_first, token_last - token_first + 1);
 									if (!temp.empty()) {
-										aq.push(move(temp));
+										aq->push(move(temp));
 									}
 								}
-								aq.push("}");
+								aq->push("}");
 								token_first = i + 1;
 							}
 
@@ -627,7 +627,7 @@ namespace wiz {
 								token_last = i - 1;
 								string temp = statement.substr(token_first, token_last - token_first + 1);
 								if (!temp.empty()) {
-									aq.push(move(temp));
+									aq->push(move(temp));
 								}
 								token_first = statement.size();
 								break;
@@ -638,20 +638,20 @@ namespace wiz {
 						{
 							string temp = statement.substr(token_first);
 							if (!temp.empty()) {
-								aq.push(move(temp));
+								aq->push(move(temp));
 							}
 						}
 					}
 				}
-
-				DoThread(DoThread& other, tbb::split) : strVec(other.strVec) // , aq(other.aq)
-				{
+				//
+				//DoThread(DoThread& other, tbb::split) : strVec(other.strVec) // , aq(other.aq)
+				//{
 					//
-				}
-				void join(DoThread& other) 
-				{
-					aq.push(std::move(other.aq));
-				}
+				//}
+				//void join(DoThread& other) 
+				//{
+				//	aqpush(std::move(other.aq));
+				//}
 			};
 		public:
 			static pair<bool, int> Reserve2(ifstream& inFile, ArrayQueue<string>& aq, const int num = 1)
@@ -668,10 +668,12 @@ namespace wiz {
 				}
 
 				
-				DoThread doThread(&strVecTemp);
-				//doThread(tbb::blocked_range<size_t>(0, count));
-				tbb::parallel_reduce(tbb::blocked_range<size_t>(0, count), doThread);
-				aq.push(std::move(doThread.aq));
+				DoThread doThread(&strVecTemp, &aq);
+				
+				doThread(tbb::blocked_range<size_t>(0, count));
+				
+				//tbb::parallel_reduce(tbb::blocked_range<size_t>(0, count), doThread);
+				//aq.push(std::move(doThread.aq));
 				
 				return{ count > 0, count };
 			}

@@ -18,7 +18,7 @@ private:
     public:
         //
         Delement(){ left = NULL; right = NULL; } // ì´ˆê¸°???¤ì •.
-        Delement( T copy ){  // ê¸°ë³¸ ?€?? // ?•ì? ë³µì‚¬.
+        Delement( const T& copy ){  // ê¸°ë³¸ ?€?? // ?•ì? ë³µì‚¬.
             data = copy; // why this?
             left = NULL; right =  NULL;
         }
