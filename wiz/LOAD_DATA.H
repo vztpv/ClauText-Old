@@ -2144,10 +2144,20 @@ namespace wiz {
 			if (!operandStack.empty() && operandStack.top() == "ERROR") { return; }
 
 			int operandNum = 0;
+			int count = 0; // for brace!
 			{
 				for (int i = operandStack.size() - 1; i >= 0; --i) {
+					if ("{" == operandStack[i]) {
+						count++;
+					}
 					if ("}" == operandStack[i]) {
-						break;
+						count--;
+						if (count < 0) {
+							break;
+						}
+						else {
+							operandNum++;
+						}
 					}
 					else {
 						operandNum++;
@@ -2812,7 +2822,6 @@ namespace wiz {
 				if (chk) {
 					option = 1; // chk!!
 				}
-				//cout << "result is " << result << endl;
 
 				wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" }); // , "{", "=", "}" }); //
 				//wiz::StringTokenizer tokenizer2(result, { " ", "\n", "\t", "\r" } ); //
@@ -2896,7 +2905,6 @@ namespace wiz {
 					result = result + tokenVec[i];
 				}
 			}
-		//	cout << "result is " << result << endl;
 			//
 			wiz::ArrayStack<string> operandStack;
 			wiz::ArrayStack<string> operatorStack; 

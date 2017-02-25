@@ -18,11 +18,11 @@ Event = {
 	# id -> Event -> ToString?
 	# id -> registred data -> find Event!? -> ToString!
 	$register_object = { fileName = { "bool.txt" } } # from fileName,  # from object_data(string) <- done
-	$call_registered_object = { moduleName = { "bool.txt" } parameter = { id = TRUE x = "TEST 1234"  } }
+	$call_registered_object = { moduleName = { "bool.txt" } parameter = { id = TRUE x = { y = 1 z = { 1 2 3} } } }
 	$print = { data = { $return_value = { } } } # fix bug, when $return_value = { } is empty!
 	$print = { value = { \n } }
 	$register_object_from_string = { name = { "test1" } data = { $return_value = { } } }
-	$call_registered_object = { name = { "test1" } parameter = { id = -1 y = 1 } }
+	$call_registered_object = { name = { "test1" } parameter = { id = -1 y = 1 } } 
 	$print = { value = { $return_value = { } } }
 	$print = { data = { \n } }
 }
