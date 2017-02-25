@@ -1,41 +1,27 @@
-
-#Main =
-#{
-#    $call = { id = 0 }
-#}
-
-#Event =
-#{
-#    id = 0
-#    $call = { id = 1 i = 1 j = 1 }
-#}
-
+﻿
+# Data
 x = 9
+y = 9
 
+#Event
 Event =
 {
     id = 1
 
     $option = { REMOVE_IF_CALL_ONESELF_EVENT } # REMOVE_IF_CALL_ONESELF_EVENT.
     $parameter = { i j }
-	$local = { x } # "NOT_DEFINED"??
-
-	$assign_local = {
-		dir = { $local.x }
-		data = { 9 }
-	}
-	$assign_local = {
-		dir = { $concat = { $ local.x } } # ÀÌ·¸°Ô »ç¿ë?
- 		data = { 3 }
-	}
+	
+	$assign = { /./x value = { 6 } }
+	
     $if = {
-        condition = { $COMP<EQ = { $parameter.i $local.x } }
+        condition = { $COMP<EQ = { $parameter.i /./x } }
         then = {
             $call = { id = { $concat = { x $add = { 1 1 } } } i = $parameter.i j = 1 }
-            $print = { value = { \n } }
-            $call = { id = 1 i = {$add = { $parameter.i 1 } } j = 1 }
+			$call = { id = 1 i = { $add = { $parameter.i 1 } } j = 1 }
         }
     }
+	#$wait = { }
+	$return = { END }
 }
 
 Event =
@@ -45,7 +31,7 @@ Event =
     $option = { REMOVE_IF_CALL_ANY_EVENT }
 
     $if = {
-        condition = { $COMP<EQ = { $parameter.j 9 } }
+        condition = { $COMP<EQ = { $parameter.j /./y } }
         then = {
             $print = { value = { $parameter.i } }
             $print = { value = { " * " } }
@@ -56,4 +42,5 @@ Event =
             $call = { id = x2 i = $parameter.i j = { $add = { $parameter.j 1 } } }
         }
     }
+	$print = { value = { \n } }
 }

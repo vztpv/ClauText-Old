@@ -1,0 +1,157 @@
+.LOG
+# 1
+
+# Main
+Main = {
+	$call = { id = A }
+}
+
+
+# Event
+Event = {
+	id = A
+
+	$call = { id = B }
+}
+
+Event = {
+	id = B
+}
+
+
+Main -> A
+A -> B
+// 실행전에 test? 실행후 test?
+chk event caller, callee?
+chk event loop?
+chk event has resource? - only get, ( only set, get and set. )
+chk event A, B, ...  can do parallelly? (using thread)
+chk resource called by event? - only get, ( only set, get and set. )
+
+
+/로 시작하면서 존재하는 Dir or Dir + / + name ? => Resource로 구분?
+
+Resource로 활용되지 않는 Data는 ??
+
+IsExist( dir )?
+IsExist( data )?
+$concat? 
+그대로 + bool4 통과한 후 ?
+
+# 2
+XML??
+MetaData?? 	- name에 올 수 있는 문자열 제한?, val에 올 수 있는 문자열 제한?
+		
+
+EU3 or EU4 AI?
+
+UserType => GroupManager?
+
+dir/name + idx??
+
+fast make? prototype for game.
+
+# 3
+C++ Allocator? : 부분적 적용??
+
+#4
+Parallel Programming
+
+오전 5:53 2017-01-11
+
+#5
+ClauSQL , todo - search by col_name??
+
+Convert ClauText? to Tables
+	- 묶기?
+	- convert
+
+Table = {
+	name = "global"
+	key= { name }
+	col_name = { name val }
+	
+	
+}	
+
+Table = {
+	# metadata
+	name = "provinces/"
+	key = { no } # number, not no(<>yes) cf) dynamic tuple?
+	col_name = { no country history }
+
+	# data
+	{
+		no = 0	country = RUS 	history = 0 # chk?
+	}
+	{
+		no = 1	country = USA	history = 1
+	}
+}
+
+Table = {
+	# metadata
+	name = "provinces/history/"
+
+	# data
+
+}
+
+// make Table ( table name )
+// convert Table ( dir name ) 
+// merge Data? and convert Table?
+// $SQL = { SELECT = { * } FROM = { provinces } }
+	# using no copy? or copy?
+
+// print = { value = { SQL } } # ??
+
+x = 1
+y = 1
+
+=> Table = { name = global key = { name } col_name = { name value } { ~ } ...  }
+
+
+country = { 1 = { ~ } 2 = { ~ } } or -1 = { ~ } -2 = { ~ } or x = { ~ } x = { ~ }
+
+=> Table = { name = country key = { no } col_name = { no ... } { ~ } ... }
+
+
+오후 9:00 2017-01-17
+
+lex and yacc - 소스코드
+
+
+#6
+IDE for ClauText ( and ClauSQL ) ?
+-> make ClauText(and ClauSQL) extention? for vscode ?
+
+ToDo - clautext-client!
+오후 8:36 2017-01-23
+
+
+#7
+IDE for ClauText.
+
+Color, Editor for big? file, Regular expression - Modern? C++ regex??
+
+Lang Theme -> Theme name, Lang name,
+		확장자, keyword List, keyword color List,
+		자동완성?, keyword 또는 함수 설명, keyword-접두사모드?
+
++ Tree 구조 ?? 
+
+or 
+
+Event = {
+	id = 0
+	
+	$InsertTo = { /dir "fileName" }
+}
+
+오전 10:12 2017-01-24
+오전 9:27 2017-01-25
+오후 4:19 2017-01-27
+숫자 색깔!!
+
+오후 7:35 2017-02-22
+

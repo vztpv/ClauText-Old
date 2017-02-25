@@ -72,7 +72,8 @@ Event =
 	$load_only_data = { fileName = { "input.eu4" } dirName = { eu3Game } } # input.txt or input2.txt
 	$print = { value= { "load_only_data end" } }
 	$print = { value = { \n } }
-
+	
+	#$_getch = { }
 	#$replace_item = { 
 	#	var = { date }
 	#	val = { 1821.1.1 }
@@ -104,7 +105,8 @@ Event =
 		#rgx = { "[0-9]+\.[0-9]+" }
 		rgx = { "base_tax" } # "[a-zA-Z0-9_]+" }
 		# ToDo - condition == TRUE, then chk val! # /./name?
-		val = { @$eval = { " $concat_all = { $add = { 1.700 /./~~ } chk_base_tax  /./~~ } " } }
+		val = { @$eval = { " $concat_all = { $add = { 2.700 /./~~ } chk_base_tax  /./~~ } " } }
+		#val = { $concat_all = { $add = { 2.700 /./~~ } chk_base_tax  /./~~ } }
 		condition = {
 			#REGEX = { ~~ ~ "^1821\.1\.1$" ~ 0 } # option : 0, 1, 2 ?? - chk!!
 			AND = { 

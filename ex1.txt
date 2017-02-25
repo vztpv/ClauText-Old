@@ -1,0 +1,19 @@
+
+Main = 
+{
+	$call = { id = 0 }
+}
+
+data =
+{
+	test = " wow "
+}
+
+Event =
+{
+	id = 0
+	
+	$print = { value = { $add = { 2 $multiple = { 2 2 } } } }
+	$print = { value = { \n } }
+	# $_getch = { }
+}

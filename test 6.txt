@@ -1,16 +1,20 @@
 
-
 Main =
 {
 	$call = { id = 0 }
-}
+} 
 
-
-Test = { x = { y = { z = { 1 3 } 5 4 3 } a = { 7 3  } } k = 1 }
-Test = { x = { y = 1 } k = 0 } # "test test	test  !!" }
+Test = { x = { y = { z = { 1 3 }  5 4 3 } w = 1 a = { 7 3  } } k = 1 }
+Test = { x = { y = 1 w = 0 } k = 0 } # "test test	test  !!" }
 Test2 = { { no = BBB } }
 x = 1
 
+Event =
+{
+	id = 1
+
+
+}
 Event =
 {
 	id = 0
@@ -18,13 +22,13 @@ Event =
 	$local = { x y }
 
 	#$remove = { /Test/x }
-	$insert2 = { dir = { /Test/x } value = { { n = { 1 } } { m = 2 } } condition = { EQ = { k .. /./x  ~ 0 } } }
+	$insert2 = { dir = { /Test/x } value = { { n = { 1 } } { m = 2 } } condition = { EQ = { w / /./x  ~ 0 } } }
 
 	$assign_local = { dir = { $local.y } value = { y } }
 
 	$assign = { $local.x value = { $concat = { Test2/$ut $concat = { 0 /no } } } }
 	$assign_global = { dir = { $concat = { / $local.x } } value = { CCC } condition = { TRUE } }
-	$print = { value = { /Test2/$ut0/no } } # chk! $uto - todo/done list?
+	$print = { value = { /Test2/$ut0/no } } # chk! $ut0 - todo/done list? cf) @ + dir
 	$print = { value = { \n } }
 
 	# $module = { value = { "test 5.txt" } value = { input = 5 } }
@@ -38,6 +42,9 @@ Event =
 
 	$print = { value = { $return_value = { } } }
 	$print = { value = { \n } }
+	
+	$print = { value = { $size2 = { /Test/x/y } } }
+	$print = { value = { \n } }
 
 	#$print2 = { value = { /Test } }
 	#$print = { value = { \n } }
@@ -47,10 +54,106 @@ Event =
 	#$print2 = { value = { /Test } }
 	#$print = { value = { \n } }
 
+	$print = { value = { "-----------------" } }
+	$print = { value = { \n } }
+
 	$print2 = { value = { @/$/x/$local.y } } # $떄문에  @를 추가?, $ : any, all. 
 	$print = { value = { \n } }
 
 	$print2 = { value = { / } }
+	$print = { value = { \n } }
+
+	$make = { /eu3Game }
+									# input.eu4
+	$load_only_data = { fileName = { "input.eu4" } dirName = { eu3Game } } # input.txt or input2.txt
+	$print = { value= { "load_only_data end" } }
+	$print = { value = { \n } }
+
+	#$replace_item = { 
+	#	var = { date }
+	#	val = { 1821.1.1 }
+	#	condition = { 
+	#		COMP> = { date / 1821.1.1 ~ 0 }
+	#	}
+	#	start_dir = { /eu3Game }
+	#}
+	#$print = { value= { "replace_item end" } }
+	#$print = { value = { \n } }
+
+	#$remove_usertype_total = {
+	#	ut_name = { history }
+	#	condition = {
+	#		TRUE
+	#	}
+	#	start_dir = { /eu3Game }
+	#}
+	#$print = { value= { "remove_usertype_total end" } }
+	#$print = { value = { \n } }
+
+	#$call = { id = replaceA option = USE_THREAD }
+	#$call = { id = replaceB option = USE_THREAD }
+	#$wait = { }
+
+	$call = { id = save } # option = USE_THREAD }
+	#$call = { id = save2 option = USE_THREAD }
+	#$wait = { }
+	
+	$_getch = { }
+}
+
+Event = 
+{
+	id = replaceA
+	
+	$replace_datetype = {
+		val = { 1821.1.1 }
+		condition = { 
+			COMP> = { ~~ ~ 1821.1.1 ~ 0 }
+		}
+		start_dir = { /eu3Game }
+	}
+	$print = { value= { "replace_datetypeA end" } }
+	$print = { value = { \n } }
+
+	$replace_datetype = { 
+		val = { 1821.1.1 }
+		condition = {
+			COMP> = { ~~ / 1821.1.1 ~ 0 } 
+		}
+		start_dir = { /eu3Game }
+	}
+	$print = { value = { "replace_datetypeB end" } }
+	$print = { value = { \n } }
+}
+
+Event = 
+{
+	id = replaceB
+
+	$replace_datetype2 = { 
+		val = { 1821.1.1 }
+		condition = {
+			COMP> = { ~~ ~ 1821.1.1 ~ 0 } 
+		}
+		start_dir = { /eu3Game }
+	}
+	$print = { value = { "replace_datetypeC end" } }
+	$print = { value = { \n } }
+}
+
+Event =
+{
+	id = save
+
+	$save_data_only2 = { dirName = { eu3Game } fileName = { "save1.eu4" } option = { 1 } } # 1 - eu4 style? 2 - general style?
+	$print = { value = { "save_data_end" } }
+	$print = { value = { \n } }
+}
+Event = 
+{
+	id = save2
+	$save = { fileName = { "save2.txt" } option = { 1 } } # 1 - eu4 style? 2 - general style?
+	$print = { value = { "save_end" } }
 	$print = { value = { \n } }
 }
 

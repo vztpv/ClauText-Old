@@ -1,45 +1,28 @@
 
-
-X = { y = 2 }
-A = 1
-
+#Main
 Main =
 {
-    $call = { id = 0 }
+	$call = { id = 0 }  # " test "
 }
 
+x =  { y = 2 }
+ 
+#Event
 Event =
 {
-    id = 0
-    
-    $register_object = { fileName = { "ex3.txt" } } # parameter = { id = 1 i = 1 j = 1 } }
-	
-	$call_registered_object = { name = { "ex3.txt" } parameter = { id = 1 i = 1 j = 1 } }
-	$call_registered_object = { name = { "ex3.txt" } parameter = { id = 1 i = 1 j = 1 } }
-
-
-	$if = { condition = { TRUE } 
-		then = { 
-			$if = { condition = { TRUE } 
-				then= {
-				
-				}
-			}
-			$print={ data= { "test" } }
-			#$print = { value = { \n } }
-			#$print={ data= { "test2" } }
-			#$print = { value = { \n } }
-			#$print={ data= { "test3" } }
-			#$print = { value = { \n } }
-			#$else = {
-			#	then = { 
-			#		$print = { value = { "wow" } } 
-			#	}
-			#}
-		}
+	id = 0
+    $local = { k }
+	$assign_local = {
+		local = { $local.k }
+		value = { 3 }
 	}
-	$print={ value={\n}}
+	$register_object = { fileName = { "ex3.txt" } }
 	
+	$call_registered_object = { name = { "ex3.txt" } parameter = { id = 1 i = { $get = { $concat = { $ local.k } } } j = 1 } }
 
-    $return = { success }
+	$print = { value = { \n } }
+	
+	$_getch = { } # do not use in acroEdit!
+	
+	$return = { $return_value = { } }
 }

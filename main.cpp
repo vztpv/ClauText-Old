@@ -852,18 +852,6 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 	}
 }
 
-// chk..
-void ChkBool4(wiz::load_data::UserType* ut, wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const wiz::load_data::EventInfo& info) {
-	for (int i = 0; i < ut->GetItemListSize(); ++i) {
-		ut->GetItemList(i).SetName(ToBool4(global, parameters, ut->GetItemList(i).GetName(), info));
-		ut->GetItemList(i).Set(0, ToBool4(global, parameters, ut->GetItemList(i).Get(0), info));
-	}
-	for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
-		ut->GetUserTypeList(i)->SetName(ToBool4(global, parameters, ut->GetUserTypeList(i)->GetName(), info));
-		ChkBool4(ut->GetUserTypeList(i), global, parameters, info);
-	}
-}
-
 string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType* pEvents = nullptr, 
 	const std::shared_ptr<wiz::load_data::EventInfo>& pInfo = nullptr)
 {
@@ -1307,6 +1295,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 
 				else if ("$register_object" == val->GetName()) {
 					string objectFileName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
+					
 					objectFileName = wiz::String::substring(objectFileName, 1, objectFileName.size() - 2);
 
 					wiz::load_data::UserType objectUT;
@@ -1320,14 +1309,30 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
+				else if ("$register_object_from_string" == val->GetName()) {
+					string objectName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
+					string objectData = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
+					objectName = wiz::String::substring(objectName, 1, objectName.size() - 2);
+					objectData = wiz::String::substring(objectData, 1, objectData.size() - 2);
+					wiz::load_data::UserType objectUT;
+					wiz::load_data::LoadData::LoadDataFromString(objectData, objectUT); // error chk?
+
+					string data = objectUT.ToString();
+
+					//objectMap.insert(make_pair(objectFileName, data));
+					objectMap[objectName] = move(data);
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
 				else if ("$call_registered_object" == val->GetName()) {
 					string objectFileName = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top());
 					objectFileName = wiz::String::substring(objectFileName, 1, objectFileName.size() - 2);
 					string parameter;
+					string data = objectMap.at(objectFileName);
 
 					parameter = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top());
 
-					string data = objectMap.at(objectFileName);
 					data = data + " Main = { $call = { id = 0 } } Event = { id = 0 $call = { " + parameter + "  } } ";
 
 					wiz::load_data::UserType objectUT;
@@ -2418,9 +2423,9 @@ int main(int argc, char* argv[])
 	catch (const wiz::Error& e) {
 		cout << e << endl;
 	}
-	catch (...) {
-		cout << "Error.." << endl;
-	}
+	//catch (...) {
+	//	cout << "Error.." << endl;
+	//}
 
    	return 0;
 }

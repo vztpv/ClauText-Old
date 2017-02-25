@@ -1,0 +1,73 @@
+Main =
+{
+ $call = { id = 0 }
+}
+
+Event =
+{
+ id = 0
+
+ $make = { /eu4Game }
+         # input.eu4 대신 원하는 파일이름을 적으면 된다 ( 단, EU4 savegame 형식이어야한다.)?
+ $load_only_data = { fileName = { "input.eu4" } dirName = { eu4Game } } 
+
+ $print = { value= { "load_only_data end" } }
+ $print = { value = { \n } }
+
+ $call = { id = replaceA option = USE_THREAD }
+ $call = { id = replaceB option = USE_THREAD }
+
+ $wait = { }
+
+ $call = { id = save }
+}
+
+Event = 
+{
+ id = replaceA
+ 
+ $replace_datetype = {
+  val = { 1821.1.1 }
+  condition = { 
+   COMP> = { ~~ ~ 1821.1.1 ~ 0 }
+  }
+  start_dir = { /eu4Game }
+ }
+ $print = { value= { "replace_datetypeA end" } }
+ $print = { value = { \n } }
+
+ $replace_datetype = { 
+  val = { 1821.1.1 }
+  condition = {
+   COMP> = { ~~ / 1821.1.1 ~ 0 } 
+  }
+  start_dir = { /eu4Game }
+ }
+ $print = { value = { "replace_datetypeB end" } }
+ $print = { value = { \n } }
+}
+
+Event = 
+{
+ id = replaceB
+
+ $replace_datetype2 = { 
+  val = { 1821.1.1 }
+  condition = {
+   COMP> = { ~~ ~ 1821.1.1 ~ 0 } 
+  }
+  start_dir = { /eu4Game }
+ }
+ $print = { value = { "replace_datetypeC end" } }
+ $print = { value = { \n } }
+}
+
+Event =
+{
+ id = save
+# result -> save1.eu4
+ $save_data_only2 = { dirName = { eu4Game } fileName = { "save1.eu4" } option = { 1 } } 
+# 1 - eu4 style? 2 - general style?
+ $print = { value = { "save_data_end" } }
+ $print = { value = { \n } }
+}

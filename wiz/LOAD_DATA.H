@@ -2402,6 +2402,48 @@ namespace wiz {
 				}
 				operandStack.push(result);
 			}
+			else if ("$concat3" == str) { // for special case?
+				string result;
+
+				for (int i = 0; i < operandNum; ++i) {
+					string temp = operandStack.pop();
+
+					if (i < operandNum - 1) {
+						if (temp.size() > 0 && '\"' == temp.back()) {
+							temp.erase(temp.begin() + temp.size() - 1);
+						}
+						if (0 == i && temp.size() > 0 && '\"' != temp.front()) {
+							temp.insert(temp.begin(), '\"');
+						}
+						if (0 != i && temp.size() > 0 && '\"' == temp.front()) {
+							temp.erase(temp.begin());
+						}
+						result += temp;
+						result += " ";
+					}
+					else {
+						if (temp.size() > 0 && '\"' == temp.front()) {
+							temp.erase(temp.begin());
+						}
+						if (temp.size() > 0 && '\"' != temp.back()) {
+							temp.push_back('\"');
+						}
+						result += temp;
+					}
+				}
+
+				bool chk = wiz::load_data::Utility::ChkExist(result);
+				if (chk) { /// chk with tobool4
+					string temp;
+					wiz::load_data::Utility::ChangeStr(result, { "^5", "^4", "^3", "^2", "^1", "^0" }, { "#", "\n", "\r", "\t", " ", "^" }, temp);
+					result = std::move(temp);
+				}
+				else {
+					operandStack.push("ERROR in $concat3, must be \" \" ");
+					return;
+				}
+				operandStack.push(result);
+			}
 			else if ("$return_value" == str)
 			{
 				operandStack.push(info.return_value);
@@ -2615,6 +2657,24 @@ namespace wiz {
 				str = str.substr(1, str.size() - 2);
 				operandStack.push(ToBool4(global, parameters, str, info));
 			}
+			else if ("$toQuotedStr" == str) {
+				string str = operandStack.pop();
+				str.push_back('\"');
+				str.insert(str.begin(), '\"');
+				operandStack.push(str);
+			}
+			else if ("$removeQuoted" == str) { // chk "" string problem?
+				string str = operandStack.pop();
+
+				if (str.size() > 0 && str.front() == str.back()
+					&& '\n' == str.back()
+					)
+				{
+					str = wiz::String::substring(str, 1, str.size() - 2);
+				}
+
+				operandStack.push(str);
+			}
 		}
 
 		string ToBool3(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& temp, 
@@ -2746,14 +2806,16 @@ namespace wiz {
 					wiz::load_data::Utility::ChangeStr(temp, { " ", "\t", "\r", "\n", "#" }, { "^1", "^2", "^3", "^4", "^5" }, result);
 				}
 			}
-
+			
+			int option = 0; // chk!!
 			{
-				int option = 0; // chk!!
 				if (chk) {
-					option = 1;
+					option = 1; // chk!!
 				}
-				wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r", "{", "=", "}" }, option);
-				wiz::StringTokenizer tokenizer2(result, { " ", "\n", "\t", "\r" });
+				//cout << "result is " << result << endl;
+
+				wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" }); // , "{", "=", "}" }); //
+				//wiz::StringTokenizer tokenizer2(result, { " ", "\n", "\t", "\r" } ); //
 				vector<string> tokenVec;
 				vector<string> tokenVec2;
 
@@ -2811,43 +2873,45 @@ namespace wiz {
 					}
 				}
 
-				while (tokenizer2.hasMoreTokens()) {
-					tokenVec2.push_back(tokenizer2.nextToken());
-				}
+				//while (tokenizer2.hasMoreTokens()) {
+				//	tokenVec2.push_back(tokenizer2.nextToken());
+				//}
+				//cout << "result is " << result << endl;
+				//result = "";
 
+				//int j = tokenVec.size() - 1;
+				//for (int i = tokenVec2.size() - 1; i >= 0 && j >= 0; --i) {
+				//	if (tokenVec2[i] == "{" || tokenVec2[i] == "}" || tokenVec2[i] == "=") { 
+				//		continue;
+				//	}
+				//	else {
+				//		tokenVec2[i] = tokenVec[j];
+				//		--j;
+				//	}
+				//}
 				result = "";
-
-				int j = tokenVec.size() - 1;
-				for (int i = tokenVec2.size() - 1; i >= 0 && j >= 0; --i) {
-					if (tokenVec2[i] == "{" || tokenVec2[i] == "}" || tokenVec2[i] == "=") { 
-						continue;
-					}
-					else {
-						tokenVec2[i] = tokenVec[j];
-						--j;
-					}
-				}
-
-				for (int i = 0; i < tokenVec2.size(); ++i) {
+				for (int i = 0; i < tokenVec.size(); ++i) {
 					if (i != 0) { result = result + " "; }
 					
-					result = result + tokenVec2[i];
+					result = result + tokenVec[i];
 				}
 			}
-
+		//	cout << "result is " << result << endl;
 			//
 			wiz::ArrayStack<string> operandStack;
 			wiz::ArrayStack<string> operatorStack; 
-			wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" });
+			wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" } );
 			vector<string> tokenVec;
 
 			while (tokenizer.hasMoreTokens()) {
 				tokenVec.push_back(tokenizer.nextToken());
 			}
 
-			for (int i = tokenVec.size() - 1; i >= 0; --i)
-			{
-				if ('$' != tokenVec[i][0] || ('$' == tokenVec[i][0] && tokenVec[i].size() == 1)) {
+			for (int i = tokenVec.size() - 1; i >= 0; --i) {
+				if (//String::startsWith(tokenVec[i], "$parameter.") ||
+					//String::startsWith(tokenVec[i], "$local.") ||
+					'$' != tokenVec[i][0] || ('$' == tokenVec[i][0] && tokenVec[i].size() == 1)
+					) {
 					operandStack.push(tokenVec[i]);
 				}
 				else
@@ -2932,8 +2996,10 @@ namespace wiz {
 				}
 			}
 
-			result.erase(result.begin() + result.size() - 1);
-			
+			if (!result.empty()) {
+				result.erase(result.begin() + result.size() - 1);
+			}
+		
 			{
 				if (chk) {
 					string temp;
@@ -2941,6 +3007,8 @@ namespace wiz {
 					result = std::move(temp);
 				}
 			}
+			//cout << "result is " << result << endl;
+			//cout << endl;
 			return result;
 		}
 
