@@ -2712,7 +2712,7 @@ namespace wiz {
 						if ("id" == ut.GetUserTypeList(i)->GetItemList(j).GetName()
 							&& event_id == ut.GetUserTypeList(i)->GetItemList(j).Get(0)
 							) {
-							operandStack.push(ut.GetUserTypeList(i)->ToString());
+							operandStack.push("Event = { " + ut.GetUserTypeList(i)->ToString() + " } ");
 							return true;
 						}
 					}
@@ -2726,9 +2726,8 @@ namespace wiz {
 			else if ("$test" == str) { // for lambda test.
 				string temp = operandStack.pop();
 
-				temp = wiz::String::replace(temp, "^", "^0");
-				temp = wiz::String::replace(temp, "\"", "^9");
-
+				temp = wiz::String::replace(temp, "\"", "");
+				
 				temp = "\"" + temp + "\"";
 
 				operandStack.push(temp);
@@ -2738,26 +2737,47 @@ namespace wiz {
 
 				temp = wiz::String::substring(temp, 1, temp.size() - 2);
 
-				temp = wiz::String::replace(temp, "^9", "\"");
-				temp = wiz::String::replace(temp, "^0", "^");
-
 				operandStack.push(temp);
 			}
 			else if ("$test3" == str) { // for lambda test?
 				string temp = operandStack.pop();
-
-				//temp = wiz::String::substring(temp, 1, temp.size() - 2);
-
-				temp = wiz::String::replace(temp, "^9", "\"");
-				temp = wiz::String::replace(temp, "^0", "^");
 
 				operandStack.push(temp);
 			}
 			else if ("$test4" == str) {
 				string temp = operandStack.pop();
 
-				temp = wiz::String::substring(temp, 1, temp.size() - 2);
+				if (temp.size() >= 3 && temp.back() == temp.front() && temp.back() == '\"') {
+					temp = wiz::String::substring(temp, 1, temp.size() - 2);
+				}
 
+				operandStack.push(temp);
+			}
+			else if ("$test5" == str) { // chk!!
+				string temp = operandStack.pop();
+				int braceNum = 0;
+				bool first = true;
+
+				int start = String::find(temp, "$return", 0) + 7;
+				for (int i = start; i < temp.size(); ++i) {
+					if ('{' == temp[i]) {
+						if (first) {
+							temp.insert(temp.begin() + i + 1, '\"');
+						}
+						else {
+							braceNum++;
+						}
+						first = false;
+					}
+					else if ('}' == temp[i]) {
+						braceNum--;
+						if (!first && 0 == braceNum) {
+							temp.insert(temp.begin() + i + 1, '\"');
+						}
+					}
+					//cout << temp << endl;
+				}
+				
 				operandStack.push(temp);
 			}
 			else {
@@ -2845,7 +2865,7 @@ namespace wiz {
 			string result = temp;
 			//cout << "temp is " << temp << endl;
 			set<string> utNames; // rename?
-			{
+			{ // removal??
 				UserType utTemp;
 				LoadData::LoadDataFromString(result, utTemp);
 
@@ -3136,7 +3156,7 @@ namespace wiz {
 				}
 			}
 
-			{
+			{ // removal??
 				UserType ut;
 				LoadData::LoadDataFromString(result, ut);
 
@@ -3153,7 +3173,7 @@ namespace wiz {
 				result = ut.ToString();
 			}
 
-			{
+			{ // " $parameter.x " // removal??
 				for (int i = 0; i < parameters.size(); ++i) {
 					result = String::replace(result, "$parameter." + parameters[i].first, parameters[i].second);
 				}
