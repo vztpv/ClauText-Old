@@ -735,7 +735,7 @@ namespace wiz {
 			}
 		public:
 			//
-			static bool ChkExist(const string& str) /// has bug?, unstatble?
+			static bool ChkExist(const string& str) // for \"
 			{
 				int state = -1;
 
@@ -757,7 +757,7 @@ namespace wiz {
 				}
 
 				return 0 == state; // exist and valid !! chk - todo!
-			}
+			} 
 
 			// AddSpace : return string
 			static void AddSpace(const string& str, string& temp)
@@ -849,7 +849,6 @@ namespace wiz {
 
 				//return temp;
 			}
-
 		};
 	}
 }
