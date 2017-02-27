@@ -422,7 +422,7 @@ namespace wiz{
 	template <>
 	inline string _toString(const long long x)
 	{
-		return str(x);
+		return toStr(x);
 	}
 	template <>
 	inline string _toString(const int x)

@@ -2780,6 +2780,16 @@ namespace wiz {
 				
 				operandStack.push(temp);
 			}
+			else if ("$test6" == str) { // for lambda test.
+				vector<string> vec;
+				for (int i = 0; i < operandNum; ++i) {
+					vec.push_back(operandStack.pop());
+				}
+				for (int i = vec.size()-1; i >= 0; --i) {
+					vec[i] = wiz::String::replace(vec[i], "\"", "");
+					operandStack.push(vec[i]);
+				}
+			}
 			else {
 				return false;
 			}
@@ -2877,7 +2887,7 @@ namespace wiz {
 					}
 				}
 			}
-			//cout << "result is " << result << endl;
+		//	cout << "result is " << result << endl;
 
 			wiz::ArrayStack<string> resultStack;
 			wiz::load_data::UserType ut;
@@ -3180,7 +3190,7 @@ namespace wiz {
 			}
 
 		//	cout << "result is " << result << endl;
-			//cout << endl;
+		//	cout << endl;
 			return result;
 		}
 
