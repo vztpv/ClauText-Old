@@ -906,10 +906,10 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 		wiz::load_data::EventInfo info;
 		info.eventUT = Main.GetUserTypeList(0);
 		info.userType_idx.push(0);
-		info.parameters.push_back(
+		info.parameters.insert(
 			make_pair("id", info.eventUT->GetUserTypeItem("$call")[0]->GetItem("id")[0].Get(0))
 		);
-		info.id = info.parameters[0].second;
+		info.id = info.parameters["id"];
 
 		const int no = convert.at(info.id);
 		for (int i = 0; i < events.GetUserTypeList(no)->GetUserTypeListSize(); ++i) {
@@ -934,10 +934,10 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 	{
 		wiz::load_data::EventInfo info = eventStack.top();
 		string str;
-
+		map<string, string>::iterator x;
 		for (int i = 0; i < info.parameters.size(); ++i) {
-			if (info.parameters[i].first == "id") {
-				str = info.parameters[i].second;
+			if ((x = info.parameters.find("id")) != info.parameters.end()) {
+				str = x->second;
 				break;
 			}
 		}
@@ -1039,14 +1039,18 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 				else if ("$replace_datatype1" == val->GetName()) { // name
 					string rex = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap);
 					rex = rex.substr(1, rex.size() - 2);
-					string sval = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap);
-
-					string scondition = "TRUE";
+					vector<string> sval;
+					vector<string> scondition;
 					string start_dir = "root";
 
 					if (val->GetUserTypeListSize() >= 3)
 					{
-						scondition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top(), objectMap);
+						int n = (val->GetUserTypeListSize() - 1) / 2;
+						for (int i = 0; i < n; ++i) {
+							sval.push_back(ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap));
+
+							scondition.push_back(ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top(), objectMap));
+						}
 					}
 					if (val->GetUserTypeListSize() >= 4) {
 						start_dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(3)->ToString(), eventStack.top(), objectMap);
@@ -1060,17 +1064,24 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 				else if ("$replace_datatype1_2" == val->GetName()) { //val
 					string rex = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap);
 					rex = rex.substr(1, rex.size() - 2);
-					string sval = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap);
-
-					string scondition = "TRUE";
+					vector<string> sval;
+					vector<string> scondition;
 					string start_dir = "root";
 
 					if (val->GetUserTypeListSize() >= 3)
 					{
-						scondition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top(), objectMap);
+						int n = (val->GetUserTypeListSize() - 1) / 2;
+						int count = 1;
+						for (int i = 0; i < n; ++i) {
+							sval.push_back(ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(count)->ToString(), eventStack.top(), objectMap));
+							count++;
+							scondition.push_back(ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(count)->ToString(), eventStack.top(), objectMap));
+							count++;
+						}
 					}
-					if (val->GetUserTypeListSize() >= 4) {
-						start_dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(3)->ToString(), eventStack.top(), objectMap);
+
+					if (val->GetUserTypeListSize() >= 4 && (val->GetUserTypeListSize()%2 == 0)) {
+						start_dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(val->GetUserTypeListSize()-1)->ToString(), eventStack.top(), objectMap);
 					}
 
 					wiz::load_data::LoadData::ReplaceDataType1_2(global, rex, sval, scondition, start_dir, objectMap);
@@ -1082,17 +1093,24 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 					string rex = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap);
 					rex = rex.substr(1, rex.size() - 2);
 					//cout << val->GetUserTypeList(1)->ToString() << endl;
-					string sval = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap);
-
-					string scondition = "TRUE";
+					vector<string> sval;
+					vector<string> scondition;
 					string start_dir = "root";
 
 					if (val->GetUserTypeListSize() >= 3)
 					{
-						scondition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top(), objectMap);
+						int n = (val->GetUserTypeListSize() - 1) / 2;
+						int count = 1;
+						for (int i = 0; i < n; ++i) {
+							sval.push_back(ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(count)->ToString(), eventStack.top(), objectMap));
+							count++;
+							scondition.push_back(ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(count)->ToString(), eventStack.top(), objectMap));
+							count++;
+						}
 					}
-					if (val->GetUserTypeListSize() >= 4) {
-						start_dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(3)->ToString(), eventStack.top(), objectMap);
+
+					if (val->GetUserTypeListSize() >= 4 && (val->GetUserTypeListSize() % 2 == 0)) {
+						start_dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(val->GetUserTypeListSize() - 1)->ToString(), eventStack.top(), objectMap);
 					}
 
 					//cout << scondition << endl;
@@ -1490,13 +1508,13 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 						for (int j = 0; j < val->GetItemListSize(); ++j) {
 							if (val->GetItemListSize() > 0) {
 								string temp = ToBool4(global, info2.parameters, val->GetItemList(j).Get(0), info2, objectMap);
-								info.parameters.push_back(make_pair(val->GetItemList(j).GetName(), temp));
+								info.parameters.insert(make_pair(val->GetItemList(j).GetName(), temp));
 							}
 						}
 						for (int j = 0; j < val->GetUserTypeListSize(); ++j) {
 							if (val->GetUserTypeListSize() > 0) {
 								string temp = ToBool4(global, info2.parameters, val->GetUserTypeList(j)->ToString(), info2, objectMap);
-								info.parameters.push_back(make_pair(val->GetUserTypeList(j)->GetName(), temp));
+								info.parameters.insert(make_pair(val->GetUserTypeList(j)->GetName(), temp));
 							}
 						}
 						eventStack.top().userType_idx.top()++;
@@ -1505,24 +1523,22 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 						if (val->GetItemListSize() > 0) {
 							for (int j = 0; j < val->GetItemListSize(); ++j) {
 								string temp = ToBool4(global, info2.parameters, val->GetItemList(j).Get(0), info, objectMap);
-								for (int k = 0; k < info.parameters.size(); ++k)
+								
+								map<string, string>::iterator x;
+								if ((x = info.parameters.find(val->GetItemList(j).GetName())) != info.parameters.end())
 								{
-									if (info.parameters[k].first == val->GetItemList(j).GetName())
-									{
-										info.parameters[k].second = temp;
-									}
+									x->second = temp;
 								}
 							}
 						}
 						if (val->GetUserTypeListSize() > 0) {
 							for (int j = 0; j < val->GetUserTypeListSize(); ++j) {
 								string temp = ToBool4(global, info2.parameters, val->GetUserTypeList(j)->ToString(), info, objectMap);
-								for (int k = 0; k < info.parameters.size(); ++k)
+
+								map<string, string>::iterator x;
+								if ((x = info.parameters.find(val->GetUserTypeList(j)->GetName())) != info.parameters.end())
 								{
-									if (info.parameters[k].first == val->GetUserTypeList(j)->GetName())
-									{
-										info.parameters[k].second = temp;
-									}
+									x->second = temp;
 								}
 							}
 						}
@@ -1554,6 +1570,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 							break;
 						}
 					}
+
 					if (waits.size() >= 4) {
 						for (int i = 0; i < waits.size(); ++i) {
 							waits[i]->join();

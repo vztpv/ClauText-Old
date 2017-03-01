@@ -72,7 +72,7 @@ Event =
 	$load_only_data = { fileName = { "input.eu4" } dirName = { eu3Game } } # input.txt or input2.txt
 	$print = { value= { "load_only_data end" } }
 	$print = { value = { \n } }
-	
+	#$_getch = { }
 	#$_getch = { }
 	#$replace_item = { 
 	#	var = { date }
@@ -112,6 +112,15 @@ Event =
 			AND = { 
 				EQ = { ~~ ~ base_tax ~ 1 }
 				COMP> = { ~~ / 5.000 ~ 0 }
+			}
+		}
+		val = { @$eval = { " $concat_all = { $add = { 1.000 /./~~ } chk_base_tax  /./~~ } " } }
+		#val = { $concat_all = { $add = { 2.700 /./~~ } chk_base_tax  /./~~ } }
+		condition = {
+			#REGEX = { ~~ ~ "^1821\.1\.1$" ~ 0 } # option : 0, 1, 2 ?? - chk!!
+			AND = { 
+				EQ = { ~~ ~ base_tax ~ 1 }
+				COMP<EQ = { ~~ / 5.000 ~ 0 }
 			}
 		}
 		start_dir = { /eu3Game }

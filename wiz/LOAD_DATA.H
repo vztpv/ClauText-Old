@@ -40,7 +40,7 @@ namespace wiz {
 			wiz::load_data::UserType* eventUT;
 			wiz::ArrayStack< wiz::load_data::UserType* > nowUT; //
 			wiz::ArrayStack<int> userType_idx;
-			vector<pair<string, string>> parameters;
+			map<string, string> parameters;
 			map<string, string> locals;
 			string id; //
 			wiz::ArrayStack<string> conditionStack;
@@ -130,7 +130,7 @@ namespace wiz {
 				}
 			}
 		};
-		string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& temp, wiz::load_data::EventInfo info, map<string, string>& objectMap);
+		string ToBool4(wiz::load_data::UserType& global, const map<string, string>& parameters, const string& temp, wiz::load_data::EventInfo info, map<string, string>& objectMap);
 
 		class LoadData
 		{
@@ -1719,17 +1719,17 @@ namespace wiz {
 				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
 				ReplaceDateType2(global, start_dir, ut, val, condition);
 			}
-			static void ReplaceDataType1(UserType& global, const string& rex, const string& val, const string& condition, const string& start_dir, map<string, string>& objectMap) {
+			static void ReplaceDataType1(UserType& global, const string& rex, const vector<string>& val, const vector<string>& condition, const string& start_dir, map<string, string>& objectMap) {
 				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
 				std::regex rgx(rex);
 				ReplaceDataType1(global, start_dir, ut, rgx, val, condition, objectMap);
 			}
-			static void ReplaceDataType1_2(UserType& global, const string& rex, const string& val, const string& condition, const string& start_dir, map<string, string>& objectMap) {
+			static void ReplaceDataType1_2(UserType& global, const string& rex, const vector<string>& val, const vector<string>& condition, const string& start_dir, map<string, string>& objectMap) {
 				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
 				std::regex rgx(rex);
 				ReplaceDataType1_2(global, start_dir, ut, rgx, val, condition, objectMap);
 			}
-			static void ReplaceDataType2(UserType& global, const string& rex, const string& val, const string& condition, const string& start_dir, map<string, string>& objectMap) {
+			static void ReplaceDataType2(UserType& global, const string& rex, const vector<string>& val, const vector<string>& condition, const string& start_dir, map<string, string>& objectMap) {
 				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
 				std::regex rgx(rex);
 				ReplaceDataType2(global, start_dir, ut, rgx, val, condition, objectMap);
@@ -1881,26 +1881,28 @@ namespace wiz {
 				}
 			}
 			static void ReplaceDataType1(UserType& global, const string& nowPosition,
-				UserType* ut, const std::regex& rgx, const string& val, const string& condition, map<string, string>& objectMap)
+				UserType* ut, const std::regex& rgx, const vector<string>& val, const vector<string>& condition, map<string, string>& objectMap)
 			{
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
 					if (std::regex_match(ut->GetItemList(i).GetName(), rgx)) { // || Utility::IsDate(ut->GetItemList(i).Get(0))) {
-						string _condition = condition;
-						string _val = val;
-						string _var = ut->GetItemList(i).GetName();
-						_condition = wiz::String::replace(_condition, "~~", _var); //
+						for (int k = 0; k < val.size(); ++k) {
+							string _condition = condition[k];
+							string _val = val[k];
+							string _var = ut->GetItemList(i).GetName();
+							_condition = wiz::String::replace(_condition, "~~", _var); //
 
-						Condition cond(_condition, ut, &global);
+							Condition cond(_condition, ut, &global);
 
-						while (cond.Next());
+							while (cond.Next());
 
-						if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
-						{
-							if (_val[0] == '@') { _val.erase(_val.begin()); }
-							_val = wiz::String::replace(_val, "~~", _var);
-							_val = ToBool4(*ut, vector<pair<string, string>>(), _val, EventInfo(), objectMap);
+							if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
+							{
+								if (_val[0] == '@') { _val.erase(_val.begin()); }
+								_val = wiz::String::replace(_val, "~~", _var);
+								_val = ToBool4(*ut, map<string, string>(), _val, EventInfo(), objectMap);
 
-							ut->GetItemList(i).SetName(_val);
+								ut->GetItemList(i).SetName(_val);
+							}
 						}
 					}
 				}
@@ -1921,27 +1923,29 @@ namespace wiz {
 				}
 			}
 			static void ReplaceDataType1_2(UserType& global, const string& nowPosition,
-				UserType* ut, const std::regex& rgx, const string& val, const string& condition, map<string, string>& objectMap)
+				UserType* ut, const std::regex& rgx, const vector<string>& val, const vector<string>& condition, map<string, string>& objectMap)
 			{
 
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
 					if (std::regex_match(ut->GetItemList(i).GetName(), rgx)) { // || Utility::IsDate(ut->GetItemList(i).Get(0))) {
-						string _condition = condition;
-						string _val = val;
-						string _var = ut->GetItemList(i).GetName();
-						_condition = wiz::String::replace(_condition, "~~", _var); //
-					
-						Condition cond(_condition, ut, &global);
+						for (int k = 0; k < val.size(); ++k) {
+							string _condition = condition[k];
+							string _val = val[k];
+							string _var = ut->GetItemList(i).GetName();
+							_condition = wiz::String::replace(_condition, "~~", _var); //
 
-						while (cond.Next());
+							Condition cond(_condition, ut, &global);
 
-						if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
-						{
-							if (_val[0] == '@') { _val.erase(_val.begin()); } // chk, same do(chk @) to other functions?
-							_val = wiz::String::replace(_val, "~~", _var);
-							_val = ToBool4(*ut, vector<pair<string, string>>(), _val, EventInfo(), objectMap);
-							
-							ut->GetItemList(i).Set(0, _val);
+							while (cond.Next());
+
+							if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
+							{
+								if (_val[0] == '@') { _val.erase(_val.begin()); } // chk, same do(chk @) to other functions?
+								_val = wiz::String::replace(_val, "~~", _var);
+								_val = ToBool4(*ut, map<string, string>(), _val, EventInfo(), objectMap);
+
+								ut->GetItemList(i).Set(0, _val);
+							}
 						}
 					}
 				}
@@ -1962,26 +1966,28 @@ namespace wiz {
 				}
 			}
 			static void ReplaceDataType1_3(UserType& global, const string& nowPosition,
-				UserType* ut, const std::regex& rgx, const string& val, const string& condition, map<string, string>& objectMap)
+				UserType* ut, const std::regex& rgx, const vector<string>& val, const vector<string>& condition, map<string, string>& objectMap)
 			{
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
 					if (std::regex_match(ut->GetItemList(i).Get(0), rgx)) {
-						string _condition = condition;
-						string _val = val;
+						for (int k = 0; k < val.size(); ++k) {
+							string _condition = condition[k];
+							string _val = val[k];
 
-						string _var = ut->GetItemList(i).GetName();
-						_condition = wiz::String::replace(_condition, "~~", _var); //
-						
-						Condition cond(_condition, ut, &global);
+							string _var = ut->GetItemList(i).GetName();
+							_condition = wiz::String::replace(_condition, "~~", _var); //
 
-						while (cond.Next());
+							Condition cond(_condition, ut, &global);
 
-						if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
-						{
-							if (_val[0] == '@') { _val.erase(_val.begin()); }
-							_val = wiz::String::replace(_val, "~~", _var);
-							_val = ToBool4(*ut, vector<pair<string, string>>(), _val, EventInfo(), objectMap);
-							ut->GetItemList(i).Set(0, _val);
+							while (cond.Next());
+
+							if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
+							{
+								if (_val[0] == '@') { _val.erase(_val.begin()); }
+								_val = wiz::String::replace(_val, "~~", _var);
+								_val = ToBool4(*ut, map<string, string>(), _val, EventInfo(), objectMap);
+								ut->GetItemList(i).Set(0, _val);
+							}
 						}
 					}
 				}
@@ -2005,32 +2011,33 @@ namespace wiz {
 			// cf) replacedatatype1_4  match value, change var_name?
 
 			static void ReplaceDataType2(UserType& global, const string& nowPosition,
-				UserType* ut, const std::regex& rgx, const string& val, const string& condition, map<string, string>& objectMap) // first val test
+				UserType* ut, const std::regex& rgx, const vector<string>& val, const vector<string>& condition, map<string, string>& objectMap) // first val test
 			{
 				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
 					string temp = ut->GetUserTypeList(i)->GetName();
 					if (temp == "") { temp = " "; }
 
 					if (std::regex_match(temp, rgx)) {
-						string _condition = condition;
-						string _val = val;
-						string _var = ut->GetUserTypeList(i)->GetName();
-						_condition = wiz::String::replace(_condition, "~~", _var); //
-					
-						Condition cond(_condition, ut, &global);
+						for (int k = 0; k < val.size(); ++k) {
+							string _condition = condition[k];
+							string _val = val[k];
+							string _var = ut->GetUserTypeList(i)->GetName();
+							_condition = wiz::String::replace(_condition, "~~", _var); //
 
-						while (cond.Next());
+							Condition cond(_condition, ut, &global);
 
-						if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
-						{
-							if (_val[0] == '@') { _val.erase(_val.begin()); } // removal?
-						
-							_val = wiz::String::replace(_val, "~~", _var);
-							_val = ToBool4(*ut, vector<pair<string, string>>(), _val, EventInfo(), objectMap);
-							ut->GetUserTypeList(i)->SetName(_val);
+							while (cond.Next());
+
+							if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
+							{
+								if (_val[0] == '@') { _val.erase(_val.begin()); } // removal?
+
+								_val = wiz::String::replace(_val, "~~", _var);
+								_val = ToBool4(*ut, map<string, string>(), _val, EventInfo(), objectMap);
+								ut->GetUserTypeList(i)->SetName(_val);
+							}
 						}
 					}
-
 					ReplaceDataType2(
 						global,
 						nowPosition + "/" + temp,
@@ -2122,12 +2129,13 @@ namespace wiz {
 			return{ wiz::String::substring(str, 0, idx), wiz::String::substring(str,idx + 1) };
 		}
 
-		inline string FindParameters(const vector<pair<string, string>>& parameters, const string& operand)
+		inline string FindParameters(const map<string, string>& parameters, const string& operand)
 		{
+			map<string, string>::const_iterator x;
 			for (int i = 0; i < parameters.size(); ++i) {
 				if (wiz::String::startsWith(operand, "$parameter.")
-					&& wiz::String::substring(operand, 11) == parameters[i].first) {
-					return parameters[i].second;
+					&& (x = parameters.find( wiz::String::substring(operand, 11) ) ) != parameters.end())  {
+					return x->second;
 				}
 			}
 			return "";
@@ -2142,9 +2150,9 @@ namespace wiz {
 		}
 		//need to renewal. add $AND $OR $NOT
 		/// remove /, parameter chk!!
-		string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& temp, 
+		string ToBool4(wiz::load_data::UserType& global, const map<string, string>& parameters, const string& temp,
 			 wiz::load_data::EventInfo info, map<string, string>& objectMap);
-		bool operation(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& str,
+		bool operation(wiz::load_data::UserType& global, const map<string, string>& parameters, const string& str,
 			wiz::ArrayStack<string>& operandStack, wiz::load_data::EventInfo info, map<string, string>& objectMap)
 		{
 			if (!operandStack.empty() && operandStack.top() == "ERROR") { return false; }
@@ -2798,7 +2806,7 @@ namespace wiz {
 			// remove "
 		}
 
-		string ToBool3(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& temp, 
+		string ToBool3(wiz::load_data::UserType& global, const map<string, string>& parameters, const string& temp,
 			 wiz::load_data::EventInfo info) /// has bug!
 		{
 			wiz::StringTokenizer tokenizer(temp, vector<string>{ "/" });
@@ -2869,7 +2877,7 @@ namespace wiz {
 			}
 			return result;
 		}
-		string ToBool4(wiz::load_data::UserType& global, const vector<pair<string, string>>& parameters, const string& temp, 
+		string ToBool4(wiz::load_data::UserType& global, const map<string, string>& parameters, const string& temp,
 			 wiz::load_data::EventInfo info, map<string, string>& objectMap)
 		{ 
 			string result = temp;
@@ -3184,8 +3192,11 @@ namespace wiz {
 			}
 
 			{ // " $parameter.x " // removal??
-				for (int i = 0; i < parameters.size(); ++i) {
-					result = String::replace(result, "$parameter." + parameters[i].first, parameters[i].second);
+				for (auto x = parameters.rbegin(); x != parameters.rend(); ++x) {
+					result = String::replace(result, "$parameter." + x->first, x->second);
+				}
+				for (auto x = info.locals.rbegin(); x != info.locals.rend(); ++x) {
+					result = String::replace(result, "$local." + x->first, x->second);
 				}
 			}
 

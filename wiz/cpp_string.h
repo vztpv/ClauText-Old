@@ -173,7 +173,6 @@ namespace wiz{
 
 			int left = 0;
 			int right = 0;
-			bool chkEnd = false;
 			int state = 0;
 			this->exist = false;
 
@@ -181,19 +180,6 @@ namespace wiz{
 				right = i;
 				int _select = -1;
 				bool pass = false;
-				
-				/// chk!! option == 1
-				if (option == 1 && state == 0 && str[i] == '\"') {
-					state = 1; 
-					continue;
-				}
-				if (option == 1 && state == 1 && str[i] != '\"') {
-					continue;
-				}
-				if (option == 1 && state == 1 && str[i] == '\"') {
-					state = 0; 
-					continue;
-				}
 				
 				for (int j = 0; j < separator.size(); ++j) {
 					for (int k = 0; k < separator[j].size(); ++k) {
@@ -233,7 +219,7 @@ namespace wiz{
 		void Init(string&& str, const vector<string>& separator) // assumtion : separators are sorted by length?, long -> short
 		{
 			if (separator.empty() || str.empty()) { return; } // if str.empty() == false then _m_str.push_back(str); // ?
-															  //vector<int> arr(str.size(), 0);
+																//vector<int> arr(str.size(), 0);
 
 			int left = 0;
 			int right = 0;

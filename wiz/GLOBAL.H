@@ -294,17 +294,17 @@ namespace wiz{
 		}
 	};
 
-    template <typename T> /// x is 10진수..
-    inline T pos_1(const T x, const int base=10) // 1�리 �계산
+	template <typename T> /// x is 10진수..
+	inline T pos_1(const T x, const int base=10) // 1�리 �계산
 	{
 		if( x >= 0 ) { return x % base; }// x - ( x / 10 ) * 10; }
 		else{ return (x / base) * base - x; }
 		// -( x - ( (x/10) * 10 ) )
 	}
-    template <typename T> /// T <- char, int, long, long long...
-    string toStr(const T x, const int base=10 ) /// chk!!
+	template <typename T> /// T <- char, int, long, long long...
+	string toStr(const T x, const int base=10 ) /// chk!!
 	{
-	    if( base < 2 || base > 16 ) { return "base is not valid"; }
+		if( base < 2 || base > 16 ) { return "base is not valid"; }
 		T i = x;
 
 		const int INT_SIZE = sizeof(T) << 3; ///*8
@@ -315,10 +315,10 @@ namespace wiz{
 		temp[INT_SIZE+1] = '\0'; ///문자�시..
 
 		for (k = INT_SIZE; k >= 1; k--){
-            T val = pos_1<T>(i, base); /// 0 ~ base-1
-            /// number to ['0'~'9'] or ['A'~'F']
-            if( val < 10 ) { temp[k] = val + '0'; }
-            else { temp[k] = val-10 + 'A'; }
+			T val = pos_1<T>(i, base); /// 0 ~ base-1
+			/// number to ['0'~'9'] or ['A'~'F']
+			if( val < 10 ) { temp[k] = val + '0'; }
+			else { temp[k] = val-10 + 'A'; }
 
 			i /= base;
 

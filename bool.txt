@@ -1,7 +1,15 @@
 
 # need to rename for $concat3, and make $concat3?
 
-Event = { id = TRUE  $parameter = { x } $return = { $concat3 = { "Event = { id = -1 $parameter = { y } $return = { " $parameter.x " } } " } } }
+
+Event = { id = TRUE  $parameter = { x } $return = { "Event = { id = -1 $parameter = { y } $return = { $parameter.x } }  " } }
 
 Event = { id = FALSE $parameter = { x } $return = { "Event = { id = -1 $parameter = { y } $return = { $parameter.y } } " } }
+
+# cf) this.local.x
+# cf) this.parameter.x
+# $대신 this.사용?
+
+
+# $local?  chk?? -ToDO??
 
