@@ -4,7 +4,7 @@
 
 #include <string>
 #include <vector>
-#include <memory>
+#include <list>
 #include <regex>
 using namespace std;
 
@@ -1092,7 +1092,7 @@ namespace wiz {
 
 				StringTokenizer tokenizer(position, "/");
 				vector<string> strVec;
-				Deck<pair< UserType*, int >> utDeck;
+				list<pair< UserType*, int >> utDeck;
 				pair<UserType*, int> utTemp;
 				utTemp.first = global;
 				utTemp.second = 0;
@@ -1141,7 +1141,8 @@ namespace wiz {
 
 				bool exist = false;
 				while (false == utDeck.empty()) {
-					utTemp = utDeck.pop_front();
+					utTemp = utDeck.front();
+					utDeck.pop_front();
 					
 					if (utTemp.second < strVec.size() &&
 						wiz::String::startsWith(strVec[utTemp.second], "$ut")
