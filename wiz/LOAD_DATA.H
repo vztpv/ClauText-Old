@@ -3073,8 +3073,10 @@ namespace wiz {
 
 					if (false == operation(global, parameters, tokenVec[i], operandStack, info, objectMap)) // chk!!
 					{
+						// chk removal here?
 						cout << " false " << endl;
 						_getch();
+						//
 						operatorStack.pop();
 						operandStack.push("{");
 						operandStack.push("=");
@@ -3174,7 +3176,7 @@ namespace wiz {
 				}
 			}
 
-			{ // removal??
+			{ // removal?? -why?? - reason?
 				UserType ut;
 				LoadData::LoadDataFromString(result, ut);
 

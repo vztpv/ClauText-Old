@@ -169,7 +169,6 @@ namespace wiz{
 		void Init(string str, const vector<string>& separator) // assumtion : separators are sorted by length?, long -> short
 		{
 			if (separator.empty() || str.empty()) { return; } // if str.empty() == false then _m_str.push_back(str); // ?
-			//vector<int> arr(str.size(), 0);
 
 			int left = 0;
 			int right = 0;
@@ -182,7 +181,7 @@ namespace wiz{
 				bool pass = false;
 				
 				for (int j = 0; j < separator.size(); ++j) {
-					for (int k = 0; k < separator[j].size(); ++k) {
+					for (int k = 0; k < separator[j].size() && i + k < str.size(); ++k) {
 						if (str[i + k] == separator[j][k]) {
 							pass = true;
 						}
@@ -198,10 +197,7 @@ namespace wiz{
 					this->exist = true;
 
 					if (right-1 - left + 1 > 0) {
-						if (right <= str.size() - 1) {
-							str[right] = '\0';
-						}
-						_m_str.emplace_back(str.c_str() + left);
+						_m_str.push_back(String::substring(str, left, right-1));
 					}
 					i = i + separator[_select].size() - 1;
 					left = i + 1;
@@ -209,7 +205,7 @@ namespace wiz{
 				}
 				else if (!pass && i == str.size() - 1) {
 					if (right - left + 1 > 0) {
-						_m_str.emplace_back(str.c_str() + left);
+						_m_str.push_back(String::substring(str, left, right));
 					}
 				}
 			}
