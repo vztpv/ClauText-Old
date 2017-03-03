@@ -166,7 +166,7 @@ namespace wiz {
 			/// core
 		public:
 			template <class Reserver>
-			static bool _LoadData(list<Token>& strVec, Reserver& reserver, UserType& global) // first, strVec.empty() must be true!!
+			static bool _LoadData(deque<Token>& strVec, Reserver& reserver, UserType& global) // first, strVec.empty() must be true!!
 			{
 				int state = 0;
 				int braceNum = 0;
@@ -500,7 +500,7 @@ namespace wiz {
 					inFile.close(); return false;
 				}
 				UserType globalTemp = global;
-				list<Token> strVec;
+				deque<Token> strVec;
 
 				try {
 					InFileReserver ifReserver(inFile);
@@ -527,7 +527,7 @@ namespace wiz {
 			static bool LoadDataFromString(const string& str, UserType& ut)
 			{
 				UserType utTemp = ut;
-				list<Token> strVec;
+				deque<Token> strVec;
 
 				string statement = str;
 				int token_first = 0, token_last = 0; // idx of token in statement.

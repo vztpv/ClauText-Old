@@ -540,11 +540,11 @@ namespace wiz {
 			private:
 				vector<string>* strVec;
 			public:
-				list<Token>* aq;
+				deque<Token>* aq;
 				//int strVecStart;
 				//int strVecEnd;
 			public:
-				DoThread(vector<string>* strVec, list<Token>* aq) //, list<string>* aq)//, int strVecStart, int strVecEnd)
+				DoThread(vector<string>* strVec, deque<Token>* aq) //, list<string>* aq)//, int strVecStart, int strVecEnd)
 					: strVec(strVec), aq(aq) // , strVecStart(strVecStart), strVecEnd(strVecEnd)
 				{
 					//
@@ -668,7 +668,7 @@ namespace wiz {
 				//}
 			};
 		public:
-			static pair<bool, int> Reserve2(ifstream& inFile, list<Token>& aq, const int num = 1)
+			static pair<bool, int> Reserve2(ifstream& inFile, deque<Token>& aq, const int num = 1)
 			{
 				int count = 0;
 				string temp;
@@ -705,7 +705,7 @@ namespace wiz {
 			}
 
 			template<class Reserver>
-			static const string& Top(list<Token>& strVec, wiz::load_data::UserType* ut, Reserver reserver)
+			static string Top(deque<Token>& strVec, wiz::load_data::UserType* ut, Reserver reserver)
 			{
 				do {
 					while (!strVec.empty()) {
@@ -732,7 +732,7 @@ namespace wiz {
 				throw wiz::Error("Error2 in Top function in load_data_utility.h");
 			}
 			template <class Reserver>
-			static bool Pop(list<Token>& strVec, string* str, wiz::load_data::UserType* ut, Reserver reserver)
+			static bool Pop(deque<Token>& strVec, string* str, wiz::load_data::UserType* ut, Reserver reserver)
 			{
 				do {
 					while (!strVec.empty()) {
@@ -768,10 +768,10 @@ namespace wiz {
 			}
 		
 			template <class Reserver>
-			static pair<bool, Token> LookUp(list<Token>& strVec, const int offset, wiz::load_data::UserType* ut, Reserver reserver)
+			static pair<bool, Token> LookUp(deque<Token>& strVec, const int offset, wiz::load_data::UserType* ut, Reserver reserver)
 			{
 				int count = 0;
-				list<Token>::iterator x;
+				deque<Token>::iterator x;
 
 				do {
 					x = strVec.begin();
