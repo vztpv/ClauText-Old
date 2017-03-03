@@ -709,12 +709,13 @@ namespace wiz {
 			{
 				do {
 					while (!strVec.empty()) {
-						if ((strVec.begin())->isComment) {
-							ut->PushComment(move((strVec.begin())->str));
+						auto x = strVec.begin();
+						if (x->isComment) {
+							ut->PushComment(move(x->str));
 							strVec.pop_front(); // pop_front
 						}
 						else {
-							return (strVec.begin())->str;
+							return x->str;
 						}
 					}
 					reserver(strVec);
@@ -736,8 +737,9 @@ namespace wiz {
 			{
 				do {
 					while (!strVec.empty()) {
-						if ((strVec.begin())->isComment) {
-							ut->PushComment(move((strVec.begin())->str));
+						auto x = strVec.begin();
+						if (x->isComment) {
+							ut->PushComment(move(x->str));
 							strVec.pop_front(); // pop_front
 						}
 						else {
