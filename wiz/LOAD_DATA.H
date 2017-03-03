@@ -2666,7 +2666,16 @@ namespace wiz {
 					return false;
 				}
 				str = str.substr(1, str.size() - 2);
-				operandStack.push(ToBool4(global, parameters, str, info, objectMap));
+				{
+					string result = ToBool4(global, parameters, str, info, objectMap);
+					bool chk = wiz::load_data::Utility::ChkExist(result);
+					if (chk) { /// chk with tobool4
+						string temp;
+						wiz::load_data::Utility::ChangeStr(result, { "^" }, { "^0" }, temp); // in " "
+						wiz::load_data::Utility::ChangeStr(temp, { " ", "\t", "\r", "\n", "#" }, { "^1", "^2", "^3", "^4", "^5" }, result);
+					}
+					operandStack.push(move(result));
+				}
 			}
 			else if ("$toQuotedStr" == str) {
 				string str = operandStack.pop();
