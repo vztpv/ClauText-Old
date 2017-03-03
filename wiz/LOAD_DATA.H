@@ -2431,41 +2431,28 @@ namespace wiz {
 
 				for (int i = 0; i < operandNum; ++i) {
 					string temp = operandStack.pop();
-
+					if (temp.size() >= 3 && temp.back() == temp.front() && temp.back() == '\"') { }
+					else {
+						operandStack.push("ERROR in $concat3, 1. must be \" \" ");
+						return false;
+					}
 					if (i < operandNum - 1) {
-						if (temp.size() > 0 && '\"' == temp.back()) {
-							temp.erase(temp.begin() + temp.size() - 1);
-						}
-						if (0 == i && temp.size() > 0 && '\"' != temp.front()) {
-							temp.insert(temp.begin(), '\"');
-						}
-						if (0 != i && temp.size() > 0 && '\"' == temp.front()) {
+						temp.erase(temp.begin() + temp.size() - 1);
+						
+						if (0 != i) {
 							temp.erase(temp.begin());
 						}
+
 						result += temp;
 						result += " ";
 					}
 					else {
-						if (temp.size() > 0 && '\"' == temp.front()) {
-							temp.erase(temp.begin());
-						}
-						if (temp.size() > 0 && '\"' != temp.back()) {
-							temp.push_back('\"');
-						}
+						temp.erase(temp.begin());
+						
 						result += temp;
 					}
 				}
 
-				bool chk = wiz::load_data::Utility::ChkExist(result);
-				if (chk) { /// chk with tobool4
-					string temp;
-					wiz::load_data::Utility::ChangeStr(result, { "^5", "^4", "^3", "^2", "^1", "^0" }, { "#", "\n", "\r", "\t", " ", "^" }, temp);
-					result = std::move(temp);
-				}
-				else {
-					operandStack.push("ERROR in $concat3, must be \" \" ");
-					return false;
-				}
 				operandStack.push(result);
 			}
 			else if ("$return_value" == str)
