@@ -1636,6 +1636,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 						{
 							dir.second.erase(dir.second.begin());
 						}
+						cout << "chk " << dir.second << endl;
 						if (dir.first == "" && wiz::String::startsWith(dir.second, "$local."))
 						{
 							eventStack.top().locals[wiz::String::substring(dir.second, 7)] = data;

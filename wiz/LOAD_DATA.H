@@ -3189,12 +3189,16 @@ namespace wiz {
 				result = ut.ToString();
 			}
 
-			{ // " $parameter.x " // removal??
+			{ // chk..
 				for (auto x = parameters.rbegin(); x != parameters.rend(); ++x) {
-					result = String::replace(result, "$parameter." + x->first, x->second);
+					string temp;
+					Utility::ChangeStr(result, { "$parameter." + x->first }, { x->second }, temp);
+					result = move(temp);
 				}
 				for (auto x = info.locals.rbegin(); x != info.locals.rend(); ++x) {
-					result = String::replace(result, "$local." + x->first, x->second);
+					string temp;
+					Utility::ChangeStr(result, { "$local." + x->first }, { x->second }, temp);
+					result = move(temp);
 				}
 			}
 
