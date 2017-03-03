@@ -2046,6 +2046,9 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 
 					if (wiz::load_data::LoadData::LoadDataFromFile(fileName, ut)) {
 						{
+							for (int i = 0; i < ut.GetCommentListSize(); ++i) {
+								utTemp->PushComment(move(ut.GetCommentList(i)));
+							}
 							int item_count = 0;
 							int userType_count = 0;
 

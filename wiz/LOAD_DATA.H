@@ -20,6 +20,30 @@ using namespace std;
 #include <wiz/stacks.h>
 //#include <wiz/deck.h>
 
+namespace wiz {
+	class Token
+	{
+	public:
+		string str;
+		bool isComment;
+	public:
+		Token& operator=(const Token& token) {
+			str = token.str;
+			isComment = token.isComment;
+			return *this;
+		}
+		void operator=(Token&& token) {
+			str = move(token.str);
+			isComment = token.isComment;
+		}
+		Token(Token&& token) : str(move(token.str)), isComment(token.isComment) { }
+		Token(const Token& token) : str(token.str), isComment(token.isComment) { }
+		explicit Token() : isComment(false) { }
+		explicit Token(string&& str, bool isComment = false) : str(move(str)), isComment(isComment) { }
+		explicit Token(const string& str, bool isComment = false) : str(str), isComment(isComment) { }
+	};
+}
+
 #include <wiz/load_data_types.h>
 #include <wiz/load_data_utility.h>
 #include <wiz/load_data_reservers.h>
@@ -142,7 +166,7 @@ namespace wiz {
 			/// core
 		public:
 			template <class Reserver>
-			static bool _LoadData(ArrayQueue<string>& strVec, Reserver& vecReserver, UserType& global) // first, strVec.empty() must be true!!
+			static bool _LoadData(list<Token>& strVec, Reserver& reserver, UserType& global) // first, strVec.empty() must be true!!
 			{
 				int state = 0;
 				int braceNum = 0;
@@ -154,14 +178,14 @@ namespace wiz {
 
 				nestedUT[0] = &global;
 				{
-					vecReserver(strVec);
+					reserver(strVec);
 
 					while (strVec.empty())
 					{
-						vecReserver(strVec);
+						reserver(strVec);
 						if (
 							strVec.empty() &&
-							vecReserver.end()
+							reserver.end()
 							) {
 							return false; // throw "Err nextToken does not exist"; // cf) or empty file or empty string!
 						}
@@ -173,33 +197,35 @@ namespace wiz {
 					switch (state)
 					{
 					case 0:
-						if (LEFT == Utility::Top(strVec)) {
+						if (LEFT == Utility::Top(strVec, nestedUT[braceNum], reserver)) {
 							state = 2;
 						}
 						else {
-							pair<bool, string> bsPair = Utility::LookUp(strVec, 1);
+ 							pair<bool, Token> bsPair = Utility::LookUp(strVec, 1, nestedUT[braceNum], reserver);
 							if (bsPair.first) {
-								if (EQ == bsPair.second) {
-									Utility::Pop(strVec, &var2);
-									Utility::Pop(strVec);
+								if (EQ == bsPair.second.str) {
+									Utility::Pop(strVec, &var2, nestedUT[braceNum], reserver);
+									Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver);
 									state = 2;
 								}
 								else {
-									Utility::Pop(strVec, &var1);
+									if (Utility::Pop(strVec, &var1, nestedUT[braceNum], reserver)) {
+										nestedUT[braceNum]->AddItem("", move(var1));
+										state = 0;
+									}
+								}
+							}
+							else {
+								if (Utility::Pop(strVec, &var1, nestedUT[braceNum], reserver)) {
 									nestedUT[braceNum]->AddItem("", move(var1));
 									state = 0;
 								}
 							}
-							else {
-								Utility::Pop(strVec, &var1);
-								nestedUT[braceNum]->AddItem("", move(var1));
-								state = 0;
-							}
 						}
 						break;
 					case 1:
-						if (RIGHT == Utility::Top(strVec)) {
-							Utility::Pop(strVec);
+						if (RIGHT == Utility::Top(strVec, nestedUT[braceNum], reserver)) {
+							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver);
 							state = 0;
 						}
 						else {
@@ -208,8 +234,8 @@ namespace wiz {
 						}
 						break;
 					case 2:
-						if (LEFT == Utility::Top(strVec)) {
-							Utility::Pop(strVec);
+						if (LEFT == Utility::Top(strVec, nestedUT[braceNum], reserver)) {
+							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver);
 
 							///
 							nestedUT[braceNum]->AddUserTypeItem(UserType(var2));
@@ -228,18 +254,19 @@ namespace wiz {
 							state = 3;
 						}
 						else {
-							Utility::Pop(strVec, &val);
+							if (Utility::Pop(strVec, &val, nestedUT[braceNum], reserver)) {
 
-							nestedUT[braceNum]->AddItem(move(var2), move(val));
-							var2 = "";
-							val = "";
+								nestedUT[braceNum]->AddItem(move(var2), move(val));
+								var2 = "";
+								val = "";
 
-							state = 0;
+								state = 0;
+							}
 						}
 						break;
 					case 3:
-						if (RIGHT == Utility::Top(strVec)) {
-							Utility::Pop(strVec);
+						if (RIGHT == Utility::Top(strVec, nestedUT[braceNum], reserver)) {
+							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver);
 
 							nestedUT[braceNum] = nullptr;
 							braceNum--;
@@ -259,8 +286,8 @@ namespace wiz {
 						}
 						break;
 					case 4:
-						if (LEFT == Utility::Top(strVec)) {
-							Utility::Pop(strVec);
+						if (LEFT == Utility::Top(strVec, nestedUT[braceNum], reserver)) {
+							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver);
 
 							UserType temp("");
 
@@ -281,8 +308,8 @@ namespace wiz {
 
 							state = 5;
 						}
-						else if (RIGHT == Utility::Top(strVec)) {
-							Utility::Pop(strVec);
+						else if (RIGHT == Utility::Top(strVec, nestedUT[braceNum], reserver)) {
+							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver);
 							state = isState0(state_reserve) ? 0 : 4;
 							state_reserve--;
 
@@ -292,37 +319,40 @@ namespace wiz {
 							}
 						}
 						else {
-							pair<bool, string> bsPair = Utility::LookUp(strVec, 1);
+							pair<bool, Token> bsPair = Utility::LookUp(strVec, 1, nestedUT[braceNum], reserver);
 							if (bsPair.first) {
-								if (EQ == bsPair.second) {
+								if (EQ == bsPair.second.str) {
 									// var2
-									Utility::Pop(strVec, &var2);
-									Utility::Pop(strVec); // pass EQ
+									Utility::Pop(strVec, &var2, nestedUT[braceNum], reserver);
+									Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver); // pass EQ
 									state = 6;
 								}
 								else {
 									// var1
-									Utility::Pop(strVec, &var1);
+									if (Utility::Pop(strVec, &var1, nestedUT[braceNum], reserver)) {
+										nestedUT[braceNum]->AddItem("", move(var1));
+										var1 = "";
+
+										state = 4;
+									}
+								}
+							}
+							else
+							{
+								// var1
+								if (Utility::Pop(strVec, &var1, nestedUT[braceNum], reserver))
+								{
 									nestedUT[braceNum]->AddItem("", move(var1));
 									var1 = "";
 
 									state = 4;
 								}
 							}
-							else
-							{
-								// var1
-								Utility::Pop(strVec, &var1);
-								nestedUT[braceNum]->AddItem("", move(var1));
-								var1 = "";
-
-								state = 4;
-							}
 						}
 						break;
 					case 5:
-						if (RIGHT == Utility::Top(strVec)) {
-							Utility::Pop(strVec);
+						if (RIGHT == Utility::Top(strVec, nestedUT[braceNum], reserver)) {
+							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver);
 
 							//if (flag1 == 0) {
 							nestedUT[braceNum] = nullptr;
@@ -349,8 +379,8 @@ namespace wiz {
 						}
 						break;
 					case 6:
-						if (LEFT == Utility::Top(strVec)) {
-							Utility::Pop(strVec);
+						if (LEFT == Utility::Top(strVec, nestedUT[braceNum], reserver)) {
+							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver);
 
 							///
 							{
@@ -371,38 +401,39 @@ namespace wiz {
 							state = 7;
 						}
 						else {
-							Utility::Pop(strVec, &val);
+							if (Utility::Pop(strVec, &val, nestedUT[braceNum], reserver)) {
 
-							nestedUT[braceNum]->AddItem(move(var2), move(val));
-							var2 = ""; val = "";
-							if (strVec.empty())
-							{
-								//
-							}
-							else if (RIGHT == Utility::Top(strVec)) {
-								Utility::Pop(strVec);
-
+								nestedUT[braceNum]->AddItem(move(var2), move(val));
+								var2 = ""; val = "";
+								if (strVec.empty())
 								{
-									state = isState0(state_reserve)? 0 : 4;
-									state_reserve--;
+									//
+								}
+								else if (RIGHT == Utility::Top(strVec, nestedUT[braceNum], reserver)) {
+									Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver);
 
 									{
-										nestedUT[braceNum] = nullptr;
-										braceNum--;
+										state = isState0(state_reserve) ? 0 : 4;
+										state_reserve--;
+
+										{
+											nestedUT[braceNum] = nullptr;
+											braceNum--;
+										}
+									}
+									{
+										//state = 4;
 									}
 								}
-								{
-									//state = 4;
+								else {
+									state = 4;
 								}
-							}
-							else {
-								state = 4;
 							}
 						}
 						break;
 					case 7:
-						if (RIGHT == Utility::Top(strVec)) {
-							Utility::Pop(strVec);
+						if (RIGHT == Utility::Top(strVec, nestedUT[braceNum], reserver)) {
+							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver);
 							//
 
 							nestedUT[braceNum] = nullptr;
@@ -434,14 +465,14 @@ namespace wiz {
 					}
 
 					if (strVec.size() < 10) {
-						vecReserver(strVec);
+						reserver(strVec);
 
 						while (strVec.empty()) // (strVec.empty())
 						{
-							vecReserver(strVec);
+							reserver(strVec);
 							if (
 								strVec.empty() &&
-								vecReserver.end()
+								reserver.end()
 								) {
 								// throw "Err nextToken does not exist2";
 								break;
@@ -450,7 +481,7 @@ namespace wiz {
 					}
 				}
 				if (state != 0) {
-					throw "error final state is not 0!";
+					throw string("error final state is not 0!  : ") + toStr(state);
 				}
 				if (braceNum != 0) {
 					throw string("chk braceNum is ") + toStr(braceNum);
@@ -469,7 +500,7 @@ namespace wiz {
 					inFile.close(); return false;
 				}
 				UserType globalTemp = global;
-				ArrayQueue<string> strVec;
+				list<Token> strVec;
 
 				try {
 					InFileReserver ifReserver(inFile);
@@ -496,7 +527,7 @@ namespace wiz {
 			static bool LoadDataFromString(const string& str, UserType& ut)
 			{
 				UserType utTemp = ut;
-				ArrayQueue<string> strVec;
+				list<Token> strVec;
 
 				string statement = str;
 				int token_first = 0, token_last = 0; // idx of token in statement.
@@ -509,7 +540,7 @@ namespace wiz {
 						if (token_last >= 0 && token_last - token_first + 1 > 0) {
 							string temp = statement.substr(token_first, token_last - token_first + 1);
 							if (!temp.empty()) {
-								strVec.push(move(temp));
+								strVec.emplace_back((move(temp)));
 							}
 						}
 						state = 1;
@@ -518,7 +549,7 @@ namespace wiz {
 					else if (1 == state && '\"' == statement[i]) {
 						state = 0; token_last = i;
 
-						strVec.push(statement.substr(token_first, token_last - token_first + 1));
+						strVec.emplace_back((statement.substr(token_first, token_last - token_first + 1)));
 						token_first = i + 1;
 					}
 
@@ -527,10 +558,10 @@ namespace wiz {
 						if (token_last >= 0 && token_last - token_first + 1 > 0) {
 							string temp = statement.substr(token_first, token_last - token_first + 1);
 							if (!temp.empty()) {
-								strVec.push(move(temp));
+								strVec.emplace_back((move(temp)));
 							}
 						}
-						strVec.push("=");
+						strVec.emplace_back(("="));
 						token_first = i + 1;
 					}
 					else if (0 == state && isWhitespace(statement[i])) { // isspace ' ' \t \r \n , etc... ?
@@ -538,7 +569,7 @@ namespace wiz {
 						if (token_last >= 0 && token_last - token_first + 1 > 0) {
 							string temp = statement.substr(token_first, token_last - token_first + 1);
 							if (!temp.empty()) {
-								strVec.push(move(temp));
+								strVec.emplace_back((move(temp)));
 							}
 						}
 						token_first = i + 1;
@@ -548,10 +579,10 @@ namespace wiz {
 						if (token_last >= 0 && token_last - token_first + 1 > 0) {
 							string temp = statement.substr(token_first, token_last - token_first + 1);
 							if (!temp.empty()) {
-								strVec.push(move(temp));
+								strVec.emplace_back((move(temp)));
 							}
 						}
-						strVec.push("{");
+						strVec.emplace_back(("{"));
 						token_first = i + 1;
 					}
 					else if (0 == state && '}' == statement[i]) {
@@ -559,27 +590,31 @@ namespace wiz {
 						if (token_last >= 0 && token_last - token_first + 1 > 0) {
 							string temp = statement.substr(token_first, token_last - token_first + 1);
 							if (!temp.empty()) {
-								strVec.push(move(temp));
+								strVec.emplace_back((move(temp)));
 							}
 						}
-						strVec.push("}");
+						strVec.emplace_back(("}"));
 						token_first = i + 1;
 					}
 
 					if (0 == state && '#' == statement[i]) { // different from load_data_from_file
 						token_last = i - 1;
 						if (token_last >= 0 && token_last - token_first + 1 > 0) {
-							strVec.push(statement.substr(token_first, token_last - token_first + 1));
+							strVec.emplace_back((statement.substr(token_first, token_last - token_first + 1)));
 						}
 						int j=0;
 						for (j = i; j < statement.size(); ++j) {
-							if (statement[j] == '\n')
+							if (statement[j] == '\n') // cf) '\r' ?
 							{
 								break;
 							}
 						}
-						token_first = j + 1;
-						break;
+						--j; // "before enter key" or "before end"
+						if (j - i + 1 > 0) {
+							strVec.emplace_back(statement.substr(i, j - i + 1), true);
+						}
+						token_first = j + 2;
+						i = token_first-1;
 					}
 				}
 
@@ -587,7 +622,7 @@ namespace wiz {
 				{
 					string temp = statement.substr(token_first);
 					if (!temp.empty()) {
-						strVec.push(move(temp));
+						strVec.emplace_back((move(temp)));
 					}
 				}
 

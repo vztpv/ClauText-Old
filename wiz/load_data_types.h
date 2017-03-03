@@ -9,10 +9,8 @@
 using namespace std;
 
 #include <wiz/newArrays.h>
-//#include <wiz/dictionary.h>
-//#include <wiz/binary_search.h>
-#include <wiz/queues.h>
 #include <wiz/load_data_utility.h>
+#include <wiz/queues.h>
 #include <wiz/cpp_string.h>
 
 namespace wiz {
@@ -154,6 +152,20 @@ namespace wiz {
 
 		class UserType : public Type {
 		public:
+			void PushComment(const string& comment)
+			{
+				commentList.push_back(comment);
+			}
+			void PushComment(string&& comment)
+			{
+				commentList.push_back(move(comment));
+			}
+			int GetCommentListSize()const { return commentList.size(); }
+			const string& GetCommentList(const int idx) const { return commentList[idx]; }
+			string& GetCommentList(const int idx) {
+				return commentList[idx];
+			}
+		public:
 			int GetIListSize()const { return ilist.size(); }
 			int GetItemListSize()const { return itemList.size(); }
 			int GetUserTypeListSize()const { return userTypeList.size(); }
@@ -189,6 +201,7 @@ namespace wiz {
 			}
 		private:
 			UserType* parent;
+			std::vector<string> commentList;
 			std::vector<int> ilist;
 			std::vector< ItemType<string> > itemList;
 			std::vector< UserType* > userTypeList;
@@ -196,7 +209,6 @@ namespace wiz {
 			bool reservedA = false;
 			//	bool userTypeList_sortFlagA; // A : sorted < , B ; sorted > , false : not sorted!
 			//	bool userTypeList_sortFlagB;
-		private:
 		public:
 			explicit UserType(string&& name, bool noRemove = false) : Type(move(name)), parent(nullptr), noRemove(noRemove) { }
 			explicit UserType(const string& name = "", bool noRemove = false) : Type(name), parent(nullptr), noRemove(noRemove) { } //, userTypeList_sortFlagA(true), userTypeList_sortFlagB(true) { }
@@ -235,6 +247,7 @@ namespace wiz {
 				ilist = ut.ilist;
 				itemList = ut.itemList;
 				parent = ut.parent;
+				commentList = ut.commentList;
 
 				for (int i = 0; i < ut.userTypeList.size(); i++) {
 					userTypeList.push_back(new UserType(*ut.userTypeList[i]));
@@ -248,6 +261,7 @@ namespace wiz {
 				ut.parent = nullptr; /// chk..
 				ilist = std::move(ut.ilist);
 				itemList = std::move(ut.itemList);
+				commentList = std::move(ut.commentList);
 
 				for (int i = 0; i < ut.userTypeList.size(); ++i) {
 					userTypeList.push_back(move(ut.userTypeList[i]));
@@ -261,6 +275,8 @@ namespace wiz {
 				ilist = vector<int>();
 				itemList = vector< ItemType<string> >();
 				RemoveUserTypeList();
+
+				commentList.clear();
 			}
 
 		private:
@@ -417,6 +433,8 @@ namespace wiz {
 				itemList = vector< ItemType<string> >();
 
 				RemoveUserTypeList();
+
+				commentList.clear();
 			}
 			void RemoveUserTypeList() { /// chk memory leak test!!
 				for (int i = 0; i < userTypeList.size(); i++) {
@@ -802,6 +820,14 @@ namespace wiz {
 				int itemListCount = 0;
 				int userTypeListCount = 0;
 
+				for (int i = 0; i < ut->commentList.size(); ++i) {
+					stream << (ut->commentList[i]);
+
+					if (i < ut->commentList.size() - 1 || false == ut->ilist.empty()) {
+						stream << "\n";
+					}
+				}
+
 				for (int i = 0; i < ut->ilist.size(); ++i) {
 					//std::cout << "ItemList" << endl;
 					if (ut->ilist[i] == 1) {
@@ -857,6 +883,14 @@ namespace wiz {
 				int itemListCount = 0;
 				int userTypeListCount = 0;
 
+				for (int i = 0; i < ut->commentList.size(); ++i) {
+					stream << (ut->commentList[i]);
+
+					if (i < ut->commentList.size() - 1 || false == ut->ilist.empty()) {
+						stream << "\n";
+					}
+
+				}
 				for (int i = 0; i < ut->ilist.size(); ++i) {
 					//std::cout << "ItemList" << endl;
 					if (ut->ilist[i] == 1) {

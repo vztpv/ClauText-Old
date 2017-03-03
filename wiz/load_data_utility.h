@@ -17,6 +17,7 @@ using namespace std;
 
 namespace wiz {
 	namespace load_data {
+		class UserType;
 
 		class Utility
 		{
@@ -539,11 +540,11 @@ namespace wiz {
 			private:
 				vector<string>* strVec;
 			public:
-				ArrayQueue<string>* aq;
+				list<Token>* aq;
 				//int strVecStart;
 				//int strVecEnd;
 			public:
-				DoThread(vector<string>* strVec, ArrayQueue<string>* aq) //, ArrayQueue<string>* aq)//, int strVecStart, int strVecEnd)
+				DoThread(vector<string>* strVec, list<Token>* aq) //, list<string>* aq)//, int strVecStart, int strVecEnd)
 					: strVec(strVec), aq(aq) // , strVecStart(strVecStart), strVecEnd(strVecEnd)
 				{
 					//
@@ -561,21 +562,23 @@ namespace wiz {
 						int token_first = 0, token_last = 0; // idx of token in statement.
 						int state = 0;
 
+
 						for (int i = 0; i < statement.size(); ++i) {
 							if (0 == state && '\"' == statement[i]) {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									string temp = statement.substr(token_first, token_last - token_first + 1);
 									if (!temp.empty()) {
-										aq->push(move(temp));
+										aq->emplace_back(move(temp));
 									}
 								}
 								state = 1;
+								token_first = i; token_last = i;
 							}
 							else if (1 == state && '\"' == statement[i]) {
 								state = 0; token_last = i;
-								
-								aq->push(statement.substr(token_first, token_last - token_first + 1));
+
+								aq->emplace_back(statement.substr(token_first, token_last - token_first + 1));
 								token_first = i + 1;
 							}
 
@@ -584,10 +587,10 @@ namespace wiz {
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									string temp = statement.substr(token_first, token_last - token_first + 1);
 									if (!temp.empty()) {
-										aq->push(move(temp));
+										aq->emplace_back(move(temp));
 									}
 								}
-								aq->push("=");
+								aq->emplace_back(("="));
 								token_first = i + 1;
 							}
 							else if (0 == state && isWhitespace(statement[i])) { // isspace ' ' \t \r \n , etc... ?
@@ -595,7 +598,7 @@ namespace wiz {
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									string temp = statement.substr(token_first, token_last - token_first + 1);
 									if (!temp.empty()) {
-										aq->push(move(temp));
+										aq->emplace_back((move(temp)));
 									}
 								}
 								token_first = i + 1;
@@ -605,10 +608,10 @@ namespace wiz {
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									string temp = statement.substr(token_first, token_last - token_first + 1);
 									if (!temp.empty()) {
-										aq->push(move(temp));
+										aq->emplace_back((move(temp)));
 									}
 								}
-								aq->push("{");
+								aq->emplace_back(("{"));
 								token_first = i + 1;
 							}
 							else if (0 == state && '}' == statement[i]) {
@@ -616,21 +619,32 @@ namespace wiz {
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									string temp = statement.substr(token_first, token_last - token_first + 1);
 									if (!temp.empty()) {
-										aq->push(move(temp));
+										aq->emplace_back((move(temp)));
 									}
 								}
-								aq->push("}");
+								aq->emplace_back(("}"));
 								token_first = i + 1;
 							}
 
-							if (0 == state && '#' == statement[i]) {
+							if (0 == state && '#' == statement[i]) { // different from load_data_from_file
 								token_last = i - 1;
-								string temp = statement.substr(token_first, token_last - token_first + 1);
-								if (!temp.empty()) {
-									aq->push(move(temp));
+								if (token_last >= 0 && token_last - token_first + 1 > 0) {
+									aq->emplace_back((statement.substr(token_first, token_last - token_first + 1)));
 								}
-								token_first = statement.size();
-								break;
+								int j = 0;
+								for (j = i; j < statement.size(); ++j) {
+									if (statement[j] == '\n') // cf) '\r' ?
+									{
+										break;
+									}
+								}
+								--j; // "before enter key" or "before end"
+								
+								if (j - i + 1 > 0) {
+									aq->emplace_back(statement.substr(i, j - i + 1), true);
+								}
+								token_first = j + 2;
+								i = token_first - 1;
 							}
 						}
 
@@ -638,7 +652,7 @@ namespace wiz {
 						{
 							string temp = statement.substr(token_first);
 							if (!temp.empty()) {
-								aq->push(move(temp));
+								aq->emplace_back((move(temp)));
 							}
 						}
 					}
@@ -654,12 +668,11 @@ namespace wiz {
 				//}
 			};
 		public:
-			static pair<bool, int> Reserve2(ifstream& inFile, ArrayQueue<string>& aq, const int num = 1)
+			static pair<bool, int> Reserve2(ifstream& inFile, list<Token>& aq, const int num = 1)
 			{
 				int count = 0;
 				string temp;
 				vector<string> strVecTemp;
-				vector<ArrayQueue<string>> arrayQueueTemp;
 
 				for (int i = 0; i < num && (getline(inFile, temp)); ++i) {
 					if (temp.empty()) { continue; }
@@ -679,59 +692,115 @@ namespace wiz {
 			}
 
 			/// must lineNum > 0
-			static pair<bool, int> Reserve(ifstream& inFile, ArrayQueue<string>& strVec, const int num = 1)
+			static pair<bool, int> Reserve(ifstream& inFile, list<string>& strVec, const int num = 1)
 			{
 				string temp;
 				int count = 0;
 
 				for (int i = 0; i < num && (inFile >> temp); ++i) {
-					strVec.push(temp);
+					strVec.push_back(temp);
 					count++;
 				}
 				return{ count > 0, count };
 			}
 
-			static const string& Top(const ArrayQueue<string>& strVec)
+			template<class Reserver>
+			static const string& Top(list<Token>& strVec, wiz::load_data::UserType* ut, Reserver reserver)
 			{
-				return strVec[0];
-			}
-			static void Pop(ArrayQueue<string>& strVec, string* str = nullptr)
-			{
-				strVec.pop(str);
-			}
-			static int GetIndex(const ArrayQueue<string>& strVec, const string& str)
-			{
-				int idx = -1;
-
-				for (int i = 0; i < strVec.size(); ++i)
-				{
-					const string x = strVec[i];
-					idx++;
-					if (x == str)
-					{
-						return idx;
+				do {
+					while (!strVec.empty()) {
+						if ((strVec.begin())->isComment) {
+							ut->PushComment(move((strVec.begin())->str));
+							strVec.pop_front(); // pop_front
+						}
+						else {
+							return (strVec.begin())->str;
+						}
 					}
-				}
-				return -1;
+					reserver(strVec);
+					while (strVec.empty()) // (strVec.empty())
+					{
+						reserver(strVec);
+						if (
+							strVec.empty() &&
+							reserver.end()
+							) {
+							return ""; //throw wiz::Error("Error1 in Top function in load_data_utility.h");
+						}
+					}
+				} while (true);
+				throw wiz::Error("Error2 in Top function in load_data_utility.h");
 			}
-			static const string& Back(const ArrayQueue<string>& strVec)
+			template <class Reserver>
+			static bool Pop(list<Token>& strVec, string* str, wiz::load_data::UserType* ut, Reserver reserver)
 			{
-				return strVec[strVec.size() - 1];
+				do {
+					while (!strVec.empty()) {
+						if ((strVec.begin())->isComment) {
+							ut->PushComment(move((strVec.begin())->str));
+							strVec.pop_front(); // pop_front
+						}
+						else {
+							Token token = strVec.front();
+							strVec.pop_front();
+
+							//cout << token.str << endl;
+
+							if (str) {
+								*str = move(token.str);
+							}
+							return true;
+						}
+					}
+					reserver(strVec);
+					while (strVec.empty()) // (strVec.empty())
+					{
+						reserver(strVec);
+						if (
+							strVec.empty() &&
+							reserver.end()
+							) {
+							return false; //throw wiz::Error("Error1 in Pop function in load_data_utility.h");
+						}
+					}
+				} while (true);
+				throw wiz::Error("Error2 in Pop function in load_data_utility.h");
 			}
-			static string PopBack(ArrayQueue<string>& strVec)
+		
+			template <class Reserver>
+			static pair<bool, Token> LookUp(list<Token>& strVec, const int offset, wiz::load_data::UserType* ut, Reserver reserver)
 			{
-				return strVec.pop_back();
-			}
-			static pair<bool, string> LookUp(const ArrayQueue<string>& strVec, const int idx = 1)
-			{
-				if (idx < 0) {
-					return { true, strVec[strVec.size() - 1 + idx] };
-				}
-				if (strVec.size() <= idx)
-				{
-					return{ false, "" };
-				}
-				return{ true, strVec[idx] };
+				int count = 0;
+				list<Token>::iterator x;
+
+				do {
+					x = strVec.begin();
+					while (strVec.size() > offset) {
+						if (x->isComment) {
+							ut->PushComment(move(x->str));
+							x = strVec.erase(x);
+						}
+						else if (offset == count) {
+							return{ true, *x };
+						}
+						else {
+							count++;
+							++x;
+						}
+					}
+					reserver(strVec);
+					while (strVec.size() <= offset) // (strVec.empty())
+					{
+						reserver(strVec);
+						if (
+							strVec.size() <= offset &&
+							reserver.end()
+							) {
+							return{ false, Token() };
+						}
+					}
+				} while (true);
+				throw wiz::Error("Error in LookUp function in load_data_utility.h");
 			}
 		public:
 			//
