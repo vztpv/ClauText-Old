@@ -25,11 +25,6 @@ using namespace std;
 
 #include <conio.h>
 
-
-#include <tbb/blocked_range.h>
-#include <tbb/parallel_for.h>
-#include <tbb/parallel_reduce.h>
-
 #include <wiz/load_data.h>
 #include <wiz/stacks.h>
 #include <wiz/cpp_string.h>

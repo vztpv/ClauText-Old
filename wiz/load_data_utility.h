@@ -549,10 +549,10 @@ namespace wiz {
 				{
 					//
 				}
-				void operator() (const tbb::blocked_range<size_t>& r) {
+				void operator() (int left, int right) {
 					vector<string>* strVecTemp = strVec; // enterkey 기준으로 나뉘어져있다고 가정한다.
 
-					for (size_t x = r.begin(); x != r.end(); ++x)
+					for (int x = left; x <= right; ++x)
 					{
 						//StringTokenizer tokenizer(std::move( (*strVecTemp)[x] ) );
 						//while (tokenizer.hasMoreTokens()) {
@@ -665,7 +665,7 @@ namespace wiz {
 				
 				DoThread doThread(&strVecTemp, &aq);
 				
-				doThread(tbb::blocked_range<size_t>(0, count));
+				doThread(0, count-1);
 				
 				//tbb::parallel_reduce(tbb::blocked_range<size_t>(0, count), doThread);
 				//aq.push(std::move(doThread.aq));
