@@ -821,6 +821,9 @@ namespace wiz {
 				int userTypeListCount = 0;
 
 				for (int i = 0; i < ut->commentList.size(); ++i) {
+					for (int k = 0; k < depth; ++k) {
+						stream << "\t";
+					}
 					stream << (ut->commentList[i]);
 
 					if (i < ut->commentList.size() - 1 || false == ut->ilist.empty()) {
@@ -884,6 +887,9 @@ namespace wiz {
 				int userTypeListCount = 0;
 
 				for (int i = 0; i < ut->commentList.size(); ++i) {
+					for (int k = 0; k < depth; ++k) {
+						stream << "\t";
+					}
 					stream << (ut->commentList[i]);
 
 					if (i < ut->commentList.size() - 1 || false == ut->ilist.empty()) {

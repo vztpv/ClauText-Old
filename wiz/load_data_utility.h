@@ -567,10 +567,7 @@ namespace wiz {
 							if (0 == state && '\"' == statement[i]) {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
-									string temp = statement.substr(token_first, token_last - token_first + 1);
-									if (!temp.empty()) {
-										aq->emplace_back(move(temp));
-									}
+									aq->emplace_back(statement.substr(token_first, token_last - token_first + 1));
 								}
 								state = 1;
 								token_first = i; token_last = i;
@@ -585,10 +582,7 @@ namespace wiz {
 							if (0 == state && '=' == statement[i]) {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
-									string temp = statement.substr(token_first, token_last - token_first + 1);
-									if (!temp.empty()) {
-										aq->emplace_back(move(temp));
-									}
+									aq->emplace_back(statement.substr(token_first, token_last - token_first + 1));
 								}
 								aq->emplace_back(("="));
 								token_first = i + 1;
@@ -596,20 +590,14 @@ namespace wiz {
 							else if (0 == state && isWhitespace(statement[i])) { // isspace ' ' \t \r \n , etc... ?
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
-									string temp = statement.substr(token_first, token_last - token_first + 1);
-									if (!temp.empty()) {
-										aq->emplace_back((move(temp)));
-									}
+									aq->emplace_back(statement.substr(token_first, token_last - token_first + 1));
 								}
 								token_first = i + 1;
 							}
 							else if (0 == state && '{' == statement[i]) {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
-									string temp = statement.substr(token_first, token_last - token_first + 1);
-									if (!temp.empty()) {
-										aq->emplace_back((move(temp)));
-									}
+									aq->emplace_back(statement.substr(token_first, token_last - token_first + 1));
 								}
 								aq->emplace_back(("{"));
 								token_first = i + 1;
@@ -617,10 +605,7 @@ namespace wiz {
 							else if (0 == state && '}' == statement[i]) {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
-									string temp = statement.substr(token_first, token_last - token_first + 1);
-									if (!temp.empty()) {
-										aq->emplace_back((move(temp)));
-									}
+									aq->emplace_back(statement.substr(token_first, token_last - token_first + 1));
 								}
 								aq->emplace_back(("}"));
 								token_first = i + 1;
@@ -650,10 +635,7 @@ namespace wiz {
 
 						if (token_first < statement.size())
 						{
-							string temp = statement.substr(token_first);
-							if (!temp.empty()) {
-								aq->emplace_back((move(temp)));
-							}
+							aq->emplace_back(statement.substr(token_first));
 						}
 					}
 				}

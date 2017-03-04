@@ -538,10 +538,7 @@ namespace wiz {
 					if (0 == state && '\"' == statement[i]) {
 						token_last = i - 1;
 						if (token_last >= 0 && token_last - token_first + 1 > 0) {
-							string temp = statement.substr(token_first, token_last - token_first + 1);
-							if (!temp.empty()) {
-								strVec.emplace_back((move(temp)));
-							}
+							strVec.emplace_back(statement.substr(token_first, token_last - token_first + 1));
 						}
 						state = 1;
 						token_first = i; token_last = i;
@@ -549,17 +546,14 @@ namespace wiz {
 					else if (1 == state && '\"' == statement[i]) {
 						state = 0; token_last = i;
 
-						strVec.emplace_back((statement.substr(token_first, token_last - token_first + 1)));
+						strVec.emplace_back(statement.substr(token_first, token_last - token_first + 1));
 						token_first = i + 1;
 					}
 
 					if (0 == state && '=' == statement[i]) {
 						token_last = i - 1;
 						if (token_last >= 0 && token_last - token_first + 1 > 0) {
-							string temp = statement.substr(token_first, token_last - token_first + 1);
-							if (!temp.empty()) {
-								strVec.emplace_back((move(temp)));
-							}
+							strVec.emplace_back(statement.substr(token_first, token_last - token_first + 1));
 						}
 						strVec.emplace_back(("="));
 						token_first = i + 1;
@@ -567,20 +561,14 @@ namespace wiz {
 					else if (0 == state && isWhitespace(statement[i])) { // isspace ' ' \t \r \n , etc... ?
 						token_last = i - 1;
 						if (token_last >= 0 && token_last - token_first + 1 > 0) {
-							string temp = statement.substr(token_first, token_last - token_first + 1);
-							if (!temp.empty()) {
-								strVec.emplace_back((move(temp)));
-							}
+							strVec.emplace_back(statement.substr(token_first, token_last - token_first + 1));
 						}
 						token_first = i + 1;
 					}
 					else if (0 == state && '{' == statement[i]) {
 						token_last = i - 1;
 						if (token_last >= 0 && token_last - token_first + 1 > 0) {
-							string temp = statement.substr(token_first, token_last - token_first + 1);
-							if (!temp.empty()) {
-								strVec.emplace_back((move(temp)));
-							}
+							strVec.emplace_back(statement.substr(token_first, token_last - token_first + 1));
 						}
 						strVec.emplace_back(("{"));
 						token_first = i + 1;
@@ -588,10 +576,7 @@ namespace wiz {
 					else if (0 == state && '}' == statement[i]) {
 						token_last = i - 1;
 						if (token_last >= 0 && token_last - token_first + 1 > 0) {
-							string temp = statement.substr(token_first, token_last - token_first + 1);
-							if (!temp.empty()) {
-								strVec.emplace_back((move(temp)));
-							}
+							strVec.emplace_back(statement.substr(token_first, token_last - token_first + 1));
 						}
 						strVec.emplace_back(("}"));
 						token_first = i + 1;
@@ -602,7 +587,7 @@ namespace wiz {
 						if (token_last >= 0 && token_last - token_first + 1 > 0) {
 							strVec.emplace_back((statement.substr(token_first, token_last - token_first + 1)));
 						}
-						int j=0;
+						int j = 0;
 						for (j = i; j < statement.size(); ++j) {
 							if (statement[j] == '\n') // cf) '\r' ?
 							{
@@ -610,20 +595,18 @@ namespace wiz {
 							}
 						}
 						--j; // "before enter key" or "before end"
+
 						if (j - i + 1 > 0) {
 							strVec.emplace_back(statement.substr(i, j - i + 1), true);
 						}
 						token_first = j + 2;
-						i = token_first-1;
+						i = token_first - 1;
 					}
 				}
 
 				if (token_first < statement.size())
 				{
-					string temp = statement.substr(token_first);
-					if (!temp.empty()) {
-						strVec.emplace_back((move(temp)));
-					}
+					strVec.emplace_back(statement.substr(token_first));
 				}
 
 				try {
