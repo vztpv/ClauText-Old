@@ -685,106 +685,105 @@ namespace wiz {
 				}
 				return{ count > 0, count };
 			}
-
-			template<class Reserver>
-			static string Top(deque<Token>& strVec, wiz::load_data::UserType* ut, Reserver reserver)
+		private:
+			// chk!!
+			template <class Reserver>
+			static bool ChkComment(deque<Token>& strVec, wiz::load_data::UserType* ut, Reserver reserver, const int offset)
 			{
-				do {
-					while (!strVec.empty()) {
-						auto x = strVec.begin();
-						if (x->isComment) {
-							ut->PushComment(move(x->str));
-							strVec.pop_front(); // pop_front
-						}
-						else {
-							return x->str;
-						}
-					}
+				if (strVec.size() < offset) {
 					reserver(strVec);
-					while (strVec.empty()) // (strVec.empty())
+					while (strVec.size() < offset) // 
 					{
 						reserver(strVec);
 						if (
-							strVec.empty() &&
+							strVec.size() < offset &&
 							reserver.end()
 							) {
-							return ""; //throw wiz::Error("Error1 in Top function in load_data_utility.h");
+							return false;
+						}
+					}
+				}
+				
+				auto x = strVec.begin();
+				int count = 0;
+
+				do {
+					if (x->isComment) {
+						ut->PushComment(move(x->str));
+						x = strVec.erase(x);
+					}
+					else if (count == offset - 1) {
+						return true;
+					}
+					else {
+						count++;
+						++x;
+					}
+
+					if (x == strVec.end()) {
+						reserver(strVec);
+						x = strVec.begin();
+						while (strVec.size() + count < offset) // 
+						{
+							reserver(strVec);
+							x = strVec.begin();
+							if (
+								strVec.size()  + count < offset &&
+								reserver.end()
+								) {
+								return false;
+							}
 						}
 					}
 				} while (true);
-				throw wiz::Error("Error2 in Top function in load_data_utility.h");
+			}
+		public:
+			template<class Reserver>
+			static string Top(deque<Token>& strVec, wiz::load_data::UserType* ut, Reserver reserver)
+			{
+				if (strVec.empty() || strVec[0].isComment) {
+					if (false == ChkComment(strVec, ut, reserver, 1)) {
+						return string();
+					}
+				}
+				if (strVec.empty()) { return string(); }
+				return strVec[0].str;
 			}
 			template <class Reserver>
 			static bool Pop(deque<Token>& strVec, string* str, wiz::load_data::UserType* ut, Reserver reserver)
 			{
-				do {
-					while (!strVec.empty()) {
-						auto x = strVec.begin();
-						if (x->isComment) {
-							ut->PushComment(move(x->str));
-							strVec.pop_front(); // pop_front
-						}
-						else {
-							Token token = strVec.front();
-							strVec.pop_front();
-
-							//cout << token.str << endl;
-
-							if (str) {
-								*str = move(token.str);
-							}
-							return true;
-						}
+				if (strVec.empty() || strVec[0].isComment) {
+					if (false == ChkComment(strVec, ut, reserver, 1)) {
+						return false;
 					}
-					reserver(strVec);
-					while (strVec.empty()) // (strVec.empty())
-					{
-						reserver(strVec);
-						if (
-							strVec.empty() &&
-							reserver.end()
-							) {
-							return false; //throw wiz::Error("Error1 in Pop function in load_data_utility.h");
-						}
-					}
-				} while (true);
-				throw wiz::Error("Error2 in Pop function in load_data_utility.h");
+				}
+
+				if (strVec.empty()) {
+					return false;
+				}
+
+				if (str) {
+					*str = move(strVec.front().str);
+				}
+				strVec.pop_front();
+
+				return true;
 			}
 		
-			template <class Reserver>
-			static pair<bool, Token> LookUp(deque<Token>& strVec, const int offset, wiz::load_data::UserType* ut, Reserver reserver)
+			// lookup just one!
+			template <class Reserver> 
+			static pair<bool, Token> LookUp(deque<Token>& strVec, wiz::load_data::UserType* ut, Reserver reserver)
 			{
-				int count = 0;
-				deque<Token>::iterator x;
+				if (!(strVec.size() >= 2 && false == strVec[0].isComment && false == strVec[1].isComment)) {
+					if (false == ChkComment(strVec, ut, reserver, 2)) {
+						return{ false, Token() };
+					}
+				}
 
-				do {
-					x = strVec.begin();
-					while (strVec.size() > offset) {
-						if (x->isComment) {
-							ut->PushComment(move(x->str));
-							x = strVec.erase(x);
-						}
-						else if (offset == count) {
-							return{ true, *x };
-						}
-						else {
-							count++;
-							++x;
-						}
-					}
-					reserver(strVec);
-					while (strVec.size() <= offset) // (strVec.empty())
-					{
-						reserver(strVec);
-						if (
-							strVec.size() <= offset &&
-							reserver.end()
-							) {
-							return{ false, Token() };
-						}
-					}
-				} while (true);
-				throw wiz::Error("Error in LookUp function in load_data_utility.h");
+				if (strVec.size() >= 2) {
+					return{ true, strVec[1] };
+				}
+				return{ false, Token() };
 			}
 		public:
 			//

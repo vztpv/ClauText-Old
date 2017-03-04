@@ -201,7 +201,7 @@ namespace wiz {
 							state = 2;
 						}
 						else {
- 							pair<bool, Token> bsPair = Utility::LookUp(strVec, 1, nestedUT[braceNum], reserver);
+ 							pair<bool, Token> bsPair = Utility::LookUp(strVec, nestedUT[braceNum], reserver);
 							if (bsPair.first) {
 								if (EQ == bsPair.second.str) {
 									Utility::Pop(strVec, &var2, nestedUT[braceNum], reserver);
@@ -319,7 +319,7 @@ namespace wiz {
 							}
 						}
 						else {
-							pair<bool, Token> bsPair = Utility::LookUp(strVec, 1, nestedUT[braceNum], reserver);
+							pair<bool, Token> bsPair = Utility::LookUp(strVec, nestedUT[braceNum], reserver);
 							if (bsPair.first) {
 								if (EQ == bsPair.second.str) {
 									// var2
