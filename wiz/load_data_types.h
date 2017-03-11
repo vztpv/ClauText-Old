@@ -129,6 +129,13 @@ namespace wiz {
 				return inited? 1 : 0;
 			}
 			bool empty()const { return !inited; }
+			string ToString()const
+			{
+				if (Type::GetName().empty()) {
+					return Get(0);
+				}
+				return Type::GetName() + " = " + Get(0);
+			}
 		public:
 			ItemType<T>& operator=(const ItemType<T>& ta)
 			{

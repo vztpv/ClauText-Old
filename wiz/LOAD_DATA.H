@@ -10,6 +10,7 @@
 #include <utility>
 #include <algorithm>
 #include <set>
+#include <map>
 using namespace std;
 
 #include <wiz/global.h>
@@ -2067,7 +2068,6 @@ namespace wiz {
 					);
 				}
 			}
-
 		};
 
 		// only one exist or do not exist
@@ -2444,7 +2444,7 @@ namespace wiz {
 				}
 				operandStack.push(result);
 			}
-			else if ("$concat3" == str) { // for special case?
+			else if ("$concat3" == str) { // for special case? "abc" "def" "ghi" -> "abcdefghi"
 				string result;
 
 				for (int i = 0; i < operandNum; ++i) {

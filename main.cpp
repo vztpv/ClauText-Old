@@ -18,7 +18,6 @@
 #include <string>
 #include <ctime>
 #include <cstdlib>
-#include <memory> // for smart pointer.
 
 #include <regex> //
 using namespace std;
@@ -32,7 +31,7 @@ using namespace std;
 #include <Windows.h>
 
 //
-
+  
 
 inline int GETCH() /// To Do - Replace..
 {
@@ -886,7 +885,7 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 	}
 
 	// start from Main.
-	if (nullptr == pInfo) {
+	if (nullptr == pInfo.get()) { /// chk smartpointer.
 		if (global.GetUserTypeItem("Main").empty())
 		{
 			cout << "do not exist Main" << endl;
@@ -1012,14 +1011,93 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 
 			while (val != nullptr)
 			{
-				if ("$do" == val->GetName()) { // chk?
+				// ToDo -$filter, $map, $reduce?
+				// list = { base_tax } // /root/ X , root/ O
+				// $filter = { utDir = { /./test } 
+				// condition = { AND = { EXSITITEMBYVAL = { base_tax root/list } COMP> = { ~~ / 5.000 ~ 0 } } } 
+				// recursive = { false or true } } // return UserType.?
+				if ("$for_each" == val->GetName()) {
+					const string eventID = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap);
+					const string dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap);
+					const string condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top(), objectMap);
+					
+					wiz::load_data::UserType* event = nullptr;
+					string parameter = "id = " + eventID + " ";
+					// find event
+					{
+						for (int i = 0; i < events.GetUserTypeListSize(); ++i) {
+							if (eventID == events.GetUserTypeList(i)->GetItem("id")[0].Get(9)) {
+								event = events.GetUserTypeList(i);
+								break;
+							}
+						}
+					}
+					// find parameter and validate?
+					bool pass = false;
+					{
+						for (int i = 0; i < event->GetUserTypeListSize(); ++i) {
+							if ("$parameter" == event->GetUserTypeList(i)->GetName()) {
+								if (1 == event->GetUserTypeList(i)->GetItemListSize()) {
+									parameter = parameter + event->GetUserTypeList(i)->GetItemList(0).Get(0);
+								}
+								else {
+									pass = true;
+									break;
+								}
+								break;
+							}
+						}
+					}
+					if (pass) {
+						eventStack.top().userType_idx.top()++;
+						break;
+					}
+					// chk loop and condition! chk do not use ""
+					{
+						int count = 0;
+						eventStack.top().return_value = "";
+						wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, dir).second[0];
+						for (int i=0; i < ut->GetItemListSize(); ++i) {
+							string _condition = condition;
+							_condition = wiz::String::replace(_condition, "~~~", ut->GetItemList(i).Get(0)); //
+							_condition = wiz::String::replace(_condition, "~~", ut->GetItemList(i).GetName());
+							wiz::load_data::Condition _cond(_condition, ut, &global);
+							
+							while (_cond.Next());
+							
+							if (_cond.Now().size() != 1 || "TRUE" != _cond.Now()[0]) // || cond.Now().size()  != 1
+							{
+								//std::cout << cond.Now()[0] << endl;
+								continue;
+							}
+							
+							wiz::load_data::UserType globalTemp = global;
+							wiz::load_data::UserType eventsTemp = events;
+							globalTemp.RemoveUserTypeList("Main");
+							
+							wiz::load_data::LoadData::AddData(globalTemp, "/root", "Main = { $call = { id = NONE } } Event = { id = NONE $call = { " + parameter + " = { " + ut->GetItemList(i).ToString() + " } } }", "TRUE");
+							wiz::load_data::LoadData::AddData(eventsTemp, "/root", "Event = { id = NONE $call = { " + parameter + " = { " + ut->GetItemList(i).ToString() + " } } }", "TRUE");
+
+
+							if (count != 0) {
+								eventStack.top().return_value = eventStack.top().return_value + " ";
+							}
+
+							eventStack.top().return_value = eventStack.top().return_value + excute_module(&globalTemp, &eventsTemp);
+
+							count++;
+						}
+					}
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$do" == val->GetName()) { // chk?
 					wiz::load_data::UserType subGlobal;
 					wiz::load_data::LoadData::LoadDataFromString(val->GetUserTypeList(1)->ToString(), subGlobal);
 					wiz::load_data::UserType inputUT;
 					wiz::load_data::LoadData::LoadDataFromString(ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap), inputUT);
 
-
-					//ChkBool4(&inputUT, global, eventStack.top().parameters, eventStack.top(), objectMap);
 
 					wiz::load_data::LoadData::AddData(subGlobal, "/./", inputUT.ToString(), "TRUE");
 
@@ -2454,12 +2532,15 @@ int main(int argc, char* argv[])
 	}
 	catch (const char* str) {
 		cout << str << endl;
+		GETCH();
 	}
 	catch (const string& str) {
 		cout << str << endl;
+		GETCH();
 	}
 	catch (const wiz::Error& e) {
 		cout << e << endl;
+		GETCH();
 	}
 	//catch (...) {
 	//	cout << "Error.." << endl;

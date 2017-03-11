@@ -21,6 +21,7 @@ Event =
         }
     }
 	#$wait = { }
+	#$_getch = { }
 	$return = { END }
 }
 

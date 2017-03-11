@@ -49,14 +49,15 @@ namespace wiz {
 				}
 				return UserType::Find(utTemp, valTemp);
 			}
+			// val -> rename?, parameter:option -> removal?
 			string GetValue(const string& op, const string& var, const string& val, UserType* utPosition, UserType* global, const string& option = "0")
 			{
 				/// ExistItem, ExistUserType
 				if (NULL == utPosition) { return "ERROR"; }
+
 				if ("EXISTITEM" == op) { /// option == 1?	
 					auto x = Get(var, val, utPosition, global);
 					if (x.first) {
-						//if (x.second.size() > 1) { return "ERROR"; } ///
 						for (int i = 0; i < x.second.size(); ++i) {
 							if (x.second[i]->GetItem(var).size() > 0)
 							{
@@ -70,7 +71,6 @@ namespace wiz {
 				else if ("EXISTUSERTYPE" == op) { /// option == 1?	
 					auto x = Get(var, val, utPosition, global);
 					if (x.first) {
-						//if (x.second.size() > 1) { return "ERROR"; } ///
 						for (int i = 0; i < x.second.size(); ++i) {
 							if (x.second[i]->GetUserTypeItem(var).size() > 0)
 							{
@@ -84,8 +84,6 @@ namespace wiz {
 				else if ("NOTEXISTITEM" == op) { /// option == 2 ?
 					auto x = Get(var, val, utPosition, global);
 					if (x.first) {
-						//if (x.second.size() > 1) { return "ERROR"; } ///
-
 						for (int i = 0; i < x.second.size(); ++i) {
 							if (0 < x.second[i]->GetItem(var).size())
 							{
@@ -99,8 +97,6 @@ namespace wiz {
 				else if ("NOTEXISTUSERTYPE" == op) { /// option == 2 ?
 					auto x = Get(var, val, utPosition, global);
 					if (x.first) {
-						//if (x.second.size() > 1) { return "ERROR"; } ///
-
 						for (int i = 0; i < x.second.size(); ++i) {
 							if (0 < x.second[i]->GetUserTypeItem(var).size())
 							{
@@ -347,7 +343,28 @@ namespace wiz {
 				
 				return "ERROR GV7";
 			}
+			string GetValue3(const string& op, const string& val, const string& dir, UserType* utPosition, UserType* global)
+			{
+				if (NULL == utPosition) { return "ERROR"; }
 
+				auto x = Get(val, dir, utPosition, global);
+
+				if (false == x.first || x.second.size() != 1) {
+					return "ERROR";
+				}
+
+				if ("EXISTITEMBYVALUE" == op)
+				{
+					for (int i = 0; i < x.second[0]->GetItemListSize(); ++i) {
+						if (val == x.second[0]->GetItemList(i).Get(0)) {
+							return "TRUE";
+						}
+					}
+					return "FALSE";
+				}
+
+				return "ERROR";
+			}
 			void Init(const string& condition)
 			{
 				bool evalue = false;
@@ -411,6 +428,17 @@ namespace wiz {
 
 								tokenStack.push(GetValue(op, var1, position1, var2, position2, position, global, option));
 							}
+							else if (tokenStack.size() >= 3 && "EXISTITEMBYVALUE" == tokenStack[tokenStack.size() - 3])
+							{
+								const string op = tokenStack[tokenStack.size() - 3];
+								const string val = tokenStack[tokenStack.size() - 2];
+								const string dir = tokenStack[tokenStack.size() - 1];
+
+								tokenStack.pop();
+								tokenStack.pop();
+								tokenStack.pop();
+								tokenStack.push(GetValue3(op, val, dir, position, global));
+							}
 							else if (tokenStack.size() >= 3 && "NOT" != tokenStack[tokenStack.size() - 2]) {
 								string op = tokenStack[tokenStack.size() - 3];
 								const string operand1 = tokenStack[tokenStack.size() - 2];
@@ -444,6 +472,7 @@ namespace wiz {
 					}
 				}
 				catch (const char* err) { cout << err << endl; return false; }
+				catch (string err) { cout << err << endl; return false; }
 				catch (Error& e) { cout << e << endl; return false; }
 				return true;
 			}

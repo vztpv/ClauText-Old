@@ -1,0 +1,36 @@
+
+# global -> object -> module?
+
+Main = { $call = { id = 0 } }
+
+test = { 1 x=2 y=3 z=4 x=5 a b c }
+pass = { x y z }
+
+Event = {
+	id = 0
+	
+	$for_each = { 
+		# eventID -> event -> $parameter? 
+		# error, when num of parameter > 1 or empty.
+		eventID = { first_test }
+		dir = { test }
+		condition = {  
+			AND = {
+				EXISTITEMBYVALUE = { ~~ root/pass }
+				#EXISTITEMBYVALUE = { ~~~ root/pass } # pass = { 1 2 3 4 } test = { 1 2 3 4 5 }
+				COMP> = { ~~~ ~ 3 ~ 0 }
+			}
+		}
+	}
+	
+	$print = { data = { $return_value = { } } }
+	$_getch = { }
+}
+
+Event = {
+	id = first_test
+	
+	$parameter = { input }
+	
+	$return = { $parameter.input }
+}
