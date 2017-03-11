@@ -2812,6 +2812,35 @@ namespace wiz {
 					operandStack.push(vec[i]);
 				}
 			}
+			else if ("$item_name" == str) {
+				wiz::load_data::UserType ut;
+				string statement;
+
+				for (int i = 0; i < operandNum; ++i)
+				{
+					statement = statement + operandStack.pop();
+				}
+
+				wiz::load_data::LoadData::LoadDataFromString(statement, ut);
+
+				operandStack.push(ut.GetItemList(0).GetName());
+			}
+			else if ("$item_value" == str) {
+				wiz::load_data::UserType ut;
+				string statement;
+
+				for (int i = 0; i < operandNum; ++i)
+				{
+					statement = statement + operandStack.pop();
+				}
+
+				wiz::load_data::LoadData::LoadDataFromString(statement, ut);
+
+				operandStack.push(ut.GetItemList(0).Get(0));
+			}
+			else if ("$is_empty_string" == str) {
+				operandStack.push(operandStack.pop().empty() ? "TRUE" : "FALSE");
+			}
 			else {
 				return false;
 			}

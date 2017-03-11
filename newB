@@ -3,34 +3,42 @@
 
 Main = { $call = { id = 0 } }
 
-test = { 1 x=2 y=3 z=4 x=5 a b c }
-pass = { x y z }
+test = { 1 2 x=3 y=4 5 a b c z = { 1 2 3 } } }
+pass = { 1 2 3 4 5 }
 
 Event = {
 	id = 0
-	
-	$for_each = { 
+	# cf) $for - ToDo?? : using idx? [start, last]
+	$for_each = {  # option - not change!?
 		# eventID -> event -> $parameter? 
 		# error, when num of parameter > 1 or empty.
 		eventID = { first_test }
 		dir = { test }
-		condition = {  
+		condition = {  # chk ~~~ and ~~ /
 			AND = {
-				EXISTITEMBYVALUE = { ~~ root/pass }
+				EXISTITEMBYVALUE = { ~~~ root/pass }
 				#EXISTITEMBYVALUE = { ~~~ root/pass } # pass = { 1 2 3 4 } test = { 1 2 3 4 5 }
-				COMP> = { ~~~ ~ 3 ~ 0 }
+				COMP> = { ~~~ ~ $add = { 1 2 } ~ 0 }
 			}
 		}
 	}
 	
 	$print = { data = { $return_value = { } } }
+	$print = { val = { \n } }
+	$print2 = { dir = { /./ } }
 	$_getch = { }
 }
 
 Event = {
 	id = first_test
 	
-	$parameter = { input }
+	$parameter = { x }
 	
-	$return = { $parameter.input }
+	$if = { 
+		condition = { $is_empty_string = { $item_name = { $parameter.x } } }
+		then = {
+			$return = { $multiple = { 10 $item_value = { $parameter.x } } }
+		}
+	}
+	$return = { $concat_all2  = { $item_name = { $parameter.x } = $multiple = { 10 $item_value = { $parameter.x } } } }
 }

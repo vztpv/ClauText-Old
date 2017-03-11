@@ -1078,12 +1078,19 @@ string excute_module(wiz::load_data::UserType* _global, wiz::load_data::UserType
 							wiz::load_data::LoadData::AddData(globalTemp, "/root", "Main = { $call = { id = NONE } } Event = { id = NONE $call = { " + parameter + " = { " + ut->GetItemList(i).ToString() + " } } }", "TRUE");
 							wiz::load_data::LoadData::AddData(eventsTemp, "/root", "Event = { id = NONE $call = { " + parameter + " = { " + ut->GetItemList(i).ToString() + " } } }", "TRUE");
 
+							const string return_value = excute_module(&globalTemp, &eventsTemp);
+						 	wiz::load_data::UserType return_value_ut;
+
+							wiz::load_data::LoadData::LoadDataFromString(return_value, return_value_ut);
+
+							ut->GetItemList(i).SetName(return_value_ut.GetItemList(0).GetName());
+							ut->GetItemList(i).Set(0, return_value_ut.GetItemList(0).Get(0));
 
 							if (count != 0) {
 								eventStack.top().return_value = eventStack.top().return_value + " ";
 							}
 
-							eventStack.top().return_value = eventStack.top().return_value + excute_module(&globalTemp, &eventsTemp);
+							eventStack.top().return_value = eventStack.top().return_value + return_value;
 
 							count++;
 						}
