@@ -8,6 +8,9 @@ pass = { 1 2 3 4 5 }
 
 Event = {
 	id = 0
+	#
+	## ~~, ~~~ chk -> condition : ToBool4? - for all function?
+	#
 	# cf) $for - ToDo?? : using idx? [start, last]
 	$for_each = {  # option - not change!?
 		# eventID -> event -> $parameter? 
@@ -18,15 +21,24 @@ Event = {
 			AND = {
 				EXISTITEMBYVALUE = { ~~~ root/pass }
 				#EXISTITEMBYVALUE = { ~~~ root/pass } # pass = { 1 2 3 4 } test = { 1 2 3 4 5 }
-				COMP> = { ~~~ ~ $add = { 1 2 } ~ 0 }
+				#COMP> = { ~~~ ~ $add = { 1 2 } ~ 0 }
+				$event_result = { id = { bool_chk } x = { ~~~ } }
 			}
 		}
 	}
 	
-	$print = { data = { $return_value = { } } }
+	$print = { data = { $return_value = { } } } 
 	$print = { val = { \n } }
 	$print2 = { dir = { /./ } }
 	$_getch = { }
+}
+
+Event = {
+	id = bool_chk
+	
+	$parameter = { x } 
+	
+	$return = { $COMP> = { $parameter.x 3 } }
 }
 
 Event = {

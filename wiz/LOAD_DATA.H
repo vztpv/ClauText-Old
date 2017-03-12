@@ -50,113 +50,117 @@ namespace wiz {
 #include <wiz/load_data_reservers.h>
 #include <wiz/load_data_condition.h>
 
+const string LEFT = "{";
+const string RIGHT = "}";
+const string EQ_STR = "="; // EQ 충돌 -> EQ_STR로 변경
+
+const int RIGHT_DO = 1;
+
+
+class EventInfo
+{
+public:
+	wiz::load_data::UserType* eventUT;
+	wiz::ArrayStack< wiz::load_data::UserType* > nowUT; //
+	wiz::ArrayStack<int> userType_idx;
+	map<string, string> parameters;
+	map<string, string> locals;
+	string id; //
+	wiz::ArrayStack<string> conditionStack;
+	wiz::ArrayStack<int> state;
+	string return_value;
+	string option;
+public:
+	EventInfo() : eventUT(nullptr), return_value("")
+	{
+
+	}
+};
+
+class SortInfo // need to rename
+{
+public:
+	string data;
+	int iElement; // 2 : userType, // 1 : item
+	size_t idx; // for stable? - chk!!
+public:
+	SortInfo() : idx(-1) { }
+	SortInfo(const string& data, int iElement, size_t idx)
+		: data(data), iElement(iElement), idx(idx)
+	{
+
+	}
+	// for sorting..
+	bool operator<(const SortInfo& info) const
+	{
+		string temp = wiz::load_data::Utility::Compare(this->data, info.data);
+
+		if (this->data == "") {
+			return false;
+		}
+		if (info.data == "") {
+			return true;
+		}
+
+		if (temp == "< 0") { return true; }
+		else if (temp == "> 0") { return false; }
+		else if (temp == "== 0") {
+			return idx < info.idx;
+		}
+		else {
+			throw "temp is not valid in sortinfo";
+		}
+	}
+};
+
+class SortInfo2 // need to rename, sortinfo by dsc..
+{
+public:
+	string data;
+	int iElement; // 2 : userType, // 1 : item
+	size_t idx; // for stable? - chk!!
+public:
+	SortInfo2() : idx(-1) { }
+	SortInfo2(const string& data, int iElement, size_t idx)
+		: data(data), iElement(iElement), idx(idx)
+	{
+
+	}
+	// for sorting..
+	bool operator<(const SortInfo2& info) const
+	{
+		if (this->data == "" && info.data == "") {
+			return false;
+		}
+		if (this->data == "") {
+			return true;
+		}
+
+		if (info.data == "") {
+			return false;
+		}
+
+		string temp = wiz::load_data::Utility::Compare(this->data, info.data);
+		if (temp == "< 0") { return false; }
+		else if (temp == "> 0") { return true; }
+		else if (temp == "== 0") {
+			return idx < info.idx;
+		}
+		else {
+			cout << "sortInfo2" << endl;
+			cout << data << " " << info.data << endl;
+			throw "temp is not valid in sortinfo2";
+		}
+	}
+};
+
+string excute_module(const string& str, wiz::load_data::UserType* _global, wiz::load_data::UserType* pEvents = nullptr,
+	const std::shared_ptr<EventInfo>& pInfo = nullptr);
+
 namespace wiz {
 	namespace load_data {
-		const string LEFT = "{";
-		const string RIGHT = "}";
-		const string EQ = "=";
-
-		const int RIGHT_DO = 1;
-	
-
-		class EventInfo
-		{
-		public:
-			wiz::load_data::UserType* eventUT;
-			wiz::ArrayStack< wiz::load_data::UserType* > nowUT; //
-			wiz::ArrayStack<int> userType_idx;
-			map<string, string> parameters;
-			map<string, string> locals;
-			string id; //
-			wiz::ArrayStack<string> conditionStack;
-			wiz::ArrayStack<int> state;
-			string return_value;
-			string option;
-		public:
-			EventInfo() : eventUT(nullptr), return_value("")
-			{
-
-			}
-		};
-
-		class SortInfo // need to rename
-		{
-		public:
-			string data;
-			int iElement; // 2 : userType, // 1 : item
-			size_t idx; // for stable? - chk!!
-		public:
-			SortInfo() : idx(-1) { }
-			SortInfo(const string& data, int iElement, size_t idx)
-				: data(data), iElement(iElement), idx(idx)
-			{
-
-			}
-			// for sorting..
-			bool operator<(const SortInfo& info) const
-			{
-				string temp = wiz::load_data::Utility::Compare(this->data, info.data);
-
-				if (this->data == "") {
-					return false;
-				}
-				if (info.data == "") {
-					return true;
-				}
-
-				if (temp == "< 0") { return true; }
-				else if (temp == "> 0") { return false; }
-				else if (temp == "== 0") {
-					return idx < info.idx;
-				}
-				else {
-					throw "temp is not valid in sortinfo";
-				}
-			}
-		};
-
-		class SortInfo2 // need to rename, sortinfo by dsc..
-		{
-		public:
-			string data;
-			int iElement; // 2 : userType, // 1 : item
-			size_t idx; // for stable? - chk!!
-		public:
-			SortInfo2() : idx(-1) { }
-			SortInfo2(const string& data, int iElement, size_t idx)
-				: data(data), iElement(iElement), idx(idx)
-			{
-
-			}
-			// for sorting..
-			bool operator<(const SortInfo2& info) const
-			{
-				if (this->data == "" && info.data == "") {
-					return false;
-				}
-				if (this->data == "") {
-					return true;
-				}
-
-				if (info.data == "") {
-					return false;
-				}
-
-				string temp = wiz::load_data::Utility::Compare(this->data, info.data);
-				if (temp == "< 0") { return false; }
-				else if (temp == "> 0") { return true; }
-				else if (temp == "== 0") {
-					return idx < info.idx;
-				}
-				else {
-					cout << "sortInfo2" << endl;
-					cout << data << " " << info.data << endl;
-					throw "temp is not valid in sortinfo2";
-				}
-			}
-		};
-		string ToBool4(wiz::load_data::UserType& global, const map<string, string>& parameters, const string& temp, wiz::load_data::EventInfo info, map<string, string>& objectMap);
-
+		string ToBool4(wiz::load_data::UserType& global, const map<string, string>& parameters, const string& temp, EventInfo info, map<string, string>& objectMap, wiz::load_data::UserType* pEvents);
+		
 		class LoadData
 		{
 		private:
@@ -204,7 +208,7 @@ namespace wiz {
 						else {
  							pair<bool, Token> bsPair = Utility::LookUp(strVec, nestedUT[braceNum], reserver);
 							if (bsPair.first) {
-								if (EQ == bsPair.second.str) {
+								if (EQ_STR == bsPair.second.str) {
 									Utility::Pop(strVec, &var2, nestedUT[braceNum], reserver);
 									Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver);
 									state = 2;
@@ -322,10 +326,10 @@ namespace wiz {
 						else {
 							pair<bool, Token> bsPair = Utility::LookUp(strVec, nestedUT[braceNum], reserver);
 							if (bsPair.first) {
-								if (EQ == bsPair.second.str) {
+								if (EQ_STR == bsPair.second.str) {
 									// var2
 									Utility::Pop(strVec, &var2, nestedUT[braceNum], reserver);
-									Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver); // pass EQ
+									Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver); // pass EQ_STR
 									state = 6;
 								}
 								else {
@@ -1738,20 +1742,20 @@ namespace wiz {
 				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
 				ReplaceDateType2(global, start_dir, ut, val, condition);
 			}
-			static void ReplaceDataType1(UserType& global, const string& rex, const vector<string>& val, const vector<string>& condition, const string& start_dir, map<string, string>& objectMap) {
+			static void ReplaceDataType1(UserType& global, const string& rex, const vector<string>& val, const vector<string>& condition, const string& start_dir, map<string, string>& objectMap,  wiz::load_data::UserType* pEvents) {
 				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
 				std::regex rgx(rex);
-				ReplaceDataType1(global, start_dir, ut, rgx, val, condition, objectMap);
+				ReplaceDataType1(global, start_dir, ut, rgx, val, condition, objectMap,  pEvents);
 			}
-			static void ReplaceDataType1_2(UserType& global, const string& rex, const vector<string>& val, const vector<string>& condition, const string& start_dir, map<string, string>& objectMap) {
+			static void ReplaceDataType1_2(UserType& global, const string& rex, const vector<string>& val, const vector<string>& condition, const string& start_dir, map<string, string>& objectMap,  wiz::load_data::UserType* pEvents) {
 				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
 				std::regex rgx(rex);
-				ReplaceDataType1_2(global, start_dir, ut, rgx, val, condition, objectMap);
+				ReplaceDataType1_2(global, start_dir, ut, rgx, val, condition, objectMap,  pEvents);
 			}
-			static void ReplaceDataType2(UserType& global, const string& rex, const vector<string>& val, const vector<string>& condition, const string& start_dir, map<string, string>& objectMap) {
+			static void ReplaceDataType2(UserType& global, const string& rex, const vector<string>& val, const vector<string>& condition, const string& start_dir, map<string, string>& objectMap,  wiz::load_data::UserType* pEvents) {
 				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
 				std::regex rgx(rex);
-				ReplaceDataType2(global, start_dir, ut, rgx, val, condition, objectMap);
+				ReplaceDataType2(global, start_dir, ut, rgx, val, condition, objectMap,  pEvents);
 			}
 		private:
 			static void ReplaceItem(UserType& global, const string& var, const string& nowPosition,
@@ -1900,7 +1904,7 @@ namespace wiz {
 				}
 			}
 			static void ReplaceDataType1(UserType& global, const string& nowPosition,
-				UserType* ut, const std::regex& rgx, const vector<string>& val, const vector<string>& condition, map<string, string>& objectMap)
+				UserType* ut, const std::regex& rgx, const vector<string>& val, const vector<string>& condition, map<string, string>& objectMap,  wiz::load_data::UserType* pEvents)
 			{
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
 					if (std::regex_match(ut->GetItemList(i).GetName(), rgx)) { // || Utility::IsDate(ut->GetItemList(i).Get(0))) {
@@ -1918,7 +1922,7 @@ namespace wiz {
 							{
 								if (_val[0] == '@') { _val.erase(_val.begin()); }
 								_val = wiz::String::replace(_val, "~~", _var);
-								_val = ToBool4(*ut, map<string, string>(), _val, EventInfo(), objectMap);
+								_val = ToBool4(*ut, map<string, string>(), _val, EventInfo(), objectMap,  pEvents);
 
 								ut->GetItemList(i).SetName(_val);
 							}
@@ -1937,12 +1941,13 @@ namespace wiz {
 						rgx,
 						val,
 						condition,
-						objectMap
+						objectMap,
+						pEvents
 					);
 				}
 			}
 			static void ReplaceDataType1_2(UserType& global, const string& nowPosition,
-				UserType* ut, const std::regex& rgx, const vector<string>& val, const vector<string>& condition, map<string, string>& objectMap)
+				UserType* ut, const std::regex& rgx, const vector<string>& val, const vector<string>& condition, map<string, string>& objectMap,  wiz::load_data::UserType* pEvents)
 			{
 
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
@@ -1961,7 +1966,7 @@ namespace wiz {
 							{
 								if (_val[0] == '@') { _val.erase(_val.begin()); } // chk, same do(chk @) to other functions?
 								_val = wiz::String::replace(_val, "~~", _var);
-								_val = ToBool4(*ut, map<string, string>(), _val, EventInfo(), objectMap);
+								_val = ToBool4(*ut, map<string, string>(), _val, EventInfo(), objectMap,  pEvents);
 
 								ut->GetItemList(i).Set(0, _val);
 							}
@@ -1980,12 +1985,13 @@ namespace wiz {
 						rgx,
 						val,
 						condition,
-						objectMap
+						objectMap, 
+						pEvents
 					);
 				}
 			}
 			static void ReplaceDataType1_3(UserType& global, const string& nowPosition,
-				UserType* ut, const std::regex& rgx, const vector<string>& val, const vector<string>& condition, map<string, string>& objectMap)
+				UserType* ut, const std::regex& rgx, const vector<string>& val, const vector<string>& condition, map<string, string>& objectMap,  wiz::load_data::UserType* pEvents)
 			{
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
 					if (std::regex_match(ut->GetItemList(i).Get(0), rgx)) {
@@ -2004,7 +2010,7 @@ namespace wiz {
 							{
 								if (_val[0] == '@') { _val.erase(_val.begin()); }
 								_val = wiz::String::replace(_val, "~~", _var);
-								_val = ToBool4(*ut, map<string, string>(), _val, EventInfo(), objectMap);
+								_val = ToBool4(*ut, map<string, string>(), _val, EventInfo(), objectMap,  pEvents);
 								ut->GetItemList(i).Set(0, _val);
 							}
 						}
@@ -2022,7 +2028,8 @@ namespace wiz {
 						rgx,
 						val,
 						condition,
-						objectMap
+						objectMap,
+						pEvents
 					);
 				}
 			}
@@ -2030,7 +2037,7 @@ namespace wiz {
 			// cf) replacedatatype1_4  match value, change var_name?
 
 			static void ReplaceDataType2(UserType& global, const string& nowPosition,
-				UserType* ut, const std::regex& rgx, const vector<string>& val, const vector<string>& condition, map<string, string>& objectMap) // first val test
+				UserType* ut, const std::regex& rgx, const vector<string>& val, const vector<string>& condition, map<string, string>& objectMap,  wiz::load_data::UserType* pEvents) // first val test
 			{
 				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
 					string temp = ut->GetUserTypeList(i)->GetName();
@@ -2052,7 +2059,7 @@ namespace wiz {
 								if (_val[0] == '@') { _val.erase(_val.begin()); } // removal?
 
 								_val = wiz::String::replace(_val, "~~", _var);
-								_val = ToBool4(*ut, map<string, string>(), _val, EventInfo(), objectMap);
+								_val = ToBool4(*ut, map<string, string>(), _val, EventInfo(), objectMap,  pEvents);
 								ut->GetUserTypeList(i)->SetName(_val);
 							}
 						}
@@ -2064,7 +2071,8 @@ namespace wiz {
 						rgx,
 						val,
 						condition,
-						objectMap
+						objectMap,
+						pEvents
 					);
 				}
 			}
@@ -2167,11 +2175,12 @@ namespace wiz {
 			return "";
 		}
 		//need to renewal. add $AND $OR $NOT
+	
 		/// remove /, parameter chk!!
 		string ToBool4(wiz::load_data::UserType& global, const map<string, string>& parameters, const string& temp,
-			 wiz::load_data::EventInfo info, map<string, string>& objectMap);
+			 EventInfo info, map<string, string>& objectMap,  wiz::load_data::UserType* pEvents);
 		bool operation(wiz::load_data::UserType& global, const map<string, string>& parameters, const string& str,
-			wiz::ArrayStack<string>& operandStack, wiz::load_data::EventInfo info, map<string, string>& objectMap)
+			wiz::ArrayStack<string>& operandStack, EventInfo info, map<string, string>& objectMap, wiz::load_data::UserType* pEvents)
 		{
 			if (!operandStack.empty() && operandStack.top() == "ERROR") { return false; }
 
@@ -2685,7 +2694,7 @@ namespace wiz {
 				}
 				str = str.substr(1, str.size() - 2);
 				{
-					string result = ToBool4(global, parameters, str, info, objectMap);
+					string result = ToBool4(global, parameters, str, info, objectMap,  pEvents);
 					bool chk = wiz::load_data::Utility::ChkExist(result);
 					if (chk) { /// chk with tobool4
 						string temp;
@@ -2841,6 +2850,22 @@ namespace wiz {
 			else if ("$is_empty_string" == str) {
 				operandStack.push(operandStack.pop().empty() ? "TRUE" : "FALSE");
 			}
+			else if ("$event_result" == str) {
+				vector<string> eventVec;
+				for (int i = 0; i < operandNum; ++i) {
+					eventVec.push_back(operandStack.pop());
+				}
+				
+				string statements2 = "Event = { id = NONE $call = { ";
+				for (int i = 0; i < eventVec.size(); ++i) {
+					statements2 = statements2 + eventVec[i] + " ";
+				}
+				statements2 = statements2 + " } }";
+				wiz::load_data::UserType eventsTemp = *pEvents;
+				wiz::load_data::LoadData::AddData(eventsTemp, "/root", statements2, "TRUE");
+
+				operandStack.push(excute_module("Main = { $call = { id = NONE } }", &global, &eventsTemp));
+			}
 			else {
 				return false;
 			}
@@ -2850,7 +2875,7 @@ namespace wiz {
 		}
 
 		string ToBool3(wiz::load_data::UserType& global, const map<string, string>& parameters, const string& temp,
-			 wiz::load_data::EventInfo info) /// has bug!
+			 EventInfo info) /// has bug!
 		{
 			wiz::StringTokenizer tokenizer(temp, vector<string>{ "/" });
 			vector<string> tokenVec;
@@ -2921,7 +2946,7 @@ namespace wiz {
 			return result;
 		}
 		string ToBool4(wiz::load_data::UserType& global, const map<string, string>& parameters, const string& temp,
-			 wiz::load_data::EventInfo info, map<string, string>& objectMap)
+			 EventInfo info, map<string, string>& objectMap, wiz::load_data::UserType* pEvents)
 		{ 
 			string result = temp;
 			//cout << "temp is " << temp << endl;
@@ -3114,7 +3139,7 @@ namespace wiz {
 					operandStack.pop(); // {
 					operatorStack.push(tokenVec[i]);
 
-					if (false == operation(global, parameters, tokenVec[i], operandStack, info, objectMap)) // chk!!
+					if (false == operation(global, parameters, tokenVec[i], operandStack, info, objectMap, pEvents)) // chk!!
 					{
 						// chk removal here?
 						cout << " false " << endl;
