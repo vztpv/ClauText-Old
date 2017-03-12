@@ -72,7 +72,9 @@ Event =
 	$load_only_data = { fileName = { "input.eu4" } dirName = { eu3Game } } # input.txt or input2.txt
 	$print = { value= { "load_only_data end" } }
 	$print = { value = { \n } }
-	#$_getch = { }
+	
+
+	$_getch = { }
 	#$_getch = { }
 	#$replace_item = { 
 	#	var = { date }
@@ -103,7 +105,7 @@ Event =
 		#rgx = { "^[0-9]+\.[0-9]+\.[0-9]+$" }
 		#val = { @$eval = { " $concat = { /~~/university test! } " } }  # using @/~~
 		#rgx = { "[0-9]+\.[0-9]+" }
-		rgx = { "base_tax" } # "[a-zA-Z0-9_]+" }
+		rgx = { "\bbase_tax\b" } # "[a-zA-Z0-9_]+" }
 		# ToDo - condition == TRUE, then chk val! # /./name?
 		val = { @$eval = { " $concat_all = { $add = { 2.700 /./~~ } chk_base_tax  /./~~ } " } }
 		#val = { $concat_all = { $add = { 2.700 /./~~ } chk_base_tax  /./~~ } }
@@ -126,9 +128,9 @@ Event =
 		start_dir = { /eu3Game }
 	}
 	
-	$call = { id = save } # option = USE_THREAD }
-	#$call = { id = save2 option = USE_THREAD }
-	#$wait = { }
+	$call = { id = save option = USE_THREAD }
+	$call = { id = save2 option = USE_THREAD }
+	$wait = { }
 	
 	$_getch = { }
 }

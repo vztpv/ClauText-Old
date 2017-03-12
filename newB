@@ -4,7 +4,7 @@
 Main = { $call = { id = 0 } }
 
 test = { 1 2 x=3 y=4 5 a b c z = { 1 2 3 } } }
-pass = { 1 2 3 4 5 }
+pass = { 1 2 3 4 5 } # mask?
 
 Event = {
 	id = 0
@@ -30,6 +30,7 @@ Event = {
 	$print = { data = { $return_value = { } } } 
 	$print = { val = { \n } }
 	$print2 = { dir = { /./ } }
+	$print = { val = { \n } }
 	$_getch = { }
 }
 

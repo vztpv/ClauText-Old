@@ -811,7 +811,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 							}
 							else if ("remove" == strVecTemp[0])
 							{
-								wiz::load_data::LoadData::Remove(*utTemp, strVecTemp[1], strVecTemp[2], strVecTemp[3]);
+								wiz::load_data::LoadData::Remove(*utTemp, strVecTemp[1], strVecTemp[2], strVecTemp[3], map<string, string>(), nullptr, EventInfo());
 							}
 							//else if ("removenonameitem" == strVecTemp[0])
 							//{
@@ -819,16 +819,16 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 							//}
 							else if ("removeall" == strVecTemp[0])
 							{
-								wiz::load_data::LoadData::Remove(*utTemp, strVecTemp[1], strVecTemp[2]);
+								wiz::load_data::LoadData::Remove(*utTemp, strVecTemp[1], strVecTemp[2], map<string, string>(), nullptr, EventInfo());
 							}
 							else if ("searchitem" == strVecTemp[0])
 							{
-								cout << wiz::load_data::LoadData::SearchItem(*utTemp, strVecTemp[1], strVecTemp[2]) << endl;
+								cout << wiz::load_data::LoadData::SearchItem(*utTemp, strVecTemp[1], strVecTemp[2], map<string, string>(), nullptr, EventInfo()) << endl;
 								GETCH();
 							}
 							else if ("searchusertype" == strVecTemp[0])
 							{
-								cout << wiz::load_data::LoadData::SearchUserType(*utTemp, strVecTemp[1], strVecTemp[2]) << endl;
+								cout << wiz::load_data::LoadData::SearchUserType(*utTemp, strVecTemp[1], strVecTemp[2], map<string, string>(), nullptr, EventInfo()) << endl;
 								GETCH();
 							}
 						}
@@ -1135,16 +1135,16 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 					{
 						int n = (val->GetUserTypeListSize() - 1) / 2;
 						for (int i = 0; i < n; ++i) {
-							sval.push_back(ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  &events));
+							sval.push_back(val->GetUserTypeList(1)->ToString());
 
-							scondition.push_back(ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top(), objectMap,  &events));
+							scondition.push_back(val->GetUserTypeList(2)->ToString());
 						}
 					}
 					if (val->GetUserTypeListSize() >= 4) {
 						start_dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(3)->ToString(), eventStack.top(), objectMap,  &events);
 					}
 
-					wiz::load_data::LoadData::ReplaceDataType1(global, rex, sval, scondition, start_dir, objectMap,  &events);
+					wiz::load_data::LoadData::ReplaceDataType1(global, rex, sval, scondition, start_dir, objectMap, &events, eventStack.top());
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1161,9 +1161,9 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 						int n = (val->GetUserTypeListSize() - 1) / 2;
 						int count = 1;
 						for (int i = 0; i < n; ++i) {
-							sval.push_back(ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(count)->ToString(), eventStack.top(), objectMap,  &events));
+							sval.push_back(val->GetUserTypeList(count)->ToString());
 							count++;
-							scondition.push_back(ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(count)->ToString(), eventStack.top(), objectMap,  &events));
+							scondition.push_back(val->GetUserTypeList(count)->ToString());
 							count++;
 						}
 					}
@@ -1172,7 +1172,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 						start_dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(val->GetUserTypeListSize()-1)->ToString(), eventStack.top(), objectMap,  &events);
 					}
 
-					wiz::load_data::LoadData::ReplaceDataType1_2(global, rex, sval, scondition, start_dir, objectMap,  &events);
+					wiz::load_data::LoadData::ReplaceDataType1_2(global, rex, sval, scondition, start_dir, objectMap,  &events, eventStack.top());
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1190,9 +1190,9 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 						int n = (val->GetUserTypeListSize() - 1) / 2;
 						int count = 1;
 						for (int i = 0; i < n; ++i) {
-							sval.push_back(ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(count)->ToString(), eventStack.top(), objectMap,  &events));
+							sval.push_back(val->GetUserTypeList(count)->ToString());
 							count++;
-							scondition.push_back(ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(count)->ToString(), eventStack.top(), objectMap,  &events));
+							scondition.push_back(val->GetUserTypeList(count)->ToString());
 							count++;
 						}
 					}
@@ -1203,63 +1203,63 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 
 					//cout << scondition << endl;
 					//cout << "sval " << sval << endl;
-					wiz::load_data::LoadData::ReplaceDataType2(global, rex, sval, scondition, start_dir, objectMap,  &events);
+					wiz::load_data::LoadData::ReplaceDataType2(global, rex, sval, scondition, start_dir, objectMap, &events, eventStack.top());
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$replace_datetype" == val->GetName()) {
-					string sval = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  &events);
+					string sval = val->GetUserTypeList(0)->ToString();
 					
 					string scondition = "TRUE";
 					string start_dir = "root";
 
 					if (val->GetUserTypeListSize() >= 2)
 					{
-						scondition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  &events);
+						scondition = val->GetUserTypeList(1)->ToString();
 					}
 					if (val->GetUserTypeListSize() >= 3) {
 						start_dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top(), objectMap,  &events);
 					}
 
-					wiz::load_data::LoadData::ReplaceDateType(global, sval, scondition, start_dir);
+					wiz::load_data::LoadData::ReplaceDateType(global, sval, scondition, start_dir, objectMap, pEvents, eventStack.top());
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$replace_datetype2" == val->GetName()) {
-					string sval = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  &events);
+					string sval = val->GetUserTypeList(0)->ToString();
 					string scondition = "TRUE";
 					string start_dir = "root";
 
 					
 					if (val->GetUserTypeListSize() >= 2)
 					{
-						scondition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  &events);
+						scondition = val->GetUserTypeList(1)->ToString();
 					}
 					if (val->GetUserTypeListSize() >= 3) {
 						start_dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top(), objectMap,  &events);
 					}
 
-					wiz::load_data::LoadData::ReplaceDateType2(global, sval, scondition, start_dir);
+					wiz::load_data::LoadData::ReplaceDateType2(global, sval, scondition, start_dir, objectMap, pEvents, eventStack.top());
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$remove_usertype_total" == val->GetName()) {
-					string ut_name = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  &events);
+					string ut_name = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), info, objectMap, pEvents);
 					string condition = "TRUE";
 					string start_dir = "root";
 
 					if (val->GetUserTypeListSize() >= 2)
 					{
-						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  &events);
+						condition = val->GetUserTypeList(1)->ToString();
 					}
 					if (val->GetUserTypeListSize() >= 3) {
 						start_dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top(), objectMap,  &events);
 					}
 
-					wiz::load_data::LoadData::RemoveUserTypeTotal(global, ut_name, condition, start_dir);
+					wiz::load_data::LoadData::RemoveUserTypeTotal(global, ut_name, condition, start_dir, objectMap, pEvents, eventStack.top());
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1272,13 +1272,13 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 
 					if (val->GetUserTypeListSize() >= 3)
 					{
-						scondition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top(), objectMap,  &events);
+						scondition = val->GetUserTypeList(2)->ToString();
 					}
 					if (val->GetUserTypeListSize() >= 4) {
 						start_dir = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(3)->ToString(), eventStack.top(), objectMap,  &events);
 					}
 
-					wiz::load_data::LoadData::ReplaceItem(global, svar, sval, scondition, start_dir);
+					wiz::load_data::LoadData::ReplaceItem(global, svar, sval, scondition, start_dir, objectMap, pEvents, eventStack.top());
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1517,7 +1517,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 					if (val->GetUserTypeListSize() >= 2) {
 						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  &events);
 					}
-					wiz::load_data::LoadData::Remove(global, dir, ut->GetIListSize() - 1, condition);
+					wiz::load_data::LoadData::Remove(global, dir, ut->GetIListSize() - 1, condition, objectMap, &events, eventStack.top());
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1554,7 +1554,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 					if (val->GetUserTypeListSize() >= 2) {
 						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  &events);
 					}
-					wiz::load_data::LoadData::Remove(global, dir, 0, condition);
+					wiz::load_data::LoadData::Remove(global, dir, 0, condition, objectMap, &events, eventStack.top());
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1741,11 +1741,11 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 					pair<string, string> dir = Find2(&global, ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  &events));
 					string data = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  &events);
 
-					string condition;
-					if (val->GetUserTypeListSize() >= 3) {
-						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top(), objectMap,  &events);
-					}
-					wiz::load_data::LoadData::SetData(global, dir.first, dir.second, data, condition);
+					//string condition;
+					//if (val->GetUserTypeListSize() >= 3) {
+					//	condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top(), objectMap,  &events);
+					//}
+					wiz::load_data::LoadData::SetData(global, dir.first, dir.second, data, "TRUE");
 
 					// chk local?
 
@@ -1873,7 +1873,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 					if (val->GetUserTypeListSize() >= 2) {
 						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  &events);
 					}
-					wiz::load_data::LoadData::Remove(global, dir, condition);
+					wiz::load_data::LoadData::Remove(global, dir, condition, objectMap, &events, eventStack.top());
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1897,7 +1897,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 					if (val->GetUserTypeListSize() >= 2) {
 						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  &events);
 					}
-					wiz::load_data::LoadData::Remove(global, dir, name, condition);
+					wiz::load_data::LoadData::Remove(global, dir, name, condition, objectMap, &events, eventStack.top());
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1915,7 +1915,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 						condition = ToBool4(global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top(), objectMap,  &events);
 					}
 
-					wiz::load_data::LoadData::Remove(global, dir, idx, condition);
+					wiz::load_data::LoadData::Remove(global, dir, idx, condition, objectMap, &events, eventStack.top());
 					// remove -> UserType::Find(&global, dir).second[0]->RemoveItemList(idx); /// change ?
 
 					eventStack.top().userType_idx.top()++;
