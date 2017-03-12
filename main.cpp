@@ -1087,7 +1087,8 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 							wiz::load_data::LoadData::AddData(eventsTemp, "/root", "Event = { id = NONE $call = { " + parameter + " = { " + ut->GetItemList(i).ToString() + " } } }", "TRUE");
 
 							const string return_value = excute_module("Main = { $call = { id = NONE } }", &global, &eventsTemp);
-						 	wiz::load_data::UserType return_value_ut;
+						 	
+							wiz::load_data::UserType return_value_ut;
 
 							wiz::load_data::LoadData::LoadDataFromString(return_value, return_value_ut);
 
