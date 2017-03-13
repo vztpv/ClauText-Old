@@ -1889,18 +1889,19 @@ namespace wiz {
 						_condition = wiz::String::replace(_condition, "~~~", ut->GetItemList(i).Get(0));
 						_condition = wiz::String::replace(_condition, "~~", _var); //
 
-						_val = wiz::String::replace(_val, "~~~", ut->GetItemList(i).Get(0));
-						_val = wiz::String::replace(_val, "~~", _var); //
-
 						_condition = ToBool4(nullptr, global, info.parameters, _condition, info, objectMap, pEvents);
-						_val = ToBool4(nullptr, global, info.parameters, _val, info, objectMap, pEvents);
-
+						
 						Condition cond(_condition, ut, &global);
 
 						while (cond.Next());
 
 						if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
 						{
+							_val = wiz::String::replace(_val, "~~~", ut->GetItemList(i).Get(0));
+							_val = wiz::String::replace(_val, "~~", _var); //
+							
+							_val = ToBool4(nullptr, global, info.parameters, _val, info, objectMap, pEvents);
+
 							if (Utility::IsDate(ut->GetItemList(i).GetName())) {
 								ut->GetItemList(i).SetName(_val);
 							}
@@ -1941,10 +1942,8 @@ namespace wiz {
 
 						string _var = ut->GetUserTypeList(i)->GetName();
 
-						_val = wiz::String::replace(_val, "~~", _var); //
 						_condition = wiz::String::replace(_condition, "~~", _var); //
 
-						_val = ToBool4(nullptr, global, info.parameters, _val, info, objectMap, pEvents);
 						_condition = ToBool4(nullptr, global, info.parameters, _condition, info, objectMap, pEvents);
 
 
@@ -1954,6 +1953,9 @@ namespace wiz {
 
 						if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
 						{
+							_val = wiz::String::replace(_val, "~~", _var); //
+							_val = ToBool4(nullptr, global, info.parameters, _val, info, objectMap, pEvents);
+						
 							ut->GetUserTypeList(i)->SetName(_val);
 						}
 					}
@@ -1981,13 +1983,10 @@ namespace wiz {
 							string _val = val[k];
 							string _var = ut->GetItemList(i).GetName();
 
-							_val = wiz::String::replace(_val, "~~~", ut->GetItemList(i).Get(0));
-							_val = wiz::String::replace(_val, "~~", ut->GetItemList(i).GetName());
-
+							
 							_condition = wiz::String::replace(_condition, "~~~", ut->GetItemList(i).Get(0));
 							_condition = wiz::String::replace(_condition, "~~", _var); //
 
-							_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
 							_condition = ToBool4(nullptr, global, info.parameters, _condition, info, objectMap, pEvents);
 
 
@@ -1997,6 +1996,11 @@ namespace wiz {
 
 							if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
 							{
+								_val = wiz::String::replace(_val, "~~~", ut->GetItemList(i).Get(0));
+								_val = wiz::String::replace(_val, "~~", ut->GetItemList(i).GetName());
+
+								_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
+							
 								//if (_val[0] == '@') { _val.erase(_val.begin()); }
 								//_val = wiz::String::replace(_val, "~~", _var);
 								//_val = ToBool4(ut, global, map<string, string>(), _val, EventInfo(), objectMap,  pEvents);
@@ -2037,13 +2041,9 @@ namespace wiz {
 							string _var = ut->GetItemList(i).GetName();
 							// ~~~ -> _val?
 
-							_val = wiz::String::replace(_val, "~~~", ut->GetItemList(i).Get(0));
-							_val = wiz::String::replace(_val, "~~", _var); //
-
 							_condition = wiz::String::replace(_condition, "~~~", ut->GetItemList(i).Get(0));
 							_condition = wiz::String::replace(_condition, "~~", _var); //
 
-							_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
 							_condition = ToBool4(nullptr, global, info.parameters, _condition, info, objectMap, pEvents);
 
 							Condition cond(_condition, ut, &global);
@@ -2052,6 +2052,11 @@ namespace wiz {
 
 							if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
 							{
+								_val = wiz::String::replace(_val, "~~~", ut->GetItemList(i).Get(0));
+								_val = wiz::String::replace(_val, "~~", _var); //
+
+								_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
+							
 								// remove 3 lines?
 							//	if (_val[0] == '@') { _val.erase(_val.begin()); } // chk, same do(chk @) to other functions?
 							//	_val = wiz::String::replace(_val, "~~", _var);
@@ -2093,13 +2098,10 @@ namespace wiz {
 
 							string _var = ut->GetItemList(i).GetName();
 
-							_val = wiz::String::replace(_val, "~~~", ut->GetItemList(i).Get(0));
-							_val = wiz::String::replace(_val, "~~", _var); //
-
+							
 							_condition = wiz::String::replace(_condition, "~~~", ut->GetItemList(i).Get(0));
 							_condition = wiz::String::replace(_condition, "~~", _var); //
 
-							_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
 							_condition = ToBool4(nullptr, global, info.parameters, _condition, info, objectMap, pEvents);
 
 
@@ -2109,6 +2111,11 @@ namespace wiz {
 
 							if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
 							{
+								_val = wiz::String::replace(_val, "~~~", ut->GetItemList(i).Get(0));
+								_val = wiz::String::replace(_val, "~~", _var); //
+
+								_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
+							
 								//if (_val[0] == '@') { _val.erase(_val.begin()); }
 								//_val = wiz::String::replace(_val, "~~", _var);
 								//_val = ToBool4(ut, global, map<string, string>(), _val, EventInfo(), objectMap,  pEvents);
@@ -2154,10 +2161,8 @@ namespace wiz {
 							string _var = ut->GetUserTypeList(i)->GetName(); 
 							
 							
-							_val = wiz::String::replace(_val, "~~", _var); //
 							_condition = wiz::String::replace(_condition, "~~", _var); //
 
-							_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
 							_condition = ToBool4(nullptr, global, info.parameters, _condition, info, objectMap, pEvents);
 
 
@@ -2168,6 +2173,9 @@ namespace wiz {
 
 							if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
 							{
+								_val = wiz::String::replace(_val, "~~", _var); //
+								_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
+							
 								//if (_val[0] == '@') { _val.erase(_val.begin()); } // removal?
 
 								//_val = wiz::String::replace(_val, "~~", _var);

@@ -125,7 +125,8 @@ Event =
 		}
 		start_dir = { /eu3Game }
 	}
-	
+	$print = { val = { "change end" } }
+	$print = { val = { \n } }
 	$call = { id = save option = USE_THREAD }
 	$call = { id = save2 option = USE_THREAD }
 	$wait = { }
