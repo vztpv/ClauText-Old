@@ -13,11 +13,6 @@ x = 6
 
 Event =
 {
-	id = 1
-
-}
-Event =
-{
 	id = 0
 
 	$local = { x y }
@@ -107,7 +102,8 @@ Event =
 		#rgx = { "[0-9]+\.[0-9]+" }
 		rgx = { "\bbase_tax\b" } # "[a-zA-Z0-9_]+" }
 		# ToDo - condition == TRUE, then chk val! # /./name?
-		val = { @$eval = { "$concat_all = { $add = { 2.700 /./~~ } chk_base_tax  /./~~ } " } }
+		val = { $event_result = { id = { test } x = { $get = { now.~~ } } y = 2.0 } }
+		##val = { @$eval = { "$concat_all = { $add = { 2.700 /./~~ } chk_base_tax  /./~~ } " } }
 		#val = { $concat_all = { $add = { 2.700 /./~~ } chk_base_tax  /./~~ } }
 		condition = {
 			#REGEX = { ~~ ~ "^1821\.1\.1$" ~ 0 } # option : 0, 1, 2 ?? - chk!!
@@ -116,7 +112,9 @@ Event =
 				COMP> = { ~~ / 5.000 ~ 0 }
 			}
 		}
-		val = { @$eval = { " $concat_all = { $add = { 1.000 /./~~ } chk_base_tax  /./~~ } " } }
+		
+		val = { $event_result = { id = { test } x = { $get = { now.~~ } } y = 1.0 } }
+		##val = { @$eval = { " $concat_all = { $add = { 1.000 /./~~ } chk_base_tax  /./~~ } " } }
 		#val = { $concat_all = { $add = { 2.700 /./~~ } chk_base_tax  /./~~ } }
 		condition = {
 			#REGEX = { ~~ ~ "^1821\.1\.1$" ~ 0 } # option : 0, 1, 2 ?? - chk!!
@@ -192,3 +190,10 @@ Event =
 	$print = { value = { \n } }
 }
 
+Event = {
+	id = test
+	
+	$parameter = { x y }
+	
+	$return = { $concat_all = { $add = { $parameter.y $parameter.x }  chk_base_tax $parameter.x } }  
+}

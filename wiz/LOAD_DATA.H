@@ -160,7 +160,7 @@ string excute_module(const string& str, wiz::load_data::UserType* _global, wiz::
 namespace wiz {
 		
 	namespace load_data {
-		string ToBool4(wiz::load_data::UserType& global, const map<string, string>& parameters, const string& temp, EventInfo info, map<string, string>& objectMap, wiz::load_data::UserType* pEvents);
+		string ToBool4(wiz::load_data::UserType* now, wiz::load_data::UserType& global, const map<string, string>& parameters, const string& temp, EventInfo info, map<string, string>& objectMap, wiz::load_data::UserType* pEvents);
 	
 		class LoadData
 		{
@@ -1801,7 +1801,7 @@ namespace wiz {
 							_condition = wiz::String::replace(_condition, "~~", _var); //
 						}
 
-						_condition = ToBool4(global, info.parameters, _condition, info, objectMap, pEvents);
+						_condition = ToBool4(nullptr, global, info.parameters, _condition, info, objectMap, pEvents);
 
 						Condition cond(_condition, ut, &global);
 
@@ -1847,7 +1847,7 @@ namespace wiz {
 							_condition = wiz::String::replace(_condition, "~~", _var); //
 						}
 
-						_condition = ToBool4(global, info.parameters, _condition, info, objectMap, pEvents);
+						_condition = ToBool4(nullptr, global, info.parameters, _condition, info, objectMap, pEvents);
 
 						Condition cond(_condition, ut, &global);
 
@@ -1892,8 +1892,8 @@ namespace wiz {
 						_val = wiz::String::replace(_val, "~~~", ut->GetItemList(i).Get(0));
 						_val = wiz::String::replace(_val, "~~", _var); //
 
-						_condition = ToBool4(global, info.parameters, _condition, info, objectMap, pEvents);
-						_val = ToBool4(global, info.parameters, _val, info, objectMap, pEvents);
+						_condition = ToBool4(nullptr, global, info.parameters, _condition, info, objectMap, pEvents);
+						_val = ToBool4(nullptr, global, info.parameters, _val, info, objectMap, pEvents);
 
 						Condition cond(_condition, ut, &global);
 
@@ -1944,8 +1944,8 @@ namespace wiz {
 						_val = wiz::String::replace(_val, "~~", _var); //
 						_condition = wiz::String::replace(_condition, "~~", _var); //
 
-						_val = ToBool4(global, info.parameters, _val, info, objectMap, pEvents);
-						_condition = ToBool4(global, info.parameters, _condition, info, objectMap, pEvents);
+						_val = ToBool4(nullptr, global, info.parameters, _val, info, objectMap, pEvents);
+						_condition = ToBool4(nullptr, global, info.parameters, _condition, info, objectMap, pEvents);
 
 
 						Condition cond(_condition, ut, &global);
@@ -1987,8 +1987,8 @@ namespace wiz {
 							_condition = wiz::String::replace(_condition, "~~~", ut->GetItemList(i).Get(0));
 							_condition = wiz::String::replace(_condition, "~~", _var); //
 
-							_val = ToBool4(global, info.parameters, _val, info, objectMap, pEvents);
-							_condition = ToBool4(global, info.parameters, _condition, info, objectMap, pEvents);
+							_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
+							_condition = ToBool4(nullptr, global, info.parameters, _condition, info, objectMap, pEvents);
 
 
 							Condition cond(_condition, ut, &global);
@@ -1997,11 +1997,12 @@ namespace wiz {
 
 							if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
 							{
-								if (_val[0] == '@') { _val.erase(_val.begin()); }
-								_val = wiz::String::replace(_val, "~~", _var);
-								_val = ToBool4(*ut, map<string, string>(), _val, EventInfo(), objectMap,  pEvents);
+								//if (_val[0] == '@') { _val.erase(_val.begin()); }
+								//_val = wiz::String::replace(_val, "~~", _var);
+								//_val = ToBool4(ut, global, map<string, string>(), _val, EventInfo(), objectMap,  pEvents);
 
 								ut->GetItemList(i).SetName(_val);
+								break;
 							}
 						}
 					}
@@ -2042,8 +2043,8 @@ namespace wiz {
 							_condition = wiz::String::replace(_condition, "~~~", ut->GetItemList(i).Get(0));
 							_condition = wiz::String::replace(_condition, "~~", _var); //
 
-							_val = ToBool4(global, info.parameters, _val, info, objectMap, pEvents);
-							_condition = ToBool4(global, info.parameters, _condition, info, objectMap, pEvents);
+							_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
+							_condition = ToBool4(nullptr, global, info.parameters, _condition, info, objectMap, pEvents);
 
 							Condition cond(_condition, ut, &global);
 
@@ -2051,11 +2052,13 @@ namespace wiz {
 
 							if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
 							{
-								if (_val[0] == '@') { _val.erase(_val.begin()); } // chk, same do(chk @) to other functions?
-								_val = wiz::String::replace(_val, "~~", _var);
-								_val = ToBool4(*ut, map<string, string>(), _val, EventInfo(), objectMap,  pEvents);
+								// remove 3 lines?
+							//	if (_val[0] == '@') { _val.erase(_val.begin()); } // chk, same do(chk @) to other functions?
+							//	_val = wiz::String::replace(_val, "~~", _var);
+						//		_val = ToBool4(ut, global, map<string, string>(), _val, EventInfo(), objectMap,  pEvents); // chk!!
 
 								ut->GetItemList(i).Set(0, _val);
+								break;
 							}
 						}
 					}
@@ -2096,8 +2099,8 @@ namespace wiz {
 							_condition = wiz::String::replace(_condition, "~~~", ut->GetItemList(i).Get(0));
 							_condition = wiz::String::replace(_condition, "~~", _var); //
 
-							_val = ToBool4(global, info.parameters, _val, info, objectMap, pEvents);
-							_condition = ToBool4(global, info.parameters, _condition, info, objectMap, pEvents);
+							_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
+							_condition = ToBool4(nullptr, global, info.parameters, _condition, info, objectMap, pEvents);
 
 
 							Condition cond(_condition, ut, &global);
@@ -2106,10 +2109,11 @@ namespace wiz {
 
 							if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
 							{
-								if (_val[0] == '@') { _val.erase(_val.begin()); }
-								_val = wiz::String::replace(_val, "~~", _var);
-								_val = ToBool4(*ut, map<string, string>(), _val, EventInfo(), objectMap,  pEvents);
-								ut->GetItemList(i).Set(0, _val);
+								//if (_val[0] == '@') { _val.erase(_val.begin()); }
+								//_val = wiz::String::replace(_val, "~~", _var);
+								//_val = ToBool4(ut, global, map<string, string>(), _val, EventInfo(), objectMap,  pEvents);
+								ut->GetItemList(i).Set(0, _val); 
+								break;
 							}
 						}
 					}
@@ -2153,8 +2157,8 @@ namespace wiz {
 							_val = wiz::String::replace(_val, "~~", _var); //
 							_condition = wiz::String::replace(_condition, "~~", _var); //
 
-							_val = ToBool4(global, info.parameters, _val, info, objectMap, pEvents);
-							_condition = ToBool4(global, info.parameters, _condition, info, objectMap, pEvents);
+							_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
+							_condition = ToBool4(nullptr, global, info.parameters, _condition, info, objectMap, pEvents);
 
 
 
@@ -2164,11 +2168,12 @@ namespace wiz {
 
 							if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
 							{
-								if (_val[0] == '@') { _val.erase(_val.begin()); } // removal?
+								//if (_val[0] == '@') { _val.erase(_val.begin()); } // removal?
 
-								_val = wiz::String::replace(_val, "~~", _var);
-								_val = ToBool4(*ut, map<string, string>(), _val, EventInfo(), objectMap,  pEvents);
+								//_val = wiz::String::replace(_val, "~~", _var);
+								//_val = ToBool4(ut, global, map<string, string>(), _val, EventInfo(), objectMap,  pEvents);
 								ut->GetUserTypeList(i)->SetName(_val);
+								break;
 							}
 						}
 					}
@@ -2286,9 +2291,9 @@ namespace wiz {
 		//need to renewal. add $AND $OR $NOT
 	
 		/// remove /, parameter chk!!
-		string ToBool4(wiz::load_data::UserType& global, const map<string, string>& parameters, const string& temp,
+		string ToBool4(wiz::load_data::UserType* now, wiz::load_data::UserType& global, const map<string, string>& parameters, const string& temp,
 			 EventInfo info, map<string, string>& objectMap,  wiz::load_data::UserType* pEvents);
-		bool operation(wiz::load_data::UserType& global, const map<string, string>& parameters, const string& str,
+		bool operation(wiz::load_data::UserType* now, wiz::load_data::UserType& global, const map<string, string>& parameters, const string& str,
 			wiz::ArrayStack<string>& operandStack, EventInfo info, map<string, string>& objectMap, wiz::load_data::UserType* pEvents)
 		{
 			if (!operandStack.empty() && operandStack.top() == "ERROR") { return false; }
@@ -2704,10 +2709,23 @@ namespace wiz {
 				if ('@' == x[0]) { // chk..
 					x.erase(x.begin());
 				}
-				if ('/' == x[0])
+
+				if (wiz::String::startsWith(x, "now.") && nullptr != now)
 				{
-					string temp = Find(&global, x); if (!temp.empty()) { x = temp; }
+					x = wiz::String::substring(x, 4);
+					x = "/./" + x;
+					if ('/' == x[0])
+					{
+						string temp = Find(now, x); if (!temp.empty()) { x = temp; }
+					}
 				}
+				else {
+					if ('/' == x[0])
+					{
+						string temp = Find(&global, x); if (!temp.empty()) { x = temp; }
+					}
+				}
+
 				{
 					string temp = FindParameters(parameters, x);
 					if (!temp.empty()) { x = temp; }
@@ -2716,6 +2734,7 @@ namespace wiz {
 					string temp = FindLocals(info.locals, x);
 					if (!temp.empty()) { x = temp; }
 				}
+				
 				operandStack.push(x);
 			}
 			else if ("$size" == str)
@@ -2803,7 +2822,7 @@ namespace wiz {
 				}
 				str = str.substr(1, str.size() - 2);
 				{
-					string result = ToBool4(global, parameters, str, info, objectMap,  pEvents);
+					string result = ToBool4(nullptr, global, parameters, str, info, objectMap,  pEvents);
 					bool chk = wiz::load_data::Utility::ChkExist(result);
 					if (chk) { /// chk with tobool4
 						string temp;
@@ -3054,7 +3073,7 @@ namespace wiz {
 			}
 			return result;
 		}
-		string ToBool4(wiz::load_data::UserType& global, const map<string, string>& parameters, const string& temp,
+		string ToBool4(wiz::load_data::UserType* now, wiz::load_data::UserType& global, const map<string, string>& parameters, const string& temp,
 			 EventInfo info, map<string, string>& objectMap, wiz::load_data::UserType* pEvents)
 		{ 
 			string result = temp;
@@ -3248,7 +3267,7 @@ namespace wiz {
 					operandStack.pop(); // {
 					operatorStack.push(tokenVec[i]);
 
-					if (false == operation(global, parameters, tokenVec[i], operandStack, info, objectMap, pEvents)) // chk!!
+					if (false == operation(now, global, parameters, tokenVec[i], operandStack, info, objectMap, pEvents)) // chk!!
 					{
 						// chk removal here?
 						cout << " false " << endl;
