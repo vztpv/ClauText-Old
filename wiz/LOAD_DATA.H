@@ -549,6 +549,9 @@ namespace wiz {
 						state = 1;
 						token_first = i; token_last = i;
 					}
+					else if (1 == state && '\\' == statement[i - 1] && '\"' == statement[i]) {
+						token_last = i;
+					}
 					else if (1 == state && '\"' == statement[i]) {
 						state = 0; token_last = i;
 

@@ -1,0 +1,15 @@
+
+Main = {
+	$call = { id = 0 }
+}
+
+test = "test \" wow \" ! "  # cf) "test ' wow ' ! "
+
+Event = {
+	id = 0
+	
+	$print  = { value = { $get = { /./test } } }
+	$_getch = { }
+}
+
+
