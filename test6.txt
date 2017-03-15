@@ -102,12 +102,13 @@ Event =
 		#rgx = { "[0-9]+\.[0-9]+" }
 		rgx = { "\bbase_tax\b" } # "[a-zA-Z0-9_]+" }
 		# ToDo - condition == TRUE, then chk val! # /./name?
-		val = { $event_result = { id = { test } x = { $get = { now.~~ } } y = 2.0 } }
+													### now.var? if var is empty!! - then err -> use { $getItemValue = { /// } 
+		val = { $event_result = { id = { test } x = { $getItemValue= { /// } } y = 2.0 } } #{ $get = { now.~~ } } y = 2.0 } }
 		##val = { @$eval = { "$concat_all = { $add = { 2.700 /./~~ } chk_base_tax  /./~~ } " } }
 		#val = { $concat_all = { $add = { 2.700 /./~~ } chk_base_tax  /./~~ } }
 		condition = {
 			#REGEX = { ~~ ~ "^1821\.1\.1$" ~ 0 } # option : 0, 1, 2 ?? - chk!!
-			AND = { 
+			AND = {
 				EQ = { ~~ ~ base_tax ~ 1 }
 				COMP> = { ~~ / 5.000 ~ 0 }
 			}

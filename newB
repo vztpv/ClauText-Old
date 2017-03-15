@@ -3,7 +3,7 @@
 
 Main = { $call = { id = 0 } }
 
-test = { 1 2 x=3 y=4 5 a b c z = { 1 2 3 } } }
+test = { 1 2 x=3 y=4 5 a b c z = { 1 2 3 } } 
 pass = { 1 2 3 4 5 } # mask?
 
 Event = {
@@ -21,8 +21,11 @@ Event = {
 			AND = {
 				EXISTITEMBYVALUE = { ~~~ root/pass }
 				#EXISTITEMBYVALUE = { ~~~ root/pass } # pass = { 1 2 3 4 } test = { 1 2 3 4 5 }
-				#COMP> = { ~~~ ~ $add = { 1 2 } ~ 0 }
-				$event_result = { id = { bool_chk } x = { ~~~ } }
+				#COMP> = { ~~~ ~ $add = { 1 2 } ~ 0 } 
+														# make new GET ??
+													# x = { ~~~ }   /// - idx!
+													# chk ~~~ and ///
+				$event_result = { id = { bool_chk } x = { $getItemValue = { /// } } }
 			}
 		}
 	}
@@ -39,7 +42,7 @@ Event = {
 	
 	$parameter = { x } 
 	
-	$return = { $COMP> = { $parameter.x 3 } }
+	$return = { $COMP> = { $parameter.x 2 } }
 }
 
 Event = {
