@@ -1041,13 +1041,24 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 						}
 					}
 					// find parameter and validate?
+					bool pass = false;
 					{
 						for (int i = 0; i < event->GetUserTypeListSize(); ++i) {
 							if ("$parameter" == event->GetUserTypeList(i)->GetName()) {
-								parameter = parameter + event->GetUserTypeList(i)->ToString() + " ";
+								if (1 == event->GetUserTypeList(i)->GetItemListSize()) {
+									parameter = parameter + event->GetUserTypeList(i)->GetItemList(0).Get(0);
+								}
+								else {
+									pass = true;
+									break;
+								}
 								break;
 							}
 						}
+					}
+					if (pass) {
+						eventStack.top().userType_idx.top()++;
+						break;
 					}
 					// chk loop and condition! chk do not use ""
 					{
