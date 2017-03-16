@@ -3,7 +3,9 @@
 
 Main = { $call = { id = 0 } }
 
-test = { 1 2 x=3 y=4 5 a b c z = { 1 2 3 } } 
+{ # _ is not allowed!?, _ used to support space in dir
+	test = { 1 2 x=3 y=4 5 a b c z = { 1 2 3 } } 
+}
 pass = { 1 2 3 4 5 } # mask?
 
 Event = {
@@ -14,18 +16,13 @@ Event = {
 	# cf) $for - ToDo?? : using idx? [start, last]
 	$for_each = {  # option - not change!?
 		# eventID -> event -> $parameter? 
-		# error, when num of parameter > 1 or empty.
-		eventID = { first_test }
-		dir = { test }
+		
+		eventID = { first_test } 
+		dir = { $concat_all = { / _ / test } } # cf ) "test" for / / name that is empty!
 		condition = {  # chk ~~~ and ~~ /
 			AND = {
 				EXISTITEMBYVALUE = { ~~~ root/pass }
-				#EXISTITEMBYVALUE = { ~~~ root/pass } # pass = { 1 2 3 4 } test = { 1 2 3 4 5 }
-				#COMP> = { ~~~ ~ $add = { 1 2 } ~ 0 } 
-														# make new GET ??
-													# x = { ~~~ }   /// - idx!
-													# chk ~~~ and ///
-				$event_result = { id = { bool_chk } x = { $getItemValue = { /// } } }
+				$event_result = { id = { bool_chk } x = { $getItemValue = { /// } } y = { //// } } # //// QoutedString?
 			}
 		}
 	}
@@ -40,7 +37,11 @@ Event = {
 Event = {
 	id = bool_chk
 	
-	$parameter = { x } 
+	$parameter = { x y }
+	
+	$print = { value = { "test " } } 
+	$print2 = { value = { $concat_all = { $move_up = { $parameter.y } test } } } # 여백 때문에 나누어 진다? - chk!! - ToDo
+	$print = { value = { \n } }
 	
 	$return = { $COMP> = { $parameter.x 2 } }
 }

@@ -1878,6 +1878,7 @@ namespace wiz {
 							_condition = wiz::String::replace(_condition, "~~~", val); //
 							_condition = wiz::String::replace(_condition, "~~", _var); //
 						}
+						_condition = wiz::String::replace(_condition, "////", nowPosition);
 						_condition = wiz::String::replace(_condition, "///", wiz::_toString(i));
 						_condition = ToBool4(ut, global, info.parameters, _condition, info, objectMap, pEvents);
 
@@ -1966,6 +1967,7 @@ namespace wiz {
 
 						_condition = wiz::String::replace(_condition, "~~~", ut->GetItemList(i).Get(0));
 						_condition = wiz::String::replace(_condition, "~~", _var); //
+						_condition = wiz::String::replace(_condition, "////", nowPosition);
 						_condition = wiz::String::replace(_condition, "///", wiz::_toString(i));
 						_condition = ToBool4(ut, global, info.parameters, _condition, info, objectMap, pEvents);
 						
@@ -1978,6 +1980,7 @@ namespace wiz {
 							_val = wiz::String::replace(_val, "~~~", ut->GetItemList(i).Get(0));
 							_val = wiz::String::replace(_val, "~~", _var); //
 
+							_val = wiz::String::replace(_val, "////", nowPosition);
 							_val = wiz::String::replace(_val, "///", wiz::_toString(i));
 							_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
 
@@ -2064,6 +2067,7 @@ namespace wiz {
 							
 							_condition = wiz::String::replace(_condition, "~~~", ut->GetItemList(i).Get(0));
 							_condition = wiz::String::replace(_condition, "~~", _var); //
+							_condition = wiz::String::replace(_condition, "////", nowPosition);
 							_condition = wiz::String::replace(_condition, "///", wiz::_toString(i));
 							_condition = ToBool4(ut, global, info.parameters, _condition, info, objectMap, pEvents);
 
@@ -2077,6 +2081,7 @@ namespace wiz {
 								_val = wiz::String::replace(_val, "~~~", ut->GetItemList(i).Get(0));
 								_val = wiz::String::replace(_val, "~~", ut->GetItemList(i).GetName());
 
+								_val = wiz::String::replace(_val, "////", nowPosition);
 								_val = wiz::String::replace(_val, "///", wiz::_toString(i));
 								_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
 							
@@ -2122,6 +2127,7 @@ namespace wiz {
 
 							_condition = wiz::String::replace(_condition, "~~~", ut->GetItemList(i).Get(0));
 							_condition = wiz::String::replace(_condition, "~~", _var); //
+							_condition = wiz::String::replace(_condition, "////", nowPosition);
 							_condition = wiz::String::replace(_condition, "///", wiz::_toString(i));
 							_condition = ToBool4(ut, global, info.parameters, _condition, info, objectMap, pEvents);
 
@@ -2133,6 +2139,7 @@ namespace wiz {
 							{
 								_val = wiz::String::replace(_val, "~~~", ut->GetItemList(i).Get(0));
 								_val = wiz::String::replace(_val, "~~", _var); //
+								_val = wiz::String::replace(_val, "////", nowPosition);
 								_val = wiz::String::replace(_val, "///", wiz::_toString(i));
 								_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
 							
@@ -2180,6 +2187,7 @@ namespace wiz {
 							
 							_condition = wiz::String::replace(_condition, "~~~", ut->GetItemList(i).Get(0));
 							_condition = wiz::String::replace(_condition, "~~", _var); //
+							_condition = wiz::String::replace(_condition, "////", nowPosition);
 							_condition = wiz::String::replace(_condition, "///", wiz::_toString(i));
 							_condition = ToBool4(ut, global, info.parameters, _condition, info, objectMap, pEvents);
 
@@ -2192,6 +2200,7 @@ namespace wiz {
 							{
 								_val = wiz::String::replace(_val, "~~~", ut->GetItemList(i).Get(0));
 								_val = wiz::String::replace(_val, "~~", _var); //
+								_val = wiz::String::replace(_val, "////", nowPosition);
 								_val = wiz::String::replace(_val, "///", wiz::_toString(i));
 								_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
 							
@@ -2642,11 +2651,15 @@ namespace wiz {
 			}
 			else if ("$concat_all" == str)
 			{
+				//cout << "----" << endl;
 				string result;
 
 				for (int i = 0; i < operandNum; ++i) {
-					result += operandStack.pop();
+					result = result + operandStack.pop();
+					//	cout << "test" <<  result << endl;
 				}
+				//cout << "----" << endl;
+
 				operandStack.push(result);
 			}
 			else if ("$concat_all2" == str)
@@ -2933,7 +2946,7 @@ namespace wiz {
 				str.insert(str.begin(), '\"');
 				operandStack.push(str);
 			}
-			else if ("$addSmallQouted" == str) {
+			else if ("$addSmallQuoted" == str) {
 				string str = operandStack.pop();
 				str.push_back('\'');
 				str.insert(str.begin(), '\'');
@@ -2943,7 +2956,7 @@ namespace wiz {
 				string str = operandStack.pop();
 
 				if (str.size() > 0 && str.front() == str.back()
-					&& '\n' == str.back()
+					&& '\"' == str.back()
 					)
 				{
 					str = wiz::String::substring(str, 1, str.size() - 2);
@@ -3086,7 +3099,7 @@ namespace wiz {
 				statements2 = statements2 + " } }";
 				wiz::load_data::UserType eventsTemp = *pEvents;
 				wiz::load_data::LoadData::AddData(eventsTemp, "/root", statements2, "TRUE", objectMap, pEvents, info);
-
+				//cout << " chk " << statements2 << endl;
 				operandStack.push(excute_module("Main = { $call = { id = NONE } }", &global, &eventsTemp));
 			}
 			else if ("$getItemValue" == str) {
@@ -3100,6 +3113,42 @@ namespace wiz {
 					operandStack.push("ERROR");
 					return false;
 				}
+			}
+			else if ("$space" == str) {
+				operandStack.push(" ");
+				return true;
+			}
+			else if ("$empty" == str) {
+				operandStack.push("");
+				return true;
+			}
+			else if ("$move_up" == str) {
+				string dir;
+				
+				for (int i = 0; i < operandNum; ++i) {
+					string temp = operandStack.pop();
+					dir = dir + temp;
+				//	cout << "temp is " << temp << endl;
+				}
+
+				//cout << " dir is  " << dir << endl;
+				if (String::startsWith(dir, "/."))
+				{
+					dir = String::substring(dir, 3);
+				}
+
+				StringTokenizer tokenizer(dir, "/");
+				vector<string> tokenVec;
+				while (tokenizer.hasMoreTokens()) {
+					tokenVec.push_back(tokenizer.nextToken());
+				}
+				dir = "/./";
+				if (tokenVec.empty()) { operandStack.push(dir); return true; }
+				for (int i = 0; i < tokenVec.size()-1; ++i) {
+					dir = dir + tokenVec[i] +"/";
+				}
+				operandStack.push(dir);
+				return true;
 			}
 			else {
 				return false;
@@ -3270,7 +3319,6 @@ namespace wiz {
 
 				while (tokenizer.hasMoreTokens()) {
 					tokenVec.push_back(tokenizer.nextToken());
-					//cout << "chk is " <<  tokenVec.back() << endl;
 				}
 
 				for (int i = tokenVec.size() - 1; i >= 0; --i)

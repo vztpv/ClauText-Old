@@ -1,0 +1,29 @@
+
+Main = 
+{
+	$call = { id = 0 }
+}
+
+# data
+a = "Hello^1"
+b = "World!^2"
+c = "chk"
+chk = { #test
+test
+x = 1
+x y = { 3  #chk
+}
+#test2
+}
+
+
+
+Event = {
+	id = 0
+	
+	$print = { str = { $concat3 = { /./a  #test
+			/./b  /./c } } }
+	$print = { str = { \n } } # enter
+	$save_data_only2 = { dir_name = { chk } fileName = { "new4.txt" } option = { 1 } }
+	$_getch = { } # pause
+}

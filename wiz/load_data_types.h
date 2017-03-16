@@ -19,12 +19,20 @@ namespace wiz {
 		class Type {
 		private:
 			string name;
+
+			void chk() {
+				if (name == "_") {
+					throw "ERROR for name in Type";
+				}
+			}
 		public:
-			explicit Type(const string& name = "", const bool valid = true) : name(name) { }
-			explicit Type(string&& name, const bool valid = true) : name(move(name)) { }
+			explicit Type(const string& name = "", const bool valid = true) : name(name) { chk();  }
+			explicit Type(string&& name, const bool valid = true) : name(move(name)) { chk(); }
 			Type(const Type& type)
 				: name(type.name)
-			{ }
+			{
+				chk();
+			}
 			virtual ~Type() { }
 			bool IsFail() const { // change body
 				return "" == name;
@@ -35,10 +43,14 @@ namespace wiz {
 			void SetName(const string& name)
 			{
 				this->name = name;
+
+				chk();
 			}
 			void SetName(string&& name)
 			{
 				this->name = name;
+
+				chk();
 			}
 			bool operator==(const Type& t) const {
 				return name == t.name;
@@ -1112,6 +1124,10 @@ namespace wiz {
 					}
 
 					if ((strVec.size() >= 1) && (" " == strVec[strVec.size() - 1])) /// chk!!
+					{
+						strVec[strVec.size() - 1] = "";
+					}
+					else if ((strVec.size() >= 1) && ("_" == strVec[strVec.size() - 1]))
 					{
 						strVec[strVec.size() - 1] = "";
 					}

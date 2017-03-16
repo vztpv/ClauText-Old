@@ -1041,24 +1041,13 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 						}
 					}
 					// find parameter and validate?
-					bool pass = false;
 					{
 						for (int i = 0; i < event->GetUserTypeListSize(); ++i) {
 							if ("$parameter" == event->GetUserTypeList(i)->GetName()) {
-								if (1 == event->GetUserTypeList(i)->GetItemListSize()) {
-									parameter = parameter + event->GetUserTypeList(i)->GetItemList(0).Get(0);
-								}
-								else {
-									pass = true;
-									break;
-								}
+								parameter = parameter + event->GetUserTypeList(i)->ToString() + " ";
 								break;
 							}
 						}
-					}
-					if (pass) {
-						eventStack.top().userType_idx.top()++;
-						break;
 					}
 					// chk loop and condition! chk do not use ""
 					{
@@ -1069,6 +1058,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 							string _condition = condition;
 
 							_condition = wiz::String::replace(_condition, "~~~", ut->GetItemList(i).Get(0)); //
+							_condition = wiz::String::replace(_condition, "////", dir);
 							_condition = wiz::String::replace(_condition, "///", wiz::_toString(i));
 							// ToDo - chk : empty name!!
 							if (ut->GetItemList(i).GetName().empty()) {
