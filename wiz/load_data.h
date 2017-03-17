@@ -542,12 +542,13 @@ namespace wiz {
 
 				for (int i = 0; i < statement.size(); ++i) {
 					if (0 == state && '\"' == statement[i]) {
-						token_last = i - 1;
-						if (token_last >= 0 && token_last - token_first + 1 > 0) {
-							strVec.emplace_back(statement.substr(token_first, token_last - token_first + 1));
-						}
+						//token_last = i - 1;
+						//if (token_last >= 0 && token_last - token_first + 1 > 0) {
+						//	strVec.emplace_back(statement.substr(token_first, token_last - token_first + 1));
+						//}
 						state = 1;
-						token_first = i; token_last = i;
+						//token_first = i; 
+						token_last = i;
 					}
 					else if (1 == state && '\\' == statement[i - 1] && '\"' == statement[i]) {
 						token_last = i;
@@ -770,6 +771,7 @@ namespace wiz {
 					else
 						_condition = wiz::String::replace(_condition, "~~", _var); //
 					
+					_condition = wiz::String::replace(_condition, "////", nowPosition);
 					_condition = ToBool4(ut, global, info.parameters, _condition, info, objectMap, pEvents);
 					
 					Condition cond(_condition, ut, &global);
@@ -813,6 +815,8 @@ namespace wiz {
 					if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "^"); }
 					else  _condition = wiz::String::replace(_condition, "~~", _var); //
 
+
+					_condition = wiz::String::replace(_condition, "////", nowPosition);
 					_condition = ToBool4(ut, global, info.parameters, _condition, info, objectMap, pEvents);
 
 					Condition cond(_condition, ut, &global);
@@ -1888,7 +1892,15 @@ namespace wiz {
 
 						if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
 						{
-							ut->GetItemList(i).Set(0, val);
+							string _val = val;
+							_val = wiz::String::replace(_val, "~~~", val); //
+							_val = wiz::String::replace(_val, "~~", _var); //
+	
+							_val = wiz::String::replace(_val, "////", nowPosition);
+							_val = wiz::String::replace(_val, "///", wiz::_toString(i));
+							_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
+
+							ut->GetItemList(i).Set(0, _val);
 						}
 					}
 				}
@@ -1925,7 +1937,9 @@ namespace wiz {
 						else {
 							_condition = wiz::String::replace(_condition, "~~", _var); //
 						}
-						
+
+						_condition = wiz::String::replace(_condition, "////", nowPosition);
+
 						_condition = ToBool4(ut, global, info.parameters, _condition, info, objectMap, pEvents);
 
 						Condition cond(_condition, ut, &global);
@@ -2025,6 +2039,8 @@ namespace wiz {
 						string _var = ut->GetUserTypeList(i)->GetName();
 
 						_condition = wiz::String::replace(_condition, "~~", _var); //
+
+						_condition = wiz::String::replace(_condition, "////", nowPosition);
 						_condition = ToBool4(ut, global, info.parameters, _condition, info, objectMap, pEvents);
 
 
@@ -2035,6 +2051,8 @@ namespace wiz {
 						if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
 						{
 							_val = wiz::String::replace(_val, "~~", _var); //
+
+							_val = wiz::String::replace(_val, "////", nowPosition);
 							_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
 						
 							ut->GetUserTypeList(i)->SetName(_val);
@@ -2250,6 +2268,7 @@ namespace wiz {
 							
 							
 							_condition = wiz::String::replace(_condition, "~~", _var); //
+							_condition = wiz::String::replace(_condition, "////", nowPosition);
 							_condition = ToBool4(ut, global, info.parameters, _condition, info, objectMap, pEvents);
 
 
@@ -2261,6 +2280,7 @@ namespace wiz {
 							if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
 							{
 								_val = wiz::String::replace(_val, "~~", _var); //
+								_val = wiz::String::replace(_val, "////", nowPosition);
 								_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
 							
 								//if (_val[0] == '@') { _val.erase(_val.begin()); } // removal?
