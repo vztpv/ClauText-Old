@@ -180,6 +180,32 @@ namespace wiz{
 				int _select = -1;
 				bool pass = false;
 				
+				if (1 == option && 0 == state && '\"' == str[i]) {
+					if (i == 0) {
+						state = 1;
+						continue;
+					}
+					else if (i > 0 && '\\' == str[i - 1]) {
+						throw "ERROR for Init on StringTokenizer"; // error!
+					}
+					else if (i > 0) {
+						state = 1;
+						continue;
+					}
+				}
+				else if (1 == option && 1 == state && '\"' == str[i]) {
+					if ('\\' == str[i - 1]) {
+						continue;
+					}
+					else {
+						state = 0;
+					}
+				}
+				else if (1 == option && 1 == state) {
+					continue;
+				}
+
+
 				for (int j = 0; j < separator.size(); ++j) {
 					for (int k = 0; k < separator[j].size() && i + k < str.size(); ++k) {
 						if (str[i + k] == separator[j][k]) {

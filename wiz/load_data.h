@@ -1063,7 +1063,7 @@ namespace wiz {
 				if (finded.first) {
 					string temp = var;
 					if (temp == "") { temp = " "; }
-					StringTokenizer tokenizer(temp, "/");
+					StringTokenizer tokenizer(temp, "/", 1);
 					UserType utTemp = UserType("");
 					if (false == LoadDataFromString(data, utTemp))
 					{
@@ -1077,7 +1077,7 @@ namespace wiz {
 
 						if (utName.size() >= 3 && utName[0] == '[' && utName[utName.size() - 1] == ']')
 						{
-							StringTokenizer tokenizer2(utName, vector<string>{ "[", "~", "]" });
+							StringTokenizer tokenizer2(utName, vector<string>{ "[", "~", "]" }, 1);
 							while (tokenizer2.hasMoreTokens())
 							{
 								strVec.push_back(tokenizer2.nextToken());
@@ -1154,7 +1154,7 @@ namespace wiz {
 				if (finded.first) {
 					string temp = varName;
 					if (temp == "") { temp = " "; }
-					StringTokenizer tokenizer(temp, "/");
+					StringTokenizer tokenizer(temp, "/", 1);
 					UserType utTemp("");
 					if (false == LoadDataFromString(data, utTemp)) {
 						return false;
@@ -1196,7 +1196,7 @@ namespace wiz {
 
 							if (_varName.size() >= 3 && _varName[0] == '[' && _varName[_varName.size() - 1] == ']')
 							{
-								StringTokenizer tokenizer2(_varName, vector<string>{ "[", "~", "]" });
+								StringTokenizer tokenizer2(_varName, vector<string>{ "[", "~", "]" }, 1);
 								while (tokenizer2.hasMoreTokens())
 								{
 									strVec.push_back(tokenizer2.nextToken());
@@ -1463,7 +1463,7 @@ namespace wiz {
 				if (finded.first) {
 					string temp = var;
 					if (temp == "") { temp = " "; }
-					StringTokenizer tokenizer(temp, "/");
+					StringTokenizer tokenizer(temp, "/", 1);
 					while (tokenizer.hasMoreTokens()) {
 						string _var = tokenizer.nextToken();
 						if (_var == " ") { _var = ""; }
@@ -2939,10 +2939,7 @@ namespace wiz {
 				string str = operandStack.pop();
 
 				bool chk = wiz::load_data::Utility::ChkExist(str);
-				if (chk) { /// chk with tobool4
-					string temp;
-					wiz::load_data::Utility::ChangeStr(str, { "^5", "^4", "^3", "^2", "^1", "^0" }, { "#", "\n", "\r", "\t", " ", "^" }, temp);
-					str = std::move(temp);
+				if (chk) {
 				}
 				else {
 					operandStack.push("ERROR in $eval, must be \" \" ");
@@ -2951,12 +2948,7 @@ namespace wiz {
 				str = str.substr(1, str.size() - 2);
 				{
 					string result = ToBool4(now, global, parameters, str, info, objectMap,  pEvents);
-					bool chk = wiz::load_data::Utility::ChkExist(result);
-					if (chk) { /// chk with tobool4
-						string temp;
-						wiz::load_data::Utility::ChangeStr(result, { "^" }, { "^0" }, temp); // in " "
-						wiz::load_data::Utility::ChangeStr(temp, { " ", "\t", "\r", "\n", "#" }, { "^1", "^2", "^3", "^4", "^5" }, result);
-					}
+					
 					operandStack.push(move(result));
 				}
 			}
@@ -3157,7 +3149,7 @@ namespace wiz {
 					dir = String::substring(dir, 3);
 				}
 
-				StringTokenizer tokenizer(dir, "/");
+				StringTokenizer tokenizer(dir, "/", 1);
 				vector<string> tokenVec;
 				while (tokenizer.hasMoreTokens()) {
 					tokenVec.push_back(tokenizer.nextToken());
@@ -3181,7 +3173,7 @@ namespace wiz {
 		string ToBool3(wiz::load_data::UserType& global, const map<string, string>& parameters, const string& temp,
 			 EventInfo info) /// has bug!
 		{
-			wiz::StringTokenizer tokenizer(temp, vector<string>{ "/" });
+			wiz::StringTokenizer tokenizer(temp, vector<string>{ "/" }, 1);
 			vector<string> tokenVec;
 			string result;
 
@@ -3317,22 +3309,7 @@ namespace wiz {
 			}
 
 			{
-				chk = wiz::load_data::Utility::ChkExist(result);
-				if (chk) {
-					count_change++;
-					string temp;
-					wiz::load_data::Utility::ChangeStr(result, { "^" }, { "^0" }, temp); // in " "
-					wiz::load_data::Utility::ChangeStr(temp, { " ", "\t", "\r", "\n", "#" }, { "^1", "^2", "^3", "^4", "^5" }, result);
-				}
-			}
-			
-			int option = 0; // chk!!
-			{
-				if (chk) {
-					option = 1; // chk!!
-				}
-
-				wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" }); // , "{", "=", "}" }); //
+				wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" }, 1); // , "{", "=", "}" }); //
 				//wiz::StringTokenizer tokenizer2(result, { " ", "\n", "\t", "\r" } ); //
 				vector<string> tokenVec;
 				vector<string> tokenVec2;
@@ -3349,45 +3326,18 @@ namespace wiz {
 						string _temp = Find(&global, tokenVec[i]);
 
 						if ("" != _temp) {
-							bool test = Utility::ChkExist(_temp);
-							chk = chk || test;
-
-							if (test) {
-								count_change++;
-								string temp;
-								wiz::load_data::Utility::ChangeStr(_temp, { "^" }, { "^0" }, temp); // in " "
-								wiz::load_data::Utility::ChangeStr(temp, { " ", "\t", "\r", "\n", "#" }, { "^1", "^2", "^3", "^4", "^5" }, _temp);
-							}
 							tokenVec[i] = move(_temp);
 						}
 					}
 					else if (wiz::String::startsWith(tokenVec[i], "$local.")) { // && length?
 						string _temp = FindLocals(info.locals, tokenVec[i]);
 						if (!_temp.empty()) {
-							bool test = Utility::ChkExist(_temp);
-							chk = chk || test;
-
-							if (test) {
-								count_change++;
-								string temp;
-								wiz::load_data::Utility::ChangeStr(_temp, { "^" }, { "^0" }, temp); // in " "
-								wiz::load_data::Utility::ChangeStr(temp, { " ", "\t", "\r", "\n", "#" }, { "^1", "^2", "^3", "^4", "^5" }, _temp);
-							}
 							tokenVec[i] = move(_temp);
 						}
 					}
 					else if (wiz::String::startsWith(tokenVec[i], "$parameter.")) { // && length?
 						string _temp = FindParameters(parameters, tokenVec[i]);
 						if (!_temp.empty()) {
-							bool test = Utility::ChkExist(_temp);
-							chk = chk || test;
-
-							if (test) {
-								count_change++;
-								string temp;
-								wiz::load_data::Utility::ChangeStr(_temp, { "^" }, { "^0" }, temp); // in " "
-								wiz::load_data::Utility::ChangeStr(temp, { " ", "\t", "\r", "\n", "#" }, { "^1", "^2", "^3", "^4", "^5" }, _temp);
-							}
 							tokenVec[i] = move(_temp);
 						}
 					}
@@ -3420,7 +3370,7 @@ namespace wiz {
 			//
 			wiz::ArrayStack<string> operandStack;
 			wiz::ArrayStack<string> operatorStack; 
-			wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" } );
+			wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" }, 1);
 			vector<string> tokenVec;
 
 			while (tokenizer.hasMoreTokens()) {
@@ -3505,7 +3455,7 @@ namespace wiz {
 
 			// todo!  $C = 3 => $C = { 3 } 
 			{
-				StringTokenizer tokenizer(result);
+				StringTokenizer tokenizer(result, 1);
 				result = "";
 
 				while (tokenizer.hasMoreTokens()) {
@@ -3536,16 +3486,7 @@ namespace wiz {
 			if (!result.empty()) {
 				result.erase(result.begin() + result.size() - 1);
 			}
-		
-			{
-				if (chk) {
-					for (int i = 0; i < 1; ++i) {
-						string temp;
-						wiz::load_data::Utility::ChangeStr(result, { "^5", "^4", "^3", "^2", "^1", "^0" }, { "#", "\n", "\r", "\t", " ", "^" }, temp);
-						result = std::move(temp);
-					}
-				}
-			}
+	
 
 			{ // removal?? -why?? - reason?
 				UserType ut;
@@ -3564,7 +3505,7 @@ namespace wiz {
 				result = ut.ToString();
 			}
 
-			{ // chk..
+			{ // chk.. - removal?
 				for (auto x = parameters.rbegin(); x != parameters.rend(); ++x) {
 					string temp;
 					Utility::ChangeStr(result, { "$parameter." + x->first }, { x->second }, temp);

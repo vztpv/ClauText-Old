@@ -1,0 +1,15 @@
+
+Main = { $call = { id = 0 } }
+
+"data 1" = "wow world"
+
+Event = {
+	id = 0
+
+	# test
+	$print = { str = { $get = { /./"data 1" }  } }
+	$print = { str = { \n } }
+
+	$_getch = { }
+}
+

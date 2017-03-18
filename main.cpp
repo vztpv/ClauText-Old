@@ -786,7 +786,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 					FFLUSH();
 					getline(cin, temp);
 
-					wiz::StringTokenizer tokenizer(temp, "|");
+					wiz::StringTokenizer tokenizer(temp, "|", 1);
 					vector<string> strVecTemp;
 
 					while (tokenizer.hasMoreTokens()) {
