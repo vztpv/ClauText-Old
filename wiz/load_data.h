@@ -3072,12 +3072,10 @@ namespace wiz {
 			else if ("$item_name" == str) {
 				wiz::load_data::UserType ut;
 				string statement;
-
-				for (int i = 0; i < operandNum; ++i)
-				{
+				
+				for (int i = 0; i < operandNum; ++i) {
 					statement = statement + operandStack.pop();
 				}
-
 				wiz::load_data::LoadData::LoadDataFromString(statement, ut);
 
 				operandStack.push(ut.GetItemList(0).GetName());
@@ -3085,15 +3083,27 @@ namespace wiz {
 			else if ("$item_value" == str) {
 				wiz::load_data::UserType ut;
 				string statement;
+				int idx = 0;
 
-				for (int i = 0; i < operandNum; ++i)
-				{
+				for (int i = 0; i < operandNum - 1; ++i) {
 					statement = statement + operandStack.pop();
 				}
+				idx = stoi(operandStack.pop());
 
 				wiz::load_data::LoadData::LoadDataFromString(statement, ut);
 
-				operandStack.push(ut.GetItemList(0).Get(0));
+				operandStack.push(ut.GetItemList(idx).Get(0));
+			}
+			else if ("$item_size" == str) {
+				wiz::load_data::UserType ut;
+				string statement;
+
+				for (int i = 0; i < operandNum; ++i) {
+					statement = statement + operandStack.pop();
+				}
+				wiz::load_data::LoadData::LoadDataFromString(statement, ut);
+
+				operandStack.push(wiz::_toString(ut.GetItem(ut.GetItemList(0).GetName()).size()));
 			}
 			else if ("$is_empty_string" == str) {
 				operandStack.push(operandStack.pop().empty() ? "TRUE" : "FALSE");

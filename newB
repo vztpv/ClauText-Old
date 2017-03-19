@@ -4,9 +4,9 @@
 Main = { $call = { id = 0 } }
 
 { # _ is not allowed!?, _ used to support space in dir
-	"test 3" = { 1 2 x=3 y=4 5 a b c z = { 1 2 3 } } 
+	"test 3" = { 1 2 x=3 x=8 y=4 5 a b c z = { 1 2 3 } } 
 }
-pass = { 1 2 3 4 5 } # mask?
+pass = { 1 2 3 4 5 8 } # mask?
 
 Event = {
 	id = 0
@@ -54,9 +54,9 @@ Event = {
 	$if = { 
 		condition = { $is_empty_string = { $item_name = { $parameter.x } } }
 		then = {
-			$return = { $multiple = { 10 $item_value = { $parameter.x } } }
+			$return = { $multiple = { 10 $item_value = { $parameter.x 0 } } } # core = A core = B
 		}
 	}
-	$return = { $concat_all2  = { $item_name = { $parameter.x } = $multiple = { 10 $item_value = { $parameter.x } } } }
+	$return = { $concat_all2  = { $item_name = { $parameter.x } = $multiple = { 10 $item_value = { $parameter.x 0 } } } }
 }
 "test 2"

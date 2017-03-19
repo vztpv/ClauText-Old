@@ -7,7 +7,7 @@ Event = {
 	id = 0
 
 	# test
-	$print = { str = { $get = { /./"data 1" }  } }
+	$print = { str = { $get = { /./"data 1" }  } } 
 	$print = { str = { \n } }
 
 	$_getch = { }
