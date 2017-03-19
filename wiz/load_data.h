@@ -2349,6 +2349,9 @@ namespace wiz {
 						}
 					}
 					else {
+						if (itemName == "_") {
+							itemName = "";
+						}
 						auto temp = x.second[i]->GetItem(itemName);
 						if (!temp.empty()) {
 							for (int j = 0; j < temp.size(); ++j) {
