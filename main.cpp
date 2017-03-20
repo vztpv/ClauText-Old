@@ -1795,7 +1795,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 				else if ("$insert_by_idx" == val->GetName())
 				{
 					string value = val->GetUserTypeList(2)->ToString();
-					long long idx = atoll(ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  eventPtr).c_str());
+					int idx = atoi(ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  eventPtr).c_str());
 					string dir;
 					if (val->GetUserTypeList(0)->GetItemListSize() > 0) {
 						dir = val->GetUserTypeList(0)->GetItemList(0).Get(0);
@@ -1921,7 +1921,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 					string dir = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
 					string value = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  eventPtr);
 
-					long long idx = atoll(value.c_str());  // long long -> int?
+					int idx = atoi(value.c_str());  // long long -> int?
 
 					string condition = "TRUE";
 
@@ -1942,7 +1942,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 					string idx = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  eventPtr);
 					string value = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top(), objectMap,  eventPtr);
 
-					long long _idx = stoll(idx);
+					int _idx = stoi(idx);
 					wiz::load_data::UserType::Find(&global, dir).second[0]->SetItem(_idx, value);
 
 					eventStack.top().userType_idx.top()++;
@@ -1957,8 +1957,8 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 					value1 = ToBool4(nullptr, global, eventStack.top().parameters, value1, eventStack.top(), objectMap,  eventPtr);
 					value2 = ToBool4(nullptr, global, eventStack.top().parameters, value2, eventStack.top(), objectMap,  eventPtr);
 					if (value1 != value2) {
-						long long x = atoll(value1.c_str());
-						long long y = atoll(value2.c_str());
+						int x = atoi(value1.c_str());
+						int y = atoi(value2.c_str());
 
 						string temp = wiz::load_data::UserType::Find(&global, dir).second[0]->GetItemList(x).Get(0);
 						string temp2 = wiz::load_data::UserType::Find(&global, dir).second[0]->GetItemList(y).Get(0);
@@ -2040,8 +2040,8 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 						last = ToBool4(nullptr, global, eventStack.top().parameters, last, eventStack.top(), objectMap,  eventPtr);
 
 						string listName = val->GetUserTypeList(0)->GetItemList(0).Get(0);
-						long long _start = atoll(start.c_str());
-						long long _last = atoll(last.c_str());
+						int _start = atoi(start.c_str());
+						int _last = atoi(last.c_str());
 						wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, listName).second[0];
 						for (int i = _start; i <= _last; ++i)
 						{

@@ -1,4 +1,4 @@
-#ifndef GLOBAL_H_INCLUDED
+﻿#ifndef GLOBAL_H_INCLUDED
 #define GLOBAL_H_INCLUDED
 
 // C++11 Standard.
@@ -164,7 +164,7 @@ namespace wiz{
 	template <typename T> /// T <- char, int, long, long long...
 	string toStr(const T x, const int base); /// chk!!
 
-	template <class T, class COMP = ASC<T>, class COMP2 = ASC<int>, class EE = EQ<T> > /// �서 바꾸� - 2015.07.18
+	template <class T, class COMP = ASC<T>, class COMP2 = ASC<int>, class EE = EQ<T> > /// 쒖꽌 諛붽씀湲 - 2015.07.18
 	class WrapForInfinity
 	{
 		enum Op{ MIF = 0, GR = 1, IF = 2 };
@@ -294,8 +294,8 @@ namespace wiz{
 		}
 	};
 
-	template <typename T> /// x is 10진수..
-	inline T pos_1(const T x, const int base=10) // 1�리 �계산
+	template <typename T> /// x is 10吏꾩닔..
+	inline T pos_1(const T x, const int base=10) // 1먮━ 媛怨꾩궛
 	{
 		if( x >= 0 ) { return x % base; }// x - ( x / 10 ) * 10; }
 		else{ return (x / base) * base - x; }
@@ -312,7 +312,7 @@ namespace wiz{
 		string tempString;
 		int k;
 		bool isMinus = (i < 0);
-		temp[INT_SIZE+1] = '\0'; ///문자�시..
+		temp[INT_SIZE+1] = '\0'; ///臾몄옄쒖떆..
 
 		for (k = INT_SIZE; k >= 1; k--){
 			T val = pos_1<T>(i, base); /// 0 ~ base-1
@@ -322,7 +322,7 @@ namespace wiz{
 
 			i /= base;
 
-			if (0 == i){ // �자.
+			if (0 == i){ // レ옄.
 				k--;
 				break;
 			}
@@ -354,7 +354,7 @@ namespace wiz{
 		string tempString;
 		int k;
 		bool isMinus = (i < 0);
-		temp[INT_SIZE+1] = '\0'; ///문자�시..
+		temp[INT_SIZE+1] = '\0'; ///臾몄옄쒖떆..
 
 		for (k = INT_SIZE; k >= 1; k--){
             T val = pos_1<T>(i, base); /// 0 ~ base-1
@@ -364,7 +364,7 @@ namespace wiz{
 
 			i /= base;
 
-			if (0 == i){ // �자.
+			if (0 == i){ // レ옄.
 				k--;
 				break;
 			}
@@ -395,7 +395,7 @@ namespace wiz{
 		return toStr<int>(x);
 	}
 
-	template <typename T> /// �출�때 �아체크�다
+	template <typename T> /// 몄텧좊븣 뚯븘泥댄겕쒕떎
 	inline string _toString(const T x)
 	{
 		std::stringstream strs;
@@ -507,5 +507,26 @@ namespace wiz{
 		virtual wizObject& operator=(const wizObject& object) { return *this; }
 		virtual wizObject* clone()const = 0;
 	};
+
+	template <typename T>
+	T Rand() // T : maybe int, long, long long,.., ÀüÃ¼ ¹üÀ§ Rand...
+	{
+		size_t byteSize = sizeof(T);
+		T val = 0;
+
+		for (size_t i = 0; i < byteSize; i++)
+		{
+			val = val << 8; // left shift 1 byte
+
+			val = val | (rand() % 256);
+		}
+		return val;
+	}
+	template <typename T>
+	inline T Rand2() /// T : must be signed! and no return minus value.
+	{
+		T val = Rand<T>();
+		return val & Signed_Maximum<T>();
+	}
 }
 #endif

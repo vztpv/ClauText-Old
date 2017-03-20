@@ -1169,7 +1169,7 @@ namespace wiz {
 						wiz::String::startsWith(strVec[utTemp.second], "$ut")
 						)
 					{
-						long long idx = std::stoll(wiz::String::substring(strVec[utTemp.second], 3));
+						int idx = std::stoi(wiz::String::substring(strVec[utTemp.second], 3));
 
 						if (idx < 0 || idx >= utTemp.first->GetUserTypeListSize()) {
 							throw string("ERROR NOT VALID IDX");

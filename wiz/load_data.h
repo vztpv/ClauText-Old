@@ -165,7 +165,7 @@ namespace wiz {
 		class LoadData
 		{
 		private:
-			static bool isState0(const int state_reserve)
+			static bool isState0(const long long state_reserve)
 			{
 				return 1 == state_reserve;
 			}
@@ -2640,14 +2640,14 @@ namespace wiz {
 				y = operandStack.pop();
 
 				if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && (wiz::load_data::Utility::GetType(y) == "INTEGER")) { /// only integer -> BigInteger
-					long long _x = atoll(x.c_str());
-					long long _y = atoll(y.c_str());
+					int _x = atoi(x.c_str());
+					int _y = atoi(y.c_str());
 					if (_y - _x + 1 <= 0) {
 						operandStack.push("ERROR x / 0");
 
 					}
 					else {
-						long long _z = rand() % (_y - _x + 1) + _x; // _x <= _z <= _y
+						int _z = wiz::Rand2<int>() % (_y - _x + 1) + _x; // _x <= _z <= _y
 						operandStack.push(wiz::toStr(_z));
 					}
 				}
@@ -2904,7 +2904,7 @@ namespace wiz {
 			{
 				string x = operandStack.pop(); // list_name
 				string y = operandStack.pop(); // idx
-				long long idx = atoll(y.c_str());
+				int idx = atoi(y.c_str());
 
 				if ('/' == x[0])
 				{
