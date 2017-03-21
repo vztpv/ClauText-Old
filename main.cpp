@@ -2017,9 +2017,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 							auto x = wiz::load_data::UserType::Find(&global, listName);
 							if (x.first) {
 								wiz::load_data::UserType* ut = x.second[0];
-								if (ut->GetItemList(0).GetName().empty()) {
-									cout << ut->GetItemList(0).Get(0);
-								}
+								cout << ut->ToString();
 							}
 							else {
 								cout << listName;
