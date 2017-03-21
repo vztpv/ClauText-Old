@@ -411,11 +411,13 @@ namespace wiz {
 					const bool minusComp = Utility::IsMinus(str1) && Utility::IsMinus(str2);
 
 					if (false == minusComp) {
+						if (str1[0] == '+') { str1 = string(str1.c_str() + 1); }
+						if (str2[0] == '+') { str2 = string(str2.c_str() + 1); }
+
 						string x = reverse(str1);
 						string y = reverse(str2);
 
-						if (x[0] == '+') { x = string(x.c_str() + 1); }
-						if (y[0] == '+') { y = string(y.c_str() + 1); }
+						
 
 						if (x.size() < y.size()) {
 							while (x.size() < y.size()) {
