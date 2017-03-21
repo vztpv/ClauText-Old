@@ -10,6 +10,15 @@ Event = {
 	$print = { str = { /./_ } } #$get = { /./"data 1" }  } } 
 	$print = { str = { \n } }
 
+	$if = {
+		condition = { 
+			$COMP< = { +3 +5 }
+		}
+		then = {
+			$print = { str = { TEST } }
+			$print = { str = { \n } }
+		}
+	}
 	$_getch = { }
 }
 
