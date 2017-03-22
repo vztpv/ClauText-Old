@@ -4,7 +4,7 @@
 Main = { $call = { id = 0 } }
 
 { # _ is not allowed!?, _ used to support space in dir
-	"test 3" = { 1 2 x=3 x=8 y=4 5 a b c z = { 1 2 3 } } 
+	"test 3" = { 1 2 x=3 x=8 y=4 5 a b c z = { 1 2 3 4 5} } 
 }
 pass = { 1 2 3 4 5 8 } # mask?
 
@@ -18,11 +18,11 @@ Event = {
 		# eventID -> event -> $parameter? 
 		
 		eventID = { first_test } 
-		dir = { $concat_all = { / _ / "test 3"  } } # cf ) "test" for / / name that is empty!
+		dir = { $concat_all = { / _ / "test 3" / z } } # cf ) "test" for / / name that is empty!
 		condition = {  # chk ~~~ and ~~ /
 			AND = {
-				EXISTITEMBYVALUE = { ~~~ root/pass }
-				$event_result = { id = { bool_chk } x = { $getItemValue = { /// } } y = { //// } } # //// QoutedString?
+				EXISTITEMBYVALUE = { ~~~ root/pass } # ~~~ value, ~~ var_name
+				$event_result = { id = { bool_chk } x = { $getItemValue = { /// } } y = { //// } } # //// dir?
 			} 
 		}
 	}
@@ -40,7 +40,7 @@ Event = {
 	$parameter = { x y }
 	
 	$print = { value = { "test " } } 
-	$print2 = { value = { $concat_all = { $move_up = { $parameter.y } "test 3"  } } } # 여백 때문에 나누어 진다? - chk!! - ToDo
+	$print2 = { value = { $concat_all = { $move_up = { $parameter.y } / z } } } # 여백 때문에 나누어 진다? - chk!! - ToDo
 	$print = { value = { \n } }
 	
 	$return = { $COMP> = { $parameter.x 2 } }

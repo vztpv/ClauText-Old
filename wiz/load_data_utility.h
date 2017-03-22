@@ -581,8 +581,8 @@ namespace wiz {
 							else if (1 == state && '\"' == statement[i]) {
 								state = 0; token_last = i;
 
-								aq->emplace_back(statement.substr(token_first, token_last - token_first + 1));
-								token_first = i + 1;
+								//aq->emplace_back(statement.substr(token_first, token_last - token_first + 1));
+								//token_first = i + 1;
 							}
 
 							if (0 == state && '=' == statement[i]) {
