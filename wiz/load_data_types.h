@@ -395,7 +395,7 @@ namespace wiz {
 			}
 			void RemoveItemList(const string& varName)
 			{
-				int k = _GetIndex(ilist, 1, 0);
+				int k = _GetIndex(ilist, 1, 0); 
 				vector<ItemType<string>> tempDic;
 				for (int i = 0; i < itemList.size(); ++i) {
 					if (varName != itemList[i].GetName()) {
@@ -408,7 +408,6 @@ namespace wiz {
 							ilist[j - 1] = ilist[j];
 						}
 						ilist.resize(ilist.size() - 1);
-						k = _GetIndex(ilist, 1, k);
 					}
 				}
 				itemList = (tempDic);
@@ -433,6 +432,7 @@ namespace wiz {
 				for (int i = 0; i < itemList.size(); ++i) {
 					if (itemList[i].size() > 0) {
 						tempDic.push_back(itemList[i]);
+						k = _GetIndex(ilist, 1, k + 1);
 					}
 					else {
 						// remove item, ilist left shift 1.
@@ -441,7 +441,6 @@ namespace wiz {
 						}
 						ilist.resize(ilist.size() - 1);
 					}
-					k = _GetIndex(ilist, 1, k + 1);
 				}
 				itemList = move(tempDic);
 			}
@@ -492,7 +491,6 @@ namespace wiz {
 							ilist[j - 1] = ilist[j];
 						}
 						ilist.resize(ilist.size() - 1);
-						k = _GetIndex(ilist, 2, k);
 					}
 				}
 				userTypeList = move(tempDic);
