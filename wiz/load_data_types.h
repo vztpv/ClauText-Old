@@ -408,6 +408,7 @@ namespace wiz {
 							ilist[j - 1] = ilist[j];
 						}
 						ilist.resize(ilist.size() - 1);
+						k = _GetIndex(ilist, 1, k);
 					}
 				}
 				itemList = (tempDic);
@@ -440,6 +441,7 @@ namespace wiz {
 							ilist[j - 1] = ilist[j];
 						}
 						ilist.resize(ilist.size() - 1);
+						k = _GetIndex(ilist, 1, k);
 					}
 				}
 				itemList = move(tempDic);
@@ -491,6 +493,7 @@ namespace wiz {
 							ilist[j - 1] = ilist[j];
 						}
 						ilist.resize(ilist.size() - 1);
+						k = _GetIndex(ilist, 2, k);
 					}
 				}
 				userTypeList = move(tempDic);
