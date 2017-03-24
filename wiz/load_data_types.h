@@ -1114,7 +1114,6 @@ namespace wiz {
 				pair<UserType*, int> utTemp;
 				utTemp.first = global;
 				utTemp.second = 0;
-				ItemType<UserType*> utTemp2;
 
 				for (int i = 0; i < tokenizer.countTokens(); ++i) {
 					string strTemp = tokenizer.nextToken();

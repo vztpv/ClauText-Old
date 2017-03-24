@@ -1,0 +1,98 @@
+
+Main = { $call = { id = calcul } }
+
+Event = 
+{
+	id = calcul
+	$option = REMOVE_IF_CALL_ONESELF_EVENT
+	$local = { select }
+	
+	$print = { text = { "1.+ 2.- 3.* 4./ 0.Á¾·áìž ÀÔ·Â:" } }
+	
+	$input = { }  # string temp;  cin >> temp; cf) $input_line?
+	$assign_local = { var = { $local.select } val = { $return_value = { } } } 
+	
+	$print = { enter = { \n } } # new function $enter?
+	$if = { 
+		condition = {
+			$EQ = { $local.select 0 }
+		}
+		then = {
+			$return = { }
+		}
+	}
+	$if = { 
+		condition = { 
+			$AND = { 
+				$COMP>EQ = { $local.select 1 }
+				$COMP<EQ = { $local.select 4 }
+			}
+		}
+		then = {
+			$call = { id = »çÄ¢¿¬»ê select = $local.select }
+		}
+	}
+	$call = { id = calcul }
+	#$_getch = { } # rename to $pause?
+}
+
+Event =
+{
+	id = »çÄ¢¿¬»ê
+	$parameter = { select }
+	$local = { x y }
+
+	
+	$print = { text = { "µÎ ½Ç¼ö ÀÔ·Â" } }
+	
+	$input = { }
+	$assign_local = { var = { $local.x } val = { $return_value = { }  } }
+	$input = { }
+	$assign_local = { var = { $local.y } val = { $return_value = { } } }
+	
+	$if = { 
+		condition = { $EQ = { $parameter.select 1 } }
+		then = {
+			$print = { result = { $add = { $local.x $local.y } } }
+			$print = { enter = { \n } } 
+			$return = { }
+		}	
+	}
+	$if = { 
+		condition = { $EQ = { $parameter.select 2 } }
+		then = {
+			$print = { result = { $add = { $local.x $multiple = { -1 $local.y } } } }
+			$print = { enter = { \n } } 
+			$return = { }
+		}	
+	}
+	$if = { 
+		condition = { $EQ = { $parameter.select 3 } }
+		then = {
+			$print = { result = { $multiple = { $local.x $local.y } } }  
+			$print = { enter = { \n } } 
+			$return = { }
+		}	
+	}
+	$if = { 
+		condition = { $EQ = { $parameter.select 4 } }
+		then = {
+			$if = { 
+				condition = { 
+					$OR = {
+						$EQ = { 0 $local.y }
+						$EQ = { 0.0 $local.y }	
+					}
+				}
+				then = {
+					$print = { text = { "0À¸·Î ³ª´­ ¼ö ¾ø½À´Ï´Ù." } }
+					$print = { enter = { \n } } 
+					$return = { }
+				}
+			}
+			$print = { result = { $divide = { $local.x $local.y } } }
+			$print = { enter = { \n } } 
+			$return = { }
+		}	
+	}
+}

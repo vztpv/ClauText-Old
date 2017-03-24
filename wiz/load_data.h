@@ -2452,7 +2452,7 @@ namespace wiz {
 				x = operandStack.pop();
 				y = operandStack.pop();
 
-				if (x == y) {
+				if (wiz::load_data::Utility::Compare(x, y) == "== 0") {
 					operandStack.push("TRUE");
 				}
 				else {
@@ -2465,7 +2465,7 @@ namespace wiz {
 				x = operandStack.pop();
 				y = operandStack.pop();
 
-				if (x != y) {
+				if (wiz::load_data::Utility::Compare(x, y) != "== 0") {
 					operandStack.push("TRUE");
 				}
 				else {
