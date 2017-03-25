@@ -729,12 +729,12 @@ namespace wiz {
 					if (x == strVec.end()) {
 						reserver(strVec);
 						x = strVec.begin();
-						while (strVec.size() + count < offset) // 
+						while (strVec.size() < offset) // 
 						{
 							reserver(strVec);
 							x = strVec.begin();
 							if (
-								strVec.size()  + count < offset &&
+								strVec.size() < offset &&
 								reserver.end()
 								) {
 								return false;
