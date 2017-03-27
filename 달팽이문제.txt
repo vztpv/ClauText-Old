@@ -1,0 +1,225 @@
+
+Main = { $call = { id = snail } }
+
+Event = {
+	id = snail
+	
+	$call = { id = doing }
+	$call = { id = print start_row = 1 start_col = 1 }
+	$_getch = { }
+}
+
+
+Arr[0] = { -1 -1 -1 -1 -1 -1 -1 }
+Arr[1] = { -1  1  0  0  0  0 -1 }
+Arr[2] = { -1  0  0  0  0  0 -1 }
+Arr[3] = { -1  0  0  0  0  0 -1 }
+Arr[4] = { -1  0  0  0  0  0 -1 }
+Arr[5] = { -1  0  0  0  0  0 -1 }
+Arr[6] = { -1 -1 -1 -1 -1 -1 -1 }
+
+Pos = { row = 1 col = 1 }
+value = 1
+
+Event = {
+	id = doing
+	
+	$option = { REMOVE_IF_CALL_ONESELF_EVENT } 
+	
+	$if = {
+		condition = {
+			$event_result = {
+				id = { canMoveRight }
+			}
+		}
+		then = {
+			$call = { id = moveRight }
+			
+			$assign2 = { dir = { $concat_all = { / . / value } } value = { $add = { 1 /./value } } }
+			$setElement = { dir = { $concat_all = { / . / Arr[ /Pos/row ] } } idx = { /Pos/col } value = { /./value } }
+			$call = { id = doing }
+		}
+	}
+	$if = {
+		condition = {
+			$event_result = {
+				id = { canMoveDown }
+			}
+		}
+		then = {
+			$call = { id = moveDown }
+			
+			$assign2 = { dir = { $concat_all = { / . / value } } value = { $add = { 1 /./value } } }
+			$setElement = { dir = { $concat_all = { / . / Arr[ /Pos/row ] } } idx = { /Pos/col } value = { /./value } }
+			$call = { id = doing }	
+		}
+	}
+	$if = {
+		condition = {
+			$event_result = {
+				id = { canMoveLeft }
+			}
+		}
+		then = {
+			$call = { id = moveLeft }
+			
+			$assign2 = { dir = { $concat_all = { / . / value } } value = { $add = { 1 /./value } } }
+			$setElement = { dir = { $concat_all = { / . / Arr[ /Pos/row ] } } idx = { /Pos/col } value = { /./value } }
+			$call = { id = doing }
+		}
+	}
+	$if = {
+		condition = {
+			$event_result = {
+				id = { canMoveUp }
+			}
+		}
+		then = {
+			$call = { id = moveUp }
+			
+			$assign2 = { dir = { $concat_all = { / . / value } } value = { $add = { 1 /./value } } }			
+			$setElement = { dir = { $concat_all = { / . / Arr[ /Pos/row ] } } idx = { /Pos/col } value = { /./value } }
+			$call = { id = doing }
+		}
+	}
+	
+	$return = { }
+}
+
+Event = {
+	id = print
+	
+	$option = { REMOVE_IF_CALL_ONESELF_EVENT }
+	$parameter = { start_row start_col }
+	
+	$if = {
+		condition = {
+			$AND = {
+				$COMP> = { $parameter.start_row 5 }
+				$COMP>EQ = { $parameter.start_col 5 }
+			}
+		}
+		then = {
+			$return = { }
+		}
+	}
+	
+	$if = {
+		condition = {
+			$COMP<EQ = { $parameter.start_col 5 }
+		}
+		then = {
+			$print = { data = { $element = { $concat_all = { /. / Arr[ $parameter.start_row ] } $parameter.start_col } } }
+			$print = { data = { " " } }
+			$call = { id = print start_row = { $parameter.start_row } start_col = { $add = { 1 $parameter.start_col } } }
+		}
+	}
+	$if = {
+		condition = {
+			$COMP< = { $parameter.start_row 5 }
+		}
+		then = {
+			$print = { enter = { \n } }
+			
+			$call = { id = print start_row = { $add = { 1 $parameter.start_row } } start_col = 1 }
+		}
+	}
+}
+
+Event = {
+	id = canMoveRight
+	
+	$if = {
+		condition = {
+			$AND_ALL = {
+				$EQ = { 0 $element = { $concat_all = { / . / Arr[ /./Pos/row ] } $add = { 1 /./Pos/col } } }
+				#$AND = {
+					$NOTEQ = { 0 $element = { $concat_all = { / . / Arr[ $add = { -1 /./Pos/row } ] } /./Pos/col } }
+					$NOTEQ = { 0 $element = { $concat_all = { / . / Arr[ /./Pos/row ] } $add = { -1 /./Pos/col } } } 
+				#}
+			}
+		}
+		then = {
+			$return = { TRUE }
+		}
+	}
+	$return = { FALSE }
+}
+Event = {
+	id = canMoveDown
+	
+	$if = {
+		condition = {
+			$AND = {
+				$EQ = { 0 $element = { $concat_all = { /. / Arr[ $add = { 1 /./Pos/row } ] } /./Pos/col } }
+				$AND = {
+					$NOTEQ = { 0 $element = { $concat_all = { /. / Arr[ $add = { -1 /./Pos/row } ] } /./Pos/col } }
+					$NOTEQ = { 0 $element = { $concat_all = { /. / Arr[ /./Pos/row ] } $add = { 1 /./Pos/col } } }
+				}
+			}
+		}
+		then = {
+			$return = { TRUE }
+		}
+	}
+	$return = { FALSE }
+}
+Event = {
+	id = canMoveLeft
+	
+	$if = {
+		condition = {
+			$AND = {
+				$EQ = { 0 $element = { $concat_all = { /. / Arr[ /./Pos/row ] } $add = { -1 /./Pos/col } } }
+				$AND = {
+					$NOTEQ = { 0 $element = { $concat_all = { /. / Arr[ $add = { 1 /./Pos/row } ] } /./Pos/col } }
+					$NOTEQ = { 0 $element = { $concat_all = { /. / Arr[ /./Pos/row ] } $add = { 1 /./Pos/col } } }
+				}
+			}
+		}
+		then = {
+			$return = { TRUE }
+		}
+	}
+	$return = { FALSE }
+}
+Event = {
+	id = canMoveUp
+	
+	$if = {
+		condition = {
+			$AND = {
+				$EQ = { 0 $element = { $concat_all = { /. / Arr[ $add = { -1 /./Pos/row } ] } /./Pos/col } }
+				$AND = {
+					$NOTEQ = { 0 $element = { $concat_all = { /. / Arr[ $add = { 1 /./Pos/row } ] } /./Pos/col } }
+					$NOTEQ = { 0 $element = { $concat_all = { /. / Arr[ /./Pos/row ] } $add = { -1 /./Pos/col } } } 
+				}
+			}
+		}
+		then = {
+			$return = { TRUE }
+		}
+	}
+	$return = { FALSE }
+}
+
+Event = {
+	id = moveRight
+	
+	$assign2 = { dir = { $concat_all = { / . / Pos / col } } value = { $add = { 1 /./Pos/col } } }
+}
+Event = {
+	id = moveDown
+	
+	$assign2 = { dir = { $concat_all = { / . / Pos / row } } value = { $add = { 1 /./Pos/row } } }
+}
+Event = {
+	id = moveLeft
+	
+	$assign2 = { dir = { $concat_all = { / . / Pos / col } } value = { $add = { -1 /./Pos/col } } }
+}
+Event = {
+	id = moveUp
+	
+	$assign2 = { dir = { $concat_all = { / . / Pos / row } } value = { $add = { -1 /./Pos/row } } }
+}

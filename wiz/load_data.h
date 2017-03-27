@@ -2485,6 +2485,19 @@ namespace wiz {
 					operandStack.push("FALSE");
 				}
 			}
+			else if ("$AND_ALL" == str) {
+				vector<string> store;
+				for (int i = 0; i < operandNum; ++i) {
+					store.push_back(operandStack.pop());
+				}
+				for( int i=0; i < store.size(); ++i) {
+					if ("TRUE" != store[i]) {
+						operandStack.push("FALSE");
+						return true;
+					}
+				}
+				operandStack.push("TRUE");
+			}
 			else if ("$OR" == str)
 			{
 				string x, y;
@@ -2497,6 +2510,21 @@ namespace wiz {
 				else {
 					operandStack.push("FALSE");
 				}
+			}
+			else if ("$OR_ALL" == str)
+			{
+				vector<string> store;
+
+				for (int i = 0; i < operandNum; ++i) {
+					store.push_back(operandStack.pop());
+				}
+				for (int i = 0; i < store.size(); ++i) {
+					if ("TRUE" == store[i]) {
+						operandStack.push("TRUE");
+						return true;
+					}
+				}
+				operandStack.push("FALSE");
 			}
 			else if ("$NOT" == str)
 			{
