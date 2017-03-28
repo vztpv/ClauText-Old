@@ -2,6 +2,7 @@
 # Data
 x = 9
 y = 9
+count = 0
 
 #Event
 Event =
@@ -12,14 +13,19 @@ Event =
     $parameter = { i j }
 	
 	$assign = { /./x value = { 6 } }
-	
+
     $if = {
         condition = { $COMP<EQ = { $parameter.i /./x } }
-        then = {
+        then = {	
+		$assign = { /./count value = { $add = {  1  /./count } } }
+	$print = { value = { /./count } }
+	$print = { value = { "th" } }
+	$print = { enter = { \n } }
             $call = { id = { $concat = { x $add = { 1 1 } } } i = $parameter.i j = 1 }
 			$call = { id = 1 i = { $add = { $parameter.i 1 } } j = 1 }
         }
     }
+	
 	#$wait = { }
 	#$_getch = { }
 	$return = { END }

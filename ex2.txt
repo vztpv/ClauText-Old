@@ -20,6 +20,9 @@ Event =
 	$register_object = { fileName = { "ex3.txt" } }
 	
 	$call_registered_object = { name = { "ex3.txt" } parameter = { id = 1 i = { $get = { $concat = { $ local.k } } } j = 1 } }
+	
+	$call_registered_object2 = { name = { "ex3.txt" } parameter = { id = 1 i = { $get = { $concat = { $ local.k } } } j = 1 } }
+	$call_registered_object2 = { name = { "ex3.txt" } parameter = { id = 1 i = { $get = { $concat = { $ local.k } } } j = 1 } }
 
 	$print = { value = { \n } }
 	

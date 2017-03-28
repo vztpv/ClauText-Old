@@ -923,9 +923,6 @@ namespace wiz {
 						int item_n = 0;
 						int user_n = 0;
 
-						/// chk temp test codes - > using flag 1->Exist 2->Comparision
-						//if (finded.second[i]->GetItem("base_tax").GetCount() > 0) { continue; }
-						///~end
 						if (false == condition.empty()) {
 							string _condition = condition;
 							
@@ -1564,6 +1561,73 @@ namespace wiz {
 					return false;
 				}
 			}
+			static bool RemoveUserType(UserType& global, const string& position, const string& name, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info) {
+				auto finded = UserType::Find(&global, position);
+				bool isTrue = false;
+
+				if (finded.first) {
+					for (int i = 0; i < finded.second.size(); ++i) {
+						UserType* temp = finded.second[i];
+
+						if (false == condition.empty()) {
+							string _condition = condition;
+
+							_condition = ToBool4(finded.second[i], global, info.parameters, _condition, info, objectMap, pEvents);
+
+							Condition cond(_condition, finded.second[i], &global);
+
+							while (cond.Next());
+
+							if (cond.Now().size() != 1 || "TRUE" != cond.Now()[0])
+							{
+								// std::cout << cond.Now()[0] << endl;
+								continue;
+							}
+						}
+
+						temp->RemoveUserTypeList(name);
+						isTrue = true;
+					}
+					return isTrue;
+				}
+				else {
+					return false;
+				}
+			}
+			static bool RemoveItemType(UserType& global, const string& position, const string& name, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info) {
+				auto finded = UserType::Find(&global, position);
+				bool isTrue = false;
+
+				if (finded.first) {
+					for (int i = 0; i < finded.second.size(); ++i) {
+						UserType* temp = finded.second[i];
+
+						if (false == condition.empty()) {
+							string _condition = condition;
+
+							_condition = ToBool4(finded.second[i], global, info.parameters, _condition, info, objectMap, pEvents);
+
+							Condition cond(_condition, finded.second[i], &global);
+
+							while (cond.Next());
+
+							if (cond.Now().size() != 1 || "TRUE" != cond.Now()[0])
+							{
+								// std::cout << cond.Now()[0] << endl;
+								continue;
+							}
+						}
+
+						temp->RemoveItemList(name);
+						isTrue = true;
+					}
+					return isTrue;
+				}
+				else {
+					return false;
+				}
+			}
+
 			// todo - static bool Remove(UserType& global, const string& positiion, oonst int idx, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
 			static bool Remove(UserType& global, const string& position, const int idx, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info) {
 				auto finded = UserType::Find(&global, position);
@@ -1598,40 +1662,7 @@ namespace wiz {
 					return false;
 				}
 			}
-			// cf) idx == -1 -> size()-1 ?? or RemoveBack() ??
-			static bool RemoveItem(UserType& global, const string& position, const string& value)
-			{
-				auto finded = UserType::Find(&global, position);
-				bool isTrue = false;
-
-
-				if (finded.first) {
-					for (int i = 0; i < finded.second.size(); ++i) {
-						UserType* temp = finded.second[i];
-						vector<int> idx;
-
-						for (int j = 0; j < temp->GetItemListSize(); ++j)
-						{
-							if (value == temp->GetItemList(j).Get(0)) {
-								idx.push_back(j);
-							}
-						}
-						//
-						sort(idx.begin(), idx.end(), std::greater<int>()); /// result ex) 5 4 3 2 1 
-																		   // 
-						for (const int& x : idx) {
-							temp->RemoveItemList(x);
-						}
-
-						isTrue = true;
-					}
-					return isTrue;
-				}
-				else {
-					return false;
-				}
-			}
-
+			
 			static bool LoadWizDB(UserType& global, const string& fileName) {
 				UserType globalTemp = UserType("global");
 
