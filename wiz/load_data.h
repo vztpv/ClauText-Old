@@ -1468,7 +1468,7 @@ namespace wiz {
 
 						if (_var.size() >= 3 && _var[0] == '[' && _var[_var.size() - 1] == ']')
 						{
-							StringTokenizer tokenizer2(_var, vector<string>{ "[", "~", "]" });
+							StringTokenizer tokenizer2(_var, vector<string>{ "[", "~", "]" }, 1);
 							while (tokenizer2.hasMoreTokens())
 							{
 								strVec.push_back(tokenizer2.nextToken());

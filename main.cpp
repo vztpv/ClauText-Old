@@ -1429,6 +1429,18 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
+				else if ("$copy_object" == val->GetName()) {
+					string objectNameA = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap, eventPtr);
+					string objectNameB = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap, eventPtr);
+
+					objectNameA = wiz::String::substring(objectNameA, 1, objectNameA.size() - 2);
+					objectNameB = wiz::String::substring(objectNameB, 1, objectNameB.size() - 2);
+
+					objectMap[objectNameB] = objectMap.at(objectNameA);
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
 				else if ("$register_object_from_string" == val->GetName()) {
 					string objectName = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
 					string objectData = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  eventPtr);

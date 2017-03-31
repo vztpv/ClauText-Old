@@ -1108,7 +1108,7 @@ namespace wiz {
 					position = String::substring(position, 3);
 				}
 
-				StringTokenizer tokenizer(position, "/");
+				StringTokenizer tokenizer(position, "/", 1);
 				vector<string> strVec;
 				list<pair< UserType*, int >> utDeck;
 				pair<UserType*, int> utTemp;

@@ -32,7 +32,7 @@ namespace wiz {
 		private:
 			auto Get(const string& var, const string& position, UserType* utPosition, UserType* global) {
 				string valTemp = position;
-				StringTokenizer tokenizer(position, "/");
+				StringTokenizer tokenizer(position, "/", 1);
 				UserType* utTemp;
 
 				if (false == tokenizer.hasMoreTokens()) {
@@ -372,7 +372,7 @@ namespace wiz {
 				string str;
 				Utility::AddSpace(condition, str);
 				
-				StringTokenizer tokenizer(str, { " ", "\t", "\n", "\r" });
+				StringTokenizer tokenizer(str, { " ", "\t", "\n", "\r" }, 1);
 
 				while (tokenizer.hasMoreTokens()) {
 					string temp = tokenizer.nextToken();
