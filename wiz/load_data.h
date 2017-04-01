@@ -3163,7 +3163,7 @@ namespace wiz {
 				wiz::load_data::UserType eventsTemp = *excuteData.pEvents;
 				wiz::load_data::LoadData::AddData(eventsTemp, "/root", statements2, "TRUE", excuteData);
 				//cout << " chk " << statements2 << endl;
-				ExcuteData _excuteData;
+				ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 				_excuteData.pModule = excuteData.pModule;
 				_excuteData.pObjectMap = excuteData.pObjectMap;
 				_excuteData.pEvents = &eventsTemp;

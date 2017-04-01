@@ -1043,7 +1043,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				// condition = { AND = { EXSITITEMBYVAL = { base_tax root/list } COMP> = { ~~ / 5.000 ~ 0 } } } 
 				// recursive = { false or true } } // return UserType.?
 				if ("$for_each" == val->GetName()) {
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1120,7 +1120,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 
 							wiz::load_data::UserType eventsTemp = events;
 							
-							ExcuteData _excuteData;
+							ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 							_excuteData.pEvents = &eventsTemp;
 
 							wiz::load_data::LoadData::AddData(eventsTemp, "/root", "Event = { id = NONE $call = { " + parameter + " = { " + ut->GetItemList(i).ToString() + " } } }", "TRUE", _excuteData);
@@ -1148,7 +1148,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					break;
 				}
 				else if ("$do" == val->GetName()) { // chk?
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1172,7 +1172,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				// add option! for "".support eu3, eu4.
 				else if ("$replace_datatype1" == val->GetName()) { // name
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1204,7 +1204,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					break;
 				}
 				else if ("$replace_datatype1_2" == val->GetName()) { //val
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1239,7 +1239,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					break;
 				}
 				else if ("$replace_datatype2" == val->GetName()) { // usertype name
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1277,7 +1277,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					break;
 				}
 				else if ("$replace_datetype" == val->GetName()) {
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1303,7 +1303,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					break;
 				}
 				else if ("$replace_datetype2" == val->GetName()) {
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1329,7 +1329,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					break;
 				}
 				else if ("$remove_usertype_total" == val->GetName()) {
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1354,7 +1354,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					break;
 				}
 				else if ("$replace_item" == val->GetName()) {
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1393,7 +1393,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				else if ("$save" == val->GetName()) // save data, event, main!
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1414,7 +1414,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				else if ("$save_data_only" == val->GetName())
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1434,7 +1434,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 
 				else if ("$save_data_only2" == val->GetName())
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1458,7 +1458,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				/// module name or object name -> must "~" .
 				else if ("$register_module" == val->GetName())
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1479,7 +1479,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				else if ("$call_registered_module" == val->GetName())
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1505,7 +1505,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				else if ("$module" == val->GetName())
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1535,7 +1535,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				// todo - call registered module.  $registered_module = { name = { ~ } input = { input = { n = 1 } } }
 
 				else if ("$register_object" == val->GetName()) {
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1556,7 +1556,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					break;
 				}
 				else if ("$copy_object" == val->GetName()) {
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1575,7 +1575,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					break;
 				}
 				else if ("$register_object_from_string" == val->GetName()) {
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1596,7 +1596,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					break;
 				}
 				else if ("$call_registered_object" == val->GetName()) {
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1620,7 +1620,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					break;
 				}
 				else if ("$call_registered_object2" == val->GetName()) {
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1657,7 +1657,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				/// object of class?
 				else if ("$object" == val->GetName()) { // "fileName"
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1687,7 +1687,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					break;
 				}
 				else if ("$object_from_string" == val->GetName()) {
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1721,7 +1721,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				// todo - call registered object.  $registered_object = { name = { "ex2.txt" } parameter = { id = 1 i = 1 j = 1 } }  
 				else if ("$option" == val->GetName()) // first
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1735,7 +1735,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				// done - ($push_back-insert!) $pop_back, $push_front, $pop_front ($front?, $back?)
 				else if ("$pop_back" == val->GetName()) {
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1757,7 +1757,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					break;
 				}
 				else if ("$push_front" == val->GetName()) {
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1789,7 +1789,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					break;
 				}
 				else if ("$pop_front" == val->GetName()) {
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1818,7 +1818,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					break;
 				}
 				else if ("$call" == val->GetName()) {
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1945,7 +1945,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 
 				else if ("$assign" == val->GetName()) /// -> assign2?
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1968,7 +1968,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 
 				else if ("$assign2" == val->GetName())
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -1993,7 +1993,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				else if ("$assign_local" == val->GetName()) /// no condition, 
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -2022,7 +2022,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				else if ("$assign_global" == val->GetName()) // 주의!! dir=> dir/name ( dir= { name = val } } , @�??�에 붙여???�다. 
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -2046,7 +2046,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				/// cf) insert3? - any position?
 				else if ("$push_back" == val->GetName() || "$insert" == val->GetName() || "$insert2" == val->GetName())
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -2078,7 +2078,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				else if ("$insert_by_idx" == val->GetName())
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -2112,7 +2112,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				else if ("$make" == val->GetName()) // To Do? - make2? or remake? 
 													// cf) make empty ut??
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -2159,7 +2159,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				else if ("$findIndex" == val->GetName()) // For list : { 1 2  3 4 5 }
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -2184,7 +2184,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				else if ("$remove" == val->GetName()) // remove by dir., remove all?
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -2207,7 +2207,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				else if ("$remove2" == val->GetName()) // remove /dir/name 
 													   // if name is empty, then chk!!
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -2237,7 +2237,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				else if ("$remove3" == val->GetName()) /// remove itemlist by idx.
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -2264,7 +2264,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 
 				else if ("$setElement" == val->GetName())
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -2283,7 +2283,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				else if ("$swap" == val->GetName()) // $swap2
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -2312,7 +2312,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				else if ("$print" == val->GetName()) /// has many bugs..!?, for print list or print item?.
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -2406,7 +2406,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				else if ("$print2" == val->GetName()) /// for print usertype.ToString();
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -2426,7 +2426,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				else if ("$load" == val->GetName())
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -2502,7 +2502,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				else if ("$load_only_data" == val->GetName()) // $load2?
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -2578,7 +2578,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				else if ("$return" == val->GetName())
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -2615,7 +2615,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				// make sort stable.
 				else if ("$sort" == val->GetName()) {
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -2668,7 +2668,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					break;
 				}
 				else if ("$sort2" == val->GetName()) { // colName -> just one! ? 
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -2729,7 +2729,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				else if ("$sort2_dsc" == val->GetName()) { // colName -> just one! ? 
 													   /// condition = has just one? in one usertype!
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -2789,7 +2789,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				// removal?
 				else if ("$stable_sort" == val->GetName()) {
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
@@ -2844,7 +2844,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				else if ("$if" == val->GetName()) // ToDo!!
 				{
-					ExcuteData _excuteData;
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
 					_excuteData.pObjectMap = objectMapPtr;
