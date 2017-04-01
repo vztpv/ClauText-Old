@@ -84,9 +84,11 @@ public:
 	bool chkInfo;
 	map<string, wiz::load_data::UserType>* pObjectMap;
 	map<string, wiz::load_data::UserType>* pModule;
+
+	long long depth;
 public:
 	explicit ExcuteData()
-		: pEvents(nullptr), pObjectMap(nullptr), pModule(nullptr), chkInfo(false)
+		: pEvents(nullptr), pObjectMap(nullptr), pModule(nullptr), chkInfo(false), depth(0)
 	{
 		//
 	}
@@ -3153,7 +3155,7 @@ namespace wiz {
 					eventVec.push_back(operandStack.pop());
 				}
 				
-				string statements2 = "Event = { id = NONE $call = { ";
+				string statements2 = "Event = { id = NONE" + wiz::toStr(excuteData.depth + 1) + " $call = { ";
 				for (int i = 0; i < eventVec.size(); ++i) {
 					statements2 = statements2 + eventVec[i] + " ";
 				}
@@ -3165,7 +3167,8 @@ namespace wiz {
 				_excuteData.pModule = excuteData.pModule;
 				_excuteData.pObjectMap = excuteData.pObjectMap;
 				_excuteData.pEvents = &eventsTemp;
-				operandStack.push(excute_module("Main = { $call = { id = NONE } }", &global, _excuteData));
+				_excuteData.depth = excuteData.depth + 1;
+				operandStack.push(excute_module("Main = { $call = { id = NONE" + wiz::toStr(_excuteData.depth) + " } }", &global, _excuteData));
 			}
 			else if ("$getItemValue" == str) {
 				const int i = stoi(operandStack.pop());
