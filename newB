@@ -43,7 +43,7 @@ Event = {
 	
 	$parameter = { x y }
 	
-	$call_registered_object2 = { name = { "ex3.txt" } parameter = { id = 1 i = 3 j = 1 } }
+	
 	
 	$print = { value = { "test " } } 
 	$print2 = { value = { $concat_all = { $move_up = { $parameter.y } / z } } } # 여백 때문에 나누어 진다? - chk!! - ToDo
@@ -64,6 +64,7 @@ Event = {
 	id = first_test
 	
 	$parameter = { x }
+	$call_registered_object2 = { name = { "ex3.txt" } parameter = { id = 1 i = 3 j = 1 } }
 	
 	$if = { 
 		condition = { $is_empty_string = { $item_name = { $parameter.x } } }
@@ -71,6 +72,8 @@ Event = {
 			$return = { $multiple = { 10 $item_value = { $parameter.x 0 } } } # core = A core = B
 		}
 	}
+	
+	
 	$return = { $concat_all2  = { $item_name = { $parameter.x } = $multiple = { 10 $item_value = { $parameter.x 0 } } } }
 }
 "test 2"

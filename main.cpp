@@ -1120,8 +1120,11 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 
 							wiz::load_data::UserType eventsTemp = events;
 							
-							ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
+							ExcuteData _excuteData; 
+							_excuteData.depth = excuteData.depth;
 							_excuteData.pEvents = &eventsTemp;
+							_excuteData.pModule = moduleMapPtr;
+							_excuteData.pObjectMap = objectMapPtr;
 
 							wiz::load_data::LoadData::AddData(eventsTemp, "/root", "Event = { id = NONE $call = { " + parameter + " = { " + ut->GetItemList(i).ToString() + " } } }", "TRUE", _excuteData);
 
