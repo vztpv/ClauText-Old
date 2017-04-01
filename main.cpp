@@ -796,22 +796,22 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 						try {
 							if ("add" == strVecTemp[0])
 							{
-								if (false == wiz::load_data::LoadData::AddData(*utTemp, strVecTemp[1], strVecTemp[2], strVecTemp[3], map<string, string>(), nullptr, EventInfo()))
+								if (false == wiz::load_data::LoadData::AddData(*utTemp, strVecTemp[1], strVecTemp[2], strVecTemp[3], ExcuteData()))
 								{
 									cout << "fail to add" << endl; /// To Do to following code.
 								}
 							}
 							else if ("addusertype" == strVecTemp[0])
 							{
-								wiz::load_data::LoadData::AddUserType(*utTemp, strVecTemp[1], strVecTemp[2], strVecTemp[3], strVecTemp[4], map<string, string>(), nullptr, EventInfo());
+								wiz::load_data::LoadData::AddUserType(*utTemp, strVecTemp[1], strVecTemp[2], strVecTemp[3], strVecTemp[4], ExcuteData());
 							}
 							else if ("set" == strVecTemp[0])
 							{
-								wiz::load_data::LoadData::SetData(*utTemp, strVecTemp[1], strVecTemp[2], strVecTemp[3], strVecTemp[4], map<string, string>(), nullptr, EventInfo());
+								wiz::load_data::LoadData::SetData(*utTemp, strVecTemp[1], strVecTemp[2], strVecTemp[3], strVecTemp[4], ExcuteData());
 							}
 							else if ("remove" == strVecTemp[0])
 							{
-								wiz::load_data::LoadData::Remove(*utTemp, strVecTemp[1], strVecTemp[2], strVecTemp[3], map<string, string>(), nullptr, EventInfo());
+								wiz::load_data::LoadData::Remove(*utTemp, strVecTemp[1], strVecTemp[2], strVecTemp[3], ExcuteData());
 							}
 							//else if ("removenonameitem" == strVecTemp[0])
 							//{
@@ -819,16 +819,16 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 							//}
 							else if ("removeall" == strVecTemp[0])
 							{
-								wiz::load_data::LoadData::Remove(*utTemp, strVecTemp[1], strVecTemp[2], map<string, string>(), nullptr, EventInfo());
+								wiz::load_data::LoadData::Remove(*utTemp, strVecTemp[1], strVecTemp[2], ExcuteData());
 							}
 							else if ("searchitem" == strVecTemp[0])
 							{
-								cout << wiz::load_data::LoadData::SearchItem(*utTemp, strVecTemp[1], strVecTemp[2], map<string, string>(), nullptr, EventInfo()) << endl;
+								cout << wiz::load_data::LoadData::SearchItem(*utTemp, strVecTemp[1], strVecTemp[2], ExcuteData()) << endl;
 								GETCH();
 							}
 							else if ("searchusertype" == strVecTemp[0])
 							{
-								cout << wiz::load_data::LoadData::SearchUserType(*utTemp, strVecTemp[1], strVecTemp[2], map<string, string>(), nullptr, EventInfo()) << endl;
+								cout << wiz::load_data::LoadData::SearchUserType(*utTemp, strVecTemp[1], strVecTemp[2], ExcuteData()) << endl;
 								GETCH();
 							}
 						}
@@ -846,13 +846,15 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 	}
 }
 
-string excute_module(const string& MainStr, wiz::load_data::UserType* _global, wiz::load_data::UserType* pEvents,
-	const std::shared_ptr<EventInfo>& pInfo)
+
+string excute_module(const string& MainStr, wiz::load_data::UserType* _global, const ExcuteData& excuteData)
 {
 	wiz::load_data::UserType& global = *_global;
 	vector<thread*> waits;
-	map<string, string> objectMap;
-	map<string, wiz::load_data::UserType> moduleMap;
+	map<string, wiz::load_data::UserType> objectMap; // string -> wiz::load_data::UserType
+	map<string, wiz::load_data::UserType> moduleMap; 
+	map<string, wiz::load_data::UserType>* objectMapPtr;
+	map<string, wiz::load_data::UserType>* moduleMapPtr;
 	string module_value = "";
 	// data, event load..
 	wiz::ArrayStack<EventInfo> eventStack;
@@ -862,7 +864,21 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 	wiz::load_data::UserType* eventPtr;
 	wiz::load_data::UserType Main;
 
-	if (nullptr == pEvents) {
+	if (nullptr == excuteData.pModule) {
+		moduleMapPtr = &moduleMap;
+	}
+	else {
+		moduleMapPtr = excuteData.pModule;
+	}
+
+	if (nullptr == excuteData.pObjectMap) {
+		objectMapPtr = &objectMap;
+	}
+	else {
+		objectMapPtr = excuteData.pObjectMap;
+	}
+
+	if (nullptr == excuteData.pEvents) {
 		_events = global.GetCopyUserTypeItem("Event");
 		for (int i = 0; i < _events.size(); ++i) {
 			events.LinkUserType(_events[i]);
@@ -871,7 +887,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 		eventPtr = &events;
 	}
 	else {
-		eventPtr = pEvents;
+		eventPtr = excuteData.pEvents;
 	}
 	// event table setting
 	for (int i = 0; i < eventPtr->GetUserTypeListSize(); ++i)
@@ -887,7 +903,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 	}
 
 	// start from Main.
-	if (nullptr == pInfo.get()) { /// chk smartpointer.
+	if (excuteData.chkInfo == false) { /// chk smartpointer.
 		if (global.GetUserTypeItem("Main").empty() && MainStr.empty())
 		{
 			cout << "do not exist Main" << endl;
@@ -930,7 +946,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 		eventStack.push(info);
 	}
 	else {
-		eventStack.push(*pInfo);
+		eventStack.push(excuteData.info);
 	}
 
 	// main loop
@@ -1027,8 +1043,15 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 				// condition = { AND = { EXSITITEMBYVAL = { base_tax root/list } COMP> = { ~~ / 5.000 ~ 0 } } } 
 				// recursive = { false or true } } // return UserType.?
 				if ("$for_each" == val->GetName()) {
-					const string eventID = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
-					const string dir = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					const string eventID = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					const string dir = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
 					const string condition = val->GetUserTypeList(2)->ToString(); 
 
 					wiz::load_data::UserType* event = nullptr;
@@ -1082,7 +1105,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 								_condition = wiz::String::replace(_condition, "~~", ut->GetItemList(i).GetName());
 							}
 
-							_condition = ToBool4(ut, global, eventStack.top().parameters, _condition, eventStack.top(), objectMap,  eventPtr);
+							_condition = ToBool4(ut, global, _condition, _excuteData);
 							
 							wiz::load_data::Condition _cond(_condition, ut, &global);
 							
@@ -1094,11 +1117,15 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 								continue;
 							}
 							
+
 							wiz::load_data::UserType eventsTemp = events;
 							
-							wiz::load_data::LoadData::AddData(eventsTemp, "/root", "Event = { id = NONE $call = { " + parameter + " = { " + ut->GetItemList(i).ToString() + " } } }", "TRUE", objectMap, eventPtr, info);
+							ExcuteData _excuteData;
+							_excuteData.pEvents = &eventsTemp;
 
-							const string return_value = excute_module("Main = { $call = { id = NONE } }", &global, &eventsTemp);
+							wiz::load_data::LoadData::AddData(eventsTemp, "/root", "Event = { id = NONE $call = { " + parameter + " = { " + ut->GetItemList(i).ToString() + " } } }", "TRUE", _excuteData);
+
+							const string return_value = excute_module("Main = { $call = { id = NONE } }", &global, _excuteData);
 						 	
 							wiz::load_data::UserType return_value_ut;
 
@@ -1121,16 +1148,23 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 					break;
 				}
 				else if ("$do" == val->GetName()) { // chk?
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
 					wiz::load_data::UserType subGlobal;
 					wiz::load_data::LoadData::LoadDataFromString(val->GetUserTypeList(1)->ToString(), subGlobal);
 					wiz::load_data::UserType inputUT;
-					wiz::load_data::LoadData::LoadDataFromString(ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr), inputUT);
+					wiz::load_data::LoadData::LoadDataFromString(ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData), inputUT);
 
 
-					wiz::load_data::LoadData::AddData(subGlobal, "/./", inputUT.ToString(), "TRUE", objectMap, eventPtr, info);
+					wiz::load_data::LoadData::AddData(subGlobal, "/./", inputUT.ToString(), "TRUE", _excuteData);
 
 
-					eventStack.top().return_value = excute_module("", &subGlobal); // return ?
+					eventStack.top().return_value = excute_module("", &subGlobal, ExcuteData()); // return ?
 
 
 					eventStack.top().userType_idx.top()++;
@@ -1138,7 +1172,14 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 				}
 				// add option! for "".support eu3, eu4.
 				else if ("$replace_datatype1" == val->GetName()) { // name
-					string rex = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					string rex = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
 					rex = rex.substr(1, rex.size() - 2);
 					vector<string> sval;
 					vector<string> scondition;
@@ -1154,16 +1195,23 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 						}
 					}
 					if (val->GetUserTypeListSize() >= 4) {
-						start_dir = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(3)->ToString(), eventStack.top(), objectMap,  eventPtr);
+						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(3)->ToString(), _excuteData);
 					}
 
-					wiz::load_data::LoadData::ReplaceDataType1(global, rex, sval, scondition, start_dir, objectMap, eventPtr, eventStack.top());
+					wiz::load_data::LoadData::ReplaceDataType1(global, rex, sval, scondition, start_dir, _excuteData);
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$replace_datatype1_2" == val->GetName()) { //val
-					string rex = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					string rex = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
 					rex = rex.substr(1, rex.size() - 2);
 					vector<string> sval;
 					vector<string> scondition;
@@ -1182,16 +1230,23 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 					}
 
 					if (val->GetUserTypeListSize() >= 4 && (val->GetUserTypeListSize()%2 == 0)) {
-						start_dir = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(val->GetUserTypeListSize()-1)->ToString(), eventStack.top(), objectMap,  eventPtr);
+						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(val->GetUserTypeListSize()-1)->ToString(), _excuteData);
 					}
 
-					wiz::load_data::LoadData::ReplaceDataType1_2(global, rex, sval, scondition, start_dir, objectMap,  eventPtr, eventStack.top());
+					wiz::load_data::LoadData::ReplaceDataType1_2(global, rex, sval, scondition, start_dir, _excuteData);
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$replace_datatype2" == val->GetName()) { // usertype name
-					string rex = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					string rex = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
 					rex = rex.substr(1, rex.size() - 2);
 					//cout << val->GetUserTypeList(1)->ToString() << endl;
 					vector<string> sval;
@@ -1211,17 +1266,24 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 					}
 
 					if (val->GetUserTypeListSize() >= 4 && (val->GetUserTypeListSize() % 2 == 0)) {
-						start_dir = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(val->GetUserTypeListSize() - 1)->ToString(), eventStack.top(), objectMap,  eventPtr);
+						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(val->GetUserTypeListSize() - 1)->ToString(), _excuteData);
 					}
 
 					//cout << scondition << endl;
 					//cout << "sval " << sval << endl;
-					wiz::load_data::LoadData::ReplaceDataType2(global, rex, sval, scondition, start_dir, objectMap, eventPtr, eventStack.top());
+					wiz::load_data::LoadData::ReplaceDataType2(global, rex, sval, scondition, start_dir, _excuteData);
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$replace_datetype" == val->GetName()) {
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
 					string sval = val->GetUserTypeList(0)->ToString();
 					
 					string scondition = "TRUE";
@@ -1232,15 +1294,22 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 						scondition = val->GetUserTypeList(1)->ToString();
 					}
 					if (val->GetUserTypeListSize() >= 3) {
-						start_dir = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top(), objectMap,  eventPtr);
+						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(2)->ToString(), _excuteData);
 					}
 
-					wiz::load_data::LoadData::ReplaceDateType(global, sval, scondition, start_dir, objectMap, eventPtr, eventStack.top());
+					wiz::load_data::LoadData::ReplaceDateType(global, sval, scondition, start_dir, _excuteData);
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$replace_datetype2" == val->GetName()) {
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
 					string sval = val->GetUserTypeList(0)->ToString();
 					string scondition = "TRUE";
 					string start_dir = "root";
@@ -1251,16 +1320,23 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 						scondition = val->GetUserTypeList(1)->ToString();
 					}
 					if (val->GetUserTypeListSize() >= 3) {
-						start_dir = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top(), objectMap,  eventPtr);
+						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(2)->ToString(), _excuteData);
 					}
 
-					wiz::load_data::LoadData::ReplaceDateType2(global, sval, scondition, start_dir, objectMap, eventPtr, eventStack.top());
+					wiz::load_data::LoadData::ReplaceDateType2(global, sval, scondition, start_dir, _excuteData);
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$remove_usertype_total" == val->GetName()) {
-					string ut_name = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), info, objectMap, eventPtr);
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					string ut_name = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
 					string condition = "TRUE";
 					string start_dir = "root";
 
@@ -1269,17 +1345,23 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 						condition = val->GetUserTypeList(1)->ToString();
 					}
 					if (val->GetUserTypeListSize() >= 3) {
-						start_dir = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top(), objectMap,  eventPtr);
+						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(2)->ToString(), _excuteData);
 					}
 
-					wiz::load_data::LoadData::RemoveUserTypeTotal(global, ut_name, condition, start_dir, objectMap, eventPtr, eventStack.top());
+					wiz::load_data::LoadData::RemoveUserTypeTotal(global, ut_name, condition, start_dir, _excuteData);
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$replace_item" == val->GetName()) {
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
 					// chk nullptr vs val?
-					string svar = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					string svar = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
 					string sval = val->GetUserTypeList(1)->ToString();
 					string scondition = "TRUE";
 					string start_dir = "root";
@@ -1289,10 +1371,10 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 						scondition = val->GetUserTypeList(2)->ToString();
 					}
 					if (val->GetUserTypeListSize() >= 4) {
-						start_dir = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(3)->ToString(), eventStack.top(), objectMap,  eventPtr);
+						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(3)->ToString(), _excuteData);
 					}
 
-					wiz::load_data::LoadData::ReplaceItem(global, svar, sval, scondition, start_dir, objectMap, eventPtr, eventStack.top());
+					wiz::load_data::LoadData::ReplaceItem(global, svar, sval, scondition, start_dir, _excuteData);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1311,11 +1393,17 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 				}
 				else if ("$save" == val->GetName()) // save data, event, main!
 				{
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
 					//todo
 					// "filename" save_option(0~2)
-					string fileName = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					string fileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
 					fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
-					string option = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					string option = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
 
 					wiz::load_data::LoadData::SaveWizDB(global, fileName, option, "");
 					wiz::load_data::LoadData::SaveWizDB(Main, fileName, option, "APPEND");
@@ -1326,11 +1414,17 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 				}
 				else if ("$save_data_only" == val->GetName())
 				{
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
 					//todo
 					// "filename" save_option(0~2)
-					string fileName = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					string fileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
 					fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
-					string option = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					string option = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
 
 					wiz::load_data::LoadData::SaveWizDB(global, fileName, option, "");
 
@@ -1340,12 +1434,18 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 
 				else if ("$save_data_only2" == val->GetName())
 				{
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
 					//todo
 					// "filename" save_option(0~2)
-					string dirName = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
-					string fileName = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					string dirName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string fileName = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
 					fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
-					string option = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					string option = ToBool4(nullptr, global, val->GetUserTypeList(2)->ToString(), _excuteData);
 
 					// todo - for? auto x = global.GetUserTypeItem(dirName);
 					wiz::load_data::UserType* utTemp = global.GetUserTypeItem(dirName)[0];
@@ -1358,53 +1458,74 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 				/// module name or object name -> must "~" .
 				else if ("$register_module" == val->GetName())
 				{
-					string moduleFileName = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					string moduleFileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
 					moduleFileName = wiz::String::substring(moduleFileName, 1, moduleFileName.size() - 2);
 
 					wiz::load_data::UserType moduleUT;
 					wiz::load_data::LoadData::LoadDataFromFile(moduleFileName, moduleUT);
 
-					//moduleMap.insert(make_pair(moduleFileName, moduleUT));
-					moduleMap[moduleFileName] = move(moduleUT);
+					//moduleMapPtr.insert(make_pair(moduleFileName, moduleUT));
+					(*moduleMapPtr)[moduleFileName] = move(moduleUT);
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$call_registered_module" == val->GetName())
 				{
-					string moduleFileName = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					string moduleFileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
 					string input;
 
 					if (val->GetUserTypeListSize() >= 2) {
-						input = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  eventPtr);
+						input = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
 					}
 
 					moduleFileName = wiz::String::substring(moduleFileName, 1, moduleFileName.size() - 2);
 
-					wiz::load_data::UserType moduleUT = moduleMap.at(moduleFileName);
-					wiz::load_data::LoadData::AddData(moduleUT, "", input, "TRUE", objectMap, eventPtr, info);
+					wiz::load_data::UserType moduleUT = (*moduleMapPtr).at(moduleFileName);
+					wiz::load_data::LoadData::AddData(moduleUT, "", input, "TRUE", _excuteData);
 
-					eventStack.top().return_value = excute_module("", &moduleUT);
+					eventStack.top().return_value = excute_module("", &moduleUT, ExcuteData());
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$module" == val->GetName())
 				{
-					string moduleFileName = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					string moduleFileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
 					string input;
 
 					if (val->GetUserTypeListSize() >= 2) {
-						input = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  eventPtr);
+						input = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
 					}
 
 					moduleFileName = wiz::String::substring(moduleFileName, 1, moduleFileName.size() - 2);
 
 					wiz::load_data::UserType moduleUT;
 					wiz::load_data::LoadData::LoadDataFromFile(moduleFileName, moduleUT);
-					wiz::load_data::LoadData::AddData(moduleUT, "", input, "TRUE", objectMap, eventPtr, info);
+					wiz::load_data::LoadData::AddData(moduleUT, "", input, "TRUE", _excuteData);
 
-					eventStack.top().return_value = excute_module("", &moduleUT);
+					eventStack.top().return_value = excute_module("", &moduleUT, ExcuteData());
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1414,82 +1535,110 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 				// todo - call registered module.  $registered_module = { name = { ~ } input = { input = { n = 1 } } }
 
 				else if ("$register_object" == val->GetName()) {
-					string objectFileName = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					string objectFileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
 					
 					objectFileName = wiz::String::substring(objectFileName, 1, objectFileName.size() - 2);
 
 					wiz::load_data::UserType objectUT;
 					wiz::load_data::LoadData::LoadDataFromFile(objectFileName, objectUT);
 
-					string data = objectUT.ToString();
-
-					//objectMap.insert(make_pair(objectFileName, data));
-					objectMap[objectFileName] = move(data);
+					//objectMapPtr.insert(make_pair(objectFileName, data));
+					(*objectMapPtr)[objectFileName] = move(objectUT);
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$copy_object" == val->GetName()) {
-					string objectNameA = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap, eventPtr);
-					string objectNameB = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap, eventPtr);
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					string objectNameA = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string objectNameB = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
 
 					objectNameA = wiz::String::substring(objectNameA, 1, objectNameA.size() - 2);
 					objectNameB = wiz::String::substring(objectNameB, 1, objectNameB.size() - 2);
 
-					objectMap[objectNameB] = objectMap.at(objectNameA);
+					(*objectMapPtr)[objectNameB] = (*objectMapPtr).at(objectNameA);
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$register_object_from_string" == val->GetName()) {
-					string objectName = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
-					string objectData = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					string objectName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string objectData = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
 					objectName = wiz::String::substring(objectName, 1, objectName.size() - 2);
 					objectData = wiz::String::substring(objectData, 1, objectData.size() - 2);
 					wiz::load_data::UserType objectUT;
 					wiz::load_data::LoadData::LoadDataFromString(objectData, objectUT); // error chk?
 
-					string data = objectUT.ToString();
-
-					//objectMap.insert(make_pair(objectFileName, data));
-					objectMap[objectName] = move(data);
+					//objectMapPtr.insert(make_pair(objectFileName, data));
+					(*objectMapPtr)[objectName] = move(objectUT);
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$call_registered_object" == val->GetName()) {
-					string objectFileName = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					string objectFileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
 					objectFileName = wiz::String::substring(objectFileName, 1, objectFileName.size() - 2);
 					string parameter;
-					string data = objectMap.at(objectFileName);
+					wiz::load_data::UserType objectUT = objectMapPtr->at(objectFileName);
 
-					parameter = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					parameter = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
 
-					data = data + " Event = { id = NONE $call = { " + parameter + "  } } ";
+					string data = " Event = { id = NONE $call = { " + parameter + "  } } ";
 
-					wiz::load_data::UserType objectUT;
-					wiz::load_data::LoadData::LoadDataFromString(data, objectUT);
-
-					eventStack.top().return_value = excute_module(" Main = { $call = { id = NONE } } ", &objectUT);
+					wiz::load_data::LoadData::AddData(objectUT, "/./", data, "TRUE", _excuteData);
+					
+					eventStack.top().return_value = excute_module(" Main = { $call = { id = NONE } } ", &objectUT, ExcuteData());
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$call_registered_object2" == val->GetName()) {
-					string objectFileName = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap, eventPtr);
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					string objectFileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
 					objectFileName = wiz::String::substring(objectFileName, 1, objectFileName.size() - 2);
 					string parameter;
-					string data = objectMap.at(objectFileName);
 
-					parameter = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap, eventPtr);
+					parameter = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
 
-					data = data + " Event = { id = NONE $call = { " + parameter + "  } } ";
+					string data = " Event = { id = NONE $call = { " + parameter + "  } } ";
 
-					wiz::load_data::UserType objectUT, objectUT2;
-					wiz::load_data::LoadData::LoadDataFromString(data, objectUT);
-					wiz::load_data::LoadData::LoadDataFromString(objectMap.at(objectFileName), objectUT2);
-
-					eventStack.top().return_value = excute_module(" Main = { $call = { id = NONE } } ", &objectUT);
+					wiz::load_data::UserType objectUT = objectMapPtr->at(objectFileName);
+					wiz::load_data::UserType objectUT2 = objectUT;
+					wiz::load_data::LoadData::AddData(objectUT, "/./", data, "TRUE", _excuteData);
+					eventStack.top().return_value = excute_module(" Main = { $call = { id = NONE } } ", &objectUT, ExcuteData());
 					{
 						vector<wiz::load_data::UserType*> _events;
 						wiz::load_data::UserType events;
@@ -1499,20 +1648,27 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 							events.LinkUserType(_events[i]);
 						}
 						
-						wiz::load_data::LoadData::AddData(objectUT, "/./", events.ToString(), "TRUE", objectMap, eventPtr, eventStack.top());
+						wiz::load_data::LoadData::AddData(objectUT, "/./", events.ToString(), "TRUE", _excuteData);
 					}
-					objectMap[objectFileName] = objectUT.ToString();
+					(*objectMapPtr)[objectFileName] = move(objectUT);
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				/// object of class?
 				else if ("$object" == val->GetName()) { // "fileName"
-					string objectFileName = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					string objectFileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
 					objectFileName = wiz::String::substring(objectFileName, 1, objectFileName.size() - 2);
 					string parameter;
 
-					parameter = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					parameter = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
 
 
 					wiz::load_data::UserType objectUT;
@@ -1525,16 +1681,23 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 					objectUT.Remove();
 					wiz::load_data::LoadData::LoadDataFromString(data, objectUT);
 
-					eventStack.top().return_value = excute_module(" Main = { $call = { id = NONE } } ", &objectUT);
+					eventStack.top().return_value = excute_module(" Main = { $call = { id = NONE } } ", &objectUT, ExcuteData());
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$object_from_string" == val->GetName()) {
-					string data = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					string data = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
 					string parameter;
 
-					parameter = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					parameter = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
 
 
 					wiz::load_data::UserType objectUT;
@@ -1547,7 +1710,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 					objectUT.Remove();
 					wiz::load_data::LoadData::LoadDataFromString(str, objectUT);
 
-					eventStack.top().return_value = excute_module(" Main = { $call = { id = NONE } } ", &objectUT);
+					eventStack.top().return_value = excute_module(" Main = { $call = { id = NONE } } ", &objectUT, ExcuteData());
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1558,14 +1721,28 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 				// todo - call registered object.  $registered_object = { name = { "ex2.txt" } parameter = { id = 1 i = 1 j = 1 } }  
 				else if ("$option" == val->GetName()) // first
 				{
-					eventStack.top().option = ToBool4(nullptr, global, eventStack.top().parameters, val->ToString(), eventStack.top(), objectMap,  eventPtr);
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					eventStack.top().option = ToBool4(nullptr, global, val->ToString(), _excuteData);
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				// done - ($push_back-insert!) $pop_back, $push_front, $pop_front ($front?, $back?)
 				else if ("$pop_back" == val->GetName()) {
-					string dir = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					string dir = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
 					wiz::load_data::UserType* ut = nullptr;
 					auto finded = wiz::load_data::UserType::Find(&global, dir);
 					ut = finded.second[0];
@@ -1574,44 +1751,58 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 					if (val->GetUserTypeListSize() >= 2) {
 						condition = val->GetUserTypeList(1)->ToString();
 					}
-					wiz::load_data::LoadData::Remove(global, dir, ut->GetIListSize() - 1, condition, objectMap, eventPtr, eventStack.top());
+					wiz::load_data::LoadData::Remove(global, dir, ut->GetIListSize() - 1, condition, _excuteData);
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$push_front" == val->GetName()) {
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
 					string value = val->GetUserTypeList(1)->ToString();
 					string dir;
 					if (val->GetUserTypeList(0)->GetItemListSize() > 0) {
 						dir = val->GetUserTypeList(0)->GetItemList(0).Get(0);
-						dir = ToBool4(nullptr, global, eventStack.top().parameters, dir, eventStack.top(), objectMap,  eventPtr);
+						dir = ToBool4(nullptr, global, dir, _excuteData);
 					}
 					else ///val->Ge
 					{
 						dir = string(val->GetUserTypeList(0)->ToString());
-						dir = ToBool4(nullptr, global, eventStack.top().parameters, dir, eventStack.top(), objectMap,  eventPtr);
+						dir = ToBool4(nullptr, global, dir, _excuteData);
 					}
 
 
-					value = ToBool4(nullptr, global, eventStack.top().parameters, value, eventStack.top(), objectMap,  eventPtr);
+					value = ToBool4(nullptr, global, value, _excuteData);
 
 					string condition = "TRUE";
 					if (val->GetUserTypeListSize() >= 3) {
 						condition = val->GetUserTypeList(2)->ToString();
 					}
-					wiz::load_data::LoadData::AddDataAtFront(global, dir, value, condition, objectMap, eventPtr, info);
+					wiz::load_data::LoadData::AddDataAtFront(global, dir, value, condition, _excuteData);
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$pop_front" == val->GetName()) {
-					string dir = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					string dir = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
 
 					string condition = "TRUE";
 					if (val->GetUserTypeListSize() >= 2) {
 						condition = val->GetUserTypeList(1)->ToString();
 					}
-					wiz::load_data::LoadData::Remove(global, dir, 0, condition, objectMap, eventPtr, eventStack.top());
+					wiz::load_data::LoadData::Remove(global, dir, 0, condition, _excuteData);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1627,11 +1818,18 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 					break;
 				}
 				else if ("$call" == val->GetName()) {
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
 					if (!val->GetItem("id").empty()) {
 						info.id = val->GetItem("id")[0].Get(0);
 					}
 					else {
-						info.id = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeItem("id")[0]->ToString(), eventStack.top(), objectMap,  eventPtr);
+						info.id = ToBool4(nullptr, global, val->GetUserTypeItem("id")[0]->ToString(), _excuteData);
 					}
 
 					info.eventUT = eventPtr->GetUserTypeList(no);
@@ -1652,22 +1850,27 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 					if (info.id != eventStack.top().id) {
 						for (int j = 0; j < val->GetItemListSize(); ++j) {
 							if (val->GetItemListSize() > 0) {
-								string temp = ToBool4(nullptr, global, info2.parameters, val->GetItemList(j).Get(0), info2, objectMap,  eventPtr);
+								_excuteData.info = info2;
+								string temp = ToBool4(nullptr, global, val->GetItemList(j).Get(0), _excuteData);
 								info.parameters.insert(make_pair(val->GetItemList(j).GetName(), temp));
 							}
 						}
 						for (int j = 0; j < val->GetUserTypeListSize(); ++j) {
 							if (val->GetUserTypeListSize() > 0) {
-								string temp = ToBool4(nullptr, global, info2.parameters, val->GetUserTypeList(j)->ToString(), info2, objectMap,  eventPtr);
+								_excuteData.info = info2;
+								string temp = ToBool4(nullptr, global, val->GetUserTypeList(j)->ToString(), _excuteData);
 								info.parameters.insert(make_pair(val->GetUserTypeList(j)->GetName(), temp));
 							}
 						}
 						eventStack.top().userType_idx.top()++;
 					}
-					else {
+					else { // recursive call!
 						if (val->GetItemListSize() > 0) {
 							for (int j = 0; j < val->GetItemListSize(); ++j) {
-								string temp = ToBool4(nullptr, global, info2.parameters, val->GetItemList(j).Get(0), info, objectMap,  eventPtr);
+								_excuteData.info = info;
+								_excuteData.info.parameters = info2.parameters;
+							
+								string temp = ToBool4(nullptr, global, val->GetItemList(j).Get(0), _excuteData);
 								
 								map<string, string>::iterator x;
 								if ((x = info.parameters.find(val->GetItemList(j).GetName())) != info.parameters.end())
@@ -1678,7 +1881,10 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 						}
 						if (val->GetUserTypeListSize() > 0) {
 							for (int j = 0; j < val->GetUserTypeListSize(); ++j) {
-								string temp = ToBool4(nullptr, global, info2.parameters, val->GetUserTypeList(j)->ToString(), info, objectMap,  eventPtr);
+								_excuteData.info = info;
+								_excuteData.info.parameters = info2.parameters;
+
+								string temp = ToBool4(nullptr, global, val->GetUserTypeList(j)->ToString(), _excuteData);
 
 								map<string, string>::iterator x;
 								if ((x = info.parameters.find(val->GetUserTypeList(j)->GetName())) != info.parameters.end())
@@ -1725,8 +1931,8 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 					}
 
 					if (false == val->GetItem("option").empty() && val->GetItem("option")[0].Get(0) == "USE_THREAD") {
-						std::shared_ptr<EventInfo> pInfo( new EventInfo(info) );
-						thread* A = new thread(excute_module, "", &global, eventPtr, pInfo);
+						_excuteData.info = info;
+						thread* A = new thread(excute_module, "", &global, _excuteData);
 						
 						waits.push_back(A);
 					}
@@ -1739,15 +1945,22 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 
 				else if ("$assign" == val->GetName()) /// -> assign2?
 				{
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
 					pair<string, string> dir = Find2(&global, val->GetItemList(0).Get(0));
-					string data = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					string data = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
 
 					if (dir.first == "" && wiz::String::startsWith(dir.second, "$local."))
 					{
 						eventStack.top().locals[wiz::String::substring(dir.second, 7)] = data;
 					}
 					else {
-						wiz::load_data::LoadData::SetData(global, dir.first, dir.second, data, "TRUE", objectMap, eventPtr, info);
+						wiz::load_data::LoadData::SetData(global, dir.first, dir.second, data, "TRUE", _excuteData);
 					}
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1755,8 +1968,15 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 
 				else if ("$assign2" == val->GetName())
 				{
-					pair<string, string> dir = Find2(&global, ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr));
-					string data = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					pair<string, string> dir = Find2(&global, ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData));
+					string data = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
 
 					{
 						if (dir.first == "" && wiz::String::startsWith(dir.second, "$local."))
@@ -1764,7 +1984,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 							eventStack.top().locals[wiz::String::substring(dir.second, 7)] = data;
 						}
 						else {
-							wiz::load_data::LoadData::SetData(global, dir.first, dir.second, data, "TRUE", objectMap, eventPtr, info);
+							wiz::load_data::LoadData::SetData(global, dir.first, dir.second, data, "TRUE", _excuteData);
 						}
 					}
 
@@ -1773,8 +1993,15 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 				}
 				else if ("$assign_local" == val->GetName()) /// no condition, 
 				{
-					pair<string, string> dir = Find2(&global, ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr));
-					string data = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					pair<string, string> dir = Find2(&global, ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData));
+					string data = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
 
 					{
 						if (dir.first == "" && dir.second.size() > 1 && dir.second[0] == '@')
@@ -1795,14 +2022,21 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 				}
 				else if ("$assign_global" == val->GetName()) // 주의!! dir=> dir/name ( dir= { name = val } } , @�??�에 붙여???�다. 
 				{
-					pair<string, string> dir = Find2(&global, ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr));
-					string data = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					pair<string, string> dir = Find2(&global, ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData));
+					string data = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
 
 					//string condition;
 					//if (val->GetUserTypeListSize() >= 3) {
-					//	condition = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					//	condition = ToBool4(nullptr, global, val->GetUserTypeList(2)->ToString(), _excuteData);
 					//}
-					wiz::load_data::LoadData::SetData(global, dir.first, dir.second, data, "TRUE", objectMap, eventPtr, info);
+					wiz::load_data::LoadData::SetData(global, dir.first, dir.second, data, "TRUE", _excuteData);
 
 					// chk local?
 
@@ -1812,51 +2046,65 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 				/// cf) insert3? - any position?
 				else if ("$push_back" == val->GetName() || "$insert" == val->GetName() || "$insert2" == val->GetName())
 				{
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
 					string value = val->GetUserTypeList(1)->ToString();
 					string dir;
 					if (val->GetUserTypeList(0)->GetItemListSize() > 0) {
 						dir = val->GetUserTypeList(0)->GetItemList(0).Get(0);
-						dir = ToBool4(nullptr, global, eventStack.top().parameters, dir, eventStack.top(), objectMap,  eventPtr);
+						dir = ToBool4(nullptr, global, dir, _excuteData);
 					}
 					else ///val->Ge
 					{
 						dir = string(val->GetUserTypeList(0)->ToString());
-						dir = ToBool4(nullptr, global, eventStack.top().parameters, dir, eventStack.top(), objectMap,  eventPtr);
+						dir = ToBool4(nullptr, global, dir, _excuteData);
 					}
 
-					value = ToBool4(nullptr, global, eventStack.top().parameters, value, eventStack.top(), objectMap,  eventPtr);
+					value = ToBool4(nullptr, global, value, _excuteData);
 
 					string condition = "TRUE";
 					if (val->GetUserTypeListSize() >= 3) {
 						condition = val->GetUserTypeList(2)->ToString();
 					}
-					wiz::load_data::LoadData::AddData(global, dir, value, condition, objectMap, eventPtr, info);
+					wiz::load_data::LoadData::AddData(global, dir, value, condition, _excuteData);
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$insert_by_idx" == val->GetName())
 				{
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
 					string value = val->GetUserTypeList(2)->ToString();
-					int idx = atoi(ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  eventPtr).c_str());
+					int idx = atoi(ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData).c_str());
 					string dir;
 					if (val->GetUserTypeList(0)->GetItemListSize() > 0) {
 						dir = val->GetUserTypeList(0)->GetItemList(0).Get(0);
-						dir = ToBool4(nullptr, global, eventStack.top().parameters, dir, eventStack.top(), objectMap,  eventPtr);
+						dir = ToBool4(nullptr, global, dir, _excuteData);
 					}
 					else ///val->Ge
 					{
 						dir = string(val->GetUserTypeList(0)->ToString());
-						dir = ToBool4(nullptr, global, eventStack.top().parameters, dir, eventStack.top(), objectMap,  eventPtr);
+						dir = ToBool4(nullptr, global, dir, _excuteData);
 					}
 
-					value = ToBool4(nullptr, global, eventStack.top().parameters, value, eventStack.top(), objectMap,  eventPtr);
+					value = ToBool4(nullptr, global, value, _excuteData);
 
 					string condition = "TRUE";
 					if (val->GetUserTypeListSize() >= 4) {
 						condition = val->GetUserTypeList(3)->ToString();
 					}
-					wiz::load_data::LoadData::Insert(global, dir, idx, value, condition, objectMap, eventPtr, info);
+					wiz::load_data::LoadData::Insert(global, dir, idx, value, condition, _excuteData);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1864,16 +2112,23 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 				else if ("$make" == val->GetName()) // To Do? - make2? or remake? 
 													// cf) make empty ut??
 				{
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
 					string dir;
 					bool is2 = false;
 					if (val->GetItemListSize() > 0) {
 						dir = val->GetItemList(0).Get(0);
-						dir = ToBool4(nullptr, global, eventStack.top().parameters, dir, eventStack.top(), objectMap,  eventPtr);
+						dir = ToBool4(nullptr, global, dir, _excuteData);
 					}
 					else // 
 					{
 						dir = string(val->ToString());
-						dir = ToBool4(nullptr, global, eventStack.top().parameters, dir, eventStack.top(), objectMap,  eventPtr);
+						dir = ToBool4(nullptr, global, dir, _excuteData);
 						is2 = true;
 					}
 
@@ -1896,7 +2151,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 						condition = val->GetUserTypeList(0)->ToString();
 					}
 
-					wiz::load_data::LoadData::AddUserType(global, dir, name, "", condition, objectMap, eventPtr, info);
+					wiz::load_data::LoadData::AddUserType(global, dir, name, "", condition, _excuteData);
 
 
 					eventStack.top().userType_idx.top()++;
@@ -1904,8 +2159,15 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 				}
 				else if ("$findIndex" == val->GetName()) // For list : { 1 2  3 4 5 }
 				{
-					string dir = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
-					string value = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					string dir = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string value = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
 
 					wiz::load_data::UserType ut;
 					wiz::load_data::LoadData::LoadDataFromString(wiz::load_data::UserType::Find(&global, dir).second[0]->ToString(), ut);
@@ -1922,15 +2184,22 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 				}
 				else if ("$remove" == val->GetName()) // remove by dir., remove all?
 				{
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
 					string dir = string(val->GetItemList(0).Get(0).c_str()); // item -> userType
 
-					dir = ToBool4(nullptr, global, eventStack.top().parameters, dir, eventStack.top(), objectMap,  eventPtr);
+					dir = ToBool4(nullptr, global, dir, _excuteData);
 
 					string condition = "TRUE";
 					if (val->GetUserTypeListSize() >= 2) {
 						condition = val->GetUserTypeList(1)->ToString();
 					}
-					wiz::load_data::LoadData::Remove(global, dir, condition, objectMap, eventPtr, eventStack.top());
+					wiz::load_data::LoadData::Remove(global, dir, condition, _excuteData);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1938,8 +2207,15 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 				else if ("$remove2" == val->GetName()) // remove /dir/name 
 													   // if name is empty, then chk!!
 				{
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
 					string dir = string(val->GetItemList(0).Get(0).c_str()); // item -> userType
-					dir = ToBool4(nullptr, global, eventStack.top().parameters, dir, eventStack.top(), objectMap,  eventPtr);
+					dir = ToBool4(nullptr, global, dir, _excuteData);
 					string name;
 					for (int i = dir.size() - 1; i >= 0; --i)
 					{
@@ -1954,15 +2230,22 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 					if (val->GetUserTypeListSize() >= 2) {
 						condition = val->GetUserTypeList(1)->ToString();
 					}
-					wiz::load_data::LoadData::Remove(global, dir, name, condition, objectMap, eventPtr, eventStack.top());
+					wiz::load_data::LoadData::Remove(global, dir, name, condition, _excuteData);
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$remove3" == val->GetName()) /// remove itemlist by idx.
 				{
-					string dir = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
-					string value = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					string dir = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string value = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
 
 					int idx = atoi(value.c_str());  // long long -> int?
 
@@ -1972,7 +2255,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 						condition = val->GetUserTypeList(2)->ToString();
 					}
 
-					wiz::load_data::LoadData::Remove(global, dir, idx, condition, objectMap, eventPtr, eventStack.top());
+					wiz::load_data::LoadData::Remove(global, dir, idx, condition, _excuteData);
 					// remove -> UserType::Find(&global, dir).second[0]->RemoveItemList(idx); /// change ?
 
 					eventStack.top().userType_idx.top()++;
@@ -1981,9 +2264,16 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 
 				else if ("$setElement" == val->GetName())
 				{
-					string dir = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
-					string idx = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  eventPtr);
-					string value = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(2)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					string dir = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string idx = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
+					string value = ToBool4(nullptr, global, val->GetUserTypeList(2)->ToString(), _excuteData);
 
 					int _idx = stoi(idx);
 					wiz::load_data::UserType::Find(&global, dir).second[0]->SetItem(_idx, value);
@@ -1993,12 +2283,19 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 				}
 				else if ("$swap" == val->GetName()) // $swap2
 				{
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
 					string dir = string(val->GetItemList(0).Get(0).c_str()); // + 0
 					string value1 = val->GetUserTypeList(0)->ToString();
 					string value2 = val->GetUserTypeList(1)->ToString();
 
-					value1 = ToBool4(nullptr, global, eventStack.top().parameters, value1, eventStack.top(), objectMap,  eventPtr);
-					value2 = ToBool4(nullptr, global, eventStack.top().parameters, value2, eventStack.top(), objectMap,  eventPtr);
+					value1 = ToBool4(nullptr, global, value1, _excuteData);
+					value2 = ToBool4(nullptr, global, value2, _excuteData);
 					if (value1 != value2) {
 						int x = atoi(value1.c_str());
 						int y = atoi(value2.c_str());
@@ -2006,8 +2303,8 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 						string temp = wiz::load_data::UserType::Find(&global, dir).second[0]->GetItemList(x).Get(0);
 						string temp2 = wiz::load_data::UserType::Find(&global, dir).second[0]->GetItemList(y).Get(0);
 
-						wiz::load_data::LoadData::SetData(global, dir, x, temp2, "TRUE", objectMap, eventPtr, info);
-						wiz::load_data::LoadData::SetData(global, dir, y, temp, "TRUE", objectMap, eventPtr, info);
+						wiz::load_data::LoadData::SetData(global, dir, x, temp2, "TRUE", _excuteData);
+						wiz::load_data::LoadData::SetData(global, dir, y, temp, "TRUE", _excuteData);
 					}
 
 					eventStack.top().userType_idx.top()++;
@@ -2015,6 +2312,13 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 				}
 				else if ("$print" == val->GetName()) /// has many bugs..!?, for print list or print item?.
 				{
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
 					if (val->GetUserTypeListSize() == 1
 						&& val->GetUserTypeList(0)->GetItemListSize() == 1)
 					{
@@ -2033,7 +2337,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 							|| wiz::String::startsWith(listName, "$parameter.")
 							)
 						{
-							string temp = ToBool4(nullptr, global, eventStack.top().parameters, listName, eventStack.top(), objectMap,  eventPtr);
+							string temp = ToBool4(nullptr, global, listName, _excuteData);
 							if (temp.empty()) {
 								cout << "EMPTY";
 							}
@@ -2043,7 +2347,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 						}
 						else if (wiz::String::startsWith(listName, "/") && listName.size() > 1)
 						{
-							string temp = ToBool4(nullptr, global, eventStack.top().parameters, listName, eventStack.top(), objectMap,  eventPtr);
+							string temp = ToBool4(nullptr, global, listName, _excuteData);
 							if (temp != listName) // chk 
 							{
 								cout << temp;
@@ -2074,8 +2378,8 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 					{
 						string temp = val->GetUserTypeList(0)->ToString();
 
-						string name = ToBool4(nullptr, global, eventStack.top().parameters,
-							temp, eventStack.top(), objectMap,  eventPtr);
+						string name = ToBool4(nullptr, global,
+							temp, _excuteData);
 						cout << name;
 					}
 					else
@@ -2083,8 +2387,8 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 						string start = val->GetUserTypeList(1)->ToString();
 						string last = val->GetUserTypeList(2)->ToString();
 
-						start = ToBool4(nullptr, global, eventStack.top().parameters, start, eventStack.top(), objectMap,  eventPtr);
-						last = ToBool4(nullptr, global, eventStack.top().parameters, last, eventStack.top(), objectMap,  eventPtr);
+						start = ToBool4(nullptr, global, start, _excuteData);
+						last = ToBool4(nullptr, global, last, _excuteData);
 
 						string listName = val->GetUserTypeList(0)->GetItemList(0).Get(0);
 						int _start = atoi(start.c_str());
@@ -2102,7 +2406,14 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 				}
 				else if ("$print2" == val->GetName()) /// for print usertype.ToString();
 				{
-					string dir = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					string dir = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
 					auto x = wiz::load_data::UserType::Find(&global, dir);
 
 					for (auto& ut : x.second) {
@@ -2115,10 +2426,17 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 				}
 				else if ("$load" == val->GetName())
 				{
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
 					// to do, load data and events from other file!
 					for (int i = 0; i < val->GetItemListSize(); ++i) {
 						wiz::load_data::UserType ut;
-						string fileName = ToBool4(nullptr, global, eventStack.top().parameters, val->GetItemList(i).Get(0), eventStack.top(), objectMap,  eventPtr);
+						string fileName = ToBool4(nullptr, global, val->GetItemList(i).Get(0), _excuteData);
 						fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
 
 						if (wiz::load_data::LoadData::LoadDataFromFile(fileName, ut)) {
@@ -2184,11 +2502,18 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 				}
 				else if ("$load_only_data" == val->GetName()) // $load2?
 				{
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
 					// to do, load data and events from other file!
 					wiz::load_data::UserType ut;
-					string fileName = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					string fileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
 					fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
-					string dirName = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  eventPtr);
+					string dirName = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
 					wiz::load_data::UserType* utTemp = global.GetUserTypeItem(dirName)[0];
 
 					
@@ -2253,17 +2578,24 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 				}
 				else if ("$return" == val->GetName())
 				{
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
 					eventStack.top().userType_idx.top()++;
 					if (eventStack.size() > 1)
 					{
-						string temp = ToBool4(nullptr, global, eventStack.top().parameters, val->ToString(), eventStack.top(), objectMap,  eventPtr);
+						string temp = ToBool4(nullptr, global, val->ToString(), _excuteData);
 						/// if temp just one
 						eventStack[eventStack.size() - 2].return_value = temp;
 					}
 
 					if (eventStack.size() == 1)
 					{
-						string temp = ToBool4(nullptr, global, eventStack.top().parameters, val->ToString(), eventStack.top(), objectMap,  eventPtr);
+						string temp = ToBool4(nullptr, global, val->ToString(), _excuteData);
 
 						module_value = temp;
 					}
@@ -2283,10 +2615,17 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 				}
 				// make sort stable.
 				else if ("$sort" == val->GetName()) {
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
 					vector<SortInfo> siVec;
 					wiz::load_data::UserType* utTemp =
 						wiz::load_data::UserType::Find(&global,
-							ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr)).second[0];
+							ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData)).second[0];
 
 					vector<wiz::load_data::Type*> temp;
 
@@ -2322,19 +2661,26 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 					utTemp->Remove();
 					
 					//cf) chk? *utTemp = ut;
-					wiz::load_data::LoadData::AddData(*(utTemp), "", ut.ToString(), "TRUE", objectMap, eventPtr, info);
+					wiz::load_data::LoadData::AddData(*(utTemp), "", ut.ToString(), "TRUE", _excuteData);
 
 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$sort2" == val->GetName()) { // colName -> just one! ? 
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
 					/// condition = has just one? in one usertype!
 					vector<SortInfo> siVec;
 					wiz::load_data::UserType* utTemp =
 						wiz::load_data::UserType::Find(&global,
-							ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr)).second[0];
-					const string colName = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  eventPtr);
+							ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData)).second[0];
+					const string colName = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
 
 					vector<wiz::load_data::Type*> temp;
 
@@ -2375,7 +2721,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 					utTemp->RemoveUserTypeList();
 
 					//cf) chk? *utTemp = ut;
-					wiz::load_data::LoadData::AddData(*(utTemp), "", ut.ToString(), "TRUE", objectMap, eventPtr, info);
+					wiz::load_data::LoadData::AddData(*(utTemp), "", ut.ToString(), "TRUE", _excuteData);
 
 
 					eventStack.top().userType_idx.top()++;
@@ -2383,11 +2729,18 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 				}
 				else if ("$sort2_dsc" == val->GetName()) { // colName -> just one! ? 
 													   /// condition = has just one? in one usertype!
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
 					vector<SortInfo2> siVec;
 					wiz::load_data::UserType* utTemp =
 						wiz::load_data::UserType::Find(&global,
-							ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr)).second[0];
-					const string colName = ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(1)->ToString(), eventStack.top(), objectMap,  eventPtr);
+							ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData)).second[0];
+					const string colName = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
 
 					vector<wiz::load_data::Type*> temp;
 
@@ -2428,7 +2781,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 					utTemp->RemoveUserTypeList();
 
 					//cf) chk? *utTemp = ut;
-					wiz::load_data::LoadData::AddData(*(utTemp), "", ut.ToString(), "TRUE", objectMap, eventPtr, info);
+					wiz::load_data::LoadData::AddData(*(utTemp), "", ut.ToString(), "TRUE", _excuteData);
 
 
 					eventStack.top().userType_idx.top()++;
@@ -2436,12 +2789,19 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 				}
 				// removal?
 				else if ("$stable_sort" == val->GetName()) {
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
 					// todo
 					// todo
 					vector<SortInfo> siVec;
 					wiz::load_data::UserType* utTemp =
 						wiz::load_data::UserType::Find(&global,
-							ToBool4(nullptr, global, eventStack.top().parameters, val->GetUserTypeList(0)->ToString(), eventStack.top(), objectMap,  eventPtr)).second[0];
+							ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData)).second[0];
 
 					vector<wiz::load_data::Type*> temp;
 
@@ -2476,7 +2836,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 
 					utTemp->Remove();
 
-					wiz::load_data::LoadData::AddData(*(utTemp), "", ut.ToString(), "TRUE", objectMap, eventPtr, info);
+					wiz::load_data::LoadData::AddData(*(utTemp), "", ut.ToString(), "TRUE", _excuteData);
 
 
 					eventStack.top().userType_idx.top()++;
@@ -2484,8 +2844,15 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, w
 				}
 				else if ("$if" == val->GetName()) // ToDo!!
 				{
+					ExcuteData _excuteData;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
 					string temp = val->GetUserTypeList(0)->ToString();
-					temp = ToBool4(nullptr, global, eventStack.top().parameters, temp, eventStack.top(), objectMap,  eventPtr);
+					temp = ToBool4(nullptr, global, temp, _excuteData);
 
 					if (!eventStack.top().conditionStack.empty())
 					{
@@ -2603,7 +2970,7 @@ int main(int argc, char* argv[])
 		wiz::load_data::LoadData::LoadDataFromFile(fileName, global);
 
 		cout << "fileName is " << fileName << endl;
-		cout << "excute result is " << excute_module("", &global) << endl;
+		cout << "excute result is " << excute_module("", &global, ExcuteData()) << endl;
 		//_getch(); // pause..
 	}
 	catch (const char* str) {

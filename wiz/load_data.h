@@ -45,6 +45,8 @@ namespace wiz {
 	};
 }
 
+
+
 #include <wiz/load_data_types.h>
 #include <wiz/load_data_utility.h>
 #include <wiz/load_data_reservers.h>
@@ -53,9 +55,6 @@ namespace wiz {
 const string LEFT = "{";
 const string RIGHT = "}";
 const string EQ_STR = "="; // EQ 충돌 -> EQ_STR로 변경
-
-const int RIGHT_DO = 1;
-
 
 class EventInfo
 {
@@ -74,6 +73,22 @@ public:
 	EventInfo() : eventUT(nullptr), return_value("")
 	{
 
+	}
+};
+
+class ExcuteData
+{
+public:
+	wiz::load_data::UserType* pEvents;
+	EventInfo info; // chk!
+	bool chkInfo;
+	map<string, wiz::load_data::UserType>* pObjectMap;
+	map<string, wiz::load_data::UserType>* pModule;
+public:
+	explicit ExcuteData()
+		: pEvents(nullptr), pObjectMap(nullptr), pModule(nullptr), chkInfo(false)
+	{
+		//
 	}
 };
 
@@ -154,13 +169,12 @@ public:
 	}
 };
 
-string excute_module(const string& str, wiz::load_data::UserType* _global, wiz::load_data::UserType* pEvents = nullptr,
-	const std::shared_ptr<EventInfo>& pInfo = nullptr);
+string excute_module(const string& mainStr, wiz::load_data::UserType* _global, const ExcuteData& excuteData);
 
 namespace wiz {
 		
 	namespace load_data {
-		string ToBool4(wiz::load_data::UserType* now, wiz::load_data::UserType& global, const map<string, string>& parameters, const string& temp, EventInfo info, map<string, string>& objectMap, wiz::load_data::UserType* pEvents);
+		string ToBool4(wiz::load_data::UserType* now, wiz::load_data::UserType& global, const string& str, const ExcuteData& excuteData);
 	
 		class LoadData
 		{
@@ -669,58 +683,44 @@ namespace wiz {
 				return AllRemoveWizDB(global);
 			}
 			// AddQuery AddData, AddUserTypeData
-			bool AddData(const string& position, const string& data, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info) {
-				return AddData(global, position, data, condition, objectMap, pEvents, info);
+			bool AddData(const string& position, const string& data, const string& condition, const ExcuteData& excuteData) {
+				return AddData(global, position, data, condition, excuteData);
 			}
 			// 
-			bool AddNoNameUserType(const string& position, const string& data, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
+			bool AddNoNameUserType(const string& position, const string& data, const string& condition, const ExcuteData& excuteData)
 			{
-				return AddNoNameUserType(global, position, data, condition, objectMap, pEvents, info);
+				return AddNoNameUserType(global, position, data, condition, excuteData);
 			}
 			// SetQuery
-			bool SetData(const string& position, const string& varName, const string& data, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
+			bool SetData(const string& position, const string& varName, const string& data, const string& condition, const ExcuteData& excuteData)
 			{
-				return SetData(global, position, varName, data, condition, objectMap, pEvents, info);
+				return SetData(global, position, varName, data, condition, excuteData);
 			}
 			/// 
-			string GetData(const string& position, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)  {
-				return GetData(global, position, condition, objectMap, pEvents, info);
+			string GetData(const string& position, const string& condition, const ExcuteData& excuteData)  {
+				return GetData(global, position, condition, excuteData);
 			}
-			string GetItemListData(const string& position, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
+			string GetItemListData(const string& position, const string& condition, const ExcuteData& excuteData)
 			{
-				return GetItemListData(global, position, condition, objectMap, pEvents, info);
+				return GetItemListData(global, position, condition, excuteData);
 			}
-			string GetItemListNamesData(const string& position, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
+			string GetItemListNamesData(const string& position, const string& condition, const ExcuteData& excuteData)
 			{
-				return GetItemListNamesData(global, position, condition, objectMap, pEvents, info);
+				return GetItemListNamesData(global, position, condition, excuteData);
 			}
-			string GetUserTypeListNamesData(const string& position, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
+			string GetUserTypeListNamesData(const string& position, const string& condition, const ExcuteData& excuteData)
 			{
-				return GetUserTypeListNamesData(global, position, condition, objectMap, pEvents, info);
+				return GetUserTypeListNamesData(global, position, condition, excuteData);
 			}
 			/// varName = val - do
 			/// varName = { val val val } - GetData(position+"/varName", ""); 
 			/// varName = { var = val } - GetData(position+"/varname", var);
-			string GetData(const string& position, const string& varName, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info) // 
+			string GetData(const string& position, const string& varName, const string& condition, const ExcuteData& excuteData) // 
 			{
-				return GetData(global, position, varName, condition, objectMap, pEvents, info);
+				return GetData(global, position, varName, condition, excuteData);
 			}
-			/*
-			bool RemoveData(const string& position) {
-			auto finded = Find(global, position);
-			if (finded.first) {
-			for (int i = 0; i < finded.second.size(); ++i) {
-			finded.second[i]->Remove(); // todo - ����..
-			}
-			return true;
-			}
-			else {
-			return false;
-			}
-			}
-			*/
-			bool Remove(const string& position, const string& var, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info) {
-				return Remove(global, position, var, condition, objectMap, pEvents, info);
+			bool Remove(const string& position, const string& var, const string& condition, const ExcuteData& excuteData) {
+				return Remove(global, position, var, condition, excuteData);
 			}
 
 			bool LoadWizDB(const string& fileName) {
@@ -732,35 +732,35 @@ namespace wiz {
 			}
 
 			/// To Do - ExistItem, ExistUserType, SetUserType GetUserType
-			bool ExistData(const string& position, const string& varName, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info) // 
+			bool ExistData(const string& position, const string& varName, const string& condition, const ExcuteData& excuteData) // 
 			{
-				return ExistData(global, position, varName, condition, objectMap, pEvents, info);
+				return ExistData(global, position, varName, condition, excuteData);
 			}
 
 			/// ToDo - recursive function
-			string SearchItem(const string& var, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
+			string SearchItem(const string& var, const string& condition, const ExcuteData& excuteData)
 			{
-				return SearchItem(global, var, condition, objectMap, pEvents, info);
+				return SearchItem(global, var, condition, excuteData);
 			}
-			string SearchUserType(const string& var, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
+			string SearchUserType(const string& var, const string& condition, const ExcuteData& excuteData)
 			{
-				return SearchUserType(global, var, condition, objectMap, pEvents, info);
+				return SearchUserType(global, var, condition, excuteData);
 			}
 		private:
 			void SearchItem(vector<string>& positionVec, const string& var, const string& nowPosition,
-				UserType* ut, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
+				UserType* ut, const string& condition, const ExcuteData& excuteData)
 			{
-				SearchItem(global, positionVec, var, nowPosition, ut, condition, objectMap, pEvents, info);
+				SearchItem(global, positionVec, var, nowPosition, ut, condition, excuteData);
 			}
 			void SearchUserType(vector<string>& positionVec, const string& var, const string& nowPosition,
-				UserType* ut, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
+				UserType* ut, const string& condition, const ExcuteData& excuteData)
 			{
-				SearchUserType(global, positionVec, var, nowPosition, ut, condition, objectMap, pEvents, info);
+				SearchUserType(global, positionVec, var, nowPosition, ut, condition, excuteData);
 			}
 		private:
 			// chk - Search(item or usertype) : add ~~~ (option?)?? and ToBool4? // chk more thinking!!
 			static void SearchItem(UserType& global, vector<string>& positionVec, const string& var, const string& nowPosition,
-				UserType* ut, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
+				UserType* ut, const string& condition, const ExcuteData& excuteData)
 			{
 				string _var = var;
 				if (_var == " ") { _var = ""; }
@@ -772,7 +772,7 @@ namespace wiz {
 						_condition = wiz::String::replace(_condition, "~~", _var); //
 					
 					_condition = wiz::String::replace(_condition, "////", nowPosition);
-					_condition = ToBool4(ut, global, info.parameters, _condition, info, objectMap, pEvents);
+					_condition = ToBool4(ut, global, _condition, excuteData);
 					
 					Condition cond(_condition, ut, &global);
 
@@ -795,15 +795,13 @@ namespace wiz {
 						nowPosition + "/" + temp,
 						ut->GetUserTypeList(i),
 						condition,
-						objectMap,
-						pEvents,
-						info
+						excuteData
 					);
 				}
 			}
 
 			static void SearchUserType(UserType& global, vector<string>& positionVec, const string& var, const string& nowPosition,
-				UserType* ut, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
+				UserType* ut, const string& condition, const ExcuteData& excuteData)
 			{
 				string _var = var;
 				if (_var == " ") {
@@ -817,7 +815,7 @@ namespace wiz {
 
 
 					_condition = wiz::String::replace(_condition, "////", nowPosition);
-					_condition = ToBool4(ut, global, info.parameters, _condition, info, objectMap, pEvents);
+					_condition = ToBool4(ut, global, _condition, excuteData);
 
 					Condition cond(_condition, ut, &global);
 
@@ -840,9 +838,7 @@ namespace wiz {
 						nowPosition + "/" + temp,
 						ut->GetUserTypeList(i),
 						condition,
-						objectMap,
-						pEvents,
-						info
+						excuteData
 					);
 				}
 			}
@@ -858,7 +854,7 @@ namespace wiz {
 				return true;
 			}
 			// AddQuery AddData, AddUserTypeData
-			static bool AddDataAtFront(UserType& global, const string& position, const string& data, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info) {
+			static bool AddDataAtFront(UserType& global, const string& position, const string& data, const string& condition, const ExcuteData& excuteData) {
 				UserType utTemp = UserType("global");
 				bool isTrue = false;
 
@@ -878,7 +874,7 @@ namespace wiz {
 						if (false == condition.empty()) {
 							string _condition = condition;
 
-							_condition = ToBool4(finded.second[i], global, info.parameters, _condition, info, objectMap, pEvents);
+							_condition = ToBool4(finded.second[i], global, _condition, excuteData);
 
 							Condition cond(_condition, finded.second[i], &global);
 
@@ -909,7 +905,7 @@ namespace wiz {
 					return false;
 				}
 			}
-			static bool AddData(UserType& global, const string& position, const string& data, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info) {
+			static bool AddData(UserType& global, const string& position, const string& data, const string& condition, const ExcuteData& excuteData) {
 				UserType utTemp = UserType("global");
 				bool isTrue = false;
 
@@ -926,7 +922,7 @@ namespace wiz {
 						if (false == condition.empty()) {
 							string _condition = condition;
 							
-							_condition = ToBool4(finded.second[i], global, info.parameters, _condition, info, objectMap, pEvents);
+							_condition = ToBool4(finded.second[i], global,  _condition, excuteData);
 
 							Condition cond(_condition, finded.second[i], &global);
 
@@ -957,7 +953,7 @@ namespace wiz {
 					return false;
 				}
 			}
-			static bool Insert(UserType& global, const string& position, const int idx, const string& data, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info) {
+			static bool Insert(UserType& global, const string& position, const int idx, const string& data, const string& condition, const ExcuteData& excuteData) {
 				UserType utTemp = UserType("global");
 				bool isTrue = false;
 
@@ -977,7 +973,7 @@ namespace wiz {
 						if (false == condition.empty()) {
 							string _condition = condition;
 
-							_condition = ToBool4(finded.second[i], global, info.parameters, _condition, info, objectMap, pEvents);
+							_condition = ToBool4(finded.second[i], global, _condition, excuteData);
 							
 							Condition cond(_condition, finded.second[i], &global);
 
@@ -1009,7 +1005,7 @@ namespace wiz {
 					return false;
 				}
 			}
-			static bool AddNoNameUserType(UserType& global, const string& position, const string& data, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
+			static bool AddNoNameUserType(UserType& global, const string& position, const string& data, const string& condition, const ExcuteData& excuteData)
 			{
 				UserType utTemp = UserType("");
 				bool isTrue = false;
@@ -1029,7 +1025,7 @@ namespace wiz {
 						///~end
 						if (false == condition.empty()) {
 							string _condition = condition;
-							_condition = ToBool4(finded.second[i], global, info.parameters, _condition, info, objectMap, pEvents);
+							_condition = ToBool4(finded.second[i], global, _condition, excuteData);
 
 							Condition cond(_condition, finded.second[i], &global);
 
@@ -1053,7 +1049,7 @@ namespace wiz {
 			}
 
 			// todo - find example code?  a/b/c/d/e/f/ ??
-			static bool AddUserType(UserType& global, const string& position, const string& var, const string& data, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
+			static bool AddUserType(UserType& global, const string& position, const string& var, const string& data, const string& condition, const ExcuteData& excuteData)
 			{
 				bool isTrue = false;
 				auto finded = UserType::Find(&global, position);
@@ -1113,7 +1109,7 @@ namespace wiz {
 									else
 										_condition = wiz::String::replace(_condition, "~~", utName); //
 
-									_condition = ToBool4(finded.second[i], global, info.parameters, _condition, info, objectMap, pEvents);
+									_condition = ToBool4(finded.second[i], global, _condition, excuteData);
 																									 //	cout << "condition is " << _condition << endl;
 
 									Condition cond(_condition, finded.second[i], &global);
@@ -1143,7 +1139,7 @@ namespace wiz {
 				}
 			}
 			/// SetData - Re Do!
-			static bool SetData(UserType& global, const string& position, const string& varName, const string& data, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
+			static bool SetData(UserType& global, const string& position, const string& varName, const string& data, const string& condition, const ExcuteData& excuteData)
 			{
 				auto finded = UserType::Find(&global, position);
 				bool isTrue = false;
@@ -1168,7 +1164,7 @@ namespace wiz {
 									else
 										_condition = wiz::String::replace(_condition, "~~", _varName); //
 									
-									_condition = ToBool4(finded.second[i], global, info.parameters, _condition, info, objectMap, pEvents);
+									_condition = ToBool4(finded.second[i], global, _condition, excuteData);
 
 									Condition cond(_condition, finded.second[i], &global);
 
@@ -1224,7 +1220,7 @@ namespace wiz {
 										else
 											_condition = wiz::String::replace(_condition, "~~", _varName); //
 
-										_condition = ToBool4(finded.second[i], global, info.parameters, _condition, info, objectMap, pEvents);
+										_condition = ToBool4(finded.second[i], global, _condition, excuteData);
 
 										Condition cond(_condition, finded.second[i], &global);
 
@@ -1252,7 +1248,7 @@ namespace wiz {
 				}
 			}
 
-			static bool SetData(UserType& global, const string& position, const int var_idx, const string& data, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
+			static bool SetData(UserType& global, const string& position, const int var_idx, const string& data, const string& condition, const ExcuteData& excuteData)
 			{
 				auto finded = UserType::Find(&global, position);
 				bool isTrue = false;
@@ -1270,7 +1266,7 @@ namespace wiz {
 								string _condition = condition;
 
 
-								_condition = ToBool4(finded.second[i], global, info.parameters, _condition, info, objectMap, pEvents);
+								_condition = ToBool4(finded.second[i], global, _condition, excuteData);
 
 								Condition cond(_condition, finded.second[i], &global);
 
@@ -1296,7 +1292,7 @@ namespace wiz {
 				}
 			}
 			/// 
-			static string GetData(UserType& global, const string& position, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info) {
+			static string GetData(UserType& global, const string& position, const string& condition, const ExcuteData& excuteData) {
 				string str;
 				auto finded = UserType::Find(&global, position);
 				if (finded.first) {
@@ -1304,7 +1300,7 @@ namespace wiz {
 						if (false == condition.empty()) {
 							string _condition = condition;
 
-							_condition = ToBool4(finded.second[i], global, info.parameters, _condition, info, objectMap, pEvents);
+							_condition = ToBool4(finded.second[i], global, _condition, excuteData);
 
 							Condition cond(_condition, finded.second[i], &global);
 
@@ -1324,7 +1320,7 @@ namespace wiz {
 					return "";
 				}
 			}
-			static string GetItemListData(UserType& global, const string& position, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
+			static string GetItemListData(UserType& global, const string& position, const string& condition, const ExcuteData& excuteData)
 			{
 				string str;
 				auto finded = UserType::Find(&global, position);
@@ -1333,7 +1329,7 @@ namespace wiz {
 						if (false == condition.empty()) {
 							string _condition = condition;
 							
-							_condition = ToBool4(finded.second[i], global, info.parameters, _condition, info, objectMap, pEvents);
+							_condition = ToBool4(finded.second[i], global, _condition, excuteData);
 
 							Condition cond(_condition, finded.second[i], &global);
 
@@ -1353,7 +1349,7 @@ namespace wiz {
 					return "";
 				}
 			}
-			static string GetItemListNamesData(UserType& global, const string& position, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
+			static string GetItemListNamesData(UserType& global, const string& position, const string& condition, const ExcuteData& excuteData)
 			{
 				string str;
 				auto finded = UserType::Find(&global, position);
@@ -1362,7 +1358,7 @@ namespace wiz {
 						if (false == condition.empty()) {
 							string _condition = condition;
 
-							_condition = ToBool4(finded.second[i], global, info.parameters, _condition, info, objectMap, pEvents);
+							_condition = ToBool4(finded.second[i], global, _condition, excuteData);
 
 							Condition cond(_condition, finded.second[i], &global);
 
@@ -1382,7 +1378,7 @@ namespace wiz {
 					return "";
 				}
 			}
-			static string GetUserTypeListNamesData(UserType& global, const string& position, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
+			static string GetUserTypeListNamesData(UserType& global, const string& position, const string& condition, const ExcuteData& excuteData)
 			{
 				string str;
 				auto finded = UserType::Find(&global, position);
@@ -1391,7 +1387,7 @@ namespace wiz {
 						if (false == condition.empty()) {
 							string _condition = condition;
 
-							_condition = ToBool4(finded.second[i], global, info.parameters, _condition, info, objectMap, pEvents);
+							_condition = ToBool4(finded.second[i], global, _condition, excuteData);
 
 							Condition cond(_condition, finded.second[i], &global);
 
@@ -1414,7 +1410,7 @@ namespace wiz {
 			/// varName = val - do
 			/// varName = { val val val } - GetData(position+"/varName", ""); 
 			/// varName = { var = val } - GetData(position+"/varname", var);
-			static string GetData(UserType& global, const string& position, const string& varName, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info) // 
+			static string GetData(UserType& global, const string& position, const string& varName, const string& condition, const ExcuteData& excuteData) // 
 			{
 				string str;
 				string _var = varName;
@@ -1431,7 +1427,7 @@ namespace wiz {
 							else
 								_condition = wiz::String::replace(_condition, "~~", _var); /// varName -> _var.
 							
-							_condition = ToBool4(finded.second[i], global, info.parameters, _condition, info, objectMap, pEvents);
+							_condition = ToBool4(finded.second[i], global, _condition, excuteData);
 
 							Condition cond(_condition, finded.second[i], &global);
 
@@ -1453,7 +1449,7 @@ namespace wiz {
 				return str;
 			}
 
-			static bool Remove(UserType& global, const string& position, const string& var, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info) {
+			static bool Remove(UserType& global, const string& position, const string& var, const string& condition, const ExcuteData& excuteData) {
 				auto finded = UserType::Find(&global, position);
 				bool isTrue = false;
 
@@ -1501,7 +1497,7 @@ namespace wiz {
 									else
 										_condition = wiz::String::replace(_condition, "~~", _var); //
 									
-									_condition = ToBool4(finded.second[i], global, info.parameters, _condition, info, objectMap, pEvents);
+									_condition = ToBool4(finded.second[i], global, _condition, excuteData);
 
 									Condition cond(_condition, finded.second[i], &global);
 									while (cond.Next());
@@ -1528,7 +1524,7 @@ namespace wiz {
 					return false;
 				}
 			}
-			static bool Remove(UserType& global, const string& position, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info) {
+			static bool Remove(UserType& global, const string& position, const string& condition, const ExcuteData& excuteData) {
 				auto finded = UserType::Find(&global, position);
 				bool isTrue = false;
 
@@ -1539,7 +1535,7 @@ namespace wiz {
 						if (false == condition.empty()) {
 							string _condition = condition;
 
-							_condition = ToBool4(finded.second[i], global, info.parameters, _condition, info, objectMap, pEvents);
+							_condition = ToBool4(finded.second[i], global, _condition, excuteData);
 							
 							Condition cond(_condition, finded.second[i], &global);
 
@@ -1561,7 +1557,7 @@ namespace wiz {
 					return false;
 				}
 			}
-			static bool RemoveUserType(UserType& global, const string& position, const string& name, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info) {
+			static bool RemoveUserType(UserType& global, const string& position, const string& name, const string& condition, const ExcuteData& excuteData) {
 				auto finded = UserType::Find(&global, position);
 				bool isTrue = false;
 
@@ -1572,7 +1568,7 @@ namespace wiz {
 						if (false == condition.empty()) {
 							string _condition = condition;
 
-							_condition = ToBool4(finded.second[i], global, info.parameters, _condition, info, objectMap, pEvents);
+							_condition = ToBool4(finded.second[i], global, _condition, excuteData);
 
 							Condition cond(_condition, finded.second[i], &global);
 
@@ -1594,7 +1590,7 @@ namespace wiz {
 					return false;
 				}
 			}
-			static bool RemoveItemType(UserType& global, const string& position, const string& name, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info) {
+			static bool RemoveItemType(UserType& global, const string& position, const string& name, const string& condition, const ExcuteData& excuteData) {
 				auto finded = UserType::Find(&global, position);
 				bool isTrue = false;
 
@@ -1605,7 +1601,7 @@ namespace wiz {
 						if (false == condition.empty()) {
 							string _condition = condition;
 
-							_condition = ToBool4(finded.second[i], global, info.parameters, _condition, info, objectMap, pEvents);
+							_condition = ToBool4(finded.second[i], global, _condition, excuteData);
 
 							Condition cond(_condition, finded.second[i], &global);
 
@@ -1628,8 +1624,8 @@ namespace wiz {
 				}
 			}
 
-			// todo - static bool Remove(UserType& global, const string& positiion, oonst int idx, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
-			static bool Remove(UserType& global, const string& position, const int idx, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info) {
+			// todo - static bool Remove(UserType& global, const string& positiion, oonst int idx, const string& condition, const ExcuteData& excuteData)
+			static bool Remove(UserType& global, const string& position, const int idx, const string& condition, const ExcuteData& excuteData) {
 				auto finded = UserType::Find(&global, position);
 				bool isTrue = false;
 
@@ -1640,7 +1636,7 @@ namespace wiz {
 						if (false == condition.empty()) {
 							string _condition = condition;
 							
-							_condition = ToBool4(finded.second[i], global, info.parameters, _condition, info, objectMap, pEvents);
+							_condition = ToBool4(finded.second[i], global, _condition, excuteData);
 
 							Condition cond(_condition, finded.second[i], &global);
 
@@ -1700,7 +1696,7 @@ namespace wiz {
 			}
 
 			/// To Do - ExistItem, ExistUserType, SetUserType GetUserType
-			static bool ExistData(UserType& global, const string& position, const string& varName, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info) // 
+			static bool ExistData(UserType& global, const string& position, const string& varName, const string& condition, const ExcuteData& excuteData) // 
 			{
 				int count = 0;
 				string _var = varName;
@@ -1712,7 +1708,7 @@ namespace wiz {
 						if (false == condition.empty()) {
 							string _condition = condition;
 							
-							_condition = ToBool4(finded.second[i], global, info.parameters, _condition, info, objectMap, pEvents);
+							_condition = ToBool4(finded.second[i], global, _condition, excuteData);
 
 							Condition cond(_condition, finded.second[i], &global);
 
@@ -1730,7 +1726,7 @@ namespace wiz {
 				return 0 != count;
 			}
 			static bool ExistUserType(UserType& global, const string& position, const string& condition, 
-				map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info) // 
+				const ExcuteData& excuteData) // 
 			{
 				int count = 0;
 
@@ -1740,7 +1736,7 @@ namespace wiz {
 						if (false == condition.empty()) {
 							string _condition = condition;
 							
-							_condition = ToBool4(finded.second[i], global, info.parameters, _condition, info, objectMap, pEvents);
+							_condition = ToBool4(finded.second[i], global, _condition, excuteData);
 
 							Condition cond(_condition, finded.second[i], &global);
 
@@ -1758,7 +1754,7 @@ namespace wiz {
 				return 0 != count;
 			}
 			static bool ExistOneUserType(UserType& global, const string& position, const string& condition, 
-				map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info) // 
+				const ExcuteData& excuteData) // 
 			{
 				int count = 0;
 
@@ -1771,7 +1767,7 @@ namespace wiz {
 						if (false == condition.empty()) {
 							string _condition = condition;
 							
-							_condition = ToBool4(finded.second[i], global, info.parameters, _condition, info, objectMap, pEvents);
+							_condition = ToBool4(finded.second[i], global, _condition, excuteData);
 							
 							Condition cond(_condition, finded.second[i], &global);
 
@@ -1789,7 +1785,7 @@ namespace wiz {
 				return 1 == count;
 			}
 			static bool ExistItem(UserType& global, const string& position, const string& varName, const string& condition, 
-				map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info) // 
+				const ExcuteData& excuteData) // 
 			{
 				int count = 0;
 				string _var = varName;
@@ -1801,7 +1797,7 @@ namespace wiz {
 						if (false == condition.empty()) {
 							string _condition = condition;
 							
-							_condition = ToBool4(finded.second[i], global, info.parameters, _condition, info, objectMap, pEvents);
+							_condition = ToBool4(finded.second[i], global, _condition, excuteData);
 
 							Condition cond(_condition, finded.second[i], &global);
 
@@ -1822,13 +1818,13 @@ namespace wiz {
 			/// ToDo - global, position, var, condition + var is " "!
 			// "root" -> position.
 			static string SearchItem(UserType& global, const string& var, const string& condition, 
-				map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info, 
+				const ExcuteData& excuteData, 
 				const string& start_dir = "root")
 			{
 				vector<string> positionVec;
 				string temp;
 
-				SearchItem(global, positionVec, var, start_dir, &global, condition, objectMap, pEvents, info);
+				SearchItem(global, positionVec, var, start_dir, &global, condition, excuteData);
 
 				for (int i = 0; i < positionVec.size(); ++i)
 				{
@@ -1838,12 +1834,12 @@ namespace wiz {
 				return temp;
 			}
 			static string SearchUserType(UserType& global, const string& var, const string& condition, 
-				map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
+				const ExcuteData& excuteData)
 			{
 				vector<string> positionVec;
 				string temp;
 
-				SearchUserType(global, positionVec, var, "root", &global, condition, objectMap, pEvents, info);
+				SearchUserType(global, positionVec, var, "root", &global, condition, excuteData);
 
 				for (int i = 0; i < positionVec.size(); ++i)
 				{
@@ -1853,53 +1849,53 @@ namespace wiz {
 				return temp;
 			}
 			static void ReplaceItem(UserType& global, const string& var, const string& val, const string& condition, const string& start_dir,
-				map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
+				const ExcuteData& excuteData)
 			{
 				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
-				ReplaceItem(global, var, start_dir, ut, val, condition, objectMap, pEvents, info);
+				ReplaceItem(global, var, start_dir, ut, val, condition, excuteData);
 			}
 			static void RemoveUserTypeTotal(UserType& global, const string& ut_name, const string& condition, const string& start_dir,
-				map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info) 
+				const ExcuteData& excuteData) 
 			{
 				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
-				RemoveUserTypeTotal(global, ut_name, start_dir, ut, condition, objectMap, pEvents, info);
+				RemoveUserTypeTotal(global, ut_name, start_dir, ut, condition, excuteData);
 			}
 			static void ReplaceDateType(UserType& global, const string& val, const string& condition, const string& start_dir,
-				map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info
+				const ExcuteData& excuteData
 			) {
 				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
-				ReplaceDateType(global, start_dir, ut, val, condition, objectMap, pEvents, info);
+				ReplaceDateType(global, start_dir, ut, val, condition, excuteData);
 			}
 			static void ReplaceDateType2(UserType& global, const string& val, const string& condition, const string& start_dir,
-				map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info) 
+				const ExcuteData& excuteData) 
 			{
 				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
-				ReplaceDateType2(global, start_dir, ut, val, condition, objectMap, pEvents, info);
+				ReplaceDateType2(global, start_dir, ut, val, condition, excuteData);
 			}
 			static void ReplaceDataType1(UserType& global, const string& rex, const vector<string>& val, const vector<string>& condition,
-				const string& start_dir, map<string, string>& objectMap,  wiz::load_data::UserType* pEvents, const EventInfo& info) 
+				const string& start_dir, const ExcuteData& excuteData) 
 			{
 				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
 				std::regex rgx(rex);
-				ReplaceDataType1(global, start_dir, ut, rgx, val, condition, objectMap,  pEvents, info);
+				ReplaceDataType1(global, start_dir, ut, rgx, val, condition, excuteData);
 			}
 			static void ReplaceDataType1_2(UserType& global, const string& rex, const vector<string>& val, const vector<string>& condition,
-				const string& start_dir, map<string, string>& objectMap,  wiz::load_data::UserType* pEvents, const EventInfo& info) 
+				const string& start_dir, const ExcuteData& excuteData) 
 			{
 				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
 				std::regex rgx(rex);
-				ReplaceDataType1_2(global, start_dir, ut, rgx, val, condition, objectMap,  pEvents, info);
+				ReplaceDataType1_2(global, start_dir, ut, rgx, val, condition, excuteData);
 			}
 			static void ReplaceDataType2(UserType& global, const string& rex, const vector<string>& val, const vector<string>& condition,
-				const string& start_dir, map<string, string>& objectMap,  wiz::load_data::UserType* pEvents, const EventInfo& info)
+				const string& start_dir, const ExcuteData& excuteData)
 			{
 				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
 				std::regex rgx(rex);
-				ReplaceDataType2(global, start_dir, ut, rgx, val, condition, objectMap,  pEvents, info);
+				ReplaceDataType2(global, start_dir, ut, rgx, val, condition, excuteData);
 			}
 		private:
 			static void ReplaceItem(UserType& global, const string& var, const string& nowPosition,
-				UserType* ut, const string& val, const string& condition, map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
+				UserType* ut, const string& val, const string& condition, const ExcuteData& excuteData)
 			{
 				string _var = var;
 				if (_var == " ") { _var = ""; }
@@ -1915,7 +1911,7 @@ namespace wiz {
 						}
 						_condition = wiz::String::replace(_condition, "////", nowPosition);
 						_condition = wiz::String::replace(_condition, "///", wiz::_toString(i));
-						_condition = ToBool4(ut, global, info.parameters, _condition, info, objectMap, pEvents);
+						_condition = ToBool4(ut, global, _condition, excuteData);
 
 						Condition cond(_condition, ut, &global);
 
@@ -1929,7 +1925,7 @@ namespace wiz {
 	
 							_val = wiz::String::replace(_val, "////", nowPosition);
 							_val = wiz::String::replace(_val, "///", wiz::_toString(i));
-							_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
+							_val = ToBool4(ut, global, _val, excuteData);
 
 							ut->GetItemList(i).Set(0, _val);
 						}
@@ -1946,15 +1942,13 @@ namespace wiz {
 						ut->GetUserTypeList(i),
 						val,
 						condition,
-						objectMap,
-						pEvents,
-						info
+						excuteData
 					);
 				}
 			}
 			static void RemoveUserTypeTotal(UserType& global, const string& ut_name, const string& nowPosition,
 				UserType* ut, const string& condition, 
-				map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
+				const ExcuteData& excuteData)
 			{
 				string _var = ut_name;
 				
@@ -1971,7 +1965,7 @@ namespace wiz {
 
 						_condition = wiz::String::replace(_condition, "////", nowPosition);
 
-						_condition = ToBool4(ut, global, info.parameters, _condition, info, objectMap, pEvents);
+						_condition = ToBool4(ut, global, _condition, excuteData);
 
 						Condition cond(_condition, ut, &global);
 
@@ -1994,15 +1988,13 @@ namespace wiz {
 						nowPosition + "/" + temp,
 						ut->GetUserTypeList(i),
 						condition,
-						objectMap,
-						pEvents,
-						info
+						excuteData
 					);
 				}
 			}
 			static void ReplaceDateType(UserType& global, const string& nowPosition,
 				UserType* ut, const string& val, const string& condition, 
-				map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
+				const ExcuteData& excuteData)
 			{
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
 					if (Utility::IsDate(ut->GetItemList(i).GetName()) || Utility::IsDate(ut->GetItemList(i).Get(0))) {
@@ -2014,7 +2006,7 @@ namespace wiz {
 						_condition = wiz::String::replace(_condition, "~~", _var); //
 						_condition = wiz::String::replace(_condition, "////", nowPosition);
 						_condition = wiz::String::replace(_condition, "///", wiz::_toString(i));
-						_condition = ToBool4(ut, global, info.parameters, _condition, info, objectMap, pEvents);
+						_condition = ToBool4(ut, global, _condition, excuteData);
 						
 						Condition cond(_condition, ut, &global);
 
@@ -2027,7 +2019,7 @@ namespace wiz {
 
 							_val = wiz::String::replace(_val, "////", nowPosition);
 							_val = wiz::String::replace(_val, "///", wiz::_toString(i));
-							_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
+							_val = ToBool4(ut, global, _val, excuteData);
 
 							if (Utility::IsDate(ut->GetItemList(i).GetName())) {
 								ut->GetItemList(i).SetName(_val);
@@ -2049,15 +2041,13 @@ namespace wiz {
 						ut->GetUserTypeList(i),
 						val,
 						condition,
-						objectMap,
-						pEvents,
-						info
+						excuteData
 					);
 				}
 			}
 			static void ReplaceDateType2(UserType& global, const string& nowPosition,
 				UserType* ut, const string& val, const string& condition, 
-				map<string, string>& objectMap, wiz::load_data::UserType* pEvents, const EventInfo& info)
+				const ExcuteData& excuteData)
 			{
 				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
 					string temp = ut->GetUserTypeList(i)->GetName();
@@ -2072,7 +2062,7 @@ namespace wiz {
 						_condition = wiz::String::replace(_condition, "~~", _var); //
 
 						_condition = wiz::String::replace(_condition, "////", nowPosition);
-						_condition = ToBool4(ut, global, info.parameters, _condition, info, objectMap, pEvents);
+						_condition = ToBool4(ut, global, _condition, excuteData);
 
 
 						Condition cond(_condition, ut, &global);
@@ -2084,7 +2074,7 @@ namespace wiz {
 							_val = wiz::String::replace(_val, "~~", _var); //
 
 							_val = wiz::String::replace(_val, "////", nowPosition);
-							_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
+							_val = ToBool4(ut, global, _val, excuteData);
 						
 							ut->GetUserTypeList(i)->SetName(_val);
 						}
@@ -2096,15 +2086,13 @@ namespace wiz {
 						ut->GetUserTypeList(i),
 						val,
 						condition,
-						objectMap,
-						pEvents,
-						info
+						excuteData
 					);
 				}
 			}
 			static void ReplaceDataType1(UserType& global, const string& nowPosition,
 				UserType* ut, const std::regex& rgx, const vector<string>& val, const vector<string>& condition, 
-				map<string, string>& objectMap,  wiz::load_data::UserType* pEvents, const EventInfo& info)
+				const ExcuteData& excuteData)
 			{
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
 					if (std::regex_match(ut->GetItemList(i).GetName(), rgx)) { // || Utility::IsDate(ut->GetItemList(i).Get(0))) {
@@ -2118,7 +2106,7 @@ namespace wiz {
 							_condition = wiz::String::replace(_condition, "~~", _var); //
 							_condition = wiz::String::replace(_condition, "////", nowPosition);
 							_condition = wiz::String::replace(_condition, "///", wiz::_toString(i));
-							_condition = ToBool4(ut, global, info.parameters, _condition, info, objectMap, pEvents);
+							_condition = ToBool4(ut, global, _condition, excuteData);
 
 
 							Condition cond(_condition, ut, &global);
@@ -2132,11 +2120,11 @@ namespace wiz {
 
 								_val = wiz::String::replace(_val, "////", nowPosition);
 								_val = wiz::String::replace(_val, "///", wiz::_toString(i));
-								_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
+								_val = ToBool4(ut, global, _val, excuteData);
 							
 								//if (_val[0] == '@') { _val.erase(_val.begin()); }
 								//_val = wiz::String::replace(_val, "~~", _var);
-								//_val = ToBool4(ut, global, map<string, string>(), _val, EventInfo(), objectMap,  pEvents);
+								//_val = ToBool4(ut, global, map<string, string>(), _val, EventInfo(), objectMapPtr,  excuteData.pEvents);
 
 								ut->GetItemList(i).SetName(_val);
 								break;
@@ -2156,15 +2144,13 @@ namespace wiz {
 						rgx,
 						val,
 						condition,
-						objectMap,
-						pEvents,
-						info
+						excuteData
 					);
 				}
 			}
 			static void ReplaceDataType1_2(UserType& global, const string& nowPosition,
 				UserType* ut, const std::regex& rgx, const vector<string>& val, const vector<string>& condition, 
-				map<string, string>& objectMap,  wiz::load_data::UserType* pEvents, const EventInfo& info)
+				const ExcuteData& excuteData)
 			{
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
 					if (std::regex_match(ut->GetItemList(i).GetName(), rgx)) { // || Utility::IsDate(ut->GetItemList(i).Get(0))) {
@@ -2178,7 +2164,7 @@ namespace wiz {
 							_condition = wiz::String::replace(_condition, "~~", _var); //
 							_condition = wiz::String::replace(_condition, "////", nowPosition);
 							_condition = wiz::String::replace(_condition, "///", wiz::_toString(i));
-							_condition = ToBool4(ut, global, info.parameters, _condition, info, objectMap, pEvents);
+							_condition = ToBool4(ut, global, _condition, excuteData);
 
 							Condition cond(_condition, ut, &global);
 
@@ -2190,12 +2176,12 @@ namespace wiz {
 								_val = wiz::String::replace(_val, "~~", _var); //
 								_val = wiz::String::replace(_val, "////", nowPosition);
 								_val = wiz::String::replace(_val, "///", wiz::_toString(i));
-								_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
+								_val = ToBool4(ut, global, _val, excuteData);
 							
 								// remove 3 lines?
 							//	if (_val[0] == '@') { _val.erase(_val.begin()); } // chk, same do(chk @) to other functions?
 							//	_val = wiz::String::replace(_val, "~~", _var);
-						//		_val = ToBool4(ut, global, map<string, string>(), _val, EventInfo(), objectMap,  pEvents); // chk!!
+						//		_val = ToBool4(ut, global, map<string, string>(), _val, EventInfo(), objectMapPtr,  excuteData.pEvents); // chk!!
 
 								ut->GetItemList(i).Set(0, _val);
 								break;
@@ -2215,15 +2201,13 @@ namespace wiz {
 						rgx,
 						val,
 						condition,
-						objectMap, 
-						pEvents,
-						info
+						excuteData
 					);
 				}
 			}
 			static void ReplaceDataType1_3(UserType& global, const string& nowPosition,
 				UserType* ut, const std::regex& rgx, const vector<string>& val, const vector<string>& condition, 
-				map<string, string>& objectMap,  wiz::load_data::UserType* pEvents, const EventInfo& info)
+				const ExcuteData& excuteData)
 			{
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
 					if (std::regex_match(ut->GetItemList(i).Get(0), rgx)) {
@@ -2238,7 +2222,7 @@ namespace wiz {
 							_condition = wiz::String::replace(_condition, "~~", _var); //
 							_condition = wiz::String::replace(_condition, "////", nowPosition);
 							_condition = wiz::String::replace(_condition, "///", wiz::_toString(i));
-							_condition = ToBool4(ut, global, info.parameters, _condition, info, objectMap, pEvents);
+							_condition = ToBool4(ut, global, _condition, excuteData);
 
 
 							Condition cond(_condition, ut, &global);
@@ -2251,11 +2235,11 @@ namespace wiz {
 								_val = wiz::String::replace(_val, "~~", _var); //
 								_val = wiz::String::replace(_val, "////", nowPosition);
 								_val = wiz::String::replace(_val, "///", wiz::_toString(i));
-								_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
+								_val = ToBool4(ut, global, _val, excuteData);
 							
 								//if (_val[0] == '@') { _val.erase(_val.begin()); }
 								//_val = wiz::String::replace(_val, "~~", _var);
-								//_val = ToBool4(ut, global, map<string, string>(), _val, EventInfo(), objectMap,  pEvents);
+								//_val = ToBool4(ut, global, map<string, string>(), _val, EventInfo(), objectMapPtr,  excuteData.pEvents);
 								ut->GetItemList(i).Set(0, _val); 
 								break;
 							}
@@ -2274,9 +2258,7 @@ namespace wiz {
 						rgx,
 						val,
 						condition,
-						objectMap,
-						pEvents,
-						info
+						excuteData
 					);
 				}
 			}
@@ -2285,7 +2267,7 @@ namespace wiz {
 
 			static void ReplaceDataType2(UserType& global, const string& nowPosition,
 				UserType* ut, const std::regex& rgx, const vector<string>& val, const vector<string>& condition, 
-				map<string, string>& objectMap,  wiz::load_data::UserType* pEvents, const EventInfo& info) // first val test
+				const ExcuteData& excuteData) // first val test
 			{
 				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
 					string temp = ut->GetUserTypeList(i)->GetName();
@@ -2300,7 +2282,7 @@ namespace wiz {
 							
 							_condition = wiz::String::replace(_condition, "~~", _var); //
 							_condition = wiz::String::replace(_condition, "////", nowPosition);
-							_condition = ToBool4(ut, global, info.parameters, _condition, info, objectMap, pEvents);
+							_condition = ToBool4(ut, global, _condition, excuteData);
 
 
 
@@ -2312,12 +2294,12 @@ namespace wiz {
 							{
 								_val = wiz::String::replace(_val, "~~", _var); //
 								_val = wiz::String::replace(_val, "////", nowPosition);
-								_val = ToBool4(ut, global, info.parameters, _val, info, objectMap, pEvents);
+								_val = ToBool4(ut, global, _val, excuteData);
 							
 								//if (_val[0] == '@') { _val.erase(_val.begin()); } // removal?
 
 								//_val = wiz::String::replace(_val, "~~", _var);
-								//_val = ToBool4(ut, global, map<string, string>(), _val, EventInfo(), objectMap,  pEvents);
+								//_val = ToBool4(ut, global, map<string, string>(), _val, EventInfo(), objectMapPtr,  excuteData.pEvents);
 								ut->GetUserTypeList(i)->SetName(_val);
 								break;
 							}
@@ -2330,9 +2312,7 @@ namespace wiz {
 						rgx,
 						val,
 						condition,
-						objectMap,
-						pEvents,
-						info
+						excuteData
 					);
 				}
 			}
@@ -2429,21 +2409,20 @@ namespace wiz {
 			}
 			return "";
 		}
-		inline string FindLocals(map<string, string>& locals, const string& operand)
+		inline string FindLocals(const map<string, string>& locals, const string& operand)
 		{
 			if (wiz::String::startsWith(operand, "$local.") && locals.end() != locals.find(wiz::String::substring(operand, 7)))
 			{
-				return locals[wiz::String::substring(operand, 7)];
+				return locals.at(wiz::String::substring(operand, 7));
 			}
 			return "";
 		}
 		//need to renewal. add $AND $OR $NOT
 	
 		/// remove /, parameter chk!!
-		string ToBool4(wiz::load_data::UserType* now, wiz::load_data::UserType& global, const map<string, string>& parameters, const string& temp,
-			 EventInfo info, map<string, string>& objectMap,  wiz::load_data::UserType* pEvents);
-		bool operation(wiz::load_data::UserType* now, wiz::load_data::UserType& global, const map<string, string>& parameters, const string& str,
-			wiz::ArrayStack<string>& operandStack, EventInfo info, map<string, string>& objectMap, wiz::load_data::UserType* pEvents)
+		string ToBool4(wiz::load_data::UserType* now, wiz::load_data::UserType& global, const string& temp, const ExcuteData& excuteData);
+		bool operation(wiz::load_data::UserType* now, wiz::load_data::UserType& global, const string& str,
+			wiz::ArrayStack<string>& operandStack, const ExcuteData& excuteData)
 		{
 			if (!operandStack.empty() && operandStack.top() == "ERROR") {
 				return false;
@@ -2787,7 +2766,7 @@ namespace wiz {
 			}
 			else if ("$return_value" == str)
 			{
-				operandStack.push(info.return_value);
+				operandStack.push(excuteData.info.return_value);
 			}
 			// cf) empty test!!
 			///ToDo - GetList -> // GetItemListIdxByIListIdx, GetUserTypeLisIdxtByIListIdx ?
@@ -2795,7 +2774,7 @@ namespace wiz {
 			{
 				string x = operandStack.pop();
 
-				string value = wiz::load_data::LoadData::GetItemListData(global, x, "TRUE", objectMap, pEvents, info);
+				string value = wiz::load_data::LoadData::GetItemListData(global, x, "TRUE", excuteData);
 				wiz::load_data::UserType ut;
 				wiz::load_data::LoadData::LoadDataFromString(value, ut);
 
@@ -2847,7 +2826,7 @@ namespace wiz {
 			{
 				string x = operandStack.pop();
 
-				string value = wiz::load_data::LoadData::GetItemListData(global, x, "TRUE", objectMap, pEvents, info);
+				string value = wiz::load_data::LoadData::GetItemListData(global, x, "TRUE", excuteData);
 				wiz::load_data::UserType ut;
 				wiz::load_data::LoadData::LoadDataFromString(value, ut);
 
@@ -2917,11 +2896,11 @@ namespace wiz {
 				}
 
 				{
-					string temp = FindParameters(parameters, x);
+					string temp = FindParameters(excuteData.info.parameters, x);
 					if (!temp.empty()) { x = temp; }
 				}
 				{
-					string temp = FindLocals(info.locals, x);
+					string temp = FindLocals(excuteData.info.locals, x);
 					if (!temp.empty()) { x = temp; }
 				}
 				
@@ -3009,7 +2988,7 @@ namespace wiz {
 				}
 				str = str.substr(1, str.size() - 2);
 				{
-					string result = ToBool4(now, global, parameters, str, info, objectMap,  pEvents);
+					string result = ToBool4(now, global, str, excuteData);
 					
 					operandStack.push(move(result));
 				}
@@ -3043,10 +3022,8 @@ namespace wiz {
 				object_name = wiz::String::substring(object_name, 1, object_name.size() - 2);
 				string event_id = operandStack.pop();
 
-				string temp = objectMap[object_name];
-				wiz::load_data::UserType ut;
+				wiz::load_data::UserType ut = (*excuteData.pObjectMap)[object_name];
 
-				wiz::load_data::LoadData::LoadDataFromString(temp, ut);
 				bool pass = false;
 				for (int i = 0; i < ut.GetUserTypeListSize(); ++i) {
 					for (int j = 0; j < ut.GetUserTypeList(i)->GetItemListSize(); ++j) {
@@ -3181,10 +3158,12 @@ namespace wiz {
 					statements2 = statements2 + eventVec[i] + " ";
 				}
 				statements2 = statements2 + " } }";
-				wiz::load_data::UserType eventsTemp = *pEvents;
-				wiz::load_data::LoadData::AddData(eventsTemp, "/root", statements2, "TRUE", objectMap, pEvents, info);
+				wiz::load_data::UserType eventsTemp = *excuteData.pEvents;
+				wiz::load_data::LoadData::AddData(eventsTemp, "/root", statements2, "TRUE", excuteData);
 				//cout << " chk " << statements2 << endl;
-				operandStack.push(excute_module("Main = { $call = { id = NONE } }", &global, &eventsTemp));
+				ExcuteData excuteData;
+				excuteData.pEvents = &eventsTemp;
+				operandStack.push(excute_module("Main = { $call = { id = NONE } }", &global, excuteData));
 			}
 			else if ("$getItemValue" == str) {
 				const int i = stoi(operandStack.pop());
@@ -3313,8 +3292,7 @@ namespace wiz {
 			}
 			return result;
 		}
-		string ToBool4(wiz::load_data::UserType* now, wiz::load_data::UserType& global, const map<string, string>& parameters, const string& temp,
-			 EventInfo info, map<string, string>& objectMap, wiz::load_data::UserType* pEvents)
+		string ToBool4(wiz::load_data::UserType* now, wiz::load_data::UserType& global, const string& temp, const ExcuteData& excuteData)
 		{ 
 			string result = temp;
 			//cout << "temp is " << temp << endl;
@@ -3343,7 +3321,7 @@ namespace wiz {
 			{
 				flag_A = true;
 			}
-			result = ToBool3(global, parameters, result, info);
+			result = ToBool3(global, excuteData.info.parameters, result, excuteData.info);
 			if (result.empty()) { return ""; }
 			if (!flag_A) {
 				result = string(result.c_str() + 1);
@@ -3366,13 +3344,13 @@ namespace wiz {
 					}return result;
 				}
 				else if (wiz::String::startsWith(result, "$local.")) {
-					string _temp = FindLocals(info.locals, result);
+					string _temp = FindLocals(excuteData.info.locals, result);
 					if (!_temp.empty()) {
 						result = _temp;
 					}return result;
 				}
 				else if (wiz::String::startsWith(result, "$parameter.")) {
-					string _temp = FindParameters(parameters, result);
+					string _temp = FindParameters(excuteData.info.parameters, result);
 					if (!_temp.empty()) {
 						result = _temp;
 					}return result;
@@ -3402,13 +3380,13 @@ namespace wiz {
 						}
 					}
 					else if (wiz::String::startsWith(tokenVec[i], "$local.")) { // && length?
-						string _temp = FindLocals(info.locals, tokenVec[i]);
+						string _temp = FindLocals(excuteData.info.locals, tokenVec[i]);
 						if (!_temp.empty()) {
 							tokenVec[i] = move(_temp);
 						}
 					}
 					else if (wiz::String::startsWith(tokenVec[i], "$parameter.")) { // && length?
-						string _temp = FindParameters(parameters, tokenVec[i]);
+						string _temp = FindParameters(excuteData.info.parameters, tokenVec[i]);
 						if (!_temp.empty()) {
 							tokenVec[i] = move(_temp);
 						}
@@ -3464,7 +3442,7 @@ namespace wiz {
 					operandStack.pop(); // {
 					operatorStack.push(tokenVec[i]);
 
-					if (false == operation(now, global, parameters, tokenVec[i], operandStack, info, objectMap, pEvents)) // chk!!
+					if (false == operation(now, global, tokenVec[i], operandStack, excuteData)) // chk!!
 					{
 						// chk removal here?
 						cout << " false " << endl;
@@ -3578,12 +3556,12 @@ namespace wiz {
 			}
 
 			{ // chk.. - removal?
-				for (auto x = parameters.rbegin(); x != parameters.rend(); ++x) {
+				for (auto x = excuteData.info.parameters.rbegin(); x != excuteData.info.parameters.rend(); ++x) {
 					string temp;
 					Utility::ChangeStr(result, { "$parameter." + x->first }, { x->second }, temp);
 					result = move(temp);
 				}
-				for (auto x = info.locals.rbegin(); x != info.locals.rend(); ++x) {
+				for (auto x = excuteData.info.locals.rbegin(); x != excuteData.info.locals.rend(); ++x) {
 					string temp;
 					Utility::ChangeStr(result, { "$local." + x->first }, { x->second }, temp);
 					result = move(temp);
