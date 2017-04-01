@@ -3161,9 +3161,11 @@ namespace wiz {
 				wiz::load_data::UserType eventsTemp = *excuteData.pEvents;
 				wiz::load_data::LoadData::AddData(eventsTemp, "/root", statements2, "TRUE", excuteData);
 				//cout << " chk " << statements2 << endl;
-				ExcuteData excuteData;
-				excuteData.pEvents = &eventsTemp;
-				operandStack.push(excute_module("Main = { $call = { id = NONE } }", &global, excuteData));
+				ExcuteData _excuteData;
+				_excuteData.pModule = excuteData.pModule;
+				_excuteData.pObjectMap = excuteData.pObjectMap;
+				_excuteData.pEvents = &eventsTemp;
+				operandStack.push(excute_module("Main = { $call = { id = NONE } }", &global, _excuteData));
 			}
 			else if ("$getItemValue" == str) {
 				const int i = stoi(operandStack.pop());

@@ -14,6 +14,10 @@ Event = {
 	## ~~, ~~~ chk -> condition : ToBool4? - for all function?
 	#
 	# cf) $for - ToDo?? : using idx? [start, last]
+	
+	$register_object = { fileName = { "ex3.txt" } }
+	
+	
 	$for_each = {  # option - not change!?
 		# eventID -> event -> $parameter? 
 		
@@ -38,6 +42,8 @@ Event = {
 	id = bool_chk
 	
 	$parameter = { x y }
+	
+	$call_registered_object = { name = { "ex3.txt" } parameter = { id = 1 i = 3 j = 1 } }
 	
 	$print = { value = { "test " } } 
 	$print2 = { value = { $concat_all = { $move_up = { $parameter.y } / z } } } # 여백 때문에 나누어 진다? - chk!! - ToDo
