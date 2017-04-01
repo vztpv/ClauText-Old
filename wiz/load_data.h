@@ -3155,7 +3155,7 @@ namespace wiz {
 					eventVec.push_back(operandStack.pop());
 				}
 				
-				string statements2 = "Event = { id = NONE" + wiz::toStr(excuteData.depth + 1) + " $call = { ";
+				string statements2 = "Event = { id = NONE1 $call = { ";
 				for (int i = 0; i < eventVec.size(); ++i) {
 					statements2 = statements2 + eventVec[i] + " ";
 				}
@@ -3167,8 +3167,7 @@ namespace wiz {
 				_excuteData.pModule = excuteData.pModule;
 				_excuteData.pObjectMap = excuteData.pObjectMap;
 				_excuteData.pEvents = &eventsTemp;
-				_excuteData.depth = excuteData.depth + 1;
-				operandStack.push(excute_module("Main = { $call = { id = NONE" + wiz::toStr(_excuteData.depth) + " } }", &global, _excuteData));
+				operandStack.push(excute_module("Main = { $call = { id = NONE1 } }", &global, _excuteData));
 			}
 			else if ("$getItemValue" == str) {
 				const int i = stoi(operandStack.pop());
