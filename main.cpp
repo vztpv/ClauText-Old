@@ -2130,7 +2130,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					}
 					else // 
 					{
-						dir = string(val->ToString());
+						dir = string(val->GetUserTypeList(0)->ToString());
 						dir = ToBool4(nullptr, global, dir, _excuteData);
 						is2 = true;
 					}

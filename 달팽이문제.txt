@@ -4,22 +4,124 @@ Main = { $call = { id = snail } }
 Event = {
 	id = snail
 	
+	$call = { id = init row_max = 10 col_max = 10 }
+	
+	#$print2 = { data = { /./ } }
+	#$print = { enter = { \n } }
+	
+	$setElement = { dir = { $concat_all = { / . / Arr[1] } } idx = { 1 } val = { 1 } }
+ 	
+	#$call = { id = print start_row = 1 start_col = 1 }
+	#$print = { enter ={ \n } }
+	
 	$call = { id = doing }
+	
 	$call = { id = print start_row = 1 start_col = 1 }
 	$_getch = { }
 }
 
-
-Arr[0] = { -1 -1 -1 -1 -1 -1 -1 }
-Arr[1] = { -1  1  0  0  0  0 -1 }
-Arr[2] = { -1  0  0  0  0  0 -1 }
-Arr[3] = { -1  0  0  0  0  0 -1 }
-Arr[4] = { -1  0  0  0  0  0 -1 }
-Arr[5] = { -1  0  0  0  0  0 -1 }
-Arr[6] = { -1 -1 -1 -1 -1 -1 -1 }
+ROW_MAX = 0
+COL_MAX = 0
 
 Pos = { row = 1 col = 1 }
 value = 1
+
+Event = {
+	id = init
+	
+	$parameter = { row_max col_max }
+	
+	
+	$assign = { /./ROW_MAX value = { $parameter.row_max } }
+	$assign = { /./COL_MAX value = { $parameter.col_max } }
+
+	$call = { id = init_Arr i = 0}
+}
+Event = {
+	id = init_Arr
+
+	$option = { REMOVE_IF_CALL_ONESELF_EVENT }
+	$parameter = { i }
+	
+	$if = {
+		condition = {
+			$COMP> = { $parameter.i $add = { 1 /./ROW_MAX } }
+		}
+		then = {
+			$return = { }
+		}
+	}
+	
+	$if = { 
+		condition = {
+			$OR = {
+				$EQ = { 0 $parameter.i }
+				$EQ = { $add = { 1 /./ROW_MAX } $parameter.i }
+			}
+		}
+		then = {
+			$make = { dirName = { $concat_all = {  / . / Arr[ $parameter.i ] } } }
+			$call = { id = init_Arr2 row = $parameter.i i = 0 size = { $add = { 1 /./COL_MAX } } }
+			$call = { id = init_Arr i = { $add = { 1 $parameter.i } } }
+		}
+	}
+	$else = {
+		then = {
+			$make = { dirName = { $concat_all = {  / . / Arr[ $parameter.i ] } } }
+			$call = { id = init_Arr3 row = $parameter.i i = 0 size = { $add = { 1 /./COL_MAX } } }
+			$call = { id = init_Arr i = { $add = { 1 $parameter.i } } }	
+		}
+	}
+}
+Event = {
+	id = init_Arr2
+	
+	$option = { REMOVE_IF_CALL_ONESELF_EVENT }
+	$parameter = { row i size }
+	
+	
+	$if = { 
+		condition = {
+			$COMP<EQ = { $parameter.i $parameter.size }
+		}
+		then = {
+			$insert = { dirName = { $concat_all = {  / . / Arr[ $parameter.row ] } } value = { -1 } }
+			$call = { id = init_Arr2 i = { $add = { 1 $parameter.i } } size = $parameter.size }
+		}
+	}
+}
+Event = {
+	id = init_Arr3
+	
+	$option = { REMOVE_IF_CALL_ONESELF_EVENT }
+	$parameter = { row i size }
+	
+	$if = { 
+		condition = {
+			$COMP<EQ = { $parameter.i $parameter.size }
+		}
+		then = {
+			$if = {
+				condition = {
+					$OR = {
+						$EQ = { $parameter.i 0 }
+						$EQ = { $parameter.i $add = { 1 /./COL_MAX } }
+					}
+				}
+				then = {
+					$insert = { dirName = { $concat_all = {  / . / Arr[ $parameter.row ] } } value = { -1 } }
+					$call = { id = init_Arr3 i = { $add = { 1 $parameter.i } } size = $parameter.size }
+				}
+			}
+			$else = {
+				then = {
+					$insert = { dirName = { $concat_all = {  / . / Arr[ $parameter.row ] } } value = { 0 } }
+					$call = { id = init_Arr3 i = { $add = { 1 $parameter.i } } size = $parameter.size }
+				}
+			}
+		}
+	}
+}
 
 Event = {
 	id = doing
@@ -95,8 +197,8 @@ Event = {
 	$if = {
 		condition = {
 			$AND = {
-				$COMP> = { $parameter.start_row 5 }
-				$COMP>EQ = { $parameter.start_col 5 }
+				$COMP> = { $parameter.start_row /./ROW_MAX }
+				$COMP>EQ = { $parameter.start_col /./COL_MAX }
 			}
 		}
 		then = {
@@ -106,17 +208,17 @@ Event = {
 	
 	$if = {
 		condition = {
-			$COMP<EQ = { $parameter.start_col 5 }
+			$COMP<EQ = { $parameter.start_col /./COL_MAX }
 		}
 		then = {
-			$print = { data = { $element = { $concat_all = { /. / Arr[ $parameter.start_row ] } $parameter.start_col } } }
+			$print = { data = { $element = { $concat_all = { / . / Arr[ $parameter.start_row ] } $parameter.start_col } } }
 			$print = { data = { " " } }
 			$call = { id = print start_row = { $parameter.start_row } start_col = { $add = { 1 $parameter.start_col } } }
 		}
 	}
 	$if = {
 		condition = {
-			$COMP< = { $parameter.start_row 5 }
+			$COMP< = { $parameter.start_row /./ROW_MAX }
 		}
 		then = {
 			$print = { enter = { \n } }
@@ -150,12 +252,12 @@ Event = {
 	
 	$if = {
 		condition = {
-			$AND = {
+			$AND_ALL = {
 				$EQ = { 0 $element = { $concat_all = { /. / Arr[ $add = { 1 /./Pos/row } ] } /./Pos/col } }
-				$AND = {
+				#$AND = {
 					$NOTEQ = { 0 $element = { $concat_all = { /. / Arr[ $add = { -1 /./Pos/row } ] } /./Pos/col } }
 					$NOTEQ = { 0 $element = { $concat_all = { /. / Arr[ /./Pos/row ] } $add = { 1 /./Pos/col } } }
-				}
+				#}
 			}
 		}
 		then = {
