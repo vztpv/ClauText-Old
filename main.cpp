@@ -2079,6 +2079,24 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
+				else if ("$insert_noname_usertype" == val->GetName())
+				{
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					string position = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);;
+					string data = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);;
+					string condition = val->GetUserTypeList(2)->ToString();
+
+					wiz::load_data::LoadData::AddNoNameUserType(global, position, data, condition, _excuteData);
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
 				else if ("$insert_by_idx" == val->GetName())
 				{
 					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;

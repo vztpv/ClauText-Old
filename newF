@@ -1,0 +1,24 @@
+
+Main = {
+	$call = { id = 0 }
+}
+
+Event =
+{
+	id = 0
+	
+	$make = { /./arr }
+	
+	$insert_noname_usertype = { dir = { /./arr } data = { 1 2 3  } condition = { TRUE } }
+	
+	$insert_noname_usertype = { dir = { /./arr } data = { 4 5 6 } condition = { TRUE } }
+	
+	$insert_noname_usertype = { dir = { /./arr } data = {  7 8 9 } condition = { TRUE } }
+	
+	# $add_empty_usertype?
+	
+	$print2 = { data = { /./ } }
+	
+	$_getch = { }
+}
+
