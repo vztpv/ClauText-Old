@@ -11,7 +11,7 @@ Event = { # just one!
 					$then = { $make = { /Card } }
 				}
 				$make = { /Card/$parameter.i }
-				$insert2 = { dir = { /Card/$parameter.i } value = { sha = { $divide ={$parameter.i 13} } num = { $modular={$parameter.i 13} } # no 
+				$insert2 = { dir = { /Card/$parameter.i } value = { sha = { $divide ={$parameter.i 13} } num = { $modular ={$parameter.i 13} } # no
 					isBlackJoker = no isColorJoker = no } }
 				$call = { id = 101 i = { $add = { $parameter.i 1  } } }
 		}
@@ -21,10 +21,12 @@ Event = { # just one!
 	id = 3
 	$call = { id = 101 i = 0 } # using stack + ëª‡ë²ˆì¨°ê¹Œì°ˆëŠ”ê°€
 	# insert two joker
-	$make = { $concat = { /Card $concat = { / /Info/CARDNUM } } }
-	$make = { $concat = { /Card $concat = { / $add = { /Info/CARDNUM 1 } } } } 
-	$insert2 = { dir = { $concat = { /Card $concat = { / /Info/CARDNUM } } } value = {sha = -1 num = -1  isBlackJoker = yes isColorJoker = no } }
-	$insert2 = { dir = { $concat = { /Card $concat = { / $add = { /Info/CARDNUM 1 } } } }  value = {sha = -2 num = -2  isBlackJoker = no isColorJoker = yes } }
+	$make = { dir = { $concat = { /Card $concat = { / /Info/CARDNUM } } } }
+	$make = { dir = { $concat = { /Card $concat = { / $add = { /Info/CARDNUM 1 } } } } }
+	
+	
+	$insert2 = { dir = { $concat = { /Card $concat = { / /Info/CARDNUM } } } value = { sha = -1 num = -1  isBlackJoker = yes isColorJoker = no } }
+	$insert2 = { dir = { $concat = { /Card $concat = { / $add = { /Info/CARDNUM 1 } } } }  value = { sha = -2 num = -2  isBlackJoker = no isColorJoker = yes } }
 }
 Event = {
 	id = 103
@@ -51,22 +53,23 @@ CardStringImage =
 		sha_image = { ¢» ¡ß ¢¾ ¢¿ }
 		sha_name = { spade dia heart clover }
 	}
-	blackJoker = { ¡Ù }
-	colorJoker = { ¡Ú }
+	blackJoker = ¡Ù
+	colorJoker = ¡Ú
 }
+
 Event = 
 {
-	// $name
+	# $name
 	id = 100
 
 	$parameter = { sha num isBlackJoker isColorJoker }
 
 	#Action
 	$if = { $condition = { $EQ = { yes $parameter.isBlackJoker } }
-		$then = { $print = { value = { /CardStringImage/blackJoker } } } 
+		$then = {  $print = { value = { /./CardStringImage/blackJoker } } }
 	}
 	$if = { $condition = { $EQ = { yes $parameter.isColorJoker } }
-		$then = { $print = { value = { /CardStringImage/colorJoker } } } 
+		$then = {  $print = { value = { /./CardStringImage/colorJoker } } } 
 	}
 	$if = { $condition = { $COMP< = { -1 $parameter.num } }
 		$then = { 

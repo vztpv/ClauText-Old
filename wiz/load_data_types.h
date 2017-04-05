@@ -1093,7 +1093,7 @@ namespace wiz {
 			}
 		public:
 			// find userType! not itemList!,// this has bug
-			static std::pair<bool, vector< UserType*> > Find(UserType* global, const string& _position) /// option, option_offset
+			static std::pair<bool, vector< UserType*> > Find(UserType* global, const string& _position, StringBuilder* builder) /// option, option_offset
 			{
 				string position = _position;
 				vector< UserType* > temp;
@@ -1108,7 +1108,7 @@ namespace wiz {
 					position = String::substring(position, 3);
 				}
 
-				StringTokenizer tokenizer(position, "/", 1);
+				StringTokenizer tokenizer(position, "/", builder, 1);
 				vector<string> strVec;
 				list<pair< UserType*, int >> utDeck;
 				pair<UserType*, int> utTemp;

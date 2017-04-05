@@ -101,17 +101,18 @@ public:
 	string data;
 	int iElement; // 2 : userType, // 1 : item
 	size_t idx; // for stable? - chk!!
+	wiz::StringBuilder* builder;
 public:
-	SortInfo() : idx(-1) { }
-	SortInfo(const string& data, int iElement, size_t idx)
-		: data(data), iElement(iElement), idx(idx)
+	SortInfo(wiz::StringBuilder* builder=nullptr) : idx(-1), builder(builder) { }
+	SortInfo(const string& data, int iElement, size_t idx, wiz::StringBuilder* builder)
+		: data(data), iElement(iElement), idx(idx), builder(builder)
 	{
 
 	}
 	// for sorting..
 	bool operator<(const SortInfo& info) const
 	{
-		string temp = wiz::load_data::Utility::Compare(this->data, info.data);
+		string temp = wiz::load_data::Utility::Compare(this->data, info.data, builder);
 
 		if (this->data == "") {
 			return false;
@@ -137,9 +138,10 @@ public:
 	string data;
 	int iElement; // 2 : userType, // 1 : item
 	size_t idx; // for stable? - chk!!
+	wiz::StringBuilder* builder;
 public:
-	SortInfo2() : idx(-1) { }
-	SortInfo2(const string& data, int iElement, size_t idx)
+	SortInfo2(wiz::StringBuilder* builder=nullptr) : idx(-1), builder(builder) { }
+	SortInfo2(const string& data, int iElement, size_t idx, wiz::StringBuilder* builder)
 		: data(data), iElement(iElement), idx(idx)
 	{
 
@@ -158,7 +160,7 @@ public:
 			return false;
 		}
 
-		string temp = wiz::load_data::Utility::Compare(this->data, info.data);
+		string temp = wiz::load_data::Utility::Compare(this->data, info.data, builder);
 		if (temp == "< 0") { return false; }
 		else if (temp == "> 0") { return true; }
 		else if (temp == "== 0") {
@@ -777,7 +779,7 @@ namespace wiz {
 					_condition = wiz::String::replace(_condition, "////", nowPosition);
 					_condition = ToBool4(ut, global, _condition, excuteData, builder);
 					
-					Condition cond(_condition, ut, &global);
+					Condition cond(_condition, ut, &global, builder);
 
 
 					while (cond.Next());
@@ -821,7 +823,7 @@ namespace wiz {
 					_condition = wiz::String::replace(_condition, "////", nowPosition);
 					_condition = ToBool4(ut, global, _condition, excuteData, builder);
 
-					Condition cond(_condition, ut, &global);
+					Condition cond(_condition, ut, &global, builder);
 
 					while (cond.Next());
 
@@ -867,7 +869,7 @@ namespace wiz {
 				{
 					return false;
 				}
-				auto finded = UserType::Find(&global, position);
+				auto finded = UserType::Find(&global, position, builder);
 				if (finded.first) {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						int item_n = utTemp.GetItemListSize();
@@ -881,7 +883,7 @@ namespace wiz {
 
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
-							Condition cond(_condition, finded.second[i], &global);
+							Condition cond(_condition, finded.second[i], &global, builder);
 
 							while (cond.Next());
 
@@ -906,7 +908,7 @@ namespace wiz {
 					}
 					return isTrue;
 				}
-				else {
+				else {UserType::Find(&global, position, builder);
 					return false;
 				}
 			}
@@ -918,7 +920,7 @@ namespace wiz {
 				{
 					return false;
 				}
-				auto finded = UserType::Find(&global, position);
+				auto finded = UserType::Find(&global, position, builder);
 				if (finded.first) {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						int item_n = 0;
@@ -929,7 +931,7 @@ namespace wiz {
 							
 							_condition = ToBool4(finded.second[i], global,  _condition, excuteData, builder);
 
-							Condition cond(_condition, finded.second[i], &global);
+							Condition cond(_condition, finded.second[i], &global, builder);
 
 							while (cond.Next());
 
@@ -966,7 +968,7 @@ namespace wiz {
 				{
 					return false;
 				}
-				auto finded = UserType::Find(&global, position);
+				auto finded = UserType::Find(&global, position, builder);
 				if (finded.first) {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						int item_n = utTemp.GetIListSize();
@@ -980,7 +982,7 @@ namespace wiz {
 
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 							
-							Condition cond(_condition, finded.second[i], &global);
+							Condition cond(_condition, finded.second[i], &global, builder);
 
 							while (cond.Next());
 
@@ -1019,7 +1021,7 @@ namespace wiz {
 				{
 					return false;
 				}
-				auto finded = UserType::Find(&global, position);
+				auto finded = UserType::Find(&global, position, builder);
 				if (finded.first) {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						int item_n = 0;
@@ -1032,7 +1034,7 @@ namespace wiz {
 							string _condition = condition;
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
-							Condition cond(_condition, finded.second[i], &global);
+							Condition cond(_condition, finded.second[i], &global, builder);
 
 							while (cond.Next());
 
@@ -1057,11 +1059,11 @@ namespace wiz {
 			static bool AddUserType(UserType& global, const string& position, const string& var, const string& data, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
 				bool isTrue = false;
-				auto finded = UserType::Find(&global, position);
+				auto finded = UserType::Find(&global, position, builder);
 				if (finded.first) {
 					string temp = var;
 					if (temp == "") { temp = " "; }
-					StringTokenizer tokenizer(temp, "/", 1);
+					StringTokenizer tokenizer(temp, "/", builder, 1);
 					UserType utTemp = UserType("");
 					if (false == LoadDataFromString(data, utTemp))
 					{
@@ -1075,7 +1077,7 @@ namespace wiz {
 
 						if (utName.size() >= 3 && utName[0] == '[' && utName[utName.size() - 1] == ']')
 						{
-							StringTokenizer tokenizer2(utName, vector<string>{ "[", "~", "]" }, 1);
+							StringTokenizer tokenizer2(utName, vector<string>{ "[", "~", "]" }, builder, 1);
 							while (tokenizer2.hasMoreTokens())
 							{
 								strVec.push_back(tokenizer2.nextToken());
@@ -1117,7 +1119,7 @@ namespace wiz {
 									_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 																									 //	cout << "condition is " << _condition << endl;
 
-									Condition cond(_condition, finded.second[i], &global);
+									Condition cond(_condition, finded.second[i], &global, builder);
 
 									while (cond.Next());
 
@@ -1146,13 +1148,13 @@ namespace wiz {
 			/// SetData - Re Do!
 			static bool SetData(UserType& global, const string& position, const string& varName, const string& data, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
-				auto finded = UserType::Find(&global, position);
+				auto finded = UserType::Find(&global, position, builder);
 				bool isTrue = false;
 
 				if (finded.first) {
 					string temp = varName;
 					if (temp == "") { temp = " "; }
-					StringTokenizer tokenizer(temp, "/", 1);
+					StringTokenizer tokenizer(temp, "/", builder, 1);
 					UserType utTemp("");
 					if (false == LoadDataFromString(data, utTemp)) {
 						return false;
@@ -1171,7 +1173,7 @@ namespace wiz {
 									
 									_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
-									Condition cond(_condition, finded.second[i], &global);
+									Condition cond(_condition, finded.second[i], &global, builder);
 
 									while (cond.Next());
 
@@ -1194,7 +1196,7 @@ namespace wiz {
 
 							if (_varName.size() >= 3 && _varName[0] == '[' && _varName[_varName.size() - 1] == ']')
 							{
-								StringTokenizer tokenizer2(_varName, vector<string>{ "[", "~", "]" }, 1);
+								StringTokenizer tokenizer2(_varName, vector<string>{ "[", "~", "]" }, builder, 1);
 								while (tokenizer2.hasMoreTokens())
 								{
 									strVec.push_back(tokenizer2.nextToken());
@@ -1227,7 +1229,7 @@ namespace wiz {
 
 										_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
-										Condition cond(_condition, finded.second[i], &global);
+										Condition cond(_condition, finded.second[i], &global, builder);
 
 										while (cond.Next());
 
@@ -1255,7 +1257,7 @@ namespace wiz {
 
 			static bool SetData(UserType& global, const string& position, const int var_idx, const string& data, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
-				auto finded = UserType::Find(&global, position);
+				auto finded = UserType::Find(&global, position, builder);
 				bool isTrue = false;
 
 				if (finded.first) {
@@ -1273,7 +1275,7 @@ namespace wiz {
 
 								_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
-								Condition cond(_condition, finded.second[i], &global);
+								Condition cond(_condition, finded.second[i], &global, builder);
 
 								while (cond.Next());
 
@@ -1299,7 +1301,7 @@ namespace wiz {
 			/// 
 			static string GetData(UserType& global, const string& position, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
 				string str;
-				auto finded = UserType::Find(&global, position);
+				auto finded = UserType::Find(&global, position, builder);
 				if (finded.first) {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						if (false == condition.empty()) {
@@ -1307,7 +1309,7 @@ namespace wiz {
 
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
-							Condition cond(_condition, finded.second[i], &global);
+							Condition cond(_condition, finded.second[i], &global, builder);
 
 							while (cond.Next());
 
@@ -1328,7 +1330,7 @@ namespace wiz {
 			static string GetItemListData(UserType& global, const string& position, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
 				string str;
-				auto finded = UserType::Find(&global, position);
+				auto finded = UserType::Find(&global, position, builder);
 				if (finded.first) {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						if (false == condition.empty()) {
@@ -1336,7 +1338,7 @@ namespace wiz {
 							
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
-							Condition cond(_condition, finded.second[i], &global);
+							Condition cond(_condition, finded.second[i], &global, builder);
 
 							while (cond.Next());
 
@@ -1357,7 +1359,7 @@ namespace wiz {
 			static string GetItemListNamesData(UserType& global, const string& position, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
 				string str;
-				auto finded = UserType::Find(&global, position);
+				auto finded = UserType::Find(&global, position, builder);
 				if (finded.first) {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						if (false == condition.empty()) {
@@ -1365,7 +1367,7 @@ namespace wiz {
 
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
-							Condition cond(_condition, finded.second[i], &global);
+							Condition cond(_condition, finded.second[i], &global, builder);
 
 							while (cond.Next());
 
@@ -1386,7 +1388,7 @@ namespace wiz {
 			static string GetUserTypeListNamesData(UserType& global, const string& position, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
 				string str;
-				auto finded = UserType::Find(&global, position);
+				auto finded = UserType::Find(&global, position, builder);
 				if (finded.first) {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						if (false == condition.empty()) {
@@ -1394,7 +1396,7 @@ namespace wiz {
 
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
-							Condition cond(_condition, finded.second[i], &global);
+							Condition cond(_condition, finded.second[i], &global, builder);
 
 							while (cond.Next());
 
@@ -1421,7 +1423,7 @@ namespace wiz {
 				string _var = varName;
 				if (_var == " ") { _var = ""; }
 
-				auto finded = UserType::Find(&global, position);
+				auto finded = UserType::Find(&global, position, builder);
 				if (finded.first) {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						if (false == condition.empty()) {
@@ -1434,7 +1436,7 @@ namespace wiz {
 							
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
-							Condition cond(_condition, finded.second[i], &global);
+							Condition cond(_condition, finded.second[i], &global, builder);
 
 							while (cond.Next());
 
@@ -1455,13 +1457,13 @@ namespace wiz {
 			}
 
 			static bool Remove(UserType& global, const string& position, const string& var, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
-				auto finded = UserType::Find(&global, position);
+				auto finded = UserType::Find(&global, position, builder);
 				bool isTrue = false;
 
 				if (finded.first) {
 					string temp = var;
 					if (temp == "") { temp = " "; }
-					StringTokenizer tokenizer(temp, "/", 1);
+					StringTokenizer tokenizer(temp, "/", builder, 1);
 					while (tokenizer.hasMoreTokens()) {
 						string _var = tokenizer.nextToken();
 						if (_var == " ") { _var = ""; }
@@ -1469,7 +1471,7 @@ namespace wiz {
 
 						if (_var.size() >= 3 && _var[0] == '[' && _var[_var.size() - 1] == ']')
 						{
-							StringTokenizer tokenizer2(_var, vector<string>{ "[", "~", "]" }, 1);
+							StringTokenizer tokenizer2(_var, vector<string>{ "[", "~", "]" }, builder, 1);
 							while (tokenizer2.hasMoreTokens())
 							{
 								strVec.push_back(tokenizer2.nextToken());
@@ -1504,7 +1506,7 @@ namespace wiz {
 									
 									_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
-									Condition cond(_condition, finded.second[i], &global);
+									Condition cond(_condition, finded.second[i], &global, builder);
 									while (cond.Next());
 
 									if (cond.Now().size() != 1 || "TRUE" != cond.Now()[0])
@@ -1530,7 +1532,7 @@ namespace wiz {
 				}
 			}
 			static bool Remove(UserType& global, const string& position, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
-				auto finded = UserType::Find(&global, position);
+				auto finded = UserType::Find(&global, position, builder);
 				bool isTrue = false;
 
 				if (finded.first) {
@@ -1542,7 +1544,7 @@ namespace wiz {
 
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 							
-							Condition cond(_condition, finded.second[i], &global);
+							Condition cond(_condition, finded.second[i], &global, builder);
 
 							while (cond.Next());
 
@@ -1563,7 +1565,7 @@ namespace wiz {
 				}
 			}
 			static bool RemoveUserType(UserType& global, const string& position, const string& name, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
-				auto finded = UserType::Find(&global, position);
+				auto finded = UserType::Find(&global, position, builder);
 				bool isTrue = false;
 
 				if (finded.first) {
@@ -1575,7 +1577,7 @@ namespace wiz {
 
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
-							Condition cond(_condition, finded.second[i], &global);
+							Condition cond(_condition, finded.second[i], &global, builder);
 
 							while (cond.Next());
 
@@ -1598,7 +1600,7 @@ namespace wiz {
 
 
 			static bool RemoveItemType(UserType& global, const string& position, const string& name, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
-				auto finded = UserType::Find(&global, position);
+				auto finded = UserType::Find(&global, position, builder);
 				bool isTrue = false;
 
 				if (finded.first) {
@@ -1610,7 +1612,7 @@ namespace wiz {
 
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
-							Condition cond(_condition, finded.second[i], &global);
+							Condition cond(_condition, finded.second[i], &global, builder);
 
 							while (cond.Next());
 
@@ -1633,7 +1635,7 @@ namespace wiz {
 
 			// todo - static bool Remove(UserType& global, const string& positiion, oonst int idx, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			static bool Remove(UserType& global, const string& position, const int idx, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
-				auto finded = UserType::Find(&global, position);
+				auto finded = UserType::Find(&global, position, builder);
 				bool isTrue = false;
 
 				if (finded.first) {
@@ -1645,7 +1647,7 @@ namespace wiz {
 							
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
-							Condition cond(_condition, finded.second[i], &global);
+							Condition cond(_condition, finded.second[i], &global, builder);
 
 							while (cond.Next());
 
@@ -1709,7 +1711,7 @@ namespace wiz {
 				string _var = varName;
 				if (_var == " ") { _var = ""; }
 
-				auto finded = UserType::Find(&global, position);
+				auto finded = UserType::Find(&global, position, builder);
 				if (finded.first) {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						if (false == condition.empty()) {
@@ -1717,7 +1719,7 @@ namespace wiz {
 							
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
-							Condition cond(_condition, finded.second[i], &global);
+							Condition cond(_condition, finded.second[i], &global, builder);
 
 							while (cond.Next());
 
@@ -1737,7 +1739,7 @@ namespace wiz {
 			{
 				int count = 0;
 
-				auto finded = UserType::Find(&global, position);
+				auto finded = UserType::Find(&global, position, builder);
 				if (finded.first) {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						if (false == condition.empty()) {
@@ -1745,7 +1747,7 @@ namespace wiz {
 							
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
-							Condition cond(_condition, finded.second[i], &global);
+							Condition cond(_condition, finded.second[i], &global, builder);
 
 							while (cond.Next());
 
@@ -1765,7 +1767,7 @@ namespace wiz {
 			{
 				int count = 0;
 
-				auto finded = UserType::Find(&global, position);
+				auto finded = UserType::Find(&global, position, builder);
 				if (finded.second[0] == &global) {
 					return true;
 				}
@@ -1776,7 +1778,7 @@ namespace wiz {
 							
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 							
-							Condition cond(_condition, finded.second[i], &global);
+							Condition cond(_condition, finded.second[i], &global, builder);
 
 							while (cond.Next());
 
@@ -1798,7 +1800,7 @@ namespace wiz {
 				string _var = varName;
 				if (_var == " ") { _var = ""; }
 
-				auto finded = UserType::Find(&global, position);
+				auto finded = UserType::Find(&global, position, builder);
 				if (finded.first) {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						if (false == condition.empty()) {
@@ -1806,7 +1808,7 @@ namespace wiz {
 							
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
-							Condition cond(_condition, finded.second[i], &global);
+							Condition cond(_condition, finded.second[i], &global, builder);
 
 							while (cond.Next());
 
@@ -1859,45 +1861,45 @@ namespace wiz {
 			static void ReplaceItem(UserType& global, const string& var, const string& val, const string& condition, const string& start_dir,
 				const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
-				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
+				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir, builder).second[0]; // chk!!
 				ReplaceItem(global, var, start_dir, ut, val, condition, excuteData, builder);
 			}
 			static void RemoveUserTypeTotal(UserType& global, const string& ut_name, const string& condition, const string& start_dir,
 				const ExcuteData& excuteData, wiz::StringBuilder* builder) 
 			{
-				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
+				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir, builder).second[0]; // chk!!
 				RemoveUserTypeTotal(global, ut_name, start_dir, ut, condition, excuteData, builder);
 			}
 			static void ReplaceDateType(UserType& global, const string& val, const string& condition, const string& start_dir,
 				const ExcuteData& excuteData, wiz::StringBuilder* builder
 			) {
-				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
+				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir, builder).second[0]; // chk!!
 				ReplaceDateType(global, start_dir, ut, val, condition, excuteData, builder);
 			}
 			static void ReplaceDateType2(UserType& global, const string& val, const string& condition, const string& start_dir,
 				const ExcuteData& excuteData, wiz::StringBuilder* builder) 
 			{
-				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
+				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir, builder).second[0]; // chk!!
 				ReplaceDateType2(global, start_dir, ut, val, condition, excuteData, builder);
 			}
 			static void ReplaceDataType1(UserType& global, const string& rex, const vector<string>& val, const vector<string>& condition,
 				const string& start_dir, const ExcuteData& excuteData, wiz::StringBuilder* builder) 
 			{
-				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
+				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir, builder).second[0]; // chk!!
 				std::regex rgx(rex);
 				ReplaceDataType1(global, start_dir, ut, rgx, val, condition, excuteData, builder);
 			}
 			static void ReplaceDataType1_2(UserType& global, const string& rex, const vector<string>& val, const vector<string>& condition,
 				const string& start_dir, const ExcuteData& excuteData, wiz::StringBuilder* builder) 
 			{
-				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
+				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir, builder).second[0]; // chk!!
 				std::regex rgx(rex);
 				ReplaceDataType1_2(global, start_dir, ut, rgx, val, condition, excuteData, builder);
 			}
 			static void ReplaceDataType2(UserType& global, const string& rex, const vector<string>& val, const vector<string>& condition,
 				const string& start_dir, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
-				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir).second[0]; // chk!!
+				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir, builder).second[0]; // chk!!
 				std::regex rgx(rex);
 				ReplaceDataType2(global, start_dir, ut, rgx, val, condition, excuteData, builder);
 			}
@@ -1921,7 +1923,7 @@ namespace wiz {
 						_condition = wiz::String::replace(_condition, "///", wiz::_toString(i));
 						_condition = ToBool4(ut, global, _condition, excuteData, builder);
 
-						Condition cond(_condition, ut, &global);
+						Condition cond(_condition, ut, &global, builder);
 
 						while (cond.Next());
 
@@ -1976,7 +1978,7 @@ namespace wiz {
 
 						_condition = ToBool4(ut, global, _condition, excuteData, builder);
 
-						Condition cond(_condition, ut, &global);
+						Condition cond(_condition, ut, &global, builder);
 
 						while (cond.Next());
 
@@ -2018,7 +2020,7 @@ namespace wiz {
 						_condition = wiz::String::replace(_condition, "///", wiz::_toString(i));
 						_condition = ToBool4(ut, global, _condition, excuteData, builder);
 						
-						Condition cond(_condition, ut, &global);
+						Condition cond(_condition, ut, &global, builder);
 
 						while (cond.Next());
 
@@ -2076,7 +2078,7 @@ namespace wiz {
 						_condition = ToBool4(ut, global, _condition, excuteData, builder);
 
 
-						Condition cond(_condition, ut, &global);
+						Condition cond(_condition, ut, &global, builder);
 
 						while (cond.Next());
 
@@ -2121,7 +2123,7 @@ namespace wiz {
 							_condition = ToBool4(ut, global, _condition, excuteData, builder);
 
 
-							Condition cond(_condition, ut, &global);
+							Condition cond(_condition, ut, &global, builder);
 
 							while (cond.Next());
 
@@ -2179,7 +2181,7 @@ namespace wiz {
 							_condition = wiz::String::replace(_condition, "///", wiz::_toString(i));
 							_condition = ToBool4(ut, global, _condition, excuteData, builder);
 
-							Condition cond(_condition, ut, &global);
+							Condition cond(_condition, ut, &global, builder);
 
 							while (cond.Next());
 
@@ -2239,7 +2241,7 @@ namespace wiz {
 							_condition = ToBool4(ut, global, _condition, excuteData, builder);
 
 
-							Condition cond(_condition, ut, &global);
+							Condition cond(_condition, ut, &global, builder);
 
 							while (cond.Next());
 
@@ -2301,7 +2303,7 @@ namespace wiz {
 
 
 
-							Condition cond(_condition, ut, &global);
+							Condition cond(_condition, ut, &global, builder);
 
 							while (cond.Next());
 
@@ -2343,7 +2345,7 @@ namespace wiz {
 		{
 			return ut->GetUserTypeItem(name);
 		}
-		string Find(wiz::load_data::UserType* ut, const string& str)
+		string Find(wiz::load_data::UserType* ut, const string& str, StringBuilder* builder)
 		{ // string 대신 vector<string> ??
 			int count = 0;
 			int idx = -1;
@@ -2363,7 +2365,7 @@ namespace wiz {
 			}
 			else {
 				auto x = wiz::load_data::UserType::Find(ut,
-					wiz::String::substring(str, 0, idx));
+					wiz::String::substring(str, 0, idx), builder);
 				if (x.first == false) { return ""; }
 				for (int i = 0; i < x.second.size(); ++i) {
 					string itemName = wiz::String::substring(str, idx + 1);
@@ -2396,9 +2398,9 @@ namespace wiz {
 			}
 			return result;
 		}
-		inline bool Exist(wiz::load_data::UserType* ut, const string& dir)
+		inline bool Exist(wiz::load_data::UserType* ut, const string& dir, StringBuilder* builder)
 		{
-			auto x = wiz::load_data::UserType::Find(ut, dir);
+			auto x = wiz::load_data::UserType::Find(ut, dir, builder);
 			return x.first;
 		}
 		// to do - rename!
@@ -2478,7 +2480,7 @@ namespace wiz {
 				x = operandStack.pop();
 				y = operandStack.pop();
 
-				if (wiz::load_data::Utility::Compare(x, y) == "== 0") {
+				if (wiz::load_data::Utility::Compare(x, y, builder) == "== 0") {
 					operandStack.push("TRUE");
 				}
 				else {
@@ -2491,7 +2493,7 @@ namespace wiz {
 				x = operandStack.pop();
 				y = operandStack.pop();
 
-				if (wiz::load_data::Utility::Compare(x, y) != "== 0") {
+				if (wiz::load_data::Utility::Compare(x, y, builder) != "== 0") {
 					operandStack.push("TRUE");
 				}
 				else {
@@ -2570,7 +2572,7 @@ namespace wiz {
 				x = operandStack.pop();
 				y = operandStack.pop();
 
-				if (wiz::load_data::Utility::Compare(x, y) == "< 0") {
+				if (wiz::load_data::Utility::Compare(x, y, builder) == "< 0") {
 					operandStack.push("TRUE");
 				}
 				else
@@ -2584,7 +2586,7 @@ namespace wiz {
 				x = operandStack.pop();
 				y = operandStack.pop();
 
-				if (wiz::load_data::Utility::Compare(x, y) == "> 0") {
+				if (wiz::load_data::Utility::Compare(x, y, builder) == "> 0") {
 					operandStack.push("TRUE");
 				}
 				else
@@ -2598,7 +2600,7 @@ namespace wiz {
 				x = operandStack.pop();
 				y = operandStack.pop();
 
-				if (wiz::load_data::Utility::Compare(x, y) == "< 0" || wiz::load_data::Utility::Compare(x, y) == "== 0") {
+				if (wiz::load_data::Utility::Compare(x, y, builder) == "< 0" || wiz::load_data::Utility::Compare(x, y, builder) == "== 0") {
 					operandStack.push("TRUE");
 				}
 				else
@@ -2612,7 +2614,7 @@ namespace wiz {
 				x = operandStack.pop();
 				y = operandStack.pop();
 
-				if (wiz::load_data::Utility::Compare(x, y) == "> 0" || wiz::load_data::Utility::Compare(x, y) == "== 0") {
+				if (wiz::load_data::Utility::Compare(x, y, builder) == "> 0" || wiz::load_data::Utility::Compare(x, y, builder) == "== 0") {
 					operandStack.push("TRUE");
 				}
 				else
@@ -2716,7 +2718,7 @@ namespace wiz {
 					builder->Clear();
 
 					int total_size = 0;
-					for (int i = 0; i < operandNum; ++i)
+					for (int i = 0; i < 2; ++i)
 					{
 						total_size += operandStack.top().size();
 						string temp = operandStack.pop();
@@ -2851,7 +2853,7 @@ namespace wiz {
 				if (x.empty()) { x = "."; }
 
 				wiz::load_data::UserType* ut = nullptr;
-				auto finded = wiz::load_data::UserType::Find(&global, x);
+				auto finded = wiz::load_data::UserType::Find(&global, x, builder);
 				ut = finded.second[0];
 
 				if (ut->IsItemList(ut->GetIListSize() - 1))
@@ -2901,7 +2903,7 @@ namespace wiz {
 				if (x.empty()) { x = "."; }
 
 				wiz::load_data::UserType* ut = nullptr;
-				auto finded = wiz::load_data::UserType::Find(&global, x);
+				auto finded = wiz::load_data::UserType::Find(&global, x, builder);
 				ut = finded.second[0];
 
 				if (ut->IsItemList(0))
@@ -2930,13 +2932,13 @@ namespace wiz {
 					x = "/./" + x;
 					if ('/' == x[0])
 					{
-						string temp = Find(now, x); if (!temp.empty()) { x = temp; }
+						string temp = Find(now, x, builder); if (!temp.empty()) { x = temp; }
 					}
 				}
 				else {
 					if ('/' == x[0])
 					{
-						string temp = Find(&global, x); if (!temp.empty()) { x = temp; }
+						string temp = Find(&global, x, builder); if (!temp.empty()) { x = temp; }
 					}
 				}
 
@@ -2957,7 +2959,7 @@ namespace wiz {
 
 				if ('/' == x[0])
 				{
-					wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, x).second[0];
+					wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, x, builder).second[0];
 					x = wiz::toStr(ut->GetItemListSize());
 				}
 				else
@@ -2973,7 +2975,7 @@ namespace wiz {
 
 				if ('/' == x[0])
 				{
-					wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, x).second[0];
+					wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, x, builder).second[0];
 					x = wiz::toStr(ut->GetUserTypeListSize());
 				}
 				else
@@ -2991,7 +2993,7 @@ namespace wiz {
 
 				if ('/' == x[0])
 				{
-					wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, x).second[0];
+					wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, x, builder).second[0];
 					x = ut->GetItemList(idx).Get(0);
 				}
 				else
@@ -3258,7 +3260,7 @@ namespace wiz {
 					dir = String::substring(dir, 3);
 				}
 
-				StringTokenizer tokenizer(dir, "/", 1);
+				StringTokenizer tokenizer(dir, "/", builder, 1);
 				vector<string> tokenVec;
 				while (tokenizer.hasMoreTokens()) {
 					tokenVec.push_back(tokenizer.nextToken());
@@ -3280,9 +3282,9 @@ namespace wiz {
 		}
 
 		string ToBool3(wiz::load_data::UserType& global, const map<string, string>& parameters, const string& temp,
-			 EventInfo info) /// has bug!
+			 EventInfo info, StringBuilder* builder) /// has bug!
 		{
-			wiz::StringTokenizer tokenizer(temp, vector<string>{ "/" }, 1);
+			wiz::StringTokenizer tokenizer(temp, vector<string>{ "/" }, builder, 1);
 			vector<string> tokenVec;
 			string result;
 
@@ -3379,7 +3381,7 @@ namespace wiz {
 			{
 				flag_A = true;
 			}
-			result = ToBool3(global, excuteData.info.parameters, result, excuteData.info);
+			result = ToBool3(global, excuteData.info.parameters, result, excuteData.info, builder);
 			if (result.empty()) { return ""; }
 			if (!flag_A) {
 				result = string(result.c_str() + 1);
@@ -3395,7 +3397,7 @@ namespace wiz {
 			{
 				if ('/' == result[0] && result.size() > 1)
 				{
-					string temp = Find(&global, result);
+					string temp = Find(&global, result, builder);
 
 					if (!temp.empty()) {
 						result = temp;
@@ -3417,7 +3419,7 @@ namespace wiz {
 			}
 
 			{
-				wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" }, 1); // , "{", "=", "}" }); //
+				wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" }, builder, 1); // , "{", "=", "}" }); //
 				//wiz::StringTokenizer tokenizer2(result, { " ", "\n", "\t", "\r" } ); //
 				vector<string> tokenVec;
 				vector<string> tokenVec2;
@@ -3431,7 +3433,7 @@ namespace wiz {
 					string before = tokenVec[i];
 					if ('/' == tokenVec[i][0] && tokenVec[i].size() > 1)
 					{
-						string _temp = Find(&global, tokenVec[i]);
+						string _temp = Find(&global, tokenVec[i], builder);
 
 						if ("" != _temp) {
 							tokenVec[i] = move(_temp);
@@ -3478,7 +3480,7 @@ namespace wiz {
 			//
 			wiz::ArrayStack<string> operandStack;
 			wiz::ArrayStack<string> operatorStack; 
-			wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" }, 1);
+			wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" }, builder, 1);
 			vector<string> tokenVec;
 
 			while (tokenizer.hasMoreTokens()) {
@@ -3563,7 +3565,7 @@ namespace wiz {
 
 			// todo!  $C = 3 => $C = { 3 } 
 			{
-				StringTokenizer tokenizer(result, 1);
+				StringTokenizer tokenizer(result, builder, 1);
 				result = "";
 
 				while (tokenizer.hasMoreTokens()) {

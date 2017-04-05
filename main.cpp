@@ -75,6 +75,7 @@ public:
 // ToDo - with ToBool4
 void MStyleTest(wiz::load_data::UserType* pUt)
 {
+	wiz::StringBuilder builder(1024);
 	std::vector<wiz::load_data::ItemType<wiz::load_data::UserType*>> utVec;
 	std::vector<MData> mdVec;
 	//std::vector<vector<MData>> mdVec2;
@@ -788,7 +789,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 					FFLUSH();
 					getline(cin, temp);
 
-					wiz::StringTokenizer tokenizer(temp, "|", 1);
+					wiz::StringTokenizer tokenizer(temp, "|", &builder, 1);
 					vector<string> strVecTemp;
 
 					while (tokenizer.hasMoreTokens()) {
@@ -1092,7 +1093,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					{
 						int count = 0;
 						eventStack.top().return_value = "";
-						wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, dir).second[0];
+						wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, dir, &builder).second[0];
 						for (int i = 0; i < ut->GetItemListSize(); ++i) {
 							string _condition = condition;
 
@@ -1110,7 +1111,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 
 							_condition = ToBool4(ut, global, _condition, _excuteData, &builder);
 							
-							wiz::load_data::Condition _cond(_condition, ut, &global);
+							wiz::load_data::Condition _cond(_condition, ut, &global, &builder);
 							
 							while (_cond.Next());
 							
@@ -1750,7 +1751,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 
 					string dir = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
 					wiz::load_data::UserType* ut = nullptr;
-					auto finded = wiz::load_data::UserType::Find(&global, dir);
+					auto finded = wiz::load_data::UserType::Find(&global, dir, &builder);
 					ut = finded.second[0];
 
 					string condition = "TRUE";
@@ -2194,7 +2195,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					string value = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
 
 					wiz::load_data::UserType ut;
-					wiz::load_data::LoadData::LoadDataFromString(wiz::load_data::UserType::Find(&global, dir).second[0]->ToString(), ut);
+					wiz::load_data::LoadData::LoadDataFromString(wiz::load_data::UserType::Find(&global, dir, &builder).second[0]->ToString(), ut);
 
 					for (int i = 0; i < ut.GetItemListSize(); ++i) {
 						if (ut.GetItemList(i).Get(0) == value) {
@@ -2300,7 +2301,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					string value = ToBool4(nullptr, global, val->GetUserTypeList(2)->ToString(), _excuteData, &builder);
 
 					int _idx = stoi(idx);
-					wiz::load_data::UserType::Find(&global, dir).second[0]->SetItem(_idx, value);
+					wiz::load_data::UserType::Find(&global, dir, &builder).second[0]->SetItem(_idx, value);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -2324,8 +2325,8 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 						int x = atoi(value1.c_str());
 						int y = atoi(value2.c_str());
 
-						string temp = wiz::load_data::UserType::Find(&global, dir).second[0]->GetItemList(x).Get(0);
-						string temp2 = wiz::load_data::UserType::Find(&global, dir).second[0]->GetItemList(y).Get(0);
+						string temp = wiz::load_data::UserType::Find(&global, dir, &builder).second[0]->GetItemList(x).Get(0);
+						string temp2 = wiz::load_data::UserType::Find(&global, dir, &builder).second[0]->GetItemList(y).Get(0);
 
 						wiz::load_data::LoadData::SetData(global, dir, x, temp2, "TRUE", _excuteData, &builder);
 						wiz::load_data::LoadData::SetData(global, dir, y, temp, "TRUE", _excuteData, &builder);
@@ -2377,7 +2378,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 								cout << temp;
 							}
 							else {
-								wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, listName).second[0];
+								wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, listName, &builder).second[0];
 								if (ut->GetItemListSize() == 0 && ut->GetItemList(0).GetName().empty()) {
 									cout << ut->GetItemList(0).Get(0);
 								}
@@ -2385,7 +2386,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 						}
 						else
 						{
-							auto x = wiz::load_data::UserType::Find(&global, listName);
+							auto x = wiz::load_data::UserType::Find(&global, listName, &builder);
 							if (x.first) {
 								wiz::load_data::UserType* ut = x.second[0];
 								cout << ut->ToString();
@@ -2417,7 +2418,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 						string listName = val->GetUserTypeList(0)->GetItemList(0).Get(0);
 						int _start = atoi(start.c_str());
 						int _last = atoi(last.c_str());
-						wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, listName).second[0];
+						wiz::load_data::UserType* ut = wiz::load_data::UserType::Find(&global, listName, &builder).second[0];
 						for (int i = _start; i <= _last; ++i)
 						{
 							if (i != _start) { cout << " "; }
@@ -2438,7 +2439,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pModule = moduleMapPtr;
 
 					string dir = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
-					auto x = wiz::load_data::UserType::Find(&global, dir);
+					auto x = wiz::load_data::UserType::Find(&global, dir, &builder);
 
 					for (auto& ut : x.second) {
 						cout << ut->ToString();
@@ -2649,7 +2650,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					vector<SortInfo> siVec;
 					wiz::load_data::UserType* utTemp =
 						wiz::load_data::UserType::Find(&global,
-							ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder)).second[0];
+							ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder), &builder).second[0];
 
 					vector<wiz::load_data::Type*> temp;
 
@@ -2658,12 +2659,12 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					for (int i = 0; i < utTemp->GetIListSize(); ++i) {
 						if (utTemp->IsItemList(i)) {
 							temp.push_back(&(utTemp->GetItemList(item_count)));
-							siVec.emplace_back(utTemp->GetItemList(item_count).GetName(), 1, i);
+							siVec.emplace_back(utTemp->GetItemList(item_count).GetName(), 1, i, &builder);
 							item_count++;
 						}
 						else {
 							temp.push_back(utTemp->GetUserTypeList(ut_count));
-							siVec.emplace_back(utTemp->GetUserTypeList(ut_count)->GetName(), 2, i);
+							siVec.emplace_back(utTemp->GetUserTypeList(ut_count)->GetName(), 2, i, &builder);
 							ut_count++;
 						}
 					}
@@ -2703,7 +2704,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					vector<SortInfo> siVec;
 					wiz::load_data::UserType* utTemp =
 						wiz::load_data::UserType::Find(&global,
-							ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder)).second[0];
+							ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder), &builder).second[0];
 					const string colName = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
 
 					vector<wiz::load_data::Type*> temp;
@@ -2719,10 +2720,10 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 							temp.push_back(utTemp->GetUserTypeList(ut_count));
 							if (utTemp->GetUserTypeList(ut_count)->GetItem(colName).empty())
 							{
-								siVec.emplace_back("", 2, ut_count);
+								siVec.emplace_back("", 2, ut_count, &builder);
 							}
 							else {
-								siVec.emplace_back(utTemp->GetUserTypeList(ut_count)->GetItem(colName)[0].Get(0), 2, ut_count);
+								siVec.emplace_back(utTemp->GetUserTypeList(ut_count)->GetItem(colName)[0].Get(0), 2, ut_count, &builder);
 							}
 							ut_count++;
 						}
@@ -2763,7 +2764,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					vector<SortInfo2> siVec;
 					wiz::load_data::UserType* utTemp =
 						wiz::load_data::UserType::Find(&global,
-							ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder)).second[0];
+							ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder), &builder).second[0];
 					const string colName = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
 
 					vector<wiz::load_data::Type*> temp;
@@ -2779,10 +2780,10 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 							temp.push_back(utTemp->GetUserTypeList(ut_count));
 							if (utTemp->GetUserTypeList(ut_count)->GetItem(colName).empty())
 							{
-								siVec.emplace_back("", 2, ut_count);
+								siVec.emplace_back("", 2, ut_count, &builder);
 							}
 							else {
-								siVec.emplace_back(utTemp->GetUserTypeList(ut_count)->GetItem(colName)[0].Get(0), 2, ut_count);
+								siVec.emplace_back(utTemp->GetUserTypeList(ut_count)->GetItem(colName)[0].Get(0), 2, ut_count, &builder);
 							}
 							ut_count++;
 						}
@@ -2825,7 +2826,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					vector<SortInfo> siVec;
 					wiz::load_data::UserType* utTemp =
 						wiz::load_data::UserType::Find(&global,
-							ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder)).second[0];
+							ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder), &builder).second[0];
 
 					vector<wiz::load_data::Type*> temp;
 
@@ -2834,12 +2835,12 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					for (int i = 0; i < utTemp->GetIListSize(); ++i) {
 						if (utTemp->IsItemList(i)) {
 							temp.push_back(&(utTemp->GetItemList(item_count)));
-							siVec.emplace_back(utTemp->GetItemList(item_count).GetName(), 1, i);
+							siVec.emplace_back(utTemp->GetItemList(item_count).GetName(), 1, i, &builder);
 							item_count++;
 						}
 						else {
 							temp.push_back(utTemp->GetUserTypeList(ut_count));
-							siVec.emplace_back(utTemp->GetUserTypeList(ut_count)->GetName(), 2, i);
+							siVec.emplace_back(utTemp->GetUserTypeList(ut_count)->GetName(), 2, i, &builder);
 							ut_count++;
 						}
 					}

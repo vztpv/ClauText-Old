@@ -25,9 +25,9 @@ Event = {
 		dir = { $concat_all = { / _ / "test 3" / z } } # cf ) "test" for / / name that is empty!
 		condition = {  # chk ~~~ and ~~ /
 			AND = {
-				EXISTITEMBYVALUE = { ~~~ root/pass } # ~~~ value, ~~ var_name
+				EXISTITEMBYVALUE = { ~~~ $concat_all = { root / pass } } # ~~~ value, ~~ var_name
 				$event_result = { id = { bool_chk } x = { $getItemValue = { /// } } y = { //// } } # //// dir?
-			} 
+			}
 		}
 	}
 
@@ -65,6 +65,8 @@ Event = {
 	
 	$parameter = { x }
 	$call_registered_object2 = { name = { "ex3.txt" } parameter = { id = 1 i = 3 j = 1 } }
+	
+	# $module = { fileName = { "newE"} data = { } }
 	
 	$if = { 
 		condition = { $is_empty_string = { $item_name = { $parameter.x } } }

@@ -23,16 +23,17 @@ namespace wiz {
 			UserType* position=nullptr; // need set, get ter!!
 			UserType* global=nullptr;
 			int option;
+			StringBuilder* builder;
 		public:
-			explicit Condition(const string& condition, UserType* position, UserType* global, const int option = 0)
-				: braceNum(0), condition(condition), i(0), position(position), option(option), global(global)
+			explicit Condition(const string& condition, UserType* position, UserType* global, StringBuilder* builder, const int option = 0)
+				: braceNum(0), condition(condition), i(0), position(position), option(option), global(global), builder(builder)
 			{
-				Init(condition);
+				Init(condition, builder);
 			}
 		private:
 			auto Get(const string& var, const string& position, UserType* utPosition, UserType* global) {
 				string valTemp = position;
-				StringTokenizer tokenizer(position, "/", 1);
+				StringTokenizer tokenizer(position, "/", builder, 1);
 				UserType* utTemp;
 
 				if (false == tokenizer.hasMoreTokens()) {
@@ -47,7 +48,7 @@ namespace wiz {
 						utTemp = global;
 					}
 				}
-				return UserType::Find(utTemp, valTemp);
+				return UserType::Find(utTemp, valTemp, builder);
 			}
 			// val -> rename?, parameter:option -> removal?
 			string GetValue(const string& op, const string& var, const string& val, UserType* utPosition, UserType* global, const string& option = "0")
@@ -111,7 +112,7 @@ namespace wiz {
 				return "ERROR";
 			}
 			string GetValue(const string& op, const string& var1, const string& position1, const string& var2, const string& position2,
-				UserType* utPosition, UserType* global, const string& option = "0")
+				UserType* utPosition, UserType* global, StringBuilder* builder, const string& option = "0")
 			{
 				// COMP<, COMP>, EQ, NOTEQ
 				if (NULL == utPosition) { return "ERROR"; }
@@ -168,7 +169,7 @@ namespace wiz {
 					if ("0" != option) { // ToDo.. // 0. just 1-1, // 1. for any case // 2. for all case
 						for (int i = 0; i < value1.size(); ++i) {
 							for (int j = 0; j < value2.size(); ++j) {
-								if (Utility::Compare(value1[i].Get(0), value2[j].Get(0)) == "< 0") {
+								if (Utility::Compare(value1[i].Get(0), value2[j].Get(0), builder) == "< 0") {
 									if ("1" == option) { return "TRUE"; }
 								}
 								else {
@@ -182,7 +183,7 @@ namespace wiz {
 						}
 					}
 					else {
-						if (Utility::Compare(value1[0].Get(0), value2[0].Get(0)) == "< 0") {
+						if (Utility::Compare(value1[0].Get(0), value2[0].Get(0), builder) == "< 0") {
 							return "TRUE";
 						}
 					}
@@ -192,7 +193,7 @@ namespace wiz {
 					if ("0" != option) { /// ToDo.. // 0. just 1-1, // 1. for any case // 2. for all case
 						for (int i = 0; i < value1.size(); ++i) {
 							for (int j = 0; j < value2.size(); ++j) {
-								string temp = Utility::Compare(value1[i].Get(0), value2[j].Get(0));
+								string temp = Utility::Compare(value1[i].Get(0), value2[j].Get(0), builder);
 									if (temp == "< 0" || temp == "== 0") {
 										if ("1" == option) { return "TRUE"; }
 									}
@@ -207,7 +208,7 @@ namespace wiz {
 						}
 					}
 					else {
-						string temp = Utility::Compare(value1[0].Get(0), value2[0].Get(0));
+						string temp = Utility::Compare(value1[0].Get(0), value2[0].Get(0), builder);
 						if (temp == "< 0" || temp == "== 0") {
 							return "TRUE";
 						}
@@ -218,7 +219,7 @@ namespace wiz {
 					if ("0" != option) { /// ToDo.. // 0. just 1-1, // 1. for any case // 2. for all case
 						for (int i = 0; i < value1.size(); ++i) {
 							for (int j = 0; j < value2.size(); ++j) {
-								if (Utility::Compare(value1[i].Get(0), value2[j].Get(0)) == "> 0") {
+								if (Utility::Compare(value1[i].Get(0), value2[j].Get(0), builder) == "> 0") {
 									if ("1" == option) { return "TRUE"; }
 								}
 								else {
@@ -232,7 +233,7 @@ namespace wiz {
 						}
 					}
 					else {
-						if (Utility::Compare(value1[0].Get(0), value2[0].Get(0)) == "> 0") {
+						if (Utility::Compare(value1[0].Get(0), value2[0].Get(0), builder) == "> 0") {
 							return "TRUE";
 						}
 					}
@@ -242,7 +243,7 @@ namespace wiz {
 					if ("0" != option) { /// ToDo.. // 0. just 1-1, // 1. for any case // 2. for all case
 						for (int i = 0; i < value1.size(); ++i) {
 							for (int j = 0; j < value2.size(); ++j) {
-								string temp = Utility::Compare(value1[i].Get(0), value2[j].Get(0));
+								string temp = Utility::Compare(value1[i].Get(0), value2[j].Get(0), builder);
 								if (temp == "> 0" || temp == "== 0") {
 									if ("1" == option) { return "TRUE"; }
 								}
@@ -257,7 +258,7 @@ namespace wiz {
 						}
 					}
 					else {
-						string temp = Utility::Compare(value1[0].Get(0), value2[0].Get(0));
+						string temp = Utility::Compare(value1[0].Get(0), value2[0].Get(0), builder);
 						if (temp == "> 0" || temp == "== 0") {
 							return "TRUE";
 						}
@@ -268,7 +269,7 @@ namespace wiz {
 					if ("0" != option) { /// ToDo.. // 0. just 1-1, // 1. for any case // 2. for all case
 						for (int i = 0; i < value1.size(); ++i) {
 							for (int j = 0; j < value2.size(); ++j) {
-								if (Utility::Compare(value1[i].Get(0), value2[j].Get(0)) == "== 0") {
+								if (Utility::Compare(value1[i].Get(0), value2[j].Get(0), builder) == "== 0") {
 									if ("1" == option) { return "TRUE"; }
 								}
 								else {
@@ -282,7 +283,7 @@ namespace wiz {
 						}
 					}
 					else {
-						if (Utility::Compare(value1[0].Get(0), value2[0].Get(0)) == "== 0") {
+						if (Utility::Compare(value1[0].Get(0), value2[0].Get(0), builder) == "== 0") {
 							return "TRUE";
 						}
 					}
@@ -292,7 +293,7 @@ namespace wiz {
 					if ("0" != option) { /// ToDo.. // 0. just 1-1, // 1. for any case // 2. for all case
 						for (int i = 0; i < value1.size(); ++i) {
 							for (int j = 0; j < value2.size(); ++j) {
-								if (Utility::Compare(value1[i].Get(0), value2[j].Get(0)) != "== 0") {
+								if (Utility::Compare(value1[i].Get(0), value2[j].Get(0), builder) != "== 0") {
 									if ("1" == option) { return "TRUE"; }
 								}
 								else {
@@ -306,7 +307,7 @@ namespace wiz {
 						}
 					}
 					else {
-						if (Utility::Compare(value1[0].Get(0), value2[0].Get(0)) != "== 0") {
+						if (Utility::Compare(value1[0].Get(0), value2[0].Get(0), builder) != "== 0") {
 							return "TRUE";
 						}
 					}
@@ -365,14 +366,14 @@ namespace wiz {
 
 				return "ERROR";
 			}
-			void Init(const string& condition)
+			void Init(const string& conditionm, StringBuilder* builder)
 			{
 				bool evalue = false;
 
 				string str;
 				Utility::AddSpace(condition, str);
 				
-				StringTokenizer tokenizer(str, { " ", "\t", "\n", "\r" }, 1);
+				StringTokenizer tokenizer(str, { " ", "\t", "\n", "\r" }, builder, 1);
 
 				while (tokenizer.hasMoreTokens()) {
 					string temp = tokenizer.nextToken();
@@ -426,7 +427,7 @@ namespace wiz {
 								tokenStack.pop();
 								tokenStack.pop();
 
-								tokenStack.push(GetValue(op, var1, position1, var2, position2, position, global, option));
+								tokenStack.push(GetValue(op, var1, position1, var2, position2, position, global, builder, option));
 							}
 							else if (tokenStack.size() >= 3 && "EXISTITEMBYVALUE" == tokenStack[tokenStack.size() - 3])
 							{

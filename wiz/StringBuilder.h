@@ -78,7 +78,7 @@ namespace wiz
 			buffer[0] = '\0';
 		}
 		int size() { return len; }
-		StringBuilder& LeftShift(const int offset = 1)
+		StringBuilder& LeftShift(const int offset = 1) // chk
 		{
 			if (offset < 1) { return *this; }
 

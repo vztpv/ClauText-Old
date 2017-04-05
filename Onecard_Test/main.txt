@@ -8,7 +8,7 @@ Main =
 	# $on = { id = ERROR }
 	# $on = { id = CONSOLE }
 }
-
+ 
 
 # Total
 Event =
@@ -55,8 +55,11 @@ Event =
 			$call = { id = 1011 }
 			
 			$call = { id = 3001 }
-			$call = { id = 3003 }
+			$call = { id = 3003 } 
 			$call = { id = 1007 }
+			
+			$_getch = { }
+			
 			#// main call
 			$call = { id = 4001 }
 		}
@@ -71,8 +74,12 @@ Event = {
 
 	$call = { id = 4000 }
 
-	$if = { $Condition = { $NOTEQ = { $return_value = { }  /Mode/GAME_END_MODE } }
+	$if = { $Condition = { $NOTEQ = { $return_value = { } /Mode/GAME_END_MODE } }
 		$then = { 
+			$print = { str = { "test " } }
+			$print = { str = { $return_value = { } } }
+			$print = { str = { "_____" } }
+			$print= { str = { \n } }
 			$call = { id = 4001 }
 		}
 	}
@@ -167,13 +174,13 @@ Event = {
 				dir = { $concat = { /PlayerCardList $concat = { / $add = { /Turn/now -1 } } } }
 				value = { $local.idx }
 			}
-
+			
 			# gameOver chk
 			$if = {
 				$condition = { $EQ = { 0 $size = { $concat = { /PlayerCardList $concat = { / $add = { -1 /Turn/now } } } } } }
 				$then = {
 					# print player`s cards - $parameter = { id i n }  # n==i
-					$call = { id = 50 i = 0 }
+					$print = { var = { "chk game_end_mode" } } # debug..
 					$assign = { /State/mode value = { /Mode/GAME_END_MODE } }
 					$return = { /State/mode }
 				}
@@ -325,13 +332,13 @@ Event =
 
 	$if = {
 		$condition = { $EQ = { 0 $size = { /CardList } } }
-		$then = { 
 			$return = { "ERROR_cardList_is_empty" } # chk.. $isError = { $return_value = { } }
+		$then = { 
 		}
 	}
 	$assign = { $local.card value = { $pop_back = { /CardList } } }
 	$insert2 = {
-		 dir = { $concat = { /PlayerCardList $concat = { / $add ={ /Turn/now -1 } } } } 
+		 dir = { $concat_all = { /PlayerCardList / $add ={ /Turn/now -1 } } } 
   		 value = { $local.card  } 
 	}
 }

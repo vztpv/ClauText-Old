@@ -375,7 +375,7 @@ namespace wiz {
 				else if (IsDate(str)) { return "DATE"; }
 				else return "STRING";
 			}
-			static string Compare(string str1, string str2, const int type = 0)
+			static string Compare(string str1, string str2, wiz::StringBuilder* builder, const int type = 0)
 			{
 				if (str1.size() > 2 && str1[0] == str1.back() && str1[0] == '\"')
 				{
@@ -429,21 +429,21 @@ namespace wiz {
 								y.push_back('0');
 							}
 						}
-						return Compare(reverse(x), reverse(y), 1);
+						return Compare(reverse(x), reverse(y), builder, 1);
 					}
 					else {
-						return Compare(string(str2.c_str() + 1), string(str1.c_str() + 1));
+						return Compare(string(str2.c_str() + 1), string(str1.c_str() + 1), builder);
 					}
 				}
 				else if ("DOUBLE" == type1)
 				{
-					StringTokenizer tokenizer1(str1, ".");
-					StringTokenizer tokenizer2(str2, ".");
+  					StringTokenizer tokenizer1(str1, ".", builder);
+					StringTokenizer tokenizer2(str2, ".", builder);
 
 					string x = tokenizer1.nextToken();
 					string y = tokenizer2.nextToken();
 
-					string z = Compare(x, y);
+					string z = Compare(x, y, builder);
 					if ("== 0" == z)
 					{
 						x = tokenizer1.nextToken();
@@ -459,7 +459,7 @@ namespace wiz {
 								y.push_back('0');
 							}
 						}
-						return Compare(x, y, 1);
+						return Compare(x, y, builder, 1);
 					}
 					else
 					{
@@ -468,14 +468,14 @@ namespace wiz {
 				}
 				else if ("DATE" == type1)
 				{
-					StringTokenizer tokenizer1(str1, ".");
-					StringTokenizer tokenizer2(str2, ".");
+					StringTokenizer tokenizer1(str1, ".", builder);
+					StringTokenizer tokenizer2(str2, ".", builder);
 
 					for (int i = 0; i < 3; ++i) {
 						const string x = tokenizer1.nextToken();
 						const string y = tokenizer2.nextToken();
 
-						const string comp = Compare(x, y);
+						const string comp = Compare(x, y, builder);
 
 						if (comp == "< 0") { return comp; }
 						else if (comp == "> 0") { return comp; }
@@ -483,14 +483,14 @@ namespace wiz {
 					return "== 0";
 				}
 				else if ("DATETIMEA" == type1) {
-					StringTokenizer tokenizer1(str1, ".");
-					StringTokenizer tokenizer2(str2, ".");
+					StringTokenizer tokenizer1(str1, ".", builder);
+					StringTokenizer tokenizer2(str2, ".", builder);
 
 					for (int i = 0; i < 4; ++i) {
 						const string x = tokenizer1.nextToken();
 						const string y = tokenizer2.nextToken();
 
-						const string comp = Compare(x, y);
+						const string comp = Compare(x, y, builder);
 
 						if (comp == "< 0") { return comp; }
 						else if (comp == "> 0") { return comp; }
@@ -498,14 +498,14 @@ namespace wiz {
 					return "== 0";
 				}
 				else if ("DATETIMEB" == type2) {
-					StringTokenizer tokenizer1(str1, ".");
-					StringTokenizer tokenizer2(str2, ".");
+					StringTokenizer tokenizer1(str1, ".", builder);
+					StringTokenizer tokenizer2(str2, ".", builder);
 
 					for (int i = 0; i < 5; ++i) {
 						const string x = tokenizer1.nextToken();
 						const string y = tokenizer2.nextToken();
 
-						const string comp = Compare(x, y);
+						const string comp = Compare(x, y, builder);
 
 						if (comp == "< 0") { return comp; }
 						else if (comp == "> 0") { return comp; }

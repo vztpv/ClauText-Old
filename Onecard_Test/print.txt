@@ -9,16 +9,16 @@ Event =
 		$then = {
 			$call = { 
 				id = 100
-				sha = { $get= {$concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /sha } } }
-				num = { $get= {$concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /num } } }
-				isBlackJoker = { $get= {$concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /isBlackJoker } } } 
-				isColorJoker = { $get= {$concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /isColorJoker } } }
+				sha = { $get = {$concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /sha } } }
+				num = { $get = {$concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /num } } }
+				isBlackJoker = { $get = {$concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /isBlackJoker } } } 
+				isColorJoker = { $get = {$concat = { $concat = { /Card $concat = { / $element = { /PlayerCardList/$parameter.i $parameter.j } } } /isColorJoker } } }
 			}
 			$print = { value = { "/" } }		
 			$call = {
 				id = 51
 				i = $parameter.i
-				j = { $add= { $parameter.j 1 } }
+				j = { $add = { $parameter.j 1 } }
 			}
 		}
 	}
@@ -40,7 +40,7 @@ Event =
 			$print = { value = { \n } }		
 			$call = {
 				id = 50
-				i = { $add= { $parameter.i 1 } }
+				i = { $add = { $parameter.i 1 } }
 			}
 		}
 	}
