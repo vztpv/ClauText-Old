@@ -24,6 +24,8 @@ using namespace std;
 
 #include <conio.h>
 
+#include <wiz/StringBuilder.h>
+
 #include <wiz/load_data.h>
 #include <wiz/stacks.h>
 #include <wiz/cpp_string.h>
@@ -796,22 +798,22 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 						try {
 							if ("add" == strVecTemp[0])
 							{
-								if (false == wiz::load_data::LoadData::AddData(*utTemp, strVecTemp[1], strVecTemp[2], strVecTemp[3], ExcuteData()))
+								if (false == wiz::load_data::LoadData::AddData(*utTemp, strVecTemp[1], strVecTemp[2], strVecTemp[3], ExcuteData(), nullptr))
 								{
 									cout << "fail to add" << endl; /// To Do to following code.
 								}
 							}
 							else if ("addusertype" == strVecTemp[0])
 							{
-								wiz::load_data::LoadData::AddUserType(*utTemp, strVecTemp[1], strVecTemp[2], strVecTemp[3], strVecTemp[4], ExcuteData());
+								wiz::load_data::LoadData::AddUserType(*utTemp, strVecTemp[1], strVecTemp[2], strVecTemp[3], strVecTemp[4], ExcuteData(), nullptr);
 							}
 							else if ("set" == strVecTemp[0])
 							{
-								wiz::load_data::LoadData::SetData(*utTemp, strVecTemp[1], strVecTemp[2], strVecTemp[3], strVecTemp[4], ExcuteData());
+								wiz::load_data::LoadData::SetData(*utTemp, strVecTemp[1], strVecTemp[2], strVecTemp[3], strVecTemp[4], ExcuteData(), nullptr);
 							}
 							else if ("remove" == strVecTemp[0])
 							{
-								wiz::load_data::LoadData::Remove(*utTemp, strVecTemp[1], strVecTemp[2], strVecTemp[3], ExcuteData());
+								wiz::load_data::LoadData::Remove(*utTemp, strVecTemp[1], strVecTemp[2], strVecTemp[3], ExcuteData(), nullptr);
 							}
 							//else if ("removenonameitem" == strVecTemp[0])
 							//{
@@ -819,16 +821,16 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 							//}
 							else if ("removeall" == strVecTemp[0])
 							{
-								wiz::load_data::LoadData::Remove(*utTemp, strVecTemp[1], strVecTemp[2], ExcuteData());
+								wiz::load_data::LoadData::Remove(*utTemp, strVecTemp[1], strVecTemp[2], ExcuteData(), nullptr);
 							}
 							else if ("searchitem" == strVecTemp[0])
 							{
-								cout << wiz::load_data::LoadData::SearchItem(*utTemp, strVecTemp[1], strVecTemp[2], ExcuteData()) << endl;
+								cout << wiz::load_data::LoadData::SearchItem(*utTemp, strVecTemp[1], strVecTemp[2], ExcuteData(), nullptr) << endl;
 								GETCH();
 							}
 							else if ("searchusertype" == strVecTemp[0])
 							{
-								cout << wiz::load_data::LoadData::SearchUserType(*utTemp, strVecTemp[1], strVecTemp[2], ExcuteData()) << endl;
+								cout << wiz::load_data::LoadData::SearchUserType(*utTemp, strVecTemp[1], strVecTemp[2], ExcuteData(), nullptr) << endl;
 								GETCH();
 							}
 						}
@@ -863,6 +865,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 	wiz::load_data::UserType events;
 	wiz::load_data::UserType* eventPtr;
 	wiz::load_data::UserType Main;
+	wiz::StringBuilder builder(102400);
 
 	if (nullptr == excuteData.pModule) {
 		moduleMapPtr = &moduleMap;
@@ -1050,8 +1053,8 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					const string eventID = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
-					const string dir = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
+					const string eventID = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
+					const string dir = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
 					const string condition = val->GetUserTypeList(2)->ToString(); 
 
 					wiz::load_data::UserType* event = nullptr;
@@ -1105,7 +1108,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 								_condition = wiz::String::replace(_condition, "~~", ut->GetItemList(i).GetName());
 							}
 
-							_condition = ToBool4(ut, global, _condition, _excuteData);
+							_condition = ToBool4(ut, global, _condition, _excuteData, &builder);
 							
 							wiz::load_data::Condition _cond(_condition, ut, &global);
 							
@@ -1126,7 +1129,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 							_excuteData.pModule = moduleMapPtr;
 							_excuteData.pObjectMap = objectMapPtr;
 
-							wiz::load_data::LoadData::AddData(eventsTemp, "/root", "Event = { id = NONE $call = { " + parameter + " = { " + ut->GetItemList(i).ToString() + " } } }", "TRUE", _excuteData);
+							wiz::load_data::LoadData::AddData(eventsTemp, "/root", "Event = { id = NONE $call = { " + parameter + " = { " + ut->GetItemList(i).ToString() + " } } }", "TRUE", _excuteData, &builder);
 
 							const string return_value = excute_module("Main = { $call = { id = NONE } }", &global, _excuteData);
 						 	
@@ -1161,10 +1164,10 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					wiz::load_data::UserType subGlobal;
 					wiz::load_data::LoadData::LoadDataFromString(val->GetUserTypeList(1)->ToString(), subGlobal);
 					wiz::load_data::UserType inputUT;
-					wiz::load_data::LoadData::LoadDataFromString(ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData), inputUT);
+					wiz::load_data::LoadData::LoadDataFromString(ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder), inputUT);
 
 
-					wiz::load_data::LoadData::AddData(subGlobal, "/./", inputUT.ToString(), "TRUE", _excuteData);
+					wiz::load_data::LoadData::AddData(subGlobal, "/./", inputUT.ToString(), "TRUE", _excuteData, &builder);
 
 
 					eventStack.top().return_value = excute_module("", &subGlobal, ExcuteData()); // return ?
@@ -1182,7 +1185,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					string rex = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string rex = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
 					rex = rex.substr(1, rex.size() - 2);
 					vector<string> sval;
 					vector<string> scondition;
@@ -1198,10 +1201,10 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 						}
 					}
 					if (val->GetUserTypeListSize() >= 4) {
-						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(3)->ToString(), _excuteData);
+						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(3)->ToString(), _excuteData, &builder);
 					}
 
-					wiz::load_data::LoadData::ReplaceDataType1(global, rex, sval, scondition, start_dir, _excuteData);
+					wiz::load_data::LoadData::ReplaceDataType1(global, rex, sval, scondition, start_dir, _excuteData, &builder);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1214,7 +1217,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					string rex = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string rex = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
 					rex = rex.substr(1, rex.size() - 2);
 					vector<string> sval;
 					vector<string> scondition;
@@ -1233,10 +1236,10 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					}
 
 					if (val->GetUserTypeListSize() >= 4 && (val->GetUserTypeListSize()%2 == 0)) {
-						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(val->GetUserTypeListSize()-1)->ToString(), _excuteData);
+						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(val->GetUserTypeListSize()-1)->ToString(), _excuteData, &builder);
 					}
 
-					wiz::load_data::LoadData::ReplaceDataType1_2(global, rex, sval, scondition, start_dir, _excuteData);
+					wiz::load_data::LoadData::ReplaceDataType1_2(global, rex, sval, scondition, start_dir, _excuteData, &builder);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1249,7 +1252,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					string rex = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string rex = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
 					rex = rex.substr(1, rex.size() - 2);
 					//cout << val->GetUserTypeList(1)->ToString() << endl;
 					vector<string> sval;
@@ -1269,12 +1272,12 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					}
 
 					if (val->GetUserTypeListSize() >= 4 && (val->GetUserTypeListSize() % 2 == 0)) {
-						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(val->GetUserTypeListSize() - 1)->ToString(), _excuteData);
+						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(val->GetUserTypeListSize() - 1)->ToString(), _excuteData, &builder);
 					}
 
 					//cout << scondition << endl;
 					//cout << "sval " << sval << endl;
-					wiz::load_data::LoadData::ReplaceDataType2(global, rex, sval, scondition, start_dir, _excuteData);
+					wiz::load_data::LoadData::ReplaceDataType2(global, rex, sval, scondition, start_dir, _excuteData, &builder);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1297,10 +1300,10 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 						scondition = val->GetUserTypeList(1)->ToString();
 					}
 					if (val->GetUserTypeListSize() >= 3) {
-						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(2)->ToString(), _excuteData);
+						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(2)->ToString(), _excuteData, &builder);
 					}
 
-					wiz::load_data::LoadData::ReplaceDateType(global, sval, scondition, start_dir, _excuteData);
+					wiz::load_data::LoadData::ReplaceDateType(global, sval, scondition, start_dir, _excuteData, &builder);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1323,10 +1326,10 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 						scondition = val->GetUserTypeList(1)->ToString();
 					}
 					if (val->GetUserTypeListSize() >= 3) {
-						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(2)->ToString(), _excuteData);
+						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(2)->ToString(), _excuteData, &builder);
 					}
 
-					wiz::load_data::LoadData::ReplaceDateType2(global, sval, scondition, start_dir, _excuteData);
+					wiz::load_data::LoadData::ReplaceDateType2(global, sval, scondition, start_dir, _excuteData, &builder);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1339,7 +1342,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					string ut_name = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string ut_name = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
 					string condition = "TRUE";
 					string start_dir = "root";
 
@@ -1348,10 +1351,10 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 						condition = val->GetUserTypeList(1)->ToString();
 					}
 					if (val->GetUserTypeListSize() >= 3) {
-						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(2)->ToString(), _excuteData);
+						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(2)->ToString(), _excuteData, &builder);
 					}
 
-					wiz::load_data::LoadData::RemoveUserTypeTotal(global, ut_name, condition, start_dir, _excuteData);
+					wiz::load_data::LoadData::RemoveUserTypeTotal(global, ut_name, condition, start_dir, _excuteData, &builder);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1364,7 +1367,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 					// chk nullptr vs val?
-					string svar = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string svar = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
 					string sval = val->GetUserTypeList(1)->ToString();
 					string scondition = "TRUE";
 					string start_dir = "root";
@@ -1374,10 +1377,10 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 						scondition = val->GetUserTypeList(2)->ToString();
 					}
 					if (val->GetUserTypeListSize() >= 4) {
-						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(3)->ToString(), _excuteData);
+						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(3)->ToString(), _excuteData, &builder);
 					}
 
-					wiz::load_data::LoadData::ReplaceItem(global, svar, sval, scondition, start_dir, _excuteData);
+					wiz::load_data::LoadData::ReplaceItem(global, svar, sval, scondition, start_dir, _excuteData, &builder);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1404,9 +1407,9 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pModule = moduleMapPtr;
 					//todo
 					// "filename" save_option(0~2)
-					string fileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string fileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
 					fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
-					string option = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
+					string option = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
 
 					wiz::load_data::LoadData::SaveWizDB(global, fileName, option, "");
 					wiz::load_data::LoadData::SaveWizDB(Main, fileName, option, "APPEND");
@@ -1425,9 +1428,9 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pModule = moduleMapPtr;
 					//todo
 					// "filename" save_option(0~2)
-					string fileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string fileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
 					fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
-					string option = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
+					string option = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
 
 					wiz::load_data::LoadData::SaveWizDB(global, fileName, option, "");
 
@@ -1445,10 +1448,10 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pModule = moduleMapPtr;
 					//todo
 					// "filename" save_option(0~2)
-					string dirName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
-					string fileName = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
+					string dirName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
+					string fileName = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
 					fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
-					string option = ToBool4(nullptr, global, val->GetUserTypeList(2)->ToString(), _excuteData);
+					string option = ToBool4(nullptr, global, val->GetUserTypeList(2)->ToString(), _excuteData, &builder);
 
 					// todo - for? auto x = global.GetUserTypeItem(dirName);
 					wiz::load_data::UserType* utTemp = global.GetUserTypeItem(dirName)[0];
@@ -1468,7 +1471,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					string moduleFileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string moduleFileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
 					moduleFileName = wiz::String::substring(moduleFileName, 1, moduleFileName.size() - 2);
 
 					wiz::load_data::UserType moduleUT;
@@ -1489,17 +1492,17 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					string moduleFileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string moduleFileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
 					string input;
 
 					if (val->GetUserTypeListSize() >= 2) {
-						input = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
+						input = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
 					}
 
 					moduleFileName = wiz::String::substring(moduleFileName, 1, moduleFileName.size() - 2);
 
 					wiz::load_data::UserType moduleUT = (*moduleMapPtr).at(moduleFileName);
-					wiz::load_data::LoadData::AddData(moduleUT, "", input, "TRUE", _excuteData);
+					wiz::load_data::LoadData::AddData(moduleUT, "", input, "TRUE", _excuteData, &builder);
 
 					eventStack.top().return_value = excute_module("", &moduleUT, ExcuteData());
 
@@ -1515,18 +1518,18 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					string moduleFileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string moduleFileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
 					string input;
 
 					if (val->GetUserTypeListSize() >= 2) {
-						input = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
+						input = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
 					}
 
 					moduleFileName = wiz::String::substring(moduleFileName, 1, moduleFileName.size() - 2);
 
 					wiz::load_data::UserType moduleUT;
 					wiz::load_data::LoadData::LoadDataFromFile(moduleFileName, moduleUT);
-					wiz::load_data::LoadData::AddData(moduleUT, "", input, "TRUE", _excuteData);
+					wiz::load_data::LoadData::AddData(moduleUT, "", input, "TRUE", _excuteData, &builder);
 
 					eventStack.top().return_value = excute_module("", &moduleUT, ExcuteData());
 
@@ -1545,7 +1548,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					string objectFileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string objectFileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
 					
 					objectFileName = wiz::String::substring(objectFileName, 1, objectFileName.size() - 2);
 
@@ -1566,8 +1569,8 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					string objectNameA = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
-					string objectNameB = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
+					string objectNameA = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
+					string objectNameB = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
 
 					objectNameA = wiz::String::substring(objectNameA, 1, objectNameA.size() - 2);
 					objectNameB = wiz::String::substring(objectNameB, 1, objectNameB.size() - 2);
@@ -1585,8 +1588,8 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					string objectName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
-					string objectData = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
+					string objectName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
+					string objectData = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
 					objectName = wiz::String::substring(objectName, 1, objectName.size() - 2);
 					objectData = wiz::String::substring(objectData, 1, objectData.size() - 2);
 					wiz::load_data::UserType objectUT;
@@ -1606,16 +1609,16 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					string objectFileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string objectFileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
 					objectFileName = wiz::String::substring(objectFileName, 1, objectFileName.size() - 2);
 					string parameter;
 					wiz::load_data::UserType objectUT = objectMapPtr->at(objectFileName);
 
-					parameter = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
+					parameter = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
 
 					string data = " Event = { id = NONE $call = { " + parameter + "  } } ";
 
-					wiz::load_data::LoadData::AddData(objectUT, "/./", data, "TRUE", _excuteData);
+					wiz::load_data::LoadData::AddData(objectUT, "/./", data, "TRUE", _excuteData, &builder);
 					
 					eventStack.top().return_value = excute_module(" Main = { $call = { id = NONE } } ", &objectUT, ExcuteData());
 
@@ -1630,17 +1633,17 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					string objectFileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string objectFileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
 					objectFileName = wiz::String::substring(objectFileName, 1, objectFileName.size() - 2);
 					string parameter;
 
-					parameter = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
+					parameter = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
 
 					string data = " Event = { id = NONE $call = { " + parameter + "  } } ";
 
 					wiz::load_data::UserType objectUT = objectMapPtr->at(objectFileName);
 					wiz::load_data::UserType objectUT2 = objectUT;
-					wiz::load_data::LoadData::AddData(objectUT, "/./", data, "TRUE", _excuteData);
+					wiz::load_data::LoadData::AddData(objectUT, "/./", data, "TRUE", _excuteData, &builder);
 					eventStack.top().return_value = excute_module(" Main = { $call = { id = NONE } } ", &objectUT, ExcuteData());
 					{
 						vector<wiz::load_data::UserType*> _events;
@@ -1651,7 +1654,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 							events.LinkUserType(_events[i]);
 						}
 						
-						wiz::load_data::LoadData::AddData(objectUT, "/./", events.ToString(), "TRUE", _excuteData);
+						wiz::load_data::LoadData::AddData(objectUT, "/./", events.ToString(), "TRUE", _excuteData, &builder);
 					}
 					(*objectMapPtr)[objectFileName] = move(objectUT);
 
@@ -1667,11 +1670,11 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					string objectFileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string objectFileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
 					objectFileName = wiz::String::substring(objectFileName, 1, objectFileName.size() - 2);
 					string parameter;
 
-					parameter = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
+					parameter = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
 
 
 					wiz::load_data::UserType objectUT;
@@ -1697,10 +1700,10 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					string data = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string data = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
 					string parameter;
 
-					parameter = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
+					parameter = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
 
 
 					wiz::load_data::UserType objectUT;
@@ -1731,7 +1734,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					eventStack.top().option = ToBool4(nullptr, global, val->ToString(), _excuteData);
+					eventStack.top().option = ToBool4(nullptr, global, val->ToString(), _excuteData, &builder);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1745,7 +1748,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					string dir = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string dir = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
 					wiz::load_data::UserType* ut = nullptr;
 					auto finded = wiz::load_data::UserType::Find(&global, dir);
 					ut = finded.second[0];
@@ -1754,7 +1757,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					if (val->GetUserTypeListSize() >= 2) {
 						condition = val->GetUserTypeList(1)->ToString();
 					}
-					wiz::load_data::LoadData::Remove(global, dir, ut->GetIListSize() - 1, condition, _excuteData);
+					wiz::load_data::LoadData::Remove(global, dir, ut->GetIListSize() - 1, condition, _excuteData, &builder);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1771,22 +1774,22 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					string dir;
 					if (val->GetUserTypeList(0)->GetItemListSize() > 0) {
 						dir = val->GetUserTypeList(0)->GetItemList(0).Get(0);
-						dir = ToBool4(nullptr, global, dir, _excuteData);
+						dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
 					}
 					else ///val->Ge
 					{
 						dir = string(val->GetUserTypeList(0)->ToString());
-						dir = ToBool4(nullptr, global, dir, _excuteData);
+						dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
 					}
 
 
-					value = ToBool4(nullptr, global, value, _excuteData);
+					value = ToBool4(nullptr, global, value, _excuteData, &builder);
 
 					string condition = "TRUE";
 					if (val->GetUserTypeListSize() >= 3) {
 						condition = val->GetUserTypeList(2)->ToString();
 					}
-					wiz::load_data::LoadData::AddDataAtFront(global, dir, value, condition, _excuteData);
+					wiz::load_data::LoadData::AddDataAtFront(global, dir, value, condition, _excuteData, &builder);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1799,13 +1802,13 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					string dir = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string dir = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
 
 					string condition = "TRUE";
 					if (val->GetUserTypeListSize() >= 2) {
 						condition = val->GetUserTypeList(1)->ToString();
 					}
-					wiz::load_data::LoadData::Remove(global, dir, 0, condition, _excuteData);
+					wiz::load_data::LoadData::Remove(global, dir, 0, condition, _excuteData, &builder);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1832,7 +1835,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 						info.id = val->GetItem("id")[0].Get(0);
 					}
 					else {
-						info.id = ToBool4(nullptr, global, val->GetUserTypeItem("id")[0]->ToString(), _excuteData);
+						info.id = ToBool4(nullptr, global, val->GetUserTypeItem("id")[0]->ToString(), _excuteData, &builder);
 					}
 
 					info.eventUT = eventPtr->GetUserTypeList(no);
@@ -1854,14 +1857,14 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 						for (int j = 0; j < val->GetItemListSize(); ++j) {
 							if (val->GetItemListSize() > 0) {
 								_excuteData.info = info2;
-								string temp = ToBool4(nullptr, global, val->GetItemList(j).Get(0), _excuteData);
+								string temp = ToBool4(nullptr, global, val->GetItemList(j).Get(0), _excuteData, &builder);
 								info.parameters.insert(make_pair(val->GetItemList(j).GetName(), temp));
 							}
 						}
 						for (int j = 0; j < val->GetUserTypeListSize(); ++j) {
 							if (val->GetUserTypeListSize() > 0) {
 								_excuteData.info = info2;
-								string temp = ToBool4(nullptr, global, val->GetUserTypeList(j)->ToString(), _excuteData);
+								string temp = ToBool4(nullptr, global, val->GetUserTypeList(j)->ToString(), _excuteData, &builder);
 								info.parameters.insert(make_pair(val->GetUserTypeList(j)->GetName(), temp));
 							}
 						}
@@ -1873,7 +1876,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 								_excuteData.info = info;
 								_excuteData.info.parameters = info2.parameters;
 							
-								string temp = ToBool4(nullptr, global, val->GetItemList(j).Get(0), _excuteData);
+								string temp = ToBool4(nullptr, global, val->GetItemList(j).Get(0), _excuteData, &builder);
 								
 								map<string, string>::iterator x;
 								if ((x = info.parameters.find(val->GetItemList(j).GetName())) != info.parameters.end())
@@ -1887,7 +1890,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 								_excuteData.info = info;
 								_excuteData.info.parameters = info2.parameters;
 
-								string temp = ToBool4(nullptr, global, val->GetUserTypeList(j)->ToString(), _excuteData);
+								string temp = ToBool4(nullptr, global, val->GetUserTypeList(j)->ToString(), _excuteData, &builder);
 
 								map<string, string>::iterator x;
 								if ((x = info.parameters.find(val->GetUserTypeList(j)->GetName())) != info.parameters.end())
@@ -1956,14 +1959,14 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pModule = moduleMapPtr;
 
 					pair<string, string> dir = Find2(&global, val->GetItemList(0).Get(0));
-					string data = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string data = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
 
 					if (dir.first == "" && wiz::String::startsWith(dir.second, "$local."))
 					{
 						eventStack.top().locals[wiz::String::substring(dir.second, 7)] = data;
 					}
 					else {
-						wiz::load_data::LoadData::SetData(global, dir.first, dir.second, data, "TRUE", _excuteData);
+						wiz::load_data::LoadData::SetData(global, dir.first, dir.second, data, "TRUE", _excuteData, &builder);
 					}
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1978,8 +1981,8 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					pair<string, string> dir = Find2(&global, ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData));
-					string data = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
+					pair<string, string> dir = Find2(&global, ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder));
+					string data = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
 
 					{
 						if (dir.first == "" && wiz::String::startsWith(dir.second, "$local."))
@@ -1987,7 +1990,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 							eventStack.top().locals[wiz::String::substring(dir.second, 7)] = data;
 						}
 						else {
-							wiz::load_data::LoadData::SetData(global, dir.first, dir.second, data, "TRUE", _excuteData);
+							wiz::load_data::LoadData::SetData(global, dir.first, dir.second, data, "TRUE", _excuteData, &builder);
 						}
 					}
 
@@ -2003,8 +2006,8 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					pair<string, string> dir = Find2(&global, ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData));
-					string data = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
+					pair<string, string> dir = Find2(&global, ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder));
+					string data = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
 
 					{
 						if (dir.first == "" && dir.second.size() > 1 && dir.second[0] == '@')
@@ -2032,14 +2035,14 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					pair<string, string> dir = Find2(&global, ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData));
-					string data = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
+					pair<string, string> dir = Find2(&global, ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder));
+					string data = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
 
 					//string condition;
 					//if (val->GetUserTypeListSize() >= 3) {
-					//	condition = ToBool4(nullptr, global, val->GetUserTypeList(2)->ToString(), _excuteData);
+					//	condition = ToBool4(nullptr, global, val->GetUserTypeList(2)->ToString(), _excuteData, &builder);
 					//}
-					wiz::load_data::LoadData::SetData(global, dir.first, dir.second, data, "TRUE", _excuteData);
+					wiz::load_data::LoadData::SetData(global, dir.first, dir.second, data, "TRUE", _excuteData, &builder);
 
 					// chk local?
 
@@ -2060,21 +2063,21 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					string dir;
 					if (val->GetUserTypeList(0)->GetItemListSize() > 0) {
 						dir = val->GetUserTypeList(0)->GetItemList(0).Get(0);
-						dir = ToBool4(nullptr, global, dir, _excuteData);
+						dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
 					}
 					else ///val->Ge
 					{
 						dir = string(val->GetUserTypeList(0)->ToString());
-						dir = ToBool4(nullptr, global, dir, _excuteData);
+						dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
 					}
 
-					value = ToBool4(nullptr, global, value, _excuteData);
+					value = ToBool4(nullptr, global, value, _excuteData, &builder);
 
 					string condition = "TRUE";
 					if (val->GetUserTypeListSize() >= 3) {
 						condition = val->GetUserTypeList(2)->ToString();
 					}
-					wiz::load_data::LoadData::AddData(global, dir, value, condition, _excuteData);
+					wiz::load_data::LoadData::AddData(global, dir, value, condition, _excuteData, &builder);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -2088,11 +2091,11 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					string position = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);;
-					string data = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);;
+					string position = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);;
+					string data = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);;
 					string condition = val->GetUserTypeList(2)->ToString();
 
-					wiz::load_data::LoadData::AddNoNameUserType(global, position, data, condition, _excuteData);
+					wiz::load_data::LoadData::AddNoNameUserType(global, position, data, condition, _excuteData, &builder);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -2107,25 +2110,25 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pModule = moduleMapPtr;
 
 					string value = val->GetUserTypeList(2)->ToString();
-					int idx = atoi(ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData).c_str());
+					int idx = atoi(ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder).c_str());
 					string dir;
 					if (val->GetUserTypeList(0)->GetItemListSize() > 0) {
 						dir = val->GetUserTypeList(0)->GetItemList(0).Get(0);
-						dir = ToBool4(nullptr, global, dir, _excuteData);
+						dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
 					}
 					else ///val->Ge
 					{
 						dir = string(val->GetUserTypeList(0)->ToString());
-						dir = ToBool4(nullptr, global, dir, _excuteData);
+						dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
 					}
 
-					value = ToBool4(nullptr, global, value, _excuteData);
+					value = ToBool4(nullptr, global, value, _excuteData, &builder);
 
 					string condition = "TRUE";
 					if (val->GetUserTypeListSize() >= 4) {
 						condition = val->GetUserTypeList(3)->ToString();
 					}
-					wiz::load_data::LoadData::Insert(global, dir, idx, value, condition, _excuteData);
+					wiz::load_data::LoadData::Insert(global, dir, idx, value, condition, _excuteData, &builder);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -2144,12 +2147,12 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					bool is2 = false;
 					if (val->GetItemListSize() > 0) {
 						dir = val->GetItemList(0).Get(0);
-						dir = ToBool4(nullptr, global, dir, _excuteData);
+						dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
 					}
 					else // 
 					{
 						dir = string(val->GetUserTypeList(0)->ToString());
-						dir = ToBool4(nullptr, global, dir, _excuteData);
+						dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
 						is2 = true;
 					}
 
@@ -2172,7 +2175,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 						condition = val->GetUserTypeList(0)->ToString();
 					}
 
-					wiz::load_data::LoadData::AddUserType(global, dir, name, "", condition, _excuteData);
+					wiz::load_data::LoadData::AddUserType(global, dir, name, "", condition, _excuteData, &builder);
 
 
 					eventStack.top().userType_idx.top()++;
@@ -2187,8 +2190,8 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					string dir = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
-					string value = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
+					string dir = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
+					string value = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
 
 					wiz::load_data::UserType ut;
 					wiz::load_data::LoadData::LoadDataFromString(wiz::load_data::UserType::Find(&global, dir).second[0]->ToString(), ut);
@@ -2214,13 +2217,13 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 
 					string dir = string(val->GetItemList(0).Get(0).c_str()); // item -> userType
 
-					dir = ToBool4(nullptr, global, dir, _excuteData);
+					dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
 
 					string condition = "TRUE";
 					if (val->GetUserTypeListSize() >= 2) {
 						condition = val->GetUserTypeList(1)->ToString();
 					}
-					wiz::load_data::LoadData::Remove(global, dir, condition, _excuteData);
+					wiz::load_data::LoadData::Remove(global, dir, condition, _excuteData, &builder);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -2236,7 +2239,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pModule = moduleMapPtr;
 
 					string dir = string(val->GetItemList(0).Get(0).c_str()); // item -> userType
-					dir = ToBool4(nullptr, global, dir, _excuteData);
+					dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
 					string name;
 					for (int i = dir.size() - 1; i >= 0; --i)
 					{
@@ -2251,7 +2254,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					if (val->GetUserTypeListSize() >= 2) {
 						condition = val->GetUserTypeList(1)->ToString();
 					}
-					wiz::load_data::LoadData::Remove(global, dir, name, condition, _excuteData);
+					wiz::load_data::LoadData::Remove(global, dir, name, condition, _excuteData, &builder);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -2265,8 +2268,8 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					string dir = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
-					string value = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
+					string dir = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
+					string value = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
 
 					int idx = atoi(value.c_str());  // long long -> int?
 
@@ -2276,7 +2279,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 						condition = val->GetUserTypeList(2)->ToString();
 					}
 
-					wiz::load_data::LoadData::Remove(global, dir, idx, condition, _excuteData);
+					wiz::load_data::LoadData::Remove(global, dir, idx, condition, _excuteData, &builder);
 					// remove -> UserType::Find(&global, dir).second[0]->RemoveItemList(idx); /// change ?
 
 					eventStack.top().userType_idx.top()++;
@@ -2292,9 +2295,9 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					string dir = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
-					string idx = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
-					string value = ToBool4(nullptr, global, val->GetUserTypeList(2)->ToString(), _excuteData);
+					string dir = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
+					string idx = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
+					string value = ToBool4(nullptr, global, val->GetUserTypeList(2)->ToString(), _excuteData, &builder);
 
 					int _idx = stoi(idx);
 					wiz::load_data::UserType::Find(&global, dir).second[0]->SetItem(_idx, value);
@@ -2315,8 +2318,8 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					string value1 = val->GetUserTypeList(0)->ToString();
 					string value2 = val->GetUserTypeList(1)->ToString();
 
-					value1 = ToBool4(nullptr, global, value1, _excuteData);
-					value2 = ToBool4(nullptr, global, value2, _excuteData);
+					value1 = ToBool4(nullptr, global, value1, _excuteData, &builder);
+					value2 = ToBool4(nullptr, global, value2, _excuteData, &builder);
 					if (value1 != value2) {
 						int x = atoi(value1.c_str());
 						int y = atoi(value2.c_str());
@@ -2324,8 +2327,8 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 						string temp = wiz::load_data::UserType::Find(&global, dir).second[0]->GetItemList(x).Get(0);
 						string temp2 = wiz::load_data::UserType::Find(&global, dir).second[0]->GetItemList(y).Get(0);
 
-						wiz::load_data::LoadData::SetData(global, dir, x, temp2, "TRUE", _excuteData);
-						wiz::load_data::LoadData::SetData(global, dir, y, temp, "TRUE", _excuteData);
+						wiz::load_data::LoadData::SetData(global, dir, x, temp2, "TRUE", _excuteData, &builder);
+						wiz::load_data::LoadData::SetData(global, dir, y, temp, "TRUE", _excuteData, &builder);
 					}
 
 					eventStack.top().userType_idx.top()++;
@@ -2358,7 +2361,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 							|| wiz::String::startsWith(listName, "$parameter.")
 							)
 						{
-							string temp = ToBool4(nullptr, global, listName, _excuteData);
+							string temp = ToBool4(nullptr, global, listName, _excuteData, &builder);
 							if (temp.empty()) {
 								cout << "EMPTY";
 							}
@@ -2368,7 +2371,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 						}
 						else if (wiz::String::startsWith(listName, "/") && listName.size() > 1)
 						{
-							string temp = ToBool4(nullptr, global, listName, _excuteData);
+							string temp = ToBool4(nullptr, global, listName, _excuteData, &builder);
 							if (temp != listName) // chk 
 							{
 								cout << temp;
@@ -2400,7 +2403,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 						string temp = val->GetUserTypeList(0)->ToString();
 
 						string name = ToBool4(nullptr, global,
-							temp, _excuteData);
+							temp, _excuteData, &builder);
 						cout << name;
 					}
 					else
@@ -2408,8 +2411,8 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 						string start = val->GetUserTypeList(1)->ToString();
 						string last = val->GetUserTypeList(2)->ToString();
 
-						start = ToBool4(nullptr, global, start, _excuteData);
-						last = ToBool4(nullptr, global, last, _excuteData);
+						start = ToBool4(nullptr, global, start, _excuteData, &builder);
+						last = ToBool4(nullptr, global, last, _excuteData, &builder);
 
 						string listName = val->GetUserTypeList(0)->GetItemList(0).Get(0);
 						int _start = atoi(start.c_str());
@@ -2434,7 +2437,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					string dir = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string dir = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
 					auto x = wiz::load_data::UserType::Find(&global, dir);
 
 					for (auto& ut : x.second) {
@@ -2457,7 +2460,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					// to do, load data and events from other file!
 					for (int i = 0; i < val->GetItemListSize(); ++i) {
 						wiz::load_data::UserType ut;
-						string fileName = ToBool4(nullptr, global, val->GetItemList(i).Get(0), _excuteData);
+						string fileName = ToBool4(nullptr, global, val->GetItemList(i).Get(0), _excuteData, &builder);
 						fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
 
 						if (wiz::load_data::LoadData::LoadDataFromFile(fileName, ut)) {
@@ -2532,9 +2535,9 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 
 					// to do, load data and events from other file!
 					wiz::load_data::UserType ut;
-					string fileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData);
+					string fileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
 					fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
-					string dirName = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
+					string dirName = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
 					wiz::load_data::UserType* utTemp = global.GetUserTypeItem(dirName)[0];
 
 					
@@ -2609,14 +2612,14 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					eventStack.top().userType_idx.top()++;
 					if (eventStack.size() > 1)
 					{
-						string temp = ToBool4(nullptr, global, val->ToString(), _excuteData);
+						string temp = ToBool4(nullptr, global, val->ToString(), _excuteData, &builder);
 						/// if temp just one
 						eventStack[eventStack.size() - 2].return_value = temp;
 					}
 
 					if (eventStack.size() == 1)
 					{
-						string temp = ToBool4(nullptr, global, val->ToString(), _excuteData);
+						string temp = ToBool4(nullptr, global, val->ToString(), _excuteData, &builder);
 
 						module_value = temp;
 					}
@@ -2646,7 +2649,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					vector<SortInfo> siVec;
 					wiz::load_data::UserType* utTemp =
 						wiz::load_data::UserType::Find(&global,
-							ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData)).second[0];
+							ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder)).second[0];
 
 					vector<wiz::load_data::Type*> temp;
 
@@ -2682,7 +2685,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					utTemp->Remove();
 					
 					//cf) chk? *utTemp = ut;
-					wiz::load_data::LoadData::AddData(*(utTemp), "", ut.ToString(), "TRUE", _excuteData);
+					wiz::load_data::LoadData::AddData(*(utTemp), "", ut.ToString(), "TRUE", _excuteData, &builder);
 
 
 					eventStack.top().userType_idx.top()++;
@@ -2700,8 +2703,8 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					vector<SortInfo> siVec;
 					wiz::load_data::UserType* utTemp =
 						wiz::load_data::UserType::Find(&global,
-							ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData)).second[0];
-					const string colName = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
+							ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder)).second[0];
+					const string colName = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
 
 					vector<wiz::load_data::Type*> temp;
 
@@ -2742,7 +2745,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					utTemp->RemoveUserTypeList();
 
 					//cf) chk? *utTemp = ut;
-					wiz::load_data::LoadData::AddData(*(utTemp), "", ut.ToString(), "TRUE", _excuteData);
+					wiz::load_data::LoadData::AddData(*(utTemp), "", ut.ToString(), "TRUE", _excuteData, &builder);
 
 
 					eventStack.top().userType_idx.top()++;
@@ -2760,8 +2763,8 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					vector<SortInfo2> siVec;
 					wiz::load_data::UserType* utTemp =
 						wiz::load_data::UserType::Find(&global,
-							ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData)).second[0];
-					const string colName = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData);
+							ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder)).second[0];
+					const string colName = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
 
 					vector<wiz::load_data::Type*> temp;
 
@@ -2802,7 +2805,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					utTemp->RemoveUserTypeList();
 
 					//cf) chk? *utTemp = ut;
-					wiz::load_data::LoadData::AddData(*(utTemp), "", ut.ToString(), "TRUE", _excuteData);
+					wiz::load_data::LoadData::AddData(*(utTemp), "", ut.ToString(), "TRUE", _excuteData, &builder);
 
 
 					eventStack.top().userType_idx.top()++;
@@ -2822,7 +2825,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					vector<SortInfo> siVec;
 					wiz::load_data::UserType* utTemp =
 						wiz::load_data::UserType::Find(&global,
-							ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData)).second[0];
+							ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder)).second[0];
 
 					vector<wiz::load_data::Type*> temp;
 
@@ -2857,7 +2860,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 
 					utTemp->Remove();
 
-					wiz::load_data::LoadData::AddData(*(utTemp), "", ut.ToString(), "TRUE", _excuteData);
+					wiz::load_data::LoadData::AddData(*(utTemp), "", ut.ToString(), "TRUE", _excuteData, &builder);
 
 
 					eventStack.top().userType_idx.top()++;
@@ -2873,7 +2876,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					_excuteData.pModule = moduleMapPtr;
 
 					string temp = val->GetUserTypeList(0)->ToString();
-					temp = ToBool4(nullptr, global, temp, _excuteData);
+					temp = ToBool4(nullptr, global, temp, _excuteData, &builder);
 
 					if (!eventStack.top().conditionStack.empty())
 					{
