@@ -18,7 +18,8 @@ Event =
 	# $add_empty_usertype?
 	
 	$print2 = { data = { /./ } }
-	
+	$print = { enter = { \n } }
+	$print = { data = { /./arr/$ut2/$it2 } }
 	$_getch = { }
 }
 

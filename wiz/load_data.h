@@ -1592,6 +1592,8 @@ namespace wiz {
 					return false;
 				}
 			}
+
+
 			static bool RemoveItemType(UserType& global, const string& position, const string& name, const string& condition, const ExcuteData& excuteData) {
 				auto finded = UserType::Find(&global, position);
 				bool isTrue = false;
@@ -3160,15 +3162,25 @@ namespace wiz {
 					statements2 = statements2 + eventVec[i] + " ";
 				}
 				statements2 = statements2 + " } }";
-				wiz::load_data::UserType eventsTemp = *excuteData.pEvents;
-				wiz::load_data::LoadData::AddData(eventsTemp, "/root", statements2, "TRUE", excuteData);
+				wiz::load_data::UserType* eventsTemp = excuteData.pEvents;
+				wiz::load_data::LoadData::AddData(*eventsTemp, "/root", statements2, "TRUE", ExcuteData());
 				//cout << " chk " << statements2 << endl;
-				ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
+				ExcuteData _excuteData;
 				_excuteData.pModule = excuteData.pModule;
 				_excuteData.pObjectMap = excuteData.pObjectMap;
-				_excuteData.pEvents = &eventsTemp;
+				_excuteData.pEvents = eventsTemp;
 				_excuteData.depth = excuteData.depth + 1;
+				
 				operandStack.push(excute_module("Main = { $call = { id = NONE" + wiz::toStr(_excuteData.depth) + " } }", &global, _excuteData));
+				
+				{
+					for (int idx = 0; idx < eventsTemp->GetUserTypeListSize(); ++idx) {
+						if (eventsTemp->GetUserTypeList(idx)->GetItem("id")[0].Get(0) == "NONE" + wiz::toStr(_excuteData.depth)) {
+							eventsTemp->RemoveUserTypeList(idx);
+							break;
+						}
+					}
+				}
 			}
 			else if ("$getItemValue" == str) {
 				const int i = stoi(operandStack.pop());

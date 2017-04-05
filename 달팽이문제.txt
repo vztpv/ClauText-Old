@@ -4,7 +4,7 @@ Main = { $call = { id = snail } }
 Event = {
 	id = snail
 	
-	$call = { id = init row_max = 10 col_max = 10 }
+	$call = { id = init row_max = 100 col_max = 100 }
 	
 	#$print2 = { data = { /./ } }
 	#$print = { enter = { \n } }
@@ -16,8 +16,8 @@ Event = {
 	
 	$call = { id = doing }
 	
-	$call = { id = print start_row = 1 start_col = 1 }
-	$_getch = { }
+	#$call = { id = print start_row = 1 start_col = 1 }
+	#$_getch = { }
 }
 
 ROW_MAX = 0
@@ -60,7 +60,7 @@ Event = {
 			}
 		}
 		then = {
-			$make = { dirName = { $concat_all = {  / . / Arr[ $parameter.i ] } } }
+			$make = { dirName = { $concat_all = {  / . / Arr[ $parameter.i ] } } value = { TRUE } }
 			$call = { id = init_Arr2 row = $parameter.i i = 0 size = { $add = { 1 /./COL_MAX } } }
 			$call = { id = init_Arr i = { $add = { 1 $parameter.i } } }
 		}
