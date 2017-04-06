@@ -3400,19 +3400,19 @@ namespace wiz {
 					string temp = Find(&global, result, builder);
 
 					if (!temp.empty()) {
-						result = temp;
+						result = move(temp);
 					}return result;
 				}
 				else if (wiz::String::startsWith(result, "$local.")) {
 					string _temp = FindLocals(excuteData.info.locals, result);
 					if (!_temp.empty()) {
-						result = _temp;
+						result = move(_temp);
 					}return result;
 				}
 				else if (wiz::String::startsWith(result, "$parameter.")) {
 					string _temp = FindParameters(excuteData.info.parameters, result);
 					if (!_temp.empty()) {
-						result = _temp;
+						result = move(_temp);
 					}return result;
 				}
 				
@@ -3558,41 +3558,62 @@ namespace wiz {
 
 			//cout << "result is " << result << endl;
 			result = "";
+			builder->Clear();
 			for (int i = 0; i < strVec.size(); ++i) {
-				if (i != 0) { result = result + " "; }
-				result = result + strVec[i] + " "; // add space!
+				if (i != 0) { 
+					//	result = result + " "; 
+					builder->Append(" ", 1);
+				}
+				// result = result + strVec[i] + " "; // add space!
+				builder->Append(strVec[i].c_str(), strVec[i].size());
+				builder->Append(" ", 1);
 			}
-
+			result = string(builder->Str(), builder->size());
 			// todo!  $C = 3 => $C = { 3 } 
 			{
 				StringTokenizer tokenizer(result, builder, 1);
 				result = "";
+				builder->Clear();
 
 				while (tokenizer.hasMoreTokens()) {
 					string temp = tokenizer.nextToken();
 
 					// chk!! @$paramter - removal? @$. (for regex)??
 					if (temp.size() >= 3 && String::startsWith(temp, "$.")) { // cf) @$. ?
-						result = result + temp + " ";
+						//result = result + temp + " ";
+						builder->Append(temp.c_str(), temp.size());
+						builder->Append(" ", 1);
 					}
 					else if (temp.size() >= 12 && String::startsWith(temp, "$parameter.") || (temp.size()) >= 13 && String::startsWith(temp, "@$parameter.")) {
-						result = result + temp + " ";
+						//result = result + temp + " ";
+						builder->Append(temp.c_str(), temp.size());
+						builder->Append(" ", 1);
 					}
 					else if (temp.size() >= 8 && String::startsWith(temp, "$local.") || (temp.size()>=9 && String::startsWith(temp, "@$local."))) {
-						result = result + temp + " ";
+						//result = result + temp + " ";
+						builder->Append(temp.c_str(), temp.size());
+						builder->Append(" ", 1);
 					}
 					else if (
 						(temp.size() >= 3 && temp[0] == '@' && temp[1] == '$')) {
 						tokenizer.nextToken(); // = 
 						string temp2 = tokenizer.nextToken();
-						result = result + temp + " = { " + temp2 + " } ";
+						//result = result + temp + " = { " + temp2 + " } ";
+
+						builder->Append(temp.c_str(), temp.size());
+						builder->Append(" = { ", 5); 
+						
+						builder->Append(temp2.c_str(), temp2.size());
+						builder->Append(" } ", 3);
 					}
 					else {
-						result = result + temp + " ";
+						//result = result + temp + " ";
+						builder->Append(temp.c_str(), temp.size());
+						builder->Append(" ", 1);
 					}
 				}
 			}
-
+			result = string(builder->Str(), builder->size());
 			if (!result.empty()) {
 				result.erase(result.begin() + result.size() - 1);
 			}
