@@ -1,0 +1,22 @@
+ 
+Main = { $call = { id = 0 } }
+
+Event = {
+	id = 0
+	
+	$call = { id = 1 test = { { 1 2 3 } } }
+	$_getch = { }
+}
+
+arr = {  }
+
+Event = {
+	id = 1
+	
+	$parameter = { test }
+	
+	$insert = { dir = { /./arr } data = { $parameter.test } } # errors..
+	$print2 = { data = { /./ } }
+	$print2 = { data = { /./arr } }
+}
+

@@ -26,7 +26,7 @@ Event = {
 		condition = {  # chk ~~~ and ~~ /
 			AND = {
 				EXISTITEMBYVALUE = { ~~~ $concat_all = { root / pass } } # ~~~ value, ~~ var_name
-				$event_result = { id = { bool_chk } x = { $getItemValue = { /// } } y = { //// } } # //// dir?
+				$event_result = { id = { bool_chk } x = { $get_item_value2 = { /// } } y = { //// } } # //// dir?
 			}
 		}
 	}
@@ -69,13 +69,13 @@ Event = {
 	# $module = { fileName = { "newE"} data = { } }
 	
 	$if = { 
-		condition = { $is_empty_string = { $item_name = { $parameter.x } } }
+		condition = { $is_empty_string = { $get_item_name = { $parameter.x } } }
 		then = {
-			$return = { $multiple = { 10 $item_value = { $parameter.x 0 } } } # core = A core = B
+			$return = { $multiple = { 10 $get_item_value = { $parameter.x 0 } } } # core = A core = B
 		}
 	}
 	
 	
-	$return = { $concat_all2  = { $item_name = { $parameter.x } = $multiple = { 10 $item_value = { $parameter.x 0 } } } }
+	$return = { $concat_all2  = { $get_item_name = { $parameter.x } = $multiple = { 10 $get_item_value = { $parameter.x 0 } } } }
 }
 "test 2"

@@ -3155,7 +3155,7 @@ namespace wiz {
 					operandStack.push(vec[i]);
 				}
 			}
-			else if ("$item_name" == str) {
+			else if ("$get_item_name" == str) {
 				wiz::load_data::UserType ut;
 				string statement;
 				
@@ -3166,7 +3166,7 @@ namespace wiz {
 
 				operandStack.push(ut.GetItemList(0).GetName());
 			}
-			else if ("$item_value" == str) {
+			else if ("$get_item_value" == str) {
 				wiz::load_data::UserType ut;
 				string statement;
 				int idx = 0;
@@ -3180,7 +3180,7 @@ namespace wiz {
 
 				operandStack.push(ut.GetItemList(idx).Get(0));
 			}
-			else if ("$item_size" == str) {
+			else if ("$get_item_size" == str) {
 				wiz::load_data::UserType ut;
 				string statement;
 
@@ -3225,7 +3225,7 @@ namespace wiz {
 					}
 				}
 			}
-			else if ("$getItemValue" == str) {
+			else if ("$get_item_value2" == str) {
 				const int i = stoi(operandStack.pop());
 
 				if (now) {
@@ -3417,12 +3417,13 @@ namespace wiz {
 				}
 				
 			}
-
+		
+			vector<string> tokenVec;
 			{
 				wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" }, builder, 1); // , "{", "=", "}" }); //
 				//wiz::StringTokenizer tokenizer2(result, { " ", "\n", "\t", "\r" } ); //
-				vector<string> tokenVec;
-				vector<string> tokenVec2;
+				
+				//vector<string> tokenVec2;
 
 				while (tokenizer.hasMoreTokens()) {
 					tokenVec.push_back(tokenizer.nextToken());
@@ -3469,23 +3470,23 @@ namespace wiz {
 				//		--j;
 				//	}
 				//}
-				result = "";
-				for (int i = 0; i < tokenVec.size(); ++i) {
-					if (i != 0) { result = result + " "; }
-					
-					result = result + tokenVec[i];
-				}
+			//	result = "";
+			//	for (int i = 0; i < tokenVec.size(); ++i) {
+			//		if (i != 0) { result = result + " "; }
+			//		
+			//		result += tokenVec[i];
+				//}
 			}
 			//cout << "result is " << result << endl;
 			//
 			wiz::ArrayStack<string> operandStack;
 			wiz::ArrayStack<string> operatorStack; 
-			wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" }, builder, 1);
-			vector<string> tokenVec;
+			//wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" }, builder, 1);
+			//vector<string> tokenVec;
 
-			while (tokenizer.hasMoreTokens()) {
-				tokenVec.push_back(tokenizer.nextToken());
-			}
+			//while (tokenizer.hasMoreTokens()) {
+		//		tokenVec.push_back(tokenizer.nextToken());
+			//}
 
 			for (int i = tokenVec.size() - 1; i >= 0; --i) {
 				
@@ -3557,26 +3558,27 @@ namespace wiz {
 			}
 
 			//cout << "result is " << result << endl;
-			result = "";
-			builder->Clear();
-			for (int i = 0; i < strVec.size(); ++i) {
-				if (i != 0) { 
+			//result = "";
+			//builder->Clear();
+			//for (int i = 0; i < strVec.size(); ++i) {
+			//	if (i != 0) { 
 					//	result = result + " "; 
-					builder->Append(" ", 1);
-				}
+			//		builder->Append(" ", 1);
+			//	}
 				// result = result + strVec[i] + " "; // add space!
-				builder->Append(strVec[i].c_str(), strVec[i].size());
-				builder->Append(" ", 1);
-			}
-			result = string(builder->Str(), builder->size());
+			//	builder->Append(strVec[i].c_str(), strVec[i].size());
+			//	builder->Append(" ", 1);
+			//}
+			//result = string(builder->Str(), builder->size());
 			// todo!  $C = 3 => $C = { 3 } 
 			{
-				StringTokenizer tokenizer(result, builder, 1);
-				result = "";
+				//StringTokenizer tokenizer(result, builder, 1);
+				//result = "";
 				builder->Clear();
 
-				while (tokenizer.hasMoreTokens()) {
-					string temp = tokenizer.nextToken();
+				//while (tokenizer.hasMoreTokens()) {
+				for (int i = 0; i < strVec.size(); ++i) {
+					const string temp = strVec[i]; // tokenizer.nextToken();
 
 					// chk!! @$paramter - removal? @$. (for regex)??
 					if (temp.size() >= 3 && String::startsWith(temp, "$.")) { // cf) @$. ?
@@ -3596,8 +3598,8 @@ namespace wiz {
 					}
 					else if (
 						(temp.size() >= 3 && temp[0] == '@' && temp[1] == '$')) {
-						tokenizer.nextToken(); // = 
-						string temp2 = tokenizer.nextToken();
+						++i; // tokenizer.nextToken(); // = 
+						string temp2 = strVec[i]; //tokenizer.nextToken();
 						//result = result + temp + " = { " + temp2 + " } ";
 
 						builder->Append(temp.c_str(), temp.size());

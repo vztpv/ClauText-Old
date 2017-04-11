@@ -21,7 +21,10 @@ namespace wiz {
 			string name;
 
 			void chk() {
-				if (name == "_") {
+				if ("_" == name || (String::startsWith(name, "$ut") && name.size() > 3)|| (String::startsWith(name, "$it")&&name.size() > 3)) {
+					cout << "name is " << name << endl;
+					cout << "in funciton chk() in Type" << endl;
+					_getch();
 					throw "ERROR for name in Type";
 				}
 			}
