@@ -9,7 +9,7 @@ Event = {
 	#$print2 = { data = { /./ } }
 	#$print = { enter = { \n } }
 	
-	$setElement = { dir = { $concat_all = { / . / Arr[1] } } idx = { 1 } val = { 1 } }
+	$setElement = { dir = { $concat_all = { / . / Arr / $ ut1 } } idx = { 1 } val = { 1 } }
  	
 	#$call = { id = print start_row = 1 start_col = 1 }
 	#$print = { enter ={ \n } }
@@ -31,6 +31,7 @@ Event = {
 	
 	$parameter = { row_max col_max }
 	
+	$make = { dir = { $concat_all = { / . / Arr } } }
 	
 	$assign = { /./ROW_MAX value = { $parameter.row_max } }
 	$assign = { /./COL_MAX value = { $parameter.col_max } }
@@ -60,14 +61,14 @@ Event = {
 			}
 		}
 		then = {
-			$make = { dirName = { $concat_all = {  / . / Arr[ $parameter.i ] } } value = { TRUE } }
+			$make = { dirName = { $concat_all = {  / . / Arr / _ } } condition = { TRUE } }
 			$call = { id = init_Arr2 row = $parameter.i i = 0 size = { $add = { 1 /./COL_MAX } } }
 			$call = { id = init_Arr i = { $add = { 1 $parameter.i } } }
 		}
 	}
 	$else = {
 		then = {
-			$make = { dirName = { $concat_all = {  / . / Arr[ $parameter.i ] } } }
+			$make = { dirName = { $concat_all = {  / . / Arr / _ } } }
 			$call = { id = init_Arr3 row = $parameter.i i = 0 size = { $add = { 1 /./COL_MAX } } }
 			$call = { id = init_Arr i = { $add = { 1 $parameter.i } } }	
 		}
@@ -85,7 +86,7 @@ Event = {
 			$COMP<EQ = { $parameter.i $parameter.size }
 		}
 		then = {
-			$insert = { dirName = { $concat_all = {  / . / Arr[ $parameter.row ] } } value = { -1 } }
+			$insert = { dirName = { $concat_all = {  / . / Arr / $ ut $parameter.row  } } value = { -1 } }
 			$call = { id = init_Arr2 i = { $add = { 1 $parameter.i } } size = $parameter.size }
 		}
 	}
@@ -109,13 +110,13 @@ Event = {
 					}
 				}
 				then = {
-					$insert = { dirName = { $concat_all = {  / . / Arr[ $parameter.row ] } } value = { -1 } }
+					$insert = { dirName = { $concat_all = {  / . / Arr / $ ut $parameter.row  } } value = { -1 } }
 					$call = { id = init_Arr3 i = { $add = { 1 $parameter.i } } size = $parameter.size }
 				}
 			}
 			$else = {
 				then = {
-					$insert = { dirName = { $concat_all = {  / . / Arr[ $parameter.row ] } } value = { 0 } }
+					$insert = { dirName = { $concat_all = {  / . / Arr / $ ut $parameter.row } } value = { 0 } }
 					$call = { id = init_Arr3 i = { $add = { 1 $parameter.i } } size = $parameter.size }
 				}
 			}
@@ -138,7 +139,7 @@ Event = {
 			$call = { id = moveRight }
 			
 			$assign2 = { dir = { $concat_all = { / . / value } } value = { $add = { 1 /./value } } }
-			$setElement = { dir = { $concat_all = { / . / Arr[ /Pos/row ] } } idx = { /Pos/col } value = { /./value } }
+			$setElement = { dir = { $concat_all = { / . / Arr / $ ut /Pos/row } } idx = { /Pos/col } value = { /./value } }
 			$call = { id = doing }
 		}
 	}
@@ -152,7 +153,7 @@ Event = {
 			$call = { id = moveDown }
 			
 			$assign2 = { dir = { $concat_all = { / . / value } } value = { $add = { 1 /./value } } }
-			$setElement = { dir = { $concat_all = { / . / Arr[ /Pos/row ] } } idx = { /Pos/col } value = { /./value } }
+			$setElement = { dir = { $concat_all = { / . / Arr / $ ut /Pos/row } } idx = { /Pos/col } value = { /./value } }
 			$call = { id = doing }	
 		}
 	}
@@ -166,7 +167,7 @@ Event = {
 			$call = { id = moveLeft }
 			
 			$assign2 = { dir = { $concat_all = { / . / value } } value = { $add = { 1 /./value } } }
-			$setElement = { dir = { $concat_all = { / . / Arr[ /Pos/row ] } } idx = { /Pos/col } value = { /./value } }
+			$setElement = { dir = { $concat_all = { / . / Arr / $ ut /Pos/row } } idx = { /Pos/col } value = { /./value } }
 			$call = { id = doing }
 		}
 	}
@@ -180,7 +181,7 @@ Event = {
 			$call = { id = moveUp }
 			
 			$assign2 = { dir = { $concat_all = { / . / value } } value = { $add = { 1 /./value } } }			
-			$setElement = { dir = { $concat_all = { / . / Arr[ /Pos/row ] } } idx = { /Pos/col } value = { /./value } }
+			$setElement = { dir = { $concat_all = { / . / Arr / $ ut /Pos/row } } idx = { /Pos/col } value = { /./value } }
 			$call = { id = doing }
 		}
 	}
@@ -211,7 +212,7 @@ Event = {
 			$COMP<EQ = { $parameter.start_col /./COL_MAX }
 		}
 		then = {
-			$print = { data = { $element = { $concat_all = { / . / Arr[ $parameter.start_row ] } $parameter.start_col } } }
+			$print = { data = { $element = { $concat_all = { / . / Arr / $ ut $parameter.start_row } $parameter.start_col } } }
 			$print = { data = { " " } }
 			$call = { id = print start_row = { $parameter.start_row } start_col = { $add = { 1 $parameter.start_col } } }
 		}
@@ -234,10 +235,10 @@ Event = {
 	$if = {
 		condition = {
 			$AND_ALL = {
-				$EQ = { 0 $element = { $concat_all = { / . / Arr[ /./Pos/row ] } $add = { 1 /./Pos/col } } }
+				$EQ = { 0 $element = { $concat_all = { / . / Arr / $ ut /./Pos/row } $add = { 1 /./Pos/col } } }
 				#$AND = {
-					$NOTEQ = { 0 $element = { $concat_all = { / . / Arr[ $add = { -1 /./Pos/row } ] } /./Pos/col } }
-					$NOTEQ = { 0 $element = { $concat_all = { / . / Arr[ /./Pos/row ] } $add = { -1 /./Pos/col } } } 
+					$NOTEQ = { 0 $element = { $concat_all = { / . / Arr / $ ut $add = { -1 /./Pos/row }  } /./Pos/col } }
+					$NOTEQ = { 0 $element = { $concat_all = { / . / Arr / $ ut /./Pos/row ] } $add = { -1 /./Pos/col } } } 
 				#}
 			}
 		}
@@ -253,10 +254,10 @@ Event = {
 	$if = {
 		condition = {
 			$AND_ALL = {
-				$EQ = { 0 $element = { $concat_all = { /. / Arr[ $add = { 1 /./Pos/row } ] } /./Pos/col } }
+				$EQ = { 0 $element = { $concat_all = { /. / Arr / $ ut $add = { 1 /./Pos/row }  } /./Pos/col } }
 				#$AND = {
-					$NOTEQ = { 0 $element = { $concat_all = { /. / Arr[ $add = { -1 /./Pos/row } ] } /./Pos/col } }
-					$NOTEQ = { 0 $element = { $concat_all = { /. / Arr[ /./Pos/row ] } $add = { 1 /./Pos/col } } }
+					$NOTEQ = { 0 $element = { $concat_all = { /. / Arr / $ ut $add = { -1 /./Pos/row }  } /./Pos/col } }
+					$NOTEQ = { 0 $element = { $concat_all = { /. / Arr / $ ut /./Pos/row } $add = { 1 /./Pos/col } } }
 				#}
 			}
 		}
@@ -272,10 +273,10 @@ Event = {
 	$if = {
 		condition = {
 			$AND = {
-				$EQ = { 0 $element = { $concat_all = { /. / Arr[ /./Pos/row ] } $add = { -1 /./Pos/col } } }
+				$EQ = { 0 $element = { $concat_all = { /. / Arr  / $ ut  /./Pos/row } $add = { -1 /./Pos/col } } }
 				$AND = {
-					$NOTEQ = { 0 $element = { $concat_all = { /. / Arr[ $add = { 1 /./Pos/row } ] } /./Pos/col } }
-					$NOTEQ = { 0 $element = { $concat_all = { /. / Arr[ /./Pos/row ] } $add = { 1 /./Pos/col } } }
+					$NOTEQ = { 0 $element = { $concat_all = { /. / Arr / $ ut $add = { 1 /./Pos/row } } /./Pos/col } }
+					$NOTEQ = { 0 $element = { $concat_all = { /. / Arr / $ ut /./Pos/row } $add = { 1 /./Pos/col } } }
 				}
 			}
 		}
@@ -291,10 +292,10 @@ Event = {
 	$if = {
 		condition = {
 			$AND = {
-				$EQ = { 0 $element = { $concat_all = { /. / Arr[ $add = { -1 /./Pos/row } ] } /./Pos/col } }
+				$EQ = { 0 $element = { $concat_all = { /. / Arr / $ ut  $add = { -1 /./Pos/row }  } /./Pos/col } }
 				$AND = {
-					$NOTEQ = { 0 $element = { $concat_all = { /. / Arr[ $add = { 1 /./Pos/row } ] } /./Pos/col } }
-					$NOTEQ = { 0 $element = { $concat_all = { /. / Arr[ /./Pos/row ] } $add = { -1 /./Pos/col } } } 
+					$NOTEQ = { 0 $element = { $concat_all = { /. / Arr / $ ut $add = { 1 /./Pos/row }  } /./Pos/col } }
+					$NOTEQ = { 0 $element = { $concat_all = { /. / Arr / $ ut /./Pos/row  } $add = { -1 /./Pos/col } } } 
 				}
 			}
 		}

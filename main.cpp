@@ -350,7 +350,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 					wiz::load_data::ItemType< wiz::load_data::UserType*> ref;
 					ref.Push(nullptr);
 					string strTemp = mdVec[idxVec[braceNum - 1]].varName;
-					if (strTemp == " ")
+					if (strTemp == " " || strTemp == "_")
 					{
 						strTemp = "";
 					}
@@ -380,7 +380,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 						system("cls");
 
 						string strTemp = mdVec[idx].varName;
-						if (strTemp == " ") { strTemp = ""; }
+						if (strTemp == " " || strTemp == "_" ) { strTemp = ""; }
 						const int count = 1; // utVec[braceNum].Get(mdVec[idx].no)->GetItem(strTemp).size();
 						setcolor(0, 7);
 
@@ -670,7 +670,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 								for (int i = 0; i < utVec[braceNum].Get(h)->GetUserTypeListSize(); ++i) {
 									if (count == idx) {
 										string temp = mdVec[idx].varName;
-										if (temp == " ") {
+										if (temp == " " || temp == "_") {
 											temp = "";
 										}
 										utVec[braceNum].Get(h)->RemoveUserTypeList(temp);
@@ -695,7 +695,7 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 									for (int i = 0; i < utVec[braceNum].Get(h)->GetItemListSize(); ++i) {
 										if (count == idx) {
 											string temp = mdVec[idx].varName;
-											if (temp == " ") { temp = ""; }
+											if (temp == " " || temp == "_") { temp = ""; }
 
 											utVec[braceNum].Get(h)->RemoveItemList(temp);
 										}

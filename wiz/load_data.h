@@ -768,7 +768,7 @@ namespace wiz {
 				UserType* ut, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
 				string _var = var;
-				if (_var == " ") { _var = ""; }
+				if (_var == " " || _var == "_") { _var = ""; }
 				if (ut->GetItem(_var).size() > 0) {
 					string _condition = condition;
 
@@ -810,7 +810,7 @@ namespace wiz {
 				UserType* ut, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
 				string _var = var;
-				if (_var == " ") {
+				if (_var == " " || _var == "_") {
 					_var = "";
 				}
 				if (ut->GetUserTypeItem(_var).size() > 0) {
@@ -1073,7 +1073,7 @@ namespace wiz {
 					while (tokenizer.hasMoreTokens()) {
 						string utName = tokenizer.nextToken();
 						vector<string> strVec;
-						if (utName == " ") { utName = ""; }
+						if (utName == " " || utName == "_") { utName = ""; }
 
 						if (utName.size() >= 3 && utName[0] == '[' && utName[utName.size() - 1] == ']')
 						{
@@ -1156,18 +1156,18 @@ namespace wiz {
 					if (temp == "") { temp = " "; }
 					StringTokenizer tokenizer(temp, "/", builder, 1);
 					UserType utTemp("");
-					if (false == LoadDataFromString(data, utTemp)) {
+					if (false == LoadDataFromString(data, utTemp)){
 						return false;
 					}
 					while (tokenizer.hasMoreTokens()) {
 						string _varName = tokenizer.nextToken();
 						/// todo - if varName is "" then data : val val val ... 
-						if (_varName == "" || _varName == " ") { // re?
+						if (_varName == "" || _varName == " " || _varName == "_" ) { // re?
 							const int n = utTemp.GetItem("").size();
 							for (int i = 0; i < finded.second.size(); ++i) {
 								if (false == condition.empty()) {
 									string _condition = condition;
-									if (_varName == "" || _varName == " ") { _condition = wiz::String::replace(_condition, "~~", "^"); }
+									if (_varName == "" || _varName == " " || _varName == "_" ) { _condition = wiz::String::replace(_condition, "~~", "^"); }
 									else
 										_condition = wiz::String::replace(_condition, "~~", _varName); //
 									
@@ -1421,7 +1421,7 @@ namespace wiz {
 			{
 				string str;
 				string _var = varName;
-				if (_var == " ") { _var = ""; }
+				if (_var == " " || _var == "_") { _var = ""; }
 
 				auto finded = UserType::Find(&global, position, builder);
 				if (finded.first) {
@@ -1466,7 +1466,7 @@ namespace wiz {
 					StringTokenizer tokenizer(temp, "/", builder, 1);
 					while (tokenizer.hasMoreTokens()) {
 						string _var = tokenizer.nextToken();
-						if (_var == " ") { _var = ""; }
+						if (_var == " " || _var == "_") { _var = ""; }
 						vector<string> strVec;
 
 						if (_var.size() >= 3 && _var[0] == '[' && _var[_var.size() - 1] == ']')
@@ -1709,7 +1709,7 @@ namespace wiz {
 			{
 				int count = 0;
 				string _var = varName;
-				if (_var == " ") { _var = ""; }
+				if (_var == " " || _var == "_") { _var = ""; }
 
 				auto finded = UserType::Find(&global, position, builder);
 				if (finded.first) {
@@ -1798,7 +1798,7 @@ namespace wiz {
 			{
 				int count = 0;
 				string _var = varName;
-				if (_var == " ") { _var = ""; }
+				if (_var == " " || _var == "_") { _var = ""; }
 
 				auto finded = UserType::Find(&global, position, builder);
 				if (finded.first) {
@@ -1908,7 +1908,7 @@ namespace wiz {
 				UserType* ut, const string& val, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
 				string _var = var;
-				if (_var == " ") { _var = ""; }
+				if (_var == " " || _var == "_") { _var = ""; }
 
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
 					if (ut->GetItemList(i).GetName() == _var) {
@@ -1963,7 +1963,7 @@ namespace wiz {
 			{
 				string _var = ut_name;
 				
-				if (_var == " ") { _var = ""; }
+				if (_var == " " || _var == "_") { _var = ""; }
 
 				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
 					if (ut->GetUserTypeList(i)->GetName() == _var) {
