@@ -4,10 +4,10 @@ Main = { $call = { id = snail } }
 Event = {
 	id = snail
 	
-	$call = { id = init row_max = 100 col_max = 100 }
+	$call = { id = init row_max = 5 col_max = 5 }
 	
-	#$print2 = { data = { /./ } }
-	#$print = { enter = { \n } }
+	$print2 = { data = { /./ } }
+	$print = { enter = { \n } }
 	
 	$setElement = { dir = { $concat_all = { / . / Arr / $ ut1 } } idx = { 1 } val = { 1 } }
  	
@@ -129,11 +129,11 @@ Event = {
 	
 	$option = { REMOVE_IF_CALL_ONESELF_EVENT } 
 	
+	$call = { id = canMoveRight }
+	
 	$if = {
 		condition = {
-			$event_result = {
-				id = { canMoveRight }
-			}
+			$return_value = { }
 		}
 		then = {
 			$call = { id = moveRight }
@@ -143,11 +143,13 @@ Event = {
 			$call = { id = doing }
 		}
 	}
+	
+	
+	$call = { id = canMoveDown }
+	
 	$if = {
 		condition = {
-			$event_result = {
-				id = { canMoveDown }
-			}
+			$return_value = { }
 		}
 		then = {
 			$call = { id = moveDown }
@@ -157,11 +159,11 @@ Event = {
 			$call = { id = doing }	
 		}
 	}
+	$call = { id = canMoveLeft }
+	
 	$if = {
 		condition = {
-			$event_result = {
-				id = { canMoveLeft }
-			}
+			$return_value = { }
 		}
 		then = {
 			$call = { id = moveLeft }
@@ -171,11 +173,11 @@ Event = {
 			$call = { id = doing }
 		}
 	}
+	$call = { id = canMoveUp }
+	
 	$if = {
 		condition = {
-			$event_result = {
-				id = { canMoveUp }
-			}
+			$return_value = { }
 		}
 		then = {
 			$call = { id = moveUp }

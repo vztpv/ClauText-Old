@@ -105,7 +105,7 @@ Event =
 		# ToDo - cf) empty -> "/ /" ? and ///test ??  ~~/test / ? chk name that is empty.
 		# ToDo - condition - no first ToBool4!
 													### now.var? if var is empty!! - then err -> use { $getItemValue = { /// } 
-		val = { $event_result = { id = { test } x = { $getItemValue= { /// } } y = 2.0 } } #{ $get = { now.~~ } } y = 2.0 } }
+		val = { $event_result = { id = { test } x = { $get_item_value2 = { /// } } y = 2.0 } } #{ $get = { now.~~ } } y = 2.0 } }
 		##val = { @$eval = { "$concat_all = { $add = { 2.700 /./~~ } chk_base_tax  /./~~ } " } }
 		#val = { $concat_all = { $add = { 2.700 /./~~ } chk_base_tax  /./~~ } }
 		condition = {
