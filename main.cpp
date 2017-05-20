@@ -2983,7 +2983,6 @@ int main(int argc, char* argv[])
 	if (argc == 1) {
 		cout << "FileName: ";
 		getline(cin, fileName);
-		//fileName = "test 6.txt";
 	}
 	else
 	{
@@ -2996,7 +2995,29 @@ int main(int argc, char* argv[])
 
 		cout << "fileName is " << fileName << endl;
 		cout << "excute result is " << excute_module("", &global, ExcuteData()) << endl;
-		//_getch(); // pause..
+	/*	string test;
+		string text = "$OR = { "
+			" $EQ = { 3 0 } "
+			" $EQ = { 4 $add = { 1 5 } } } ";
+		ExcuteData excuteData;
+		//wiz::StringBuilder builder(1024);
+
+		for (int i = 0; i < 50000; ++i) {
+			wiz::load_data::UserType ut;
+			wiz::load_data::LoadData::LoadDataFromString(text, ut);
+		}
+		*/
+		/*string result;
+		for (int i = 0; i < 500000; ++i) {
+			string text = "id = 1 i = 3 j = 4";
+			
+			wiz::load_data::UserType ut;
+			ExcuteData excuteData;
+			wiz::StringBuilder builder(1024);
+
+			result = ToBool4(NULL, ut, text, excuteData, &builder);
+		}
+		printf("%s\n", result.c_str());*/
 	}
 	catch (const char* str) {
 		cout << str << endl;

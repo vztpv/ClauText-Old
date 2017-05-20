@@ -246,7 +246,7 @@ namespace wiz{
 						builder->LeftShift(right - left + 2);
 					}
 					else {
-						_getch();
+						//_getch();
 					}
 				}
 			}

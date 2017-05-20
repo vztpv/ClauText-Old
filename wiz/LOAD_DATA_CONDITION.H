@@ -22,7 +22,7 @@ namespace wiz {
 			int i;
 			UserType* position=nullptr; // need set, get ter!!
 			UserType* global=nullptr;
-			int option;
+			int option; // removal?
 			StringBuilder* builder;
 		public:
 			explicit Condition(const string& condition, UserType* position, UserType* global, StringBuilder* builder, const int option = 0)

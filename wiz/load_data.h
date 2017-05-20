@@ -2629,10 +2629,13 @@ namespace wiz {
 				x = operandStack.pop();
 				y = operandStack.pop();
 
-				if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && (wiz::load_data::Utility::GetType(y) == "INTEGER")) { /// only integer -> BigInteger
+				string typex, typey; // other *, /, mod, ..
+				typex = wiz::load_data::Utility::GetType(x);
+				typey = wiz::load_data::Utility::GetType(y);
+				if (typex == typey && typey == "INTEGER") { /// only integer -> BigInteger
 					operandStack.push(wiz::toStr(atoll(x.c_str()) + atoll(y.c_str())));
 				}
-				else if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && wiz::load_data::Utility::GetType(y) == "DOUBLE") {
+				else if (typex == typey && typey == "DOUBLE") {
 					operandStack.push(wiz::_toString(std::stold(x) + std::stold(y)));
 				}
 				else
@@ -3357,7 +3360,7 @@ namespace wiz {
 		{ 
 			string result = temp;
 			//cout << "temp is " << temp << endl;
-			set<string> utNames; // rename?
+			/*set<string> utNames; // rename?
 			{ // removal??
 				UserType utTemp;
 				LoadData::LoadDataFromString(result, utTemp);
@@ -3369,7 +3372,7 @@ namespace wiz {
 						utNames.insert(utTemp.GetUserTypeList(i)->GetName());
 					}
 				}
-			}
+			}*/
 		//	cout << "result is " << result << endl;
 
 			wiz::ArrayStack<string> resultStack;
@@ -3620,7 +3623,7 @@ namespace wiz {
 			if (!result.empty()) {
 				result.erase(result.begin() + result.size() - 1);
 			}
-	
+	/*
 
 			{ // removal?? -why?? - reason?
 				UserType ut;
@@ -3651,7 +3654,7 @@ namespace wiz {
 					result = move(temp);
 				}
 			}
-
+		*/
 		//	cout << "result is " << result << endl;
 		//	cout << endl;
 			return result;

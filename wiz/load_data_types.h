@@ -751,6 +751,7 @@ namespace wiz {
 			}
 
 
+			// $it?
 			vector<ItemType<string>> GetItem(const string& name) const {
 				vector<ItemType<string>> temp;
 				if (String::startsWith(name, "$.") && name.size() >= 5) {
@@ -773,8 +774,19 @@ namespace wiz {
 				return temp;
 			}
 			// regex to SetItem?
-			bool SetItem(const string& name, const string& value) {
+			bool SetItem(string name, const string& value) {
 				int index = -1;
+
+				if (wiz::String::startsWith(name, "$it")) {
+					index = atoi(wiz::String::substring(name, 3).c_str());
+				
+					itemList[index].Set(0, value);
+					return true;
+				}
+
+				if ("_" == name) {
+					name = "";
+				}
 
 				for (int i = 0; i < itemList.size(); ++i) {
 					if (itemList[i].GetName() == name)
@@ -1106,7 +1118,7 @@ namespace wiz {
 				if (position == ".") { temp.push_back(global); return{ true, temp }; }
 				if (position == "/./") { temp.push_back(global); return{ true, temp }; } // chk..
 				if (position == "/.") { temp.push_back(global); return{ true, temp }; }
-				if (String::startsWith(position, "/."))
+				if (String::startsWith(position, "/./"))
 				{
 					position = String::substring(position, 3);
 				}
