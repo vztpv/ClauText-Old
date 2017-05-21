@@ -770,6 +770,9 @@ namespace wiz {
 			{
 				string _var = var;
 				if (_var == " " || _var == "_") { _var = ""; }
+
+				// $it?
+
 				if (ut->GetItem(_var).size() > 0) {
 					string _condition = condition;
 
@@ -1240,8 +1243,16 @@ namespace wiz {
 											continue;
 										}
 									}
-									finded.second[i]->SetItem(_varName, data); /// chk
-									isTrue = true;
+									if (wiz::String::startsWith(_varName, "$it")) {
+										int index = atoi(wiz::String::substring(_varName, 3).c_str());
+
+										finded.second[i]->SetItem(index, data);
+										isTrue = true;
+									}
+									else {
+										finded.second[i]->SetItem(_varName, data); /// chk
+										isTrue = true;
+									}
 								}
 
 								// prevent from infinity loop.
@@ -1448,9 +1459,16 @@ namespace wiz {
 							}
 						}
 
-						const int num = finded.second[i]->GetItem(_var).size();
-						for (int k = 0; k < num; ++k) {
-							str = str + finded.second[i]->GetItem(_var)[k].Get(0) + "\n";
+						if (wiz::String::startsWith(_var, "$it")) {
+							int itemIdx = stoi(wiz::String::substring(_var, 3));
+							
+							str = str + finded.second[i]->GetItemList(itemIdx).Get(0) + "\n";
+						}
+						else {
+							const int num = finded.second[i]->GetItem(_var).size();
+							for (int k = 0; k < num; ++k) {
+								str = str + finded.second[i]->GetItem(_var)[k].Get(0) + "\n";
+							}
 						}
 					}
 				}
@@ -1717,7 +1735,7 @@ namespace wiz {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						if (false == condition.empty()) {
 							string _condition = condition;
-							
+
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
 							Condition cond(_condition, finded.second[i], &global, builder);
@@ -1730,7 +1748,13 @@ namespace wiz {
 								continue;
 							}
 						}
-						count = count + (finded.second[i]->GetItem(_var).size());
+						if (wiz::String::startsWith(_var, "$it")) {
+							int itemIdx = stoi(wiz::String::substring(_var, 3));
+							count = count + (finded.second[i]->GetItemList(itemIdx).size());
+						}
+						else {
+							count = count + (finded.second[i]->GetItem(_var).size());
+						}
 					}
 				}
 				return 0 != count;
@@ -1806,7 +1830,7 @@ namespace wiz {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						if (false == condition.empty()) {
 							string _condition = condition;
-							
+
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
 							Condition cond(_condition, finded.second[i], &global, builder);
@@ -1819,7 +1843,13 @@ namespace wiz {
 								continue;
 							}
 						}
-						count = count + (finded.second[i]->GetItem(_var).size());
+						if (wiz::String::startsWith(_var, "$it")) {
+							int itemIdx = stoi(wiz::String::substring(_var, 3));
+							count = count + (finded.second[i]->GetItemList(itemIdx).size());
+						}
+						else {
+							count = count + (finded.second[i]->GetItem(_var).size());
+						}
 					}
 				}
 				return 0 != count;

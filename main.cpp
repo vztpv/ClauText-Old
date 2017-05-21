@@ -2766,7 +2766,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 						wiz::load_data::UserType::Find(&global,
 							ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder), &builder).second[0];
 					const string colName = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
-
+					// $it?
 					vector<wiz::load_data::Type*> temp;
 
 
