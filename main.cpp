@@ -2990,11 +2990,11 @@ int main(int argc, char* argv[])
 	}
 	wiz::load_data::UserType global;
 	try {
-		
-		wiz::load_data::LoadData::LoadDataFromFile(fileName, global);
+			wiz::load_data::LoadData::LoadDataFromFile(fileName, global);
 
-		cout << "fileName is " << fileName << endl;
-		cout << "excute result is " << excute_module("", &global, ExcuteData()) << endl;
+			cout << "fileName is " << fileName << endl;
+			cout << "excute result is " << excute_module("", &global, ExcuteData()) << endl;
+	
 	/*	string test;
 		string text = "$OR = { "
 			" $EQ = { 3 0 } "

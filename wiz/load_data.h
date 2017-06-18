@@ -1896,43 +1896,82 @@ namespace wiz {
 				ReplaceItem(global, var, start_dir, ut, val, condition, excuteData, builder);
 			}
 			static void RemoveUserTypeTotal(UserType& global, const string& ut_name, const string& condition, const string& start_dir,
-				const ExcuteData& excuteData, wiz::StringBuilder* builder) 
+				const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
-				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir, builder).second[0]; // chk!!
-				RemoveUserTypeTotal(global, ut_name, start_dir, ut, condition, excuteData, builder);
+				auto temp = wiz::load_data::UserType::Find(&global, start_dir, builder);
+				if (temp.first) {
+					for (int i = 0; i < temp.second.size(); ++i) // chk!!
+					{
+						UserType* ut = temp.second[i];
+						RemoveUserTypeTotal(global, ut_name, start_dir, ut, condition, excuteData, builder);
+					}
+				}
 			}
 			static void ReplaceDateType(UserType& global, const string& val, const string& condition, const string& start_dir,
 				const ExcuteData& excuteData, wiz::StringBuilder* builder
 			) {
-				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir, builder).second[0]; // chk!!
-				ReplaceDateType(global, start_dir, ut, val, condition, excuteData, builder);
+				auto temp = wiz::load_data::UserType::Find(&global, start_dir, builder);
+				if (temp.first) {
+					for (int i = 0; i < temp.second.size(); ++i) // chk!!
+					{
+						UserType* ut = temp.second[i];
+						ReplaceDateType(global, start_dir, ut, val, condition, excuteData, builder);
+					}
+				}
 			}
 			static void ReplaceDateType2(UserType& global, const string& val, const string& condition, const string& start_dir,
-				const ExcuteData& excuteData, wiz::StringBuilder* builder) 
+				const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
-				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir, builder).second[0]; // chk!!
-				ReplaceDateType2(global, start_dir, ut, val, condition, excuteData, builder);
+				auto temp = wiz::load_data::UserType::Find(&global, start_dir, builder);
+				if (temp.first) {
+					for (int i = 0; i < temp.second.size(); ++i) // chk!!
+					{
+						UserType* ut = temp.second[i];
+						ReplaceDateType2(global, start_dir, ut, val, condition, excuteData, builder);
+					}
+				}
 			}
 			static void ReplaceDataType1(UserType& global, const string& rex, const vector<string>& val, const vector<string>& condition,
-				const string& start_dir, const ExcuteData& excuteData, wiz::StringBuilder* builder) 
+				const string& start_dir, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
-				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir, builder).second[0]; // chk!!
 				std::regex rgx(rex);
-				ReplaceDataType1(global, start_dir, ut, rgx, val, condition, excuteData, builder);
+				auto temp = wiz::load_data::UserType::Find(&global, start_dir, builder);
+				if (temp.first) {
+					for (int i = 0; i < temp.second.size(); ++i) // chk!!
+					{
+						UserType* ut = temp.second[i];
+						ReplaceDataType1(global, start_dir, ut, rgx, val, condition, excuteData, builder);
+					}
+				}
 			}
 			static void ReplaceDataType1_2(UserType& global, const string& rex, const vector<string>& val, const vector<string>& condition,
-				const string& start_dir, const ExcuteData& excuteData, wiz::StringBuilder* builder) 
+				const string& start_dir, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
-				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir, builder).second[0]; // chk!!
 				std::regex rgx(rex);
-				ReplaceDataType1_2(global, start_dir, ut, rgx, val, condition, excuteData, builder);
+
+				auto temp = wiz::load_data::UserType::Find(&global, start_dir, builder);
+				if (temp.first) {
+					for (int i = 0; i < temp.second.size(); ++i) // chk!!
+					{
+						UserType* ut = temp.second[i];
+
+						ReplaceDataType1_2(global, start_dir, ut, rgx, val, condition, excuteData, builder);
+					}
+				}
 			}
 			static void ReplaceDataType2(UserType& global, const string& rex, const vector<string>& val, const vector<string>& condition,
 				const string& start_dir, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
-				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir, builder).second[0]; // chk!!
 				std::regex rgx(rex);
-				ReplaceDataType2(global, start_dir, ut, rgx, val, condition, excuteData, builder);
+
+				auto temp = wiz::load_data::UserType::Find(&global, start_dir, builder);
+				if (temp.first) {
+					for (int i = 0; i < temp.second.size(); ++i) // chk!!
+					{
+						UserType* ut = temp.second[i];
+						ReplaceDataType2(global, start_dir, ut, rgx, val, condition, excuteData, builder);
+					}
+				}
 			}
 		private:
 			static void ReplaceItem(UserType& global, const string& var, const string& nowPosition,
