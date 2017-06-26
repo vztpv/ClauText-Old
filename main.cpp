@@ -1194,18 +1194,21 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 
 					if (val->GetUserTypeListSize() >= 3)
 					{
-						int n = (val->GetUserTypeListSize() - 1) / 2;
-						for (int i = 0; i < n; ++i) {
-							sval.push_back(val->GetUserTypeList(1)->ToString());
+						const int n = (val->GetUserTypeListSize() - 3); // chk
+						for (int i = 0; i < n; i=i+2) { // chk
+							sval.push_back(val->GetUserTypeList(1 + i)->ToString());
 
-							scondition.push_back(val->GetUserTypeList(2)->ToString());
+							scondition.push_back(val->GetUserTypeList(2 + i)->ToString());
 						}
 					}
 					if (val->GetUserTypeListSize() >= 4) {
-						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(3)->ToString(), _excuteData, &builder);
+						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(val->GetUserTypeListSize()-2)->ToString(), _excuteData, &builder);
 					}
-
-					wiz::load_data::LoadData::ReplaceDataType1(global, rex, sval, scondition, start_dir, _excuteData, &builder);
+					bool recursive = true;
+					if (val->GetUserTypeListSize() >= 5) {
+						recursive = ToBool4(nullptr, global, val->GetUserTypeList(val->GetUserTypeListSize()-1)->ToString(), _excuteData, &builder) == "TRUE" ? true : false;
+					}
+					wiz::load_data::LoadData::ReplaceDataType1(global, rex, sval, scondition, start_dir, _excuteData, recursive, &builder);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1226,21 +1229,23 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 
 					if (val->GetUserTypeListSize() >= 3)
 					{
-						int n = (val->GetUserTypeListSize() - 1) / 2;
-						int count = 1;
-						for (int i = 0; i < n; ++i) {
-							sval.push_back(val->GetUserTypeList(count)->ToString());
-							count++;
-							scondition.push_back(val->GetUserTypeList(count)->ToString());
-							count++;
+						const int n = (val->GetUserTypeListSize() - 3); // chk
+						for (int i = 0; i < n; i = i + 2) { // chk
+							sval.push_back(val->GetUserTypeList(1 + i)->ToString());
+
+							scondition.push_back(val->GetUserTypeList(2 + i)->ToString());
 						}
 					}
 
-					if (val->GetUserTypeListSize() >= 4 && (val->GetUserTypeListSize()%2 == 0)) {
-						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(val->GetUserTypeListSize()-1)->ToString(), _excuteData, &builder);
+					if (val->GetUserTypeListSize() >= 4) {
+						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(val->GetUserTypeListSize() - 2)->ToString(), _excuteData, &builder);
+					}
+					bool recursive = true;
+					if (val->GetUserTypeListSize() >= 5) {
+						recursive = ToBool4(nullptr, global, val->GetUserTypeList(val->GetUserTypeListSize() - 1)->ToString(), _excuteData, &builder) == "TRUE" ? true : false;
 					}
 
-					wiz::load_data::LoadData::ReplaceDataType1_2(global, rex, sval, scondition, start_dir, _excuteData, &builder);
+					wiz::load_data::LoadData::ReplaceDataType1_2(global, rex, sval, scondition, start_dir, _excuteData, recursive, &builder);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1262,23 +1267,24 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 
 					if (val->GetUserTypeListSize() >= 3)
 					{
-						int n = (val->GetUserTypeListSize() - 1) / 2;
-						int count = 1;
-						for (int i = 0; i < n; ++i) {
-							sval.push_back(val->GetUserTypeList(count)->ToString());
-							count++;
-							scondition.push_back(val->GetUserTypeList(count)->ToString());
-							count++;
+						const int n = (val->GetUserTypeListSize() - 3); // chk
+						for (int i = 0; i < n; i = i + 2) { // chk
+							sval.push_back(val->GetUserTypeList(1 + i)->ToString());
+
+							scondition.push_back(val->GetUserTypeList(2 + i)->ToString());
 						}
 					}
 
-					if (val->GetUserTypeListSize() >= 4 && (val->GetUserTypeListSize() % 2 == 0)) {
+					if (val->GetUserTypeListSize() >= 4) {
 						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(val->GetUserTypeListSize() - 1)->ToString(), _excuteData, &builder);
 					}
-
+					bool recursive = true;
+					if (val->GetUserTypeListSize() >= 5) {
+						recursive = ToBool4(nullptr, global, val->GetUserTypeList(val->GetUserTypeListSize() - 2)->ToString(), _excuteData, &builder) == "TRUE" ? true : false;
+					}
 					//cout << scondition << endl;
 					//cout << "sval " << sval << endl;
-					wiz::load_data::LoadData::ReplaceDataType2(global, rex, sval, scondition, start_dir, _excuteData, &builder);
+					wiz::load_data::LoadData::ReplaceDataType2(global, rex, sval, scondition, start_dir, _excuteData, recursive, &builder);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1303,8 +1309,11 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					if (val->GetUserTypeListSize() >= 3) {
 						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(2)->ToString(), _excuteData, &builder);
 					}
-
-					wiz::load_data::LoadData::ReplaceDateType(global, sval, scondition, start_dir, _excuteData, &builder);
+					bool recursive = true;
+					if (val->GetUserTypeListSize() >= 4) {
+						recursive = ToBool4(nullptr, global, val->GetUserTypeList(3)->ToString(), _excuteData, &builder) == "TRUE" ? true : false;
+					}
+					wiz::load_data::LoadData::ReplaceDateType(global, sval, scondition, start_dir, _excuteData, recursive, &builder);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1329,8 +1338,11 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					if (val->GetUserTypeListSize() >= 3) {
 						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(2)->ToString(), _excuteData, &builder);
 					}
-
-					wiz::load_data::LoadData::ReplaceDateType2(global, sval, scondition, start_dir, _excuteData, &builder);
+					bool recursive = true;
+					if (val->GetUserTypeListSize() >= 4) {
+						recursive = ToBool4(nullptr, global, val->GetUserTypeList(3)->ToString(), _excuteData, &builder) == "TRUE" ? true : false;
+					}
+					wiz::load_data::LoadData::ReplaceDateType2(global, sval, scondition, start_dir, _excuteData, recursive, &builder);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1354,8 +1366,12 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					if (val->GetUserTypeListSize() >= 3) {
 						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(2)->ToString(), _excuteData, &builder);
 					}
+					bool recursive = true;
+					if (val->GetUserTypeListSize() >= 4) {
+						recursive = ToBool4(nullptr, global, val->GetUserTypeList(3)->ToString(), _excuteData, &builder) == "TRUE" ? true : false;
+					}
 
-					wiz::load_data::LoadData::RemoveUserTypeTotal(global, ut_name, condition, start_dir, _excuteData, &builder);
+					wiz::load_data::LoadData::RemoveUserTypeTotal(global, ut_name, condition, start_dir, _excuteData, recursive, &builder);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1380,8 +1396,11 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					if (val->GetUserTypeListSize() >= 4) {
 						start_dir = ToBool4(nullptr, global, val->GetUserTypeList(3)->ToString(), _excuteData, &builder);
 					}
-
-					wiz::load_data::LoadData::ReplaceItem(global, svar, sval, scondition, start_dir, _excuteData, &builder);
+					bool recursive = true;
+					if (val->GetUserTypeListSize() >= 5) {
+						recursive = ToBool4(nullptr, global, val->GetUserTypeList(4)->ToString(), _excuteData, &builder) == "TRUE"? true : false;
+					}
+					wiz::load_data::LoadData::ReplaceItem(global, svar, sval, scondition, start_dir, _excuteData, recursive, &builder);
 
 					eventStack.top().userType_idx.top()++;
 					break;

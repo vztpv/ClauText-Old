@@ -1890,49 +1890,55 @@ namespace wiz {
 				return temp;
 			}
 			static void ReplaceItem(UserType& global, const string& var, const string& val, const string& condition, const string& start_dir,
-				const ExcuteData& excuteData, wiz::StringBuilder* builder)
-			{
-				UserType* ut = wiz::load_data::UserType::Find(&global, start_dir, builder).second[0]; // chk!!
-				ReplaceItem(global, var, start_dir, ut, val, condition, excuteData, builder);
-			}
-			static void RemoveUserTypeTotal(UserType& global, const string& ut_name, const string& condition, const string& start_dir,
-				const ExcuteData& excuteData, wiz::StringBuilder* builder)
+				const ExcuteData& excuteData, bool recursive, wiz::StringBuilder* builder)
 			{
 				auto temp = wiz::load_data::UserType::Find(&global, start_dir, builder);
 				if (temp.first) {
 					for (int i = 0; i < temp.second.size(); ++i) // chk!!
 					{
 						UserType* ut = temp.second[i];
-						RemoveUserTypeTotal(global, ut_name, start_dir, ut, condition, excuteData, builder);
+						ReplaceItem(global, var, start_dir, ut, val, condition, excuteData, builder, recursive);
+					}
+				}
+			}
+			static void RemoveUserTypeTotal(UserType& global, const string& ut_name, const string& condition, const string& start_dir,
+				const ExcuteData& excuteData, bool recursive, wiz::StringBuilder* builder)
+			{
+				auto temp = wiz::load_data::UserType::Find(&global, start_dir, builder);
+				if (temp.first) {
+					for (int i = 0; i < temp.second.size(); ++i) // chk!!
+					{
+						UserType* ut = temp.second[i];
+						RemoveUserTypeTotal(global, ut_name, start_dir, ut, condition, excuteData, builder, recursive);
 					}
 				}
 			}
 			static void ReplaceDateType(UserType& global, const string& val, const string& condition, const string& start_dir,
-				const ExcuteData& excuteData, wiz::StringBuilder* builder
-			) {
+				const ExcuteData& excuteData, bool recursive, wiz::StringBuilder* builder
+				) {
 				auto temp = wiz::load_data::UserType::Find(&global, start_dir, builder);
 				if (temp.first) {
 					for (int i = 0; i < temp.second.size(); ++i) // chk!!
 					{
 						UserType* ut = temp.second[i];
-						ReplaceDateType(global, start_dir, ut, val, condition, excuteData, builder);
+						ReplaceDateType(global, start_dir, ut, val, condition, excuteData, builder, recursive);
 					}
 				}
 			}
 			static void ReplaceDateType2(UserType& global, const string& val, const string& condition, const string& start_dir,
-				const ExcuteData& excuteData, wiz::StringBuilder* builder)
+				const ExcuteData& excuteData, bool recursive, wiz::StringBuilder* builder)
 			{
 				auto temp = wiz::load_data::UserType::Find(&global, start_dir, builder);
 				if (temp.first) {
 					for (int i = 0; i < temp.second.size(); ++i) // chk!!
 					{
 						UserType* ut = temp.second[i];
-						ReplaceDateType2(global, start_dir, ut, val, condition, excuteData, builder);
+						ReplaceDateType2(global, start_dir, ut, val, condition, excuteData, builder, recursive);
 					}
 				}
 			}
 			static void ReplaceDataType1(UserType& global, const string& rex, const vector<string>& val, const vector<string>& condition,
-				const string& start_dir, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+				const string& start_dir, const ExcuteData& excuteData, bool recursive, wiz::StringBuilder* builder)
 			{
 				std::regex rgx(rex);
 				auto temp = wiz::load_data::UserType::Find(&global, start_dir, builder);
@@ -1940,12 +1946,12 @@ namespace wiz {
 					for (int i = 0; i < temp.second.size(); ++i) // chk!!
 					{
 						UserType* ut = temp.second[i];
-						ReplaceDataType1(global, start_dir, ut, rgx, val, condition, excuteData, builder);
+						ReplaceDataType1(global, start_dir, ut, rgx, val, condition, excuteData, builder, recursive);
 					}
 				}
 			}
 			static void ReplaceDataType1_2(UserType& global, const string& rex, const vector<string>& val, const vector<string>& condition,
-				const string& start_dir, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+				const string& start_dir, const ExcuteData& excuteData, bool recursive, wiz::StringBuilder* builder)
 			{
 				std::regex rgx(rex);
 
@@ -1955,12 +1961,12 @@ namespace wiz {
 					{
 						UserType* ut = temp.second[i];
 
-						ReplaceDataType1_2(global, start_dir, ut, rgx, val, condition, excuteData, builder);
+						ReplaceDataType1_2(global, start_dir, ut, rgx, val, condition, excuteData, builder, recursive);
 					}
 				}
 			}
 			static void ReplaceDataType2(UserType& global, const string& rex, const vector<string>& val, const vector<string>& condition,
-				const string& start_dir, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+				const string& start_dir, const ExcuteData& excuteData, bool recursive, wiz::StringBuilder* builder)
 			{
 				std::regex rgx(rex);
 
@@ -1969,13 +1975,13 @@ namespace wiz {
 					for (int i = 0; i < temp.second.size(); ++i) // chk!!
 					{
 						UserType* ut = temp.second[i];
-						ReplaceDataType2(global, start_dir, ut, rgx, val, condition, excuteData, builder);
+						ReplaceDataType2(global, start_dir, ut, rgx, val, condition, excuteData, builder, recursive);
 					}
 				}
 			}
 		private:
 			static void ReplaceItem(UserType& global, const string& var, const string& nowPosition,
-				UserType* ut, const string& val, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+				UserType* ut, const string& val, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder, bool recursive)
 			{
 				string _var = var;
 				if (_var == " " || _var == "_") { _var = ""; }
@@ -2012,24 +2018,27 @@ namespace wiz {
 					}
 				}
 
-				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
-					string temp = ut->GetUserTypeList(i)->GetName();
-					if (temp == "") { temp = " "; }
-					ReplaceItem(
-						global,
-						_var,
-						nowPosition + "/" + temp,
-						ut->GetUserTypeList(i),
-						val,
-						condition,
-						excuteData,
-						builder
-					);
+				if (recursive) {
+					for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
+						string temp = ut->GetUserTypeList(i)->GetName();
+						if (temp == "") { temp = " "; }
+						ReplaceItem(
+							global,
+							_var,
+							nowPosition + "/" + temp,
+							ut->GetUserTypeList(i),
+							val,
+							condition,
+							excuteData,
+							builder,
+							recursive
+						);
+					}
 				}
 			}
 			static void RemoveUserTypeTotal(UserType& global, const string& ut_name, const string& nowPosition,
 				UserType* ut, const string& condition, 
-				const ExcuteData& excuteData, wiz::StringBuilder* builder)
+				const ExcuteData& excuteData, wiz::StringBuilder* builder, bool recursive)
 			{
 				string _var = ut_name;
 				
@@ -2059,24 +2068,26 @@ namespace wiz {
 						}
 					}
 				}
-
-				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
-					string temp = ut->GetUserTypeList(i)->GetName();
-					if (temp == "") { temp = " "; }
-					RemoveUserTypeTotal(
-						global,
-						_var,
-						nowPosition + "/" + temp,
-						ut->GetUserTypeList(i),
-						condition,
-						excuteData,
-						builder
-					);
+				if (recursive) {
+					for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
+						string temp = ut->GetUserTypeList(i)->GetName();
+						if (temp == "") { temp = " "; }
+						RemoveUserTypeTotal(
+							global,
+							_var,
+							nowPosition + "/" + temp,
+							ut->GetUserTypeList(i),
+							condition,
+							excuteData,
+							builder,
+							recursive
+						);
+					}
 				}
 			}
 			static void ReplaceDateType(UserType& global, const string& nowPosition,
 				UserType* ut, const string& val, const string& condition, 
-				const ExcuteData& excuteData, wiz::StringBuilder* builder)
+				const ExcuteData& excuteData, wiz::StringBuilder* builder, bool recursive)
 			{
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
 					if (Utility::IsDate(ut->GetItemList(i).GetName()) || Utility::IsDate(ut->GetItemList(i).Get(0))) {
@@ -2112,25 +2123,27 @@ namespace wiz {
 						}
 					}
 				}
+				if (recursive) {
+					for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
+						string temp = ut->GetUserTypeList(i)->GetName();
+						if (temp == "") { temp = " "; }
 
-				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
-					string temp = ut->GetUserTypeList(i)->GetName();
-					if (temp == "") { temp = " "; }
-
-					ReplaceDateType(
-						global,
-						nowPosition + "/" + temp,
-						ut->GetUserTypeList(i),
-						val,
-						condition,
-						excuteData,
-						builder
-					);
+						ReplaceDateType(
+							global,
+							nowPosition + "/" + temp,
+							ut->GetUserTypeList(i),
+							val,
+							condition,
+							excuteData,
+							builder,
+							recursive
+						);
+					}
 				}
 			}
 			static void ReplaceDateType2(UserType& global, const string& nowPosition,
 				UserType* ut, const string& val, const string& condition, 
-				const ExcuteData& excuteData, wiz::StringBuilder* builder)
+				const ExcuteData& excuteData, wiz::StringBuilder* builder, bool recursive)
 			{
 				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
 					string temp = ut->GetUserTypeList(i)->GetName();
@@ -2162,21 +2175,23 @@ namespace wiz {
 							ut->GetUserTypeList(i)->SetName(_val);
 						}
 					}
-
-					ReplaceDateType2(
-						global,
-						nowPosition + "/" + temp,
-						ut->GetUserTypeList(i),
-						val,
-						condition,
-						excuteData,
-						builder
-					);
+					if (recursive) {
+						ReplaceDateType2(
+							global,
+							nowPosition + "/" + temp,
+							ut->GetUserTypeList(i),
+							val,
+							condition,
+							excuteData,
+							builder,
+							recursive
+						);
+					}
 				}
 			}
 			static void ReplaceDataType1(UserType& global, const string& nowPosition,
 				UserType* ut, const std::regex& rgx, const vector<string>& val, const vector<string>& condition, 
-				const ExcuteData& excuteData, wiz::StringBuilder* builder)
+				const ExcuteData& excuteData, wiz::StringBuilder* builder, bool recursive)
 			{
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
 					if (std::regex_match(ut->GetItemList(i).GetName(), rgx)) { // || Utility::IsDate(ut->GetItemList(i).Get(0))) {
@@ -2216,26 +2231,28 @@ namespace wiz {
 						}
 					}
 				}
+				if (recursive) {
+					for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
+						string temp = ut->GetUserTypeList(i)->GetName();
+						if (temp == "") { temp = " "; }
 
-				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
-					string temp = ut->GetUserTypeList(i)->GetName();
-					if (temp == "") { temp = " "; }
-
-					ReplaceDataType1(
-						global,
-						nowPosition + "/" + temp,
-						ut->GetUserTypeList(i),
-						rgx,
-						val,
-						condition,
-						excuteData,
-						builder
-					);
+						ReplaceDataType1(
+							global,
+							nowPosition + "/" + temp,
+							ut->GetUserTypeList(i),
+							rgx,
+							val,
+							condition,
+							excuteData,
+							builder,
+							recursive
+						);
+					}
 				}
 			}
 			static void ReplaceDataType1_2(UserType& global, const string& nowPosition,
 				UserType* ut, const std::regex& rgx, const vector<string>& val, const vector<string>& condition, 
-				const ExcuteData& excuteData, wiz::StringBuilder* builder)
+				const ExcuteData& excuteData, wiz::StringBuilder* builder, bool recursive)
 			{
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
 					if (std::regex_match(ut->GetItemList(i).GetName(), rgx)) { // || Utility::IsDate(ut->GetItemList(i).Get(0))) {
@@ -2274,26 +2291,28 @@ namespace wiz {
 						}
 					}
 				}
+				if (recursive) {
+					for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
+						string temp = ut->GetUserTypeList(i)->GetName();
+						if (temp == "") { temp = " "; }
 
-				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
-					string temp = ut->GetUserTypeList(i)->GetName();
-					if (temp == "") { temp = " "; }
-
-					ReplaceDataType1_2(
-						global,
-						nowPosition + "/" + temp,
-						ut->GetUserTypeList(i),
-						rgx,
-						val,
-						condition,
-						excuteData,
-						builder
-					);
+						ReplaceDataType1_2(
+							global,
+							nowPosition + "/" + temp,
+							ut->GetUserTypeList(i),
+							rgx,
+							val,
+							condition,
+							excuteData,
+							builder,
+							recursive
+						);
+					}
 				}
 			}
 			static void ReplaceDataType1_3(UserType& global, const string& nowPosition,
 				UserType* ut, const std::regex& rgx, const vector<string>& val, const vector<string>& condition, 
-				const ExcuteData& excuteData, wiz::StringBuilder* builder)
+				const ExcuteData& excuteData, wiz::StringBuilder* builder, bool recursive)
 			{
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
 					if (std::regex_match(ut->GetItemList(i).Get(0), rgx)) {
@@ -2332,21 +2351,23 @@ namespace wiz {
 						}
 					}
 				}
+				if (recursive) {
+					for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
+						string temp = ut->GetUserTypeList(i)->GetName();
+						if (temp == "") { temp = " "; }
 
-				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
-					string temp = ut->GetUserTypeList(i)->GetName();
-					if (temp == "") { temp = " "; }
-
-					ReplaceDataType1_3(
-						global,
-						nowPosition + "/" + temp,
-						ut->GetUserTypeList(i),
-						rgx,
-						val,
-						condition,
-						excuteData,
-						builder
-					);
+						ReplaceDataType1_3(
+							global,
+							nowPosition + "/" + temp,
+							ut->GetUserTypeList(i),
+							rgx,
+							val,
+							condition,
+							excuteData,
+							builder,
+							recursive
+						);
+					}
 				}
 			}
 
@@ -2354,7 +2375,7 @@ namespace wiz {
 
 			static void ReplaceDataType2(UserType& global, const string& nowPosition,
 				UserType* ut, const std::regex& rgx, const vector<string>& val, const vector<string>& condition, 
-				const ExcuteData& excuteData, wiz::StringBuilder* builder) // first val test
+				const ExcuteData& excuteData, wiz::StringBuilder* builder, bool recursive) // first val test
 			{
 				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
 					string temp = ut->GetUserTypeList(i)->GetName();
@@ -2392,16 +2413,19 @@ namespace wiz {
 							}
 						}
 					}
-					ReplaceDataType2(
-						global,
-						nowPosition + "/" + temp,
-						ut->GetUserTypeList(i),
-						rgx,
-						val,
-						condition,
-						excuteData,
-						builder
-					);
+					if (recursive) {
+						ReplaceDataType2(
+							global,
+							nowPosition + "/" + temp,
+							ut->GetUserTypeList(i),
+							rgx,
+							val,
+							condition,
+							excuteData,
+							builder,
+							recursive
+						);
+					}
 				}
 			}
 		};
@@ -3688,7 +3712,7 @@ namespace wiz {
 					}
 				}
 			}
-			result = string(builder->Str(), builder->size());
+			result = string(builder->Str(), builder->Size());
 			if (!result.empty()) {
 				result.erase(result.begin() + result.size() - 1);
 			}

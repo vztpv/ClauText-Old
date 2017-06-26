@@ -2,8 +2,10 @@
 #ifndef STRINGBUILDER_H
 #define STIRNGBUILDER_H
 
-namespace wiz
-{
+#include <cstdlib>
+#include <cstring>
+
+namespace wiz {
 	class StringBuilder //
 	{
 	private:
@@ -26,10 +28,47 @@ namespace wiz
 			buffer_first = buffer;
 		}
 		StringBuilder(const StringBuilder&) = delete;
-		StringBuilder& operator=(const StringBuilder&) = delete;
+		StringBuilder(StringBuilder&&) = delete;
+		StringBuilder& operator=(const StringBuilder& other)
+		{
+			if (buffer_first != nullptr) {
+				free(buffer_first);
+			}
+			len = other.len;
+			capacity = other.capacity;
+			buffer_first = (char*)malloc(sizeof(char)*(len + 1));
+			buffer = other.buffer;
+
+			for (int i = 0; i <= len; ++i) {
+				buffer_first[i] = other.buffer_first[i];
+			}
+
+			return *this;
+		}
+		StringBuilder& operator=(StringBuilder&& other)
+		{
+			buffer_first = other.buffer_first;
+			buffer = other.buffer;
+			len = other.len;
+			capacity = other.capacity;
+
+			other.buffer_first = nullptr;
+			other.buffer = nullptr;
+			other.len = 0;
+
+			return *this;
+		}
+
 		virtual ~StringBuilder()
 		{
 			free(buffer_first);
+		}
+
+		StringBuilder& AppendChar(const char ch)
+		{
+			char temp[2];
+			temp[0] = ch; temp[1] = '\0';
+			return Append(temp, 1);
 		}
 
 		StringBuilder& Append(const char* cstr, const int len)
@@ -55,9 +94,8 @@ namespace wiz
 					new_buffer[this->len + len] = '\0';
 					free(buffer_first);
 					buffer = new_buffer;
-					buffer_first = new_buffer;
+					buffer_first = buffer;
 					this->len = this->len + len;
-					this->capacity = this->len;
 				}
 			}
 			return *this;
@@ -67,19 +105,22 @@ namespace wiz
 			buffer[idx] = '\0';
 			return buffer;
 		}
-		const char* Str(int* size = nullptr) {
+		const char* Str(int* size = nullptr) const {
 			if (size) { *size = len; }
 			return buffer;
 		}
-
+		char* Str(int* size = nullptr) {
+			if (size) { *size = len; }
+			return buffer;
+		}
 		void Clear()
 		{
 			len = 0;
 			buffer = buffer_first;
 			buffer[0] = '\0';
 		}
-		int size() { return len; }
-		StringBuilder& LeftShift(const int offset = 1) // chk
+		int Size() { return len; }
+		StringBuilder& LeftShift(const int offset = 1)
 		{
 			if (offset < 1) { return *this; }
 
@@ -94,7 +135,18 @@ namespace wiz
 			len = len - offset;
 			return *this;
 		}
+
+		void SetLength(const int len)
+		{
+			this->len = len;
+		}
+
+		void SetBuffer(const int idx, const char val)
+		{
+			this->buffer[idx] = val;
+		}
 	};
 }
 
 #endif
+
