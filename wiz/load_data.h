@@ -3263,7 +3263,7 @@ namespace wiz {
 
 				operandStack.push(ut.GetItemList(0).GetName());
 			}
-			else if ("$get_item_value" == str) {
+			else if ("$get_item_value" == str) { // why?
 				wiz::load_data::UserType ut;
 				string statement;
 				int idx = 0;

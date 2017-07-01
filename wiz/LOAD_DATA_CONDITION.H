@@ -112,13 +112,26 @@ namespace wiz {
 				return "ERROR";
 			}
 			string GetValue(const string& op, const string& var1, const string& position1, const string& var2, const string& position2,
-				UserType* utPosition, UserType* global, StringBuilder* builder, const string& option = "0")
+				UserType* utPosition, UserType* global, StringBuilder* builder, string option = "0")
 			{
 				// COMP<, COMP>, EQ, NOTEQ
 				if (NULL == utPosition) { return "ERROR"; }
 
-				auto x = Get(var1, position1, utPosition, global);
-				auto y = Get(var2, position2, utPosition, global);
+				int mode = 0; // 0 : defualt, 1 : only position1 is /$digit, 2: only position2 is /$digit 3 : position1 and position2 are /$digit
+				string position1_temp = position1;
+				string position2_temp = position2;
+
+				if (wiz::String::startsWith(position1, "/$")) { // cf) position1 == /$0 or /$1 or ...
+					position1_temp = "/";
+					mode = mode | 1;
+				}
+				if (wiz::String::startsWith(position2, "/$")) {
+					position2_temp = "/";
+					mode = mode | 2;
+				}
+
+				auto x = Get(var1, position1_temp, utPosition, global);
+				auto y = Get(var2, position2_temp, utPosition, global);
 
 				if ("~" != position1 && false == x.first)
 				{
@@ -136,12 +149,27 @@ namespace wiz {
 				vector<ItemType<string>> value1;  // Item<string> <- 
 				vector<ItemType<string>> value2;
 				
-				// added..
 				if (position1 != "~") {
-					value1 = x.second[0]->GetItem(var1);
+					int idx = 0;
+					if (mode & 1) {
+						idx = stoi(wiz::String::substring(position1, 2));
+						value1.push_back(ItemType<string>());
+						value1[0].Push(x.second[0]->GetItemList(idx).Get(0));
+					}
+					else {
+						value1 = x.second[0]->GetItem(var1);
+					}
 				}
 				if (position2 != "~") {
-					value2 = y.second[0]->GetItem(var2);
+					int idx = 0;
+					if (mode & 2) {
+						idx = stoi(wiz::String::substring(position2, 2));
+						value2.push_back(ItemType<string>());
+						value2[0].Push(y.second[0]->GetItemList(idx).Get(0));
+					}
+					else {
+						value2 = y.second[0]->GetItem(var2);
+					}
 				}
 				//
 				if (position1 == "~" ) {
@@ -166,7 +194,7 @@ namespace wiz {
 				}
 
 				if ("COMP<" == op) {
-					if ("0" != option) { // ToDo.. // 0. just 1-1, // 1. for any case // 2. for all case
+					if ("0" != option) { // ToDo.. // 0. just 1-1, // 1. for any case // 2. for all case // .
 						for (int i = 0; i < value1.size(); ++i) {
 							for (int j = 0; j < value2.size(); ++j) {
 								if (Utility::Compare(value1[i].Get(0), value2[j].Get(0), builder) == "< 0") {

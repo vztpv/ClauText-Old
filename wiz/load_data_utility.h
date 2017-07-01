@@ -588,39 +588,39 @@ namespace wiz {
 							if (0 == state && '=' == statement[i]) {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
-									aq->emplace_back(statement.substr(token_first, token_last - token_first + 1));
+									aq->emplace_back(Token{ statement.substr(token_first, token_last - token_first + 1), false });
 								}
-								aq->emplace_back(("="));
+								aq->emplace_back(Token{ "=", false });
 								token_first = i + 1;
 							}
 							else if (0 == state && isWhitespace(statement[i])) { // isspace ' ' \t \r \n , etc... ?
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
-									aq->emplace_back(statement.substr(token_first, token_last - token_first + 1));
+									aq->emplace_back(Token{ statement.substr(token_first, token_last - token_first + 1), false });
 								}
 								token_first = i + 1;
 							}
 							else if (0 == state && '{' == statement[i]) {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
-									aq->emplace_back(statement.substr(token_first, token_last - token_first + 1));
+									aq->emplace_back(Token{ statement.substr(token_first, token_last - token_first + 1), false });
 								}
-								aq->emplace_back(("{"));
+								aq->emplace_back(Token{ "{", false });
 								token_first = i + 1;
 							}
 							else if (0 == state && '}' == statement[i]) {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
-									aq->emplace_back(statement.substr(token_first, token_last - token_first + 1));
+									aq->emplace_back(Token{ statement.substr(token_first, token_last - token_first + 1), false });
 								}
-								aq->emplace_back(("}"));
+								aq->emplace_back(Token{ "}", false });
 								token_first = i + 1;
 							}
 
 							if (0 == state && '#' == statement[i]) { // different from load_data_from_file
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
-									aq->emplace_back((statement.substr(token_first, token_last - token_first + 1)));
+									aq->emplace_back(Token{ statement.substr(token_first, token_last - token_first + 1), false });
 								}
 								int j = 0;
 								for (j = i; j < statement.size(); ++j) {
@@ -632,7 +632,7 @@ namespace wiz {
 								--j; // "before enter key" or "before end"
 								
 								if (j - i + 1 > 0) {
-									aq->emplace_back(statement.substr(i, j - i + 1), true);
+									aq->emplace_back(Token{ statement.substr(i, j - i + 1), true });
 								}
 								token_first = j + 2;
 								i = token_first - 1;
@@ -641,7 +641,7 @@ namespace wiz {
 
 						if (token_first < statement.size())
 						{
-							aq->emplace_back(statement.substr(token_first));
+							aq->emplace_back(Token{ statement.substr(token_first), false });
 						}
 					}
 				}
@@ -782,14 +782,14 @@ namespace wiz {
 			{
 				if (!(strVec.size() >= 2 && false == strVec[0].isComment && false == strVec[1].isComment)) {
 					if (false == ChkComment(strVec, ut, reserver, 2)) {
-						return{ false, Token() };
+						return{ false, Token{"", false} };
 					}
 				}
 
 				if (strVec.size() >= 2) {
 					return{ true, strVec[1] };
 				}
-				return{ false, Token() };
+				return{ false, Token{"", false} };
 			}
 		public:
 			//
