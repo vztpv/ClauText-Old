@@ -109,6 +109,7 @@ namespace wiz {
 			void Remove(const int idx = 0)
 			{
 				data = T();
+				inited = false;
 			}
 			bool Push(const T& val) { /// do not change..!!
 				if (inited) { throw "ItemType already inited"; }
