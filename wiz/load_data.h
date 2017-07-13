@@ -535,7 +535,7 @@ namespace wiz {
 					if (false == _LoadData(strVec, ifReserver, globalTemp))
 					{
 						inFile.close();
-						return true; // return false?
+						return false; // return true?
 					}
 
 					inFile.close();
