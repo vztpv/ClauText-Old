@@ -842,21 +842,21 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 }
 
 
-string excute_module(const string& MainStr, wiz::load_data::UserType* _global, const ExcuteData& excuteData)
+string excute_module(const string& MainStr, wiz::load_data::UserType* _global, const ExcuteData& excuteData, int chk)
 {
 	wiz::load_data::UserType& global = *_global;
 	vector<thread*> waits;
 	map<string, wiz::load_data::UserType> objectMap; // string -> wiz::load_data::UserType
 	map<string, wiz::load_data::UserType> moduleMap;
-	map<string, wiz::load_data::UserType>* objectMapPtr;
-	map<string, wiz::load_data::UserType>* moduleMapPtr;
+	map<string, wiz::load_data::UserType>* objectMapPtr = nullptr;
+	map<string, wiz::load_data::UserType>* moduleMapPtr = nullptr;
 	string module_value = "";
 	// data, event load..
 	wiz::ArrayStack<EventInfo> eventStack;
 	map<string, int> convert;
 	vector<wiz::load_data::UserType*> _events;
 	wiz::load_data::UserType events;
-	wiz::load_data::UserType* eventPtr;
+	wiz::load_data::UserType* eventPtr = nullptr;
 	wiz::load_data::UserType Main;
 	wiz::StringBuilder builder(102400);
 
@@ -1124,7 +1124,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 
 							wiz::load_data::LoadData::AddData(eventsTemp, "/root", "Event = { id = NONE $call = { " + parameter + " = { " + ut->GetItemList(i).ToString() + " } } }", "TRUE", _excuteData, &builder);
 
-							const string return_value = excute_module("Main = { $call = { id = NONE } }", &global, _excuteData);
+							const string return_value = excute_module("Main = { $call = { id = NONE } }", &global, _excuteData, 0);
 
 							wiz::load_data::UserType return_value_ut;
 
@@ -1163,7 +1163,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					wiz::load_data::LoadData::AddData(subGlobal, "/./", inputUT.ToString(), "TRUE", _excuteData, &builder);
 
 
-					eventStack.top().return_value = excute_module("", &subGlobal, ExcuteData()); // return ?
+					eventStack.top().return_value = excute_module("", &subGlobal, ExcuteData(), 0); // return ?
 
 
 					eventStack.top().userType_idx.top()++;
@@ -1516,7 +1516,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					wiz::load_data::UserType moduleUT = (*moduleMapPtr).at(moduleFileName);
 					wiz::load_data::LoadData::AddData(moduleUT, "", input, "TRUE", _excuteData, &builder);
 
-					eventStack.top().return_value = excute_module("", &moduleUT, ExcuteData());
+					eventStack.top().return_value = excute_module("", &moduleUT, ExcuteData(), 0);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1543,7 +1543,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					wiz::load_data::LoadData::LoadDataFromFile(moduleFileName, moduleUT);
 					wiz::load_data::LoadData::AddData(moduleUT, "", input, "TRUE", _excuteData, &builder);
 
-					eventStack.top().return_value = excute_module("", &moduleUT, ExcuteData());
+					eventStack.top().return_value = excute_module("", &moduleUT, ExcuteData(), 0);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1632,7 +1632,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 
 					wiz::load_data::LoadData::AddData(objectUT, "/./", data, "TRUE", _excuteData, &builder);
 
-					eventStack.top().return_value = excute_module(" Main = { $call = { id = NONE } } ", &objectUT, ExcuteData());
+					eventStack.top().return_value = excute_module(" Main = { $call = { id = NONE } } ", &objectUT, ExcuteData(), 0);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1656,7 +1656,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					wiz::load_data::UserType objectUT = objectMapPtr->at(objectFileName);
 					wiz::load_data::UserType objectUT2 = objectUT;
 					wiz::load_data::LoadData::AddData(objectUT, "/./", data, "TRUE", _excuteData, &builder);
-					eventStack.top().return_value = excute_module(" Main = { $call = { id = NONE } } ", &objectUT, ExcuteData());
+					eventStack.top().return_value = excute_module(" Main = { $call = { id = NONE } } ", &objectUT, ExcuteData(), 0);
 					{
 						vector<wiz::load_data::UserType*> _events;
 						wiz::load_data::UserType events;
@@ -1699,7 +1699,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					objectUT.Remove();
 					wiz::load_data::LoadData::LoadDataFromString(data, objectUT);
 
-					eventStack.top().return_value = excute_module(" Main = { $call = { id = NONE } } ", &objectUT, ExcuteData());
+					eventStack.top().return_value = excute_module(" Main = { $call = { id = NONE } } ", &objectUT, ExcuteData(), 0);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1728,7 +1728,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					objectUT.Remove();
 					wiz::load_data::LoadData::LoadDataFromString(str, objectUT);
 
-					eventStack.top().return_value = excute_module(" Main = { $call = { id = NONE } } ", &objectUT, ExcuteData());
+					eventStack.top().return_value = excute_module(" Main = { $call = { id = NONE } } ", &objectUT, ExcuteData(), 0);
 
 					eventStack.top().userType_idx.top()++;
 					break;
@@ -1950,7 +1950,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 
 					if (false == val->GetItem("option").empty() && val->GetItem("option")[0].Get(0) == "USE_THREAD") {
 						_excuteData.info = info;
-						thread* A = new thread(excute_module, "", &global, _excuteData);
+						thread* A = new thread(excute_module, "", &global, _excuteData, 0);
 
 						waits.push_back(A);
 					}
@@ -2980,6 +2980,13 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 	}
 	waits.resize(0);
 
+
+	if (1 == chk && !events.empty()) {
+		auto _events = events.GetCopyUserTypeItem("Event");
+		for (int i = 0; i < _events.size(); ++i) {
+			_global->LinkUserType(_events[i]);
+		}
+	}
 	return module_value;
 }
 

@@ -174,7 +174,7 @@ public:
 	}
 };
 
-string excute_module(const string& mainStr, wiz::load_data::UserType* _global, const ExcuteData& excuteData);
+string excute_module(const string& mainStr, wiz::load_data::UserType* _global, const ExcuteData& excuteData, int chk);
 
 namespace wiz {
 		
@@ -3311,7 +3311,7 @@ namespace wiz {
 				_excuteData.pEvents = eventsTemp;
 				_excuteData.depth = excuteData.depth + 1;
 				
-				operandStack.push(excute_module("Main = { $call = { id = NONE" + wiz::toStr(_excuteData.depth) + " } }", &global, _excuteData));
+				operandStack.push(excute_module("Main = { $call = { id = NONE" + wiz::toStr(_excuteData.depth) + " } }", &global, _excuteData, 0));
 				
 				{
 					for (int idx = 0; idx < eventsTemp->GetUserTypeListSize(); ++idx) {
