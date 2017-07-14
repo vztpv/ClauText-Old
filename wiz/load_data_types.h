@@ -963,11 +963,11 @@ namespace wiz {
 				}
 			}
 		public:
-			void Save1(ostream& stream) const {
-				Save1(stream, this);
+			void Save1(ostream& stream, int depth = 0) const {
+				Save1(stream, this, depth);
 			}
-			void Save2(ostream& stream) const {
-				Save2(stream, this);
+			void Save2(ostream& stream, int depth = 0) const {
+				Save2(stream, this, depth);
 			}
 			string ItemListToString()const
 			{
