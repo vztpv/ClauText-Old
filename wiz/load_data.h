@@ -3676,7 +3676,7 @@ namespace wiz {
 				//while (tokenizer.hasMoreTokens()) {
 				for (int i = 0; i < strVec.size(); ++i) {
 					const string temp = strVec[i]; // tokenizer.nextToken();
-
+					/*
 					// chk!! @$paramter - removal? @$. (for regex)??
 					if (temp.size() >= 3 && String::startsWith(temp, "$.")) { // cf) @$. ?
 						//result = result + temp + " ";
@@ -3694,18 +3694,21 @@ namespace wiz {
 						builder->Append(" ", 1);
 					}
 					else if (
-						(temp.size() >= 3 && temp[0] == '@' && temp[1] == '$')) {
+						(temp.size() >= 3 && temp[0] == '@' && temp[1] == '$')) { // chk - removal??
 						++i; // tokenizer.nextToken(); // = 
-						string temp2 = strVec[i]; //tokenizer.nextToken();
+						++i;
+						string temp2 = strVec[i]; //tokenizer.nextToken(); // " ~~ "
 						//result = result + temp + " = { " + temp2 + " } ";
 
-						builder->Append(temp.c_str(), temp.size());
+						builder->Append(temp.c_str() + 1, temp.size());
 						builder->Append(" = { ", 5); 
 						
 						builder->Append(temp2.c_str(), temp2.size());
 						builder->Append(" } ", 3);
 					}
-					else {
+					else 
+					*/
+					{
 						//result = result + temp + " ";
 						builder->Append(temp.c_str(), temp.size());
 						builder->Append(" ", 1);

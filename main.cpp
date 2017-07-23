@@ -9,6 +9,7 @@
 
 // Array idx chk test.
 //#define ARRAYS_DEBUG
+
 #include <wiz/ClauText.h>
 
 
