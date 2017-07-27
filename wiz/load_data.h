@@ -34,7 +34,7 @@ namespace wiz {
 			return *this;
 		}
 		void operator=(Token&& token) {
-			str = move(token.str);
+			str = move(token.str); 
 			isComment = token.isComment;
 		}
 		Token(Token&& token) : str(move(token.str)), isComment(token.isComment) { }
