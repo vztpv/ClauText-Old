@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <set>
 #include <map>
+#include <thread>
 using namespace std;
 
 #include <wiz/global.h>
@@ -34,7 +35,7 @@ namespace wiz {
 			return *this;
 		}
 		void operator=(Token&& token) {
-			str = move(token.str); 
+			str = move(token.str);
 			isComment = token.isComment;
 		}
 		Token(Token&& token) : str(move(token.str)), isComment(token.isComment) { }
@@ -217,7 +218,7 @@ namespace wiz {
 					}
 				}
 
-				
+
 				while (false == strVec.empty()) {
 					switch (state)
 					{
@@ -511,11 +512,12 @@ namespace wiz {
 				if (braceNum != 0) {
 					throw string("chk braceNum is ") + toStr(braceNum);
 				}
-				
+
 				return true;
 			}
 
 		public:
+
 			static bool LoadDataFromFile(const string& fileName, UserType& global) /// global should be empty
 			{
 				ifstream inFile;
@@ -530,7 +532,7 @@ namespace wiz {
 				try {
 					InFileReserver ifReserver(inFile);
 
-					ifReserver.Num = 100; //100000;
+					ifReserver.Num = 100; // 100000;
 					// cf) empty file..
 					if (false == _LoadData(strVec, ifReserver, globalTemp))
 					{
@@ -547,6 +549,87 @@ namespace wiz {
 				catch (...) { std::cout << "not expected error" << endl; inFile.close(); return false; }
 
 				global = move(globalTemp);
+				return true;
+			}
+
+		private:
+			class LoadData2 {
+			public:
+				void operator()(vector<string>* strVec, NoneReserver* reserver, UserType* global)
+				{
+					ArrayQueue<Token> aq;
+
+					wiz::load_data::Utility::DoThread test(strVec, &aq);
+
+					test(0, strVec->size() - 1);
+
+					_LoadData(aq, *reserver, *global);
+				}
+			};
+		public:
+			static bool LoadDataFromFile2(const string& fileName, UserType& global) /// global should be empty
+			{
+				ifstream inFile;
+				inFile.open(fileName);
+				if (true == inFile.fail())
+				{
+					inFile.close(); return false;
+				}
+				UserType globalTemp = global;
+				vector<vector<string>> strVec(1);
+				int count = 0;
+
+				try {
+
+					while (wiz::load_data::Utility::Reserve3(inFile, strVec[count], 100000))
+					{
+						count++;
+						strVec.push_back(vector<string>());
+					}
+					strVec.pop_back();
+					inFile.close();
+
+					vector<NoneReserver> noneReserver(strVec.size());
+					vector<UserType> ut(strVec.size());
+					vector<std::thread> test(strVec.size());
+
+					for (int i = 0; i < strVec.size(); ++i) {
+						test[i] = thread(LoadData2(), &strVec[i], &noneReserver[i], &ut[i]);
+					}
+
+					for (int i = 0; i < strVec.size(); ++i) {
+						test[i].join();
+					}
+
+					getchar();
+
+					for (int i = 0; i < ut.size(); ++i) {
+						for (int j = 0; j < ut[i].GetCommentListSize(); ++j) {
+							globalTemp.PushComment(std::move(ut[i].GetCommentList(j)));
+						}
+						int itemCount = 0;
+						int userTypeCount = 0;
+
+						for (int j = 0; j < ut[i].GetIListSize(); ++j) {
+							if (ut[i].IsItemList(j)) {
+								ItemType<string> temp = ut[i].GetItemList(itemCount);
+								globalTemp.AddItem(temp.GetName(), temp.Get(0));
+								itemCount++;
+							}
+							else {
+								globalTemp.AddUserTypeItem(*ut[i].GetUserTypeList(userTypeCount));
+								userTypeCount++;
+							}
+						}
+					}
+				}
+				catch (Error e) { std::cout << e << endl; if(inFile.is_open()) inFile.close(); return false; }
+				catch (const char* err) { std::cout << err << endl; if (inFile.is_open())inFile.close(); return false; }
+				catch (const string& e) { std::cout << e << endl; if (inFile.is_open())inFile.close(); return false; }
+				catch (exception e) { std::cout << e.what() << endl; if (inFile.is_open())inFile.close(); return false; }
+				catch (...) { std::cout << "not expected error" << endl; if (inFile.is_open())inFile.close(); return false; }
+
+				global = std::move(globalTemp);
 				return true;
 			}
 

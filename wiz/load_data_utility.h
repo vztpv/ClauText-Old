@@ -536,7 +536,7 @@ namespace wiz {
 				}
 			}
 
-		private:
+		public:
 			class DoThread // need to rename!
 			{
 			private:
@@ -655,6 +655,44 @@ namespace wiz {
 				//}
 			};
 		public:
+			static bool Reserve3(ifstream& inFile, vector<string>& strVecTemp, const int min_num = 1)
+			{
+				int count = 0;
+				string temp;
+				int brace = 0;
+				int i = 0;
+
+				for (int i = 0; i < min_num && (getline(inFile, temp)); ++i) {
+					if (temp.empty()) { continue; }
+					strVecTemp.push_back(temp);
+					for (int j = 0; j < temp.size(); ++j) {
+						if (temp[j] == '{') {
+							brace++;
+						}
+						else if (temp[j] == '}') {
+							brace--;
+						}
+					}
+					count++;
+				}
+
+				while (brace != 0 && getline(inFile, temp)) {
+					if (temp.empty()) { continue; }
+					strVecTemp.push_back(temp);
+					for (int j = 0; j < temp.size(); ++j) {
+						if (temp[j] == '{') {
+							brace++;
+						}
+						else if (temp[j] == '}') {
+							brace--;
+						}
+					}
+					count++;
+				}
+
+				return count > 0 && 0 == brace;
+			}
+
 			static pair<bool, int> Reserve2(ifstream& inFile, ArrayQueue<Token>& aq, const int num = 1)
 			{
 				int count = 0;
@@ -772,7 +810,7 @@ namespace wiz {
 				if (str) {
 					Token token;
 					strVec.pop_front(&token);
-					*str = token.str;
+					*str = std::move(token.str);
 					//*str = move(strVec.front().str);
 				}
 				else {

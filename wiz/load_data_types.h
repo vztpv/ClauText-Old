@@ -287,7 +287,7 @@ namespace wiz {
 				commentList = std::move(ut.commentList);
 
 				for (int i = 0; i < ut.userTypeList.size(); ++i) {
-					userTypeList.push_back(move(ut.userTypeList[i]));
+					userTypeList.push_back(std::move(ut.userTypeList[i]));
 					ut.userTypeList[i] = nullptr;
 				}
 				ut.userTypeList.clear();
