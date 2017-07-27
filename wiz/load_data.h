@@ -530,7 +530,7 @@ namespace wiz {
 				try {
 					InFileReserver ifReserver(inFile);
 
-					ifReserver.Num = 100000;
+					ifReserver.Num = 100; //100000;
 					// cf) empty file..
 					if (false == _LoadData(strVec, ifReserver, globalTemp))
 					{
