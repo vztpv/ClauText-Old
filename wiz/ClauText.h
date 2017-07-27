@@ -18,6 +18,8 @@ using namespace std;
 
 #include <wiz/StringBuilder.h>
 
+#include <wiz/queues.h>
+
 #include <wiz/load_data.h>
 #include <wiz/stacks.h>
 #include <wiz/cpp_string.h>

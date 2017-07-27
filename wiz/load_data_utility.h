@@ -542,11 +542,11 @@ namespace wiz {
 			private:
 				vector<string>* strVec;
 			public:
-				deque<Token>* aq;
+				ArrayQueue<Token>* aq;
 				//int strVecStart;
 				//int strVecEnd;
 			public:
-				DoThread(vector<string>* strVec, deque<Token>* aq) //, list<string>* aq)//, int strVecStart, int strVecEnd)
+				DoThread(vector<string>* strVec, ArrayQueue<Token>* aq) //, list<string>* aq)//, int strVecStart, int strVecEnd)
 					: strVec(strVec), aq(aq) // , strVecStart(strVecStart), strVecEnd(strVecEnd)
 				{
 					//
@@ -587,39 +587,39 @@ namespace wiz {
 							if (0 == state && '=' == statement[i]) {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
-									aq->emplace_back(statement.substr(token_first, token_last - token_first + 1), false);
+									aq->push(Token(statement.substr(token_first, token_last - token_first + 1), false));
 								}
-								aq->emplace_back("=", false);
+ 								aq->push(Token("=", false));
 								token_first = i + 1;
 							}
 							else if (0 == state && isWhitespace(statement[i])) { // isspace ' ' \t \r \n , etc... ?
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
-									aq->emplace_back(statement.substr(token_first, token_last - token_first + 1), false);
+									aq->push(Token(statement.substr(token_first, token_last - token_first + 1), false));
 								}
 								token_first = i + 1;
 							}
 							else if (0 == state && '{' == statement[i]) {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
-									aq->emplace_back(statement.substr(token_first, token_last - token_first + 1), false);
+									aq->push(Token(statement.substr(token_first, token_last - token_first + 1), false));
 								}
-								aq->emplace_back("{", false);
+								aq->push(Token("{", false));
 								token_first = i + 1;
 							}
 							else if (0 == state && '}' == statement[i]) {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
-									aq->emplace_back(statement.substr(token_first, token_last - token_first + 1), false);
+									aq->push(Token(statement.substr(token_first, token_last - token_first + 1), false));
 								}
-								aq->emplace_back("}", false);
+								aq->push(Token("}", false));
 								token_first = i + 1;
 							}
 
 							if (0 == state && '#' == statement[i]) { // different from load_data_from_file
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
-									aq->emplace_back(statement.substr(token_first, token_last - token_first + 1), false);
+									aq->push(Token(statement.substr(token_first, token_last - token_first + 1), false));
 								}
 								int j = 0;
 								for (j = i; j < statement.size(); ++j) {
@@ -631,7 +631,7 @@ namespace wiz {
 								--j; // "before enter key" or "before end"
 								
 								if (j - i + 1 > 0) {
-									aq->emplace_back(statement.substr(i, j - i + 1), true);
+									aq->push(Token(statement.substr(i, j - i + 1), true));
 								}
 								token_first = j + 2;
 								i = token_first - 1;
@@ -640,7 +640,7 @@ namespace wiz {
 
 						if (token_first < statement.size())
 						{
-							aq->emplace_back(statement.substr(token_first), false);
+							aq->push(Token(statement.substr(token_first), false));
 						}
 					}
 				}
@@ -655,7 +655,7 @@ namespace wiz {
 				//}
 			};
 		public:
-			static pair<bool, int> Reserve2(ifstream& inFile, deque<Token>& aq, const int num = 1)
+			static pair<bool, int> Reserve2(ifstream& inFile, ArrayQueue<Token>& aq, const int num = 1)
 			{
 				int count = 0;
 				string temp;
@@ -693,7 +693,7 @@ namespace wiz {
 		private:
 			// chk!!
 			template <class Reserver>
-			static bool ChkComment(deque<Token>& strVec, wiz::load_data::UserType* ut, Reserver reserver, const int offset)
+			static bool ChkComment(ArrayQueue<Token>& strVec, wiz::load_data::UserType* ut, Reserver reserver, const int offset)
 			{
 				if (strVec.size() < offset) {
 					reserver(strVec);
@@ -713,8 +713,8 @@ namespace wiz {
 				int count = 0;
 
 				do {
-					if (x->isComment) {
-						ut->PushComment(move(x->str));
+ 					if (x.ptr->isComment) {
+						ut->PushComment(move(x.ptr->str));
 						x = strVec.erase(x);
 					}
 					else if (count == offset - 1) {
@@ -722,16 +722,18 @@ namespace wiz {
 					}
 					else {
 						count++;
-						++x;
+						x.ptr++;
+						x.pos++;
 					}
 
 					if (x == strVec.end()) {
 						reserver(strVec);
-						x = strVec.begin() + count;
+						x = strVec.begin(count);
+
 						while (strVec.size() < offset) // 
 						{
 							reserver(strVec);
-							x = strVec.begin() + count;
+							x = strVec.begin(count);
 							if (
 								strVec.size() < offset &&
 								reserver.end()
@@ -744,7 +746,7 @@ namespace wiz {
 			}
 		public:
 			template<class Reserver>
-			static string Top(deque<Token>& strVec, wiz::load_data::UserType* ut, Reserver reserver)
+			static string Top(ArrayQueue<Token>& strVec, wiz::load_data::UserType* ut, Reserver reserver)
 			{
 				if (strVec.empty() || strVec[0].isComment) {
 					if (false == ChkComment(strVec, ut, reserver, 1)) {
@@ -755,7 +757,7 @@ namespace wiz {
 				return strVec[0].str;
 			}
 			template <class Reserver>
-			static bool Pop(deque<Token>& strVec, string* str, wiz::load_data::UserType* ut, Reserver reserver)
+			static bool Pop(ArrayQueue<Token>& strVec, string* str, wiz::load_data::UserType* ut, Reserver reserver)
 			{
 				if (strVec.empty() || strVec[0].isComment) {
 					if (false == ChkComment(strVec, ut, reserver, 1)) {
@@ -768,16 +770,22 @@ namespace wiz {
 				}
 
 				if (str) {
-					*str = move(strVec.front().str);
+					Token token;
+					strVec.pop_front(&token);
+					*str = token.str;
+					//*str = move(strVec.front().str);
 				}
-				strVec.pop_front();
+				else {
+					strVec.pop_front();
+				}
+				//strVec.pop_front();
 
 				return true;
 			}
 		
 			// lookup just one!
 			template <class Reserver> 
-			static pair<bool, Token> LookUp(deque<Token>& strVec, wiz::load_data::UserType* ut, Reserver reserver)
+			static pair<bool, Token> LookUp(ArrayQueue<Token>& strVec, wiz::load_data::UserType* ut, Reserver reserver)
 			{
 				if (!(strVec.size() >= 2 && false == strVec[0].isComment && false == strVec[1].isComment)) {
 					if (false == ChkComment(strVec, ut, reserver, 2)) {

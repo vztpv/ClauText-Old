@@ -140,9 +140,9 @@ public:
         Head->next = q.Head->next;
         Rear = q.Rear;
 
-q.Head->next = nullptr;
-q.Rear = q.Head;
-return *this;
+		q.Head->next = nullptr;
+		q.Rear = q.Head;
+		return *this;
 	}
 };
 
@@ -193,6 +193,38 @@ private:
 	int start;
 	int num;
 public:
+	struct Iter
+	{
+		T* ptr;
+		int pos;
+
+		Iter() { }
+		Iter(T* ptr, int pos)
+			: ptr(ptr), pos(pos)
+		{
+		
+		}
+
+		bool operator==(const Iter& other) {
+			return ptr == other.ptr;
+		}
+	};
+
+	Iter begin(int count = 0) { return Iter(&((*this)[count]), count); }
+
+	Iter end() { return Iter(&((*this)[size()]), size()); }
+
+	Iter erase(Iter ptr) {
+		for (int i = ptr.pos; i < size() - 1; ++i) {
+			(*this)[i] = (*this)[i + 1];
+		}
+		(*this)[size() - 1] = T();
+
+		num--;
+
+		return ptr;
+	}
+public:
 	explicit ArrayQueue(const int max = 2) : start(0), num(0)
 	{
 #ifdef QUEUES_DEBUG
@@ -207,19 +239,19 @@ public:
 public:
 	const T& operator[](const int idx) const
 	{
-		return que[(start + idx) & (que.size() - 1)];
+		return que[(start + idx) % (que.size())];
 	}
 	T& operator[](const int idx)
 	{
-		return que[(start + idx) & (que.size() - 1)];
+		return que[(start + idx) % (que.size())];
 	}
 public:
 	void push(const ArrayQueue<T>& val) {
 		if (val.empty()) { return; }
 		int newSize = this->que.size();
 
-		while (newSize - num < val.size()) {
-			newSize = newSize * 2;
+		while (newSize - num - 1 < val.size()) {
+			newSize = newSize * 1.5;
 		}
 		if (newSize != this->que.size()) {
 			// expand array queue.
@@ -248,8 +280,8 @@ public:
 		if (val.empty()) { return; }
 		int newSize = this->que.size();
 
-		while (newSize - num < val.size()) {
-			newSize = newSize * 2;
+		while (newSize - num - 1 < val.size()) {
+			newSize = newSize * 1.5;
 		}
 		if (newSize != this->que.size()) {
 			// expand array queue.
@@ -279,17 +311,17 @@ public:
         if( isFull() )
         {
             // expand array queue.
-            ArrayQueue temp( que.size() * 2 );
+            ArrayQueue temp( que.size() * 1.5 );
             //
 			for (int i = 0; i < que.size(); ++i) {
-				temp[i] = std::move(que[(start + i) & (que.size()-1)]);
+				temp[i] = std::move(que[(start + i) % (que.size())]);
 			}
 			temp.start = 0;
-			temp.num = que.size();
+			temp.num = que.size() - 1;
 
             *this = std::move( temp );
         }
-        que[(start+num) & (que.size()-1)] = val;
+        que[(start+num) % (que.size())] = val;
         num++;
     }
 	
@@ -298,17 +330,17 @@ public:
 		if (isFull())
 		{
 			// expand array queue.
-			ArrayQueue temp(que.size() * 2);
+			ArrayQueue temp(que.size() * 1.5);
 			//
 			for (int i = 0; i < que.size(); ++i) {
-				temp[i] = std::move(que[(start + i) & (que.size()-1)]);
+				temp[i] = std::move(que[(start + i) % (que.size())]);
 			}
 			temp.start = 0;
-			temp.num = que.size();
+			temp.num = que.size() - 1;
 			
 			*this = std::move(temp);
 		}
-		que[(start + num) & (que.size()-1)] = std::move(val);
+		que[(start + num) % (que.size())] = std::move(val);
 		num++;
 	}
 	
@@ -319,12 +351,15 @@ public:
 
 		//que[start] = T();
 
-		start = (start + 1) & (que.size() - 1); // % que.size(), 2^n.
+		start = (start + 1) % (que.size()); // % que.size(), 2^n.
 		num--;
 
 		if (nullptr != t) {
 			*t = move(temp);
 		}
+	}
+	void pop_front(T* t = nullptr) {
+		pop(t);
 	}
 
 	T pop_back()
@@ -341,7 +376,7 @@ public:
 
     bool isFull()const
     {
-        return num >= ( que.size() );
+        return num >= ( que.size() - 1);
     }
 
     bool isEmpty()const
@@ -352,6 +387,8 @@ public:
     bool empty()const { return isEmpty(); }
     int getNumMax()const { return que.size(); }
     int getNum()const { return num; }
+	T& front() { return (*this)[0]; }
+	const T& front()const { return (*this)[0]; }
     Array<T> toArray()const
     {
         Array<T> temp;

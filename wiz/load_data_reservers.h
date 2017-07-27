@@ -27,7 +27,7 @@ namespace wiz {
 			}
 			bool end()const { return pInFile->eof(); }
 		public:
-			bool operator() (deque<Token>& strVec)
+			bool operator() (ArrayQueue<Token>& strVec)
 			{
 				return Utility::Reserve2(*pInFile, strVec, Num).second > 0;
 			}
@@ -38,7 +38,7 @@ namespace wiz {
 			int count;
 		public:
 			explicit NoneReserver() : count(0) { }
-			bool operator() (deque<Token>& strVec)
+			bool operator() (ArrayQueue<Token>& strVec)
 			{
 				count = 1;
 				return false;
