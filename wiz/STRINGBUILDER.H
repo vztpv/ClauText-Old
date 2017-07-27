@@ -1,6 +1,6 @@
 
 #ifndef STRINGBUILDER_H
-#define STIRNGBUILDER_H
+#define STRINGBUILDER_H
 
 #include <cstdlib>
 #include <cstring>

@@ -14,6 +14,7 @@
 using namespace std;
 
 #include <wiz/cpp_string.h>
+#include <wiz/STRINGBUILDER.H>
 
 namespace wiz {
 	namespace load_data {
@@ -540,27 +541,27 @@ namespace wiz {
 			class DoThread // need to rename!
 			{
 			private:
-				vector<string>* strVec;
+				string* strVec;
 			public:
 				ArrayQueue<Token>* aq;
 				//int strVecStart;
 				//int strVecEnd;
 			public:
-				DoThread(vector<string>* strVec, ArrayQueue<Token>* aq) //, list<string>* aq)//, int strVecStart, int strVecEnd)
+				DoThread(string* strVec, ArrayQueue<Token>* aq) //, list<string>* aq)//, int strVecStart, int strVecEnd)
 					: strVec(strVec), aq(aq) // , strVecStart(strVecStart), strVecEnd(strVecEnd)
 				{
 					//
 				}
-				void operator() (int left, int right) {
-					vector<string>* strVecTemp = strVec; // enterkey 기준으로 나뉘어져있다고 가정한다.
+				void operator() () {
+					//string* strVecTemp = strVec; // enterkey 기준으로 나뉘어져있다고 가정한다.
 
-					for (int x = left; x <= right; ++x)
+					//for (int x = 0; x <= 0; ++x)
 					{
 						//StringTokenizer tokenizer(std::move( (*strVecTemp)[x] ) );
 						//while (tokenizer.hasMoreTokens()) {
 						//	aq.push(tokenizer.nextToken());
 						//}
-						string statement = std::move((*strVecTemp)[x]);
+						string statement = *strVec;
 						int token_first = 0, token_last = 0; // idx of token in statement.
 						int state = 0;
 
@@ -697,18 +698,20 @@ namespace wiz {
 			{
 				int count = 0;
 				string temp;
-				vector<string> strVecTemp;
+				wiz::StringBuilder builder(1024 * num);				//vector<string> strVecTemp;
 
 				for (int i = 0; i < num && (getline(inFile, temp)); ++i) {
 					if (temp.empty()) { continue; }
-					strVecTemp.push_back(temp);
+					builder.Append(temp.c_str(), temp.size());
+					builder.AppendChar('\n');
 					count++;
 				}
 
+				string str(builder.Str());
 				
-				DoThread doThread(&strVecTemp, &aq);
+				DoThread doThread(&str, &aq);
 				
-				doThread(0, count-1);
+				doThread(); // (0, count - 1);
 				
 				//tbb::parallel_reduce(tbb::blocked_range<size_t>(0, count), doThread);
 				//aq.push(std::move(doThread.aq));

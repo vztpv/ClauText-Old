@@ -532,7 +532,7 @@ namespace wiz {
 				try {
 					InFileReserver ifReserver(inFile);
 
-					ifReserver.Num = 100; // 100000;
+					ifReserver.Num = 100000;
 					// cf) empty file..
 					if (false == _LoadData(strVec, ifReserver, globalTemp))
 					{
@@ -559,9 +559,9 @@ namespace wiz {
 				{
 					ArrayQueue<Token> aq;
 
-					wiz::load_data::Utility::DoThread test(strVec, &aq);
+					//wiz::load_data::Utility::DoThread test(strVec, &aq);
 
-					test(0, strVec->size() - 1);
+					//test(0, strVec->size() - 1);
 
 					_LoadData(aq, *reserver, *global);
 				}
