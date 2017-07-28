@@ -34,7 +34,7 @@ namespace wiz {
 			Type(const Type& type)
 				: name(type.name)
 			{
-				chk();
+				//chk();
 			}
 			virtual ~Type() { }
 			bool IsFail() const { // change body
@@ -47,13 +47,13 @@ namespace wiz {
 			{
 				this->name = name;
 
-				chk();
+				//chk();
 			}
 			void SetName(string&& name)
 			{
 				this->name = name;
 
-				chk();
+				//chk();
 			}
 			bool operator==(const Type& t) const {
 				return name == t.name;

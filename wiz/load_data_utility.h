@@ -541,13 +541,13 @@ namespace wiz {
 			class DoThread // need to rename!
 			{
 			private:
-				string* strVec;
+				StringBuilder* strVec;
 			public:
 				ArrayQueue<Token>* aq;
 				//int strVecStart;
 				//int strVecEnd;
 			public:
-				DoThread(string* strVec, ArrayQueue<Token>* aq) //, list<string>* aq)//, int strVecStart, int strVecEnd)
+				DoThread(StringBuilder* strVec, ArrayQueue<Token>* aq) //, list<string>* aq)//, int strVecStart, int strVecEnd)
 					: strVec(strVec), aq(aq) // , strVecStart(strVecStart), strVecEnd(strVecEnd)
 				{
 					//
@@ -561,11 +561,11 @@ namespace wiz {
 						//while (tokenizer.hasMoreTokens()) {
 						//	aq.push(tokenizer.nextToken());
 						//}
-						string statement = *strVec;
+						StringBuilder& statement = *strVec;
 						int token_first = 0, token_last = 0; // idx of token in statement.
 						int state = 0;
 
-						for (int i = 0; i < statement.size(); ++i) {
+ 						for (int i = 0; i < statement.Size(); ++i) {
 							if (0 == state && '\"' == statement[i]) {
 								//token_last = i - 1;
 								//if (token_last >= 0 && token_last - token_first + 1 > 0) {
@@ -580,68 +580,131 @@ namespace wiz {
 							}
 							else if (1 == state && '\"' == statement[i]) {
 								state = 0; token_last = i;
-
-								//aq->emplace_back(statement.substr(token_first, token_last - token_first + 1));
-								//token_first = i + 1;
 							}
 
 							if (0 == state && '=' == statement[i]) {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
-									aq->push(Token(statement.substr(token_first, token_last - token_first + 1), false));
+									statement.Divide(i);
+									
+									aq->push(Token(string(statement.Str()), false));
+									statement.LeftShift(i + 1);
+									
+									aq->push(Token("=", false));
+									token_first = 0;
+									token_last = 0;
+									i = -1;
 								}
- 								aq->push(Token("=", false));
-								token_first = i + 1;
+								else {
+									aq->push(Token("=", false));
+									statement.LeftShift(1);
+									token_first = 0;
+									i = -1;
+								}
 							}
 							else if (0 == state && isWhitespace(statement[i])) { // isspace ' ' \t \r \n , etc... ?
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
-									aq->push(Token(statement.substr(token_first, token_last - token_first + 1), false));
+									statement.Divide(i);
+									
+									aq->push(Token(string(statement.Str()), false));
+									
+									statement.LeftShift(i + 1);
+									
+									token_first = 0;
+									token_last = 0;
+									i = -1;
 								}
-								token_first = i + 1;
+								else
+								{
+									statement.LeftShift(1);
+									token_first = 0;
+									i = -1;
+								}
 							}
 							else if (0 == state && '{' == statement[i]) {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
-									aq->push(Token(statement.substr(token_first, token_last - token_first + 1), false));
+									statement.Divide(i);
+									
+									aq->push(Token(string(statement.Str()), false));
+									statement.LeftShift(i + 1);
+
+									aq->push(Token("{", false));
+									token_first = 0;
+									token_last = 0;
+									i = -1;
 								}
-								aq->push(Token("{", false));
-								token_first = i + 1;
+								else {
+									aq->push(Token("{", false));
+									statement.LeftShift(1);
+									token_first = 0;
+									i = -1;
+								}
 							}
 							else if (0 == state && '}' == statement[i]) {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
-									aq->push(Token(statement.substr(token_first, token_last - token_first + 1), false));
+									statement.Divide(i);
+									
+
+									aq->push(Token(string(statement.Str()), false));
+									statement.LeftShift(i + 1);
+
+									aq->push(Token("}", false));
+
+									token_first = 0;
+									token_last = 0;
+									i = -1;
 								}
-								aq->push(Token("}", false));
-								token_first = i + 1;
+								else {
+									aq->push(Token("}", false));
+
+									statement.LeftShift(1);
+									token_first = 0;
+									i = -1;
+								}
 							}
 
 							if (0 == state && '#' == statement[i]) { // different from load_data_from_file
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
-									aq->push(Token(statement.substr(token_first, token_last - token_first + 1), false));
+									statement.Divide(i);
+									aq->push(Token(string(statement.Str()), false));
+									statement.LeftShift(i + 1);
+									i = 0;
 								}
 								int j = 0;
-								for (j = i; j < statement.size(); ++j) {
+								for (j = i; j < statement.Size(); ++j) {
 									if (statement[j] == '\n') // cf) '\r' ?
 									{
 										break;
 									}
 								}
 								--j; // "before enter key" or "before end"
-								
+
 								if (j - i + 1 > 0) {
-									aq->push(Token(statement.substr(i, j - i + 1), true));
+									statement.Divide(j + 1);
+									
+									aq->push(Token(string(statement.Str()), true));
+									statement.LeftShift(j + 2);
+
+									token_first = 0;
+									token_last = 0;
+									i = -1;
 								}
-								token_first = j + 2;
-								i = token_first - 1;
+								else {
+									statement.LeftShift(j + 2);
+									token_first = 0;
+									token_last = 0;
+									i = -1;
+								}
 							}
 						}
 
-						if (token_first < statement.size())
+						if (token_first < statement.Size())
 						{
-							aq->push(Token(statement.substr(token_first), false));
+							aq->push(Token(string(statement.Str()), false));
 						}
 					}
 				}
@@ -656,7 +719,7 @@ namespace wiz {
 				//}
 			};
 		public:
-			static bool Reserve3(ifstream& inFile, vector<string>& strVecTemp, const int min_num = 1)
+			static bool Reserve3(ifstream& inFile, StringBuilder& strVecTemp, const int min_num = 1)
 			{
 				int count = 0;
 				string temp;
@@ -665,7 +728,8 @@ namespace wiz {
 
 				for (int i = 0; i < min_num && (getline(inFile, temp)); ++i) {
 					if (temp.empty()) { continue; }
-					strVecTemp.push_back(temp);
+					strVecTemp.Append(temp.c_str(), temp.size());
+					strVecTemp.AppendChar('\n');
 					for (int j = 0; j < temp.size(); ++j) {
 						if (temp[j] == '{') {
 							brace++;
@@ -679,7 +743,7 @@ namespace wiz {
 
 				while (brace != 0 && getline(inFile, temp)) {
 					if (temp.empty()) { continue; }
-					strVecTemp.push_back(temp);
+					strVecTemp.Append(temp.c_str(), temp.size());
 					for (int j = 0; j < temp.size(); ++j) {
 						if (temp[j] == '{') {
 							brace++;
@@ -698,7 +762,7 @@ namespace wiz {
 			{
 				int count = 0;
 				string temp;
-				wiz::StringBuilder builder(1024 * num);				//vector<string> strVecTemp;
+				wiz::StringBuilder builder(128 * num);				//vector<string> strVecTemp;
 
 				for (int i = 0; i < num && (getline(inFile, temp)); ++i) {
 					if (temp.empty()) { continue; }
@@ -706,10 +770,8 @@ namespace wiz {
 					builder.AppendChar('\n');
 					count++;
 				}
-
-				string str(builder.Str());
 				
-				DoThread doThread(&str, &aq);
+				DoThread doThread(&builder, &aq);
 				
 				doThread(); // (0, count - 1);
 				

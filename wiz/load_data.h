@@ -555,13 +555,13 @@ namespace wiz {
 		private:
 			class LoadData2 {
 			public:
-				void operator()(vector<string>* strVec, NoneReserver* reserver, UserType* global)
+				void operator()(StringBuilder* strVec, NoneReserver* reserver, UserType* global)
 				{
 					ArrayQueue<Token> aq;
 
-					//wiz::load_data::Utility::DoThread test(strVec, &aq);
+					wiz::load_data::Utility::DoThread test(strVec, &aq);
 
-					//test(0, strVec->size() - 1);
+					test();
 
 					_LoadData(aq, *reserver, *global);
 				}
@@ -576,7 +576,7 @@ namespace wiz {
 					inFile.close(); return false;
 				}
 				UserType globalTemp = global;
-				vector<vector<string>> strVec(1);
+				vector<StringBuilder> strVec(1, StringBuilder(128));
 				int count = 0;
 
 				try {
@@ -584,7 +584,7 @@ namespace wiz {
 					while (wiz::load_data::Utility::Reserve3(inFile, strVec[count], 100000))
 					{
 						count++;
-						strVec.push_back(vector<string>());
+						strVec.push_back(StringBuilder(128));
 					}
 					strVec.pop_back();
 					inFile.close();
@@ -622,6 +622,7 @@ namespace wiz {
 							}
 						}
 					}
+					getchar();
 				}
 				catch (Error e) { std::cout << e << endl; if(inFile.is_open()) inFile.close(); return false; }
 				catch (const char* err) { std::cout << err << endl; if (inFile.is_open())inFile.close(); return false; }

@@ -27,8 +27,16 @@ namespace wiz {
 			buffer[this->len] = '\0';
 			buffer_first = buffer;
 		}
-		StringBuilder(const StringBuilder&) = delete;
-		StringBuilder(StringBuilder&&) = delete;
+		StringBuilder(const StringBuilder& other)
+		{
+			buffer = (char*)malloc(sizeof(char) * (other.capacity + 1)); // 1 for '\0'
+			this->len = other.len;
+			capacity = other.capacity;
+			memcpy(buffer, other.buffer, other.capacity);
+			buffer[this->len] = '\0';
+			buffer_first = buffer;
+		}
+
 		StringBuilder& operator=(const StringBuilder& other)
 		{
 			if (buffer_first != nullptr) {
@@ -88,13 +96,14 @@ namespace wiz {
 					this->len = this->len + len;
 				}
 				else {
-					char* new_buffer = (char*)malloc(sizeof(char) * (this->len + len + 1));
+					char* new_buffer = (char*)malloc(sizeof(char) * (2 * (this->len + len) + 1));
 					memcpy(new_buffer, buffer, this->len);
 					memcpy(new_buffer + this->len, cstr, len);
 					new_buffer[this->len + len] = '\0';
 					free(buffer_first);
 					buffer = new_buffer;
 					buffer_first = buffer;
+					this->capacity = 2 * (this->len + len);
 					this->len = this->len + len;
 				}
 			}
@@ -144,6 +153,15 @@ namespace wiz {
 		void SetBuffer(const int idx, const char val)
 		{
 			this->buffer[idx] = val;
+		}
+
+		char& operator[](const int idx)
+		{
+			return this->buffer[idx];
+		}
+		const char& operator[](const int idx) const
+		{
+			return this->buffer[idx];
 		}
 	};
 }
