@@ -566,6 +566,21 @@ namespace wiz {
 						int state = 0;
 
  						for (int i = 0; i < statement.Size(); ++i) {
+
+
+							if (0 == state && '\'' == statement[i]) {
+								//token_last = i - 1;
+								//if (token_last >= 0 && token_last - token_first + 1 > 0) {
+								//	aq->emplace_back(statement.substr(token_first, token_last - token_first + 1));
+								//}
+								state = 2;
+								//token_first = i; 
+								token_last = i;
+							}
+							else if (2 == state && '\'' == statement[i]) {
+								state = 0; token_last = i;
+							}
+
 							if (0 == state && '\"' == statement[i]) {
 								//token_last = i - 1;
 								//if (token_last >= 0 && token_last - token_first + 1 > 0) {

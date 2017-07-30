@@ -3148,6 +3148,12 @@ namespace wiz {
 				str.insert(str.begin(), '\"');
 				operandStack.push(str);
 			}
+			else if ("$toQuotedStr2" == str) {
+				string str = operandStack.pop();
+				str.push_back('\'');
+				str.insert(str.begin(), '\'');
+				operandStack.push(str);
+			}
 			else if ("$addSmallQuoted" == str) {
 				string str = operandStack.pop();
 				str.push_back('\'');
@@ -3373,6 +3379,41 @@ namespace wiz {
 					dir = dir + tokenVec[i] +"/";
 				}
 				operandStack.push(dir);
+				return true;
+			}
+			else if ("$lambda" == str) {
+				vector<string> store;
+				for (int i = 0; i < operandNum; ++i) {
+					store.push_back(operandStack.pop());
+				}
+				wiz::load_data::UserType ut;
+				wiz::load_data::LoadData::LoadDataFromString(store[0].substr(1, store[0].size() - 2), ut);
+				
+				
+				if (operandNum >= 1) {
+					vector<wiz::load_data::UserType*> param = ut.GetUserTypeItem("Event")[0]->GetUserTypeItem("$parameter");
+					// in order.
+					string mainStr = "Main = { $call = { id = NONE } } ";
+					string eventStr = "Event = { id = NONE $call = { id = " +
+						ut.GetUserTypeItem("Event")[0]->GetItem("id")[0].Get(0) + " ";
+
+					// if opeandNum != ut[0].GetUserType("$parameter").size() then push error?
+					for (int i = 0; i < param[0]->GetItemListSize(); ++i) {
+						eventStr += param[0]->GetItemList(i).Get(0) + " = { \'" + store[i + 1].substr(1, store[i + 1].size() - 2) + "\' } ";
+					}
+
+					eventStr += " }  $return = { $return_value = { } } } ";
+
+					eventStr += store[0].substr(1, store[0].size() - 2);
+
+					ut.Remove();
+					wiz::load_data::LoadData::LoadDataFromString(eventStr, ut);
+
+					const string result = excute_module(mainStr, &ut, ExcuteData(), 0);
+
+					operandStack.push(result);
+				}
+
 				return true;
 			}
 			else {

@@ -182,7 +182,18 @@ namespace wiz{
 				int _select = -1;
 				bool pass = false;
 
-				if (1 == option && 0 == state && '\"' == str[i]) {
+
+				if (1 == option && 0 == state && '\'' == str[i]) {
+					state = 2;
+					continue;
+				}
+				else if (1 == option && 2 == state && '\'' == str[i]) {
+					state = 0;
+				}
+				else if (1 == option && 2 == state) {
+					continue;
+				}
+				else if (1 == option && 0 == state && '\"' == str[i]) {
 					if (i == 0) {
 						state = 1;
 						continue;
