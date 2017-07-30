@@ -1735,10 +1735,13 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
+
 				// todo - register object from file.
 				//		~.ToString() + "Main = { $call = { id = 0 } } Event = { id = 0 $call = { id = " + id_val + " " + param_name1 + " = " + param_val1 + "  } } "
 				// todo - register object from string.
 				// todo - call registered object.  $registered_object = { name = { "ex2.txt" } parameter = { id = 1 i = 1 j = 1 } }  
+				
+
 				else if ("$option" == val->GetName()) // first
 				{
 					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
@@ -2639,6 +2642,26 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					}
 
 					eventStack.pop();
+					break;
+				}
+				else if ("$return_data" == val->GetName()) { // for functional programming??
+					eventStack.top().userType_idx.top()++;
+
+					if (eventStack.size() > 1)
+					{
+						string temp = val->ToString();
+						/// if temp just one
+						eventStack[eventStack.size() - 2].return_value = temp;
+					}
+
+					if (eventStack.size() == 1)
+					{
+						string temp = val->ToString();
+
+						module_value = temp;
+					}
+
+					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$parameter" == val->GetName())

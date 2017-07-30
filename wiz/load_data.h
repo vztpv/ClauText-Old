@@ -636,92 +636,13 @@ namespace wiz {
 
 			static bool LoadDataFromString(const string& str, UserType& ut)
 			{
-				UserType utTemp = ut;
+				UserType utTemp = ut; 
 				ArrayQueue<Token> strVec;
 
-				string statement = str;
-				int token_first = 0, token_last = 0; // idx of token in statement.
-				int state = 0;
+				wiz::StringBuilder builder(str.size(), str.c_str(), str.size());
+				wiz::load_data::Utility::DoThread doThread(&builder, &strVec);
 
-
-				for (int i = 0; i < statement.size(); ++i) {
-					if (0 == state && '\"' == statement[i]) {
-						//token_last = i - 1;
-						//if (token_last >= 0 && token_last - token_first + 1 > 0) {
-						//	strVec.emplace_back(statement.substr(token_first, token_last - token_first + 1));
-						//}
-						state = 1;
-						//token_first = i; 
-						token_last = i;
-					}
-					else if (1 == state && '\\' == statement[i - 1] && '\"' == statement[i]) {
-						token_last = i;
-					}
-					else if (1 == state && '\"' == statement[i]) {
-						state = 0; token_last = i;
-
-						//strVec.emplace_back(statement.substr(token_first, token_last - token_first + 1));
-						//token_first = i + 1;
-					}
-
-					if (0 == state && '=' == statement[i]) {
-						token_last = i - 1;
-						if (token_last >= 0 && token_last - token_first + 1 > 0) {
-							strVec.push(Token(statement.substr(token_first, token_last - token_first + 1)));
-						}
-						strVec.push(Token("="));
-						token_first = i + 1;
-					}
-					else if (0 == state && isWhitespace(statement[i])) { // isspace ' ' \t \r \n , etc... ?
-						token_last = i - 1;
-						if (token_last >= 0 && token_last - token_first + 1 > 0) {
-							strVec.push(Token(statement.substr(token_first, token_last - token_first + 1)));
-						}
-						token_first = i + 1;
-					}
-					else if (0 == state && '{' == statement[i]) {
-						token_last = i - 1;
-						if (token_last >= 0 && token_last - token_first + 1 > 0) {
-							strVec.push(Token(statement.substr(token_first, token_last - token_first + 1)));
-						}
-						strVec.push(Token("{"));
-						token_first = i + 1;
-					}
-					else if (0 == state && '}' == statement[i]) {
-						token_last = i - 1;
-						if (token_last >= 0 && token_last - token_first + 1 > 0) {
-							strVec.push(Token(statement.substr(token_first, token_last - token_first + 1)));
-						}
-						strVec.push(Token("}"));
-						token_first = i + 1;
-					}
-
-					if (0 == state && '#' == statement[i]) { // different from load_data_from_file
-						token_last = i - 1;
-						if (token_last >= 0 && token_last - token_first + 1 > 0) {
-							strVec.push(Token(statement.substr(token_first, token_last - token_first + 1)));
-						}
-						int j = 0;
-						for (j = i; j < statement.size(); ++j) {
-							if (statement[j] == '\n') // cf) '\r' ?
-							{
-								break;
-							}
-						}
-						--j; // "before enter key" or "before end"
-
-						if (j - i + 1 > 0) {
-							strVec.push(Token(statement.substr(i, j - i + 1), true));
-						}
-						token_first = j + 2;
-						i = token_first - 1;
-					}
-				}
-
-				if (token_first < statement.size())
-				{
-					strVec.push(Token(statement.substr(token_first)));
-				}
+				doThread();
 
 				try {
 					// empty string!
@@ -3455,7 +3376,10 @@ namespace wiz {
 				return true;
 			}
 			else {
-				return false;
+				if (wiz::String::startsWith(str, "$") && str.size() >= 2) {
+					return false;
+				}
+				return true;
 			}
 			return true;
 			// cf)
@@ -3670,9 +3594,12 @@ namespace wiz {
 			//}
 
 			for (int i = tokenVec.size() - 1; i >= 0; --i) {
-				
+				// todo - chk first? functions in Event
 				if ( String::startsWith(tokenVec[i], "$parameter.") ||
+					String::startsWith(tokenVec[i], "$parameter") ||
+					String::startsWith(tokenVec[i], "$local") ||
 					 String::startsWith(tokenVec[i], "$local.") ||
+					"$return" == tokenVec[i] ||
 					'$' != tokenVec[i][0] || ('$' == tokenVec[i][0] && tokenVec[i].size() == 1)
 					) {
 					operandStack.push(tokenVec[i]);
