@@ -3385,6 +3385,10 @@ namespace wiz {
 				vector<string> store;
 				for (int i = 0; i < operandNum; ++i) {
 					store.push_back(operandStack.pop());
+					if (store[i][0] != store[i][store[i].size() - 1] || '\'' != store[i][0])
+					{
+						store[i] = "\'" + store[i] + "\'";
+					}
 				}
 				wiz::load_data::UserType ut;
 				wiz::load_data::LoadData::LoadDataFromString(store[0].substr(1, store[0].size() - 2), ut);
@@ -3409,9 +3413,20 @@ namespace wiz {
 					ut.Remove();
 					wiz::load_data::LoadData::LoadDataFromString(eventStr, ut);
 
-					const string result = excute_module(mainStr, &ut, ExcuteData(), 0);
+					string result = excute_module(mainStr, &ut, ExcuteData(), 0);
+					
+					{
+						wiz::load_data::UserType ut;
+						wiz::load_data::LoadData::LoadDataFromString(result.substr(1, result.size() - 2), ut);
+		
+						if (0 == ut.GetUserTypeListSize()) {
+							string param = ut.ToString();
+							param = param.substr(11);
+							result = string("\'Event = { id = identity ") + "$parameter = { " + param + " } $return = { $parameter." + param + " } }\'";
+						}
+					}
 
-					operandStack.push(result);
+ 					operandStack.push(result);
 				}
 
 				return true;
@@ -3637,8 +3652,8 @@ namespace wiz {
 			for (int i = tokenVec.size() - 1; i >= 0; --i) {
 				// todo - chk first? functions in Event
 				if ( String::startsWith(tokenVec[i], "$parameter.") ||
-					String::startsWith(tokenVec[i], "$parameter") ||
-					String::startsWith(tokenVec[i], "$local") ||
+					tokenVec[i] == "$parameter" ||
+					tokenVec[i] == "$local" ||
 					 String::startsWith(tokenVec[i], "$local.") ||
 					"$return" == tokenVec[i] ||
 					'$' != tokenVec[i][0] || ('$' == tokenVec[i][0] && tokenVec[i].size() == 1)
@@ -3666,14 +3681,13 @@ namespace wiz {
 					}
 
 					operandStack[operandStack.size() - 2] = operandStack[operandStack.size() - 1];
-					operandStack.pop(); // } ?
+					operandStack.pop(); // } 
 				}
 			}
 
-
-			// ex) A = { B = 1 $C = { 3 } } D = { E }
-			// =>  A = { B = 1 $C = 3  }  D = E
-			// =>  A = { B = 1 $C = { 3 } } D = E  : ToDo! 
+			// ex) A = { B = 1 $C = { 3 } } D = { E }  $F = { G }
+			// =>  A = { B = 1 $C = 3  }  D = E $F = G 
+			// =>  A = { B = 1 $C = { 3 } } D = E  $F = { G } : ToDo!
 
 			vector<string> strVec;
 			stack<int> chkBrace;
@@ -3684,7 +3698,7 @@ namespace wiz {
 			{
 				if (operandStack[i] == "}") {
 					chkBrace.top()++;
-					if (chkBrace.top() == 2)
+					if (chkBrace.top() == 2 && !(i + 4 <= operandStack.size() - 1 && operandStack[i+3] == "=" && operandStack[i+4][0] == '$' && operandStack[i+4].size() > 1))
 					{
 						string temp = strVec.back();
 						strVec.pop_back();
@@ -3703,6 +3717,7 @@ namespace wiz {
 				else {
 					chkBrace.top()++;
 				}
+
 				strVec.push_back(operandStack[i]);
 			}
 

@@ -1,15 +1,27 @@
 
-# need to rename for $concat3, and make $concat3?
 
 
-Event = { id = TRUE  $parameter = { x } $return = { "Event = { id = -1 $parameter = { y } $return = { $parameter.x } }  " } }
+Event = { id = MakeTrue # x, xy, xyz ...  # ' abc = "abd" '  : wrap "" or wrap data??
+	$return_data = { Event = { id = TRUE $parameter = { x y } $return = { $parameter.x } } } 
+}
 
-Event = { id = FALSE $parameter = { x } $return = { "Event = { id = -1 $parameter = { y } $return = { $parameter.y } } " } }
+Event = { id = MakeFalse 
+	$return_data = { Event = { id = FALSE $parameter = { x y } $return = { $parameter.y } } } 
+}
 
-# cf) this.local.x
-# cf) this.parameter.x
-# $대신 this.사용?
+Event = { id = AND $parameter = { x y }
+	$return = { $lambda = { $parameter.x $parameter.y $parameter.x } }
+}
 
+Event = { id = OR $parameter = { x y }
+	$return = { $lambda = { $parameter.x $parameter.x $parameter.y } }
+}
 
-# $local?  chk?? -ToDO??
+Event = { id = NOT $parameter = { x }
+	$local = { False True }
 
+	$assign_local = { name = { $local.False } data = { $toQuotedStr2 =  { $event_result = { id = { MakeFalse } } } } }
+	$assign_local = { name = { $local.True } data = { $toQuotedStr2 =  { $event_result = { id = { MakeTrue } } } } }
+	
+	$return = { $lambda = { $parameter.x $local.False $local.True } }
+}

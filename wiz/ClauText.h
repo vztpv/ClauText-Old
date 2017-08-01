@@ -1740,7 +1740,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				//		~.ToString() + "Main = { $call = { id = 0 } } Event = { id = 0 $call = { id = " + id_val + " " + param_name1 + " = " + param_val1 + "  } } "
 				// todo - register object from string.
 				// todo - call registered object.  $registered_object = { name = { "ex2.txt" } parameter = { id = 1 i = 1 j = 1 } }  
-				
+
 
 				else if ("$option" == val->GetName()) // first
 				{
@@ -1836,6 +1836,39 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 						delete waits[i];
 					}
 					waits.resize(0);
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$call_lambda" == val->GetName())
+				{
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					string data = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
+					data = data.substr(1, data.size() - 2);
+					string parameter = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
+
+					wiz::load_data::UserType dataUT;
+
+					wiz::load_data::LoadData::LoadDataFromString(data, dataUT);
+
+					{
+						string id = dataUT.GetUserTypeItem("Event")[0]->GetItem("id")[0].Get(0);
+
+						parameter = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
+
+						data += " Event = { id = NONE $call = { id = " + id + " " + parameter + "  } } ";
+
+						wiz::load_data::UserType objectUT;
+						wiz::load_data::LoadData::LoadDataFromString(data, objectUT);
+
+						eventStack.top().return_value = excute_module(" Main = { $call = { id = NONE } } ", &objectUT, ExcuteData(), 0);
+					}
 
 					eventStack.top().userType_idx.top()++;
 					break;
