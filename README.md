@@ -80,9 +80,53 @@
 			
 	ClauText support if, else statements. ( $if = { condition = {  } then = {  } } $else = { then = { } } )
 	
-	ClauText does not support while directly. but support using if statements and Event Recursive Call( recursive function? call ).
+	Now, ClauText support while directly.!!
+	//ClauText does not support while directly. but support using if statements and Event Recursive Call.
 
 # ClauText and Paradox Game ( EU4, DHR, ... )
 	1. it can load eu4 savegames, and maybe other paradox game db or savegame files.
 	2. it`s syntax come from eu4 savegame syntax.
  
+# Example
+	Main = { $call = { id = 0 } }
+
+	Event = {
+		id = 0
+
+		$local = { i j }
+		$assign = { $local.i value = { 1 } }
+
+		$while = {
+			condition = { 
+				$COMP<EQ = { $local.i 9 } 
+			}
+			then = {
+				$assign = { $local.j value = { 1 } }
+				$while = {
+					condition = {
+						$COMP<EQ = { $local.j 9 }
+					}
+					then = {
+						$if = { 
+							condition = { $EQ = { 0 $modular = { $local.j 2 } } }
+							then = {							
+								$print = { data = { $local.i } }
+								$print = { data = { " * " } }
+								$print = { data = { $local.j } }
+								$print = { data = { " = " } }
+								$print = { data = { $multiple = { $local.i $local.j } } }
+								$print = { enter = { \n } }
+							}	
+						}		
+						$assign = { $local.j value = { $add = { 1 $local.j } } }		
+					}
+				}
+				$print = { data = { ------- } }
+				$print = { enter = { \n } }
+				$assign = { $local.i value = { $add = { 1 $local.i } } }
+			}
+		}
+
+		$_getch = { }
+	}
+
