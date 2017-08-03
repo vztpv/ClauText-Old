@@ -1,0 +1,44 @@
+
+
+Main = { $call = { id = 0 } }
+
+Event = {
+	id = 0
+		
+	$local = { i j }
+	$assign = { $local.i value = { 1 } }
+	
+	$while = {
+		condition = { 
+			$COMP<EQ = { $local.i 9 } 
+		}
+		then = {
+			$assign = { $local.j value = { 1 } }
+			$while = {
+				condition = {
+					$COMP<EQ = { $local.j 9 }
+				}
+				then = {
+					$if = { 
+						condition = { $EQ = { 0 $modular = { $local.j 2 } } }
+						then = {							
+							$print = { data = { $local.i } }
+							$print = { data = { " * " } }
+							$print = { data = { $local.j } }
+							$print = { data = { " = " } }
+							$print = { data = { $multiple = { $local.i $local.j } } }
+							$print = { enter = { \n } }
+						}	
+					}		
+					$assign = { $local.j value = { $add = { 1 $local.j } } }		
+				}
+			}
+			$print = { data = { ------- } }
+			$print = { enter = { \n } }
+			$assign = { $local.i value = { $add = { 1 $local.i } } }
+		}
+	}
+	
+	$_getch = { }
+}
+

@@ -1148,7 +1148,28 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$do" == val->GetName()) { // chk?
+				else if ("$while" == val->GetName()) {
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					const string condition = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
+
+					if ("TRUE" == condition) {
+						eventStack.top().conditionStack.push("TRUE");
+						eventStack.top().nowUT.push(val->GetUserTypeList(1));
+						eventStack.top().userType_idx.push(0);
+						break;
+					}
+					else {
+						eventStack.top().userType_idx.top()++;
+						break;
+					}
+				}
+				else if ("$do" == val->GetName()) { // chk? - need example!
 					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
@@ -2600,7 +2621,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 							int item_count = 0;
 							int userType_count = 0;
 
-							for (int i = 0; i < ut.GetIListSize(); ++i) {
+							for (int i = 0; i < ut.GetIListSize(); ++i) { 
 								if (ut.IsItemList(i)) {
 									utTemp->AddItem(std::move(ut.GetItemList(item_count).GetName()),
 										std::move(ut.GetItemList(item_count).Get(0)));

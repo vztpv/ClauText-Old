@@ -3421,8 +3421,10 @@ namespace wiz {
 		
 						if (0 == ut.GetUserTypeListSize()) {
 							string param = ut.ToString();
-							param = param.substr(11);
-							result = string("\'Event = { id = identity ") + "$parameter = { " + param + " } $return = { $parameter." + param + " } }\'";
+							if (wiz::String::startsWith(param, "$parameter.")) { // 
+								param = param.substr(11);
+								result = string("\'Event = { id = identity ") + "$parameter = { " + param + " } $return = { $parameter." + param + " } }\'";
+							}
 						}
 					}
 
