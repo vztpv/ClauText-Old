@@ -189,6 +189,13 @@ namespace wiz{
 				}
 				else if (1 == option && 2 == state && '\'' == str[i]) {
 					state = 0;
+					if (i == str.size() - 1) {
+						if (right - left + 1 > 0) {
+							_m_str.emplace_back(builder->Divide(right - left + 1), right - left + 1);
+							builder->LeftShift(right - left + 2);
+						}
+					}
+					continue;
 				}
 				else if (1 == option && 2 == state) {
 					continue;
@@ -212,6 +219,13 @@ namespace wiz{
 					}
 					else {
 						state = 0;
+						if (i == str.size() - 1) {
+							if (right - left + 1 > 0) {
+								_m_str.emplace_back(builder->Divide(right - left + 1), right - left + 1);
+								builder->LeftShift(right - left + 2);
+							}
+						}
+						continue;
 					}
 				}
 				else if (1 == option && 1 == state) {
