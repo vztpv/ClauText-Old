@@ -203,7 +203,7 @@ namespace wiz {
 				bool varOn = false;
 
 				nestedUT[0] = &global;
-				{
+				{ 
 					reserver(strVec);
 
 					while (strVec.empty())
@@ -3488,7 +3488,7 @@ namespace wiz {
 					int last = -1;
 					for (int j = 0; j < tokenVec[i].size(); ++j)
 					{
-						if (tokenVec[i][j] == ' ' || tokenVec[i][j] == '{' || tokenVec[i][j] == '}' || tokenVec[i][j] == '=') {
+						if (wiz::isWhitespace(tokenVec[i][j]) || tokenVec[i][j] == '{' || tokenVec[i][j] == '}' || tokenVec[i][j] == '=') {
 							last = j - 1;
 							break;
 						}

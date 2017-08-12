@@ -29,8 +29,8 @@ namespace wiz {
 				}
 			}
 		public:
-			explicit Type(const string& name = "", const bool valid = true) : name(name) { chk();  }
-			explicit Type(string&& name, const bool valid = true) : name(move(name)) { chk(); }
+			explicit Type(const string& name = "", const bool valid = true) : name(name) { }//chk();  }
+			explicit Type(string&& name, const bool valid = true) : name(move(name)) { }//chk(); }
 			Type(const Type& type)
 				: name(type.name)
 			{
