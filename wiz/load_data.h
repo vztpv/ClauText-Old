@@ -2617,7 +2617,7 @@ namespace wiz {
 				for (int i = 0; i < operandNum; ++i) {
 					store.push_back(operandStack.pop());
 				}
-				for( int i=0; i < store.size(); ++i) {
+				for (int i = 0; i < store.size(); ++i) {
 					if ("TRUE" != store[i]) {
 						operandStack.push("FALSE");
 						return true;
@@ -2850,7 +2850,7 @@ namespace wiz {
 				//cout << "----" << endl;
 				if (builder) {
 					builder->Clear();
-					
+
 					int total_size = 0;
 					for (int i = 0; i < operandNum; ++i)
 					{
@@ -2858,7 +2858,7 @@ namespace wiz {
 						string temp = operandStack.pop();
 						builder->Append(temp.c_str(), temp.size()); // chk
 					}
-					
+
 					operandStack.push(string(builder->Str(), total_size));
 				}
 				else {
@@ -2889,14 +2889,14 @@ namespace wiz {
 
 				for (int i = 0; i < operandNum; ++i) {
 					string temp = operandStack.pop();
-					if (temp.size() >= 3 && temp.back() == temp.front() && temp.back() == '\"') { }
+					if (temp.size() >= 3 && temp.back() == temp.front() && temp.back() == '\"') {}
 					else {
 						operandStack.push("ERROR in $concat3, 1. must be \" \" ");
 						return false;
 					}
 					if (i < operandNum - 1) {
 						temp.erase(temp.begin() + temp.size() - 1);
-						
+
 						if (0 != i) {
 							temp.erase(temp.begin());
 						}
@@ -2906,7 +2906,7 @@ namespace wiz {
 					}
 					else {
 						temp.erase(temp.begin());
-						
+
 						result += temp;
 					}
 				}
@@ -3052,7 +3052,7 @@ namespace wiz {
 					string temp = FindLocals(excuteData.info.locals, x);
 					if (!temp.empty()) { x = temp; }
 				}
-				
+
 				operandStack.push(x);
 			}
 			else if ("$size" == str)
@@ -3138,8 +3138,32 @@ namespace wiz {
 				str = str.substr(1, str.size() - 2);
 				{
 					string result = ToBool4(now, global, str, excuteData, builder);
-					
+
 					operandStack.push(move(result));
+				}
+			}
+			// big
+			else if ("$is_quoted_str" == str)
+			{
+				string str = operandStack.pop();
+				if (str.size() >= 2 && str[0] == str.back() && '\"' == str[0])
+				{
+					operandStack.push("TRUE");
+				}
+				else {
+					operandStack.push("FALSE");
+				}
+			}
+			// small
+			else if ("$is_quoted_str2" == str) 
+			{
+				string str = operandStack.pop();
+				if (str.size() >= 2 && str[0] == str.back() && '\'' == str[0])
+				{
+					operandStack.push("TRUE");
+				}
+				else {
+					operandStack.push("FALSE");
 				}
 			}
 			else if ("$toQuotedStr" == str) {
@@ -3512,12 +3536,18 @@ namespace wiz {
 
 			// todo - Is~ ?? others ??
 			else if ("$is_integer_type" == str) {
-				operandStack.push(wiz::load_data::Utility::IsInteger(operandStack.pop())? "TRUE":"FALSE");
+				operandStack.push(wiz::load_data::Utility::IsInteger(operandStack.pop())? "TRUE" : "FALSE");
 			}
 			else if ("$is_float_type" == str) {
 				operandStack.push(wiz::load_data::Utility::IsDouble(operandStack.pop()) ? "TRUE" : "FALSE");
 			}
-			
+			else if ("$is_pure_string_type" == str) {
+				operandStack.push("STRING" == wiz::load_data::Utility::GetType(operandStack.pop())? "TRUE" : "FALSE");
+			}
+			else if ("$get_type" == str) {
+				operandStack.push(wiz::load_data::Utility::GetType(operandStack.pop()));
+			}
+
 			else {
 				if (wiz::String::startsWith(str, "$") && str.size() >= 2) {
 					return false;
