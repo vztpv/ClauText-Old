@@ -3468,6 +3468,16 @@ namespace wiz {
 					operandStack.push("it is not integer");
 				}
 			}
+			else if ("$to_integer_from_float" == str) { // integer, floating point number -> floating point number(long double)
+				string value = operandStack.pop();
+				if (wiz::load_data::Utility::IsDouble(value)) {
+					long long x = stold(value);
+					operandStack.push(wiz::_toString(x));
+				}
+				else {
+					operandStack.push("it is not floating number");
+				}
+			}
 			//floor, ceiling, round,
 			else if ("$floor" == str) {
 				string value = operandStack.pop();
