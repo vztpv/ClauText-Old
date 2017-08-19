@@ -46,11 +46,12 @@ int main(int argc, char* argv[])
 		cout << e << endl;
 		GETCH();
 	}
-	//catch (...) {
-	//	cout << "UnKnown Error.." << endl;
-	//	GETCH();
-	//}
-
+#ifndef _DEBUG
+	catch (...) {
+		cout << "UnKnown Error.." << endl;
+		GETCH();
+	}
+#endif
    	return 0;
 }
 

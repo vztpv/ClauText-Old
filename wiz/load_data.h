@@ -3433,6 +3433,91 @@ namespace wiz {
 
 				return true;
 			}
+			
+			else if("$to_float_from_integer" == str) { // integer, floating point number -> floating point number(long double)
+				string value = operandStack.pop();
+				if (wiz::load_data::Utility::IsInteger(value)) {
+					long double x = stoll(value);
+					operandStack.push(wiz::_toString(x));
+				}
+				else {
+					operandStack.push("it is not integer");
+				}
+			}
+			//floor, ceiling, round,
+			else if ("$floor" == str) {
+				string value = operandStack.pop();
+				if (wiz::load_data::Utility::IsDouble) {
+					long double x = floor(stold(value));
+					operandStack.push(wiz::_toString(x));
+				}
+				else {
+					operandStack.push("only double can");
+				}
+			}
+			else if ("$ceiling" == str) {
+				string value = operandStack.pop();
+				if (wiz::load_data::Utility::IsDouble) {
+					long double x = ceil(stold(value));
+					operandStack.push(wiz::_toString(x));
+				}
+				else {
+					operandStack.push("only double can");
+				}
+			}
+			else if ("$round" == str) {
+				string value = operandStack.pop();
+				if (wiz::load_data::Utility::IsDouble) {
+					long double x = round(stold(value));
+					operandStack.push(wiz::_toString(x));
+				}
+				else {
+					operandStack.push("only double can");
+				}
+			}
+			//contains,
+			else if ("$contains" == str) {
+				string str = operandStack.pop();
+				string chk_str = operandStack.pop();
+
+				operandStack.push(string::npos != str.find(chk_str) ? "TRUE" : "FALSE");
+			}
+			//starts_with, ends_with,
+			else if ("$starts_with" == str) {
+				string str = operandStack.pop();
+				string chk_str = operandStack.pop();
+
+				operandStack.push(wiz::String::startsWith(str, chk_str) ? "TRUE" : "FALSE");
+			}
+			else if ("$ends_with" == str) {
+				string str = operandStack.pop();
+				string chk_str = operandStack.pop();
+
+				operandStack.push(wiz::String::endsWith(str, chk_str) ? "TRUE" : "FALSE");
+			}
+			//string - length,
+			else if ("$string_length" == str) {
+				string str = operandStack.pop();
+				
+				operandStack.push(wiz::_toString(str.size()));
+			}
+			//substring ?
+			else if ("$substring" == str) {
+				string str = operandStack.pop();
+				long long begin = stoll(operandStack.pop());
+				long long end = stoll(operandStack.pop());
+
+				operandStack.push(wiz::String::substring(str, begin, end-1));
+			}
+
+			// todo - Is~ ?? others ??
+			else if ("$is_integer_type" == str) {
+				operandStack.push(wiz::load_data::Utility::IsInteger(operandStack.pop())? "TRUE":"FALSE");
+			}
+			else if ("$is_float_type" == str) {
+				operandStack.push(wiz::load_data::Utility::IsDouble(operandStack.pop()) ? "TRUE" : "FALSE");
+			}
+			
 			else {
 				if (wiz::String::startsWith(str, "$") && str.size() >= 2) {
 					return false;
