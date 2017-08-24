@@ -3779,10 +3779,10 @@ namespace wiz {
 			for (int i = tokenVec.size() - 1; i >= 0; --i) {
 				// todo - chk first? functions in Event
 				if ( String::startsWith(tokenVec[i], "$parameter.") ||
-					tokenVec[i] == "$parameter" ||
-					tokenVec[i] == "$local" ||
+					//tokenVec[i] == "$parameter" ||
+					//tokenVec[i] == "$local" ||
 					 String::startsWith(tokenVec[i], "$local.") ||
-					"$return" == tokenVec[i] ||
+					//"$return" == tokenVec[i] ||
 					'$' != tokenVec[i][0] || ('$' == tokenVec[i][0] && tokenVec[i].size() == 1)
 					) {
 					operandStack.push(tokenVec[i]);
