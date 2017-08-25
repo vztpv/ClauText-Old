@@ -274,6 +274,7 @@ namespace wiz {
 
 				for (int i = 0; i < ut.userTypeList.size(); i++) {
 					userTypeList.push_back(new UserType(*ut.userTypeList[i]));
+					userTypeList.back()->parent = this;
 				}
 			}
 			void Reset2(UserType&& ut) {
@@ -289,12 +290,14 @@ namespace wiz {
 				for (int i = 0; i < ut.userTypeList.size(); ++i) {
 					userTypeList.push_back(std::move(ut.userTypeList[i]));
 					ut.userTypeList[i] = nullptr;
+					userTypeList.back()->parent = this;
 				}
 				ut.userTypeList.clear();
 			}
 
 			void _Remove()
 			{
+				parent = nullptr;
 				ilist = vector<int>();
 				itemList = vector< ItemType<string> >();
 				RemoveUserTypeList();
