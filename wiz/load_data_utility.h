@@ -602,7 +602,7 @@ namespace wiz {
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
 									
-									aq->push(Token(string(statement.Str()), false));
+ 									aq->push(Token(string(statement.Str()), false));
 									statement.LeftShift(i + 1);
 									
 									aq->push(Token("=", false));
@@ -832,7 +832,7 @@ namespace wiz {
 
 				do {
  					if (x.ptr->isComment) {
-						ut->PushComment(move(x.ptr->str));
+						ut->PushComment((std::move(x.ptr->str)));
 						x = strVec.erase(x);
 					}
 					else if (count == offset - 1) {
@@ -868,7 +868,7 @@ namespace wiz {
 			{
 				if (strVec.empty() || strVec[0].isComment) {
 					if (false == ChkComment(strVec, ut, reserver, 1)) {
-						return string();
+ 						return string();
 					}
 				}
 				if (strVec.empty()) { return string(); }
@@ -890,7 +890,7 @@ namespace wiz {
 				if (str) {
 					Token token;
 					strVec.pop_front(&token);
-					*str = std::move(token.str);
+					*str = (std::move(token.str));
 					//*str = move(strVec.front().str);
 				}
 				else {

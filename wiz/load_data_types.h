@@ -304,7 +304,20 @@ namespace wiz {
 
 				commentList.clear();
 			}
-
+		// static ??
+		public: 
+			int GetIlistIndex(const int index, const int type)
+			{
+				return _GetIlistIndex(ilist, index, type);
+			}
+			int GetUserTypeIndexFromIlistIndex(const int ilist_idx)
+			{
+				return _GetUserTypeIndexFromIlistIndex(ilist, ilist_idx);
+			}
+			int GetItemIndexFromIlistIndex(const int ilist_idx)
+			{
+				return _GetItemIndexFromIlistIndex(ilist, ilist_idx);
+			}
 		private:
 			/// val : 1 or 2
 			int _GetIndex(const vector<int>& ilist, const int val, const int start = 0) {
