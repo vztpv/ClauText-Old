@@ -3349,7 +3349,9 @@ namespace wiz {
 				_excuteData.pObjectMap = excuteData.pObjectMap;
 				_excuteData.pEvents = eventsTemp;
 				_excuteData.depth = excuteData.depth + 1;
-				
+				_excuteData.noUseInput = excuteData.noUseInput;
+				_excuteData.noUseOutput = excuteData.noUseOutput;
+
 				operandStack.push(excute_module("Main = { $call = { id = NONE" + wiz::toStr(_excuteData.depth) + " } }", &global, _excuteData, 0));
 				
 				{
@@ -3441,8 +3443,14 @@ namespace wiz {
 					ut.Remove();
 					wiz::load_data::LoadData::LoadDataFromString(eventStr, ut);
 
-					string result = excute_module(mainStr, &ut, ExcuteData(), 0);
-					
+					string result;
+					{
+						ExcuteData _excuteData;
+						_excuteData.noUseInput = excuteData.noUseInput;
+						_excuteData.noUseOutput = excuteData.noUseOutput;
+
+						result = excute_module(mainStr, &ut, _excuteData, 0);
+					}
 					{
 						wiz::load_data::UserType ut;
 						wiz::load_data::LoadData::LoadDataFromString(result.substr(1, result.size() - 2), ut);
