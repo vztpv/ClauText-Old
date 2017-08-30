@@ -1422,6 +1422,10 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				else if ("$edit_mode" == val->GetName()) // chk!!
 				{
+					if (excuteData.noUseInput || excuteData.noUseOutput) {
+						eventStack.top().userType_idx.top()++;
+						break;
+					}
 					MStyleTest(&global);
 
 					system("cls");
@@ -2407,6 +2411,10 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				else if ("$print" == val->GetName()) /// has many bugs..!?, for print list or print item?.
 				{
+					if (excuteData.noUseOutput) {
+						eventStack.top().userType_idx.top()++;
+						break;
+					}
 					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
@@ -2501,6 +2509,10 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				else if ("$print2" == val->GetName()) /// for print usertype.ToString();
 				{
+					if (excuteData.noUseOutput) {
+						eventStack.top().userType_idx.top()++;
+						break;
+					}
 					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
@@ -2659,12 +2671,21 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 				}
 				else if ("$_getch" == val->GetName())
 				{
+					if (excuteData.noUseInput) {
+						eventStack.top().userType_idx.top()++;
+						break;
+					}
+
 					_getch();
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				else if ("$input" == val->GetName())
 				{
+					if (excuteData.noUseInput) {
+						eventStack.top().userType_idx.top()++;
+						break;
+					}
 					string str;
 					cin >> str;
 					eventStack.top().return_value = str;

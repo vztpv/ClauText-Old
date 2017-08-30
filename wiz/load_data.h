@@ -88,9 +88,13 @@ public:
 	map<string, wiz::load_data::UserType>* pModule;
 
 	long long depth;
+
+	bool noUseInput;
+	bool noUseOutput;
 public:
 	explicit ExcuteData()
-		: pEvents(nullptr), pObjectMap(nullptr), pModule(nullptr), chkInfo(false), depth(0)
+		: pEvents(nullptr), pObjectMap(nullptr), pModule(nullptr), chkInfo(false), depth(0),
+		noUseInput(false), noUseOutput(false)
 	{
 		//
 	}
