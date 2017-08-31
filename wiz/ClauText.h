@@ -914,12 +914,12 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 		if (MainStr.empty()) {
 			_Main = global.GetCopyUserTypeItem("Main")[0];
 			Main.LinkUserType(_Main);
+			global.RemoveUserTypeList("Main");
 		}
 		else {
 			wiz::load_data::LoadData::LoadDataFromString(MainStr, Main);
 		}
 
-		global.RemoveUserTypeList("Main");
 
 		EventInfo info;
 		info.eventUT = Main.GetUserTypeList(0);
