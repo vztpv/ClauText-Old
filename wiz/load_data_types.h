@@ -922,7 +922,7 @@ namespace wiz {
 					}
 				}
 			}
-			/// savw2 - for more seed loading data!
+			/// save2 - for more seed loading data!
 			void Save2(ostream& stream, const UserType* ut, const int depth = 0) const {
 				int itemListCount = 0;
 				int userTypeListCount = 0;
@@ -978,12 +978,130 @@ namespace wiz {
 					}
 				}
 			}
+		
+			bool IsArrayWithJson(const UserType* ut) const
+			{
+				bool isArray = true;
+
+				for (int i = 0; i < ut->GetItemListSize(); ++i) {
+					if (ut->GetItemList(i).GetName().empty()) {
+						isArray = true;
+					}
+					else {
+						return false;
+					}
+				}
+
+				return isArray && 0 == ut->GetUserTypeListSize();
+			}
+			
+			// todo
+			void SaveWithJson(ostream& stream, const UserType* ut, const int depth = 0) const {
+				int itemListCount = 0;
+				int userTypeListCount = 0;
+
+				/*
+				for (int i = 0; i < ut->commentList.size(); ++i) {
+					for (int k = 0; k < depth; ++k) {
+						stream << "\t";
+					}
+
+					stream << "// ";
+					stream << (ut->commentList[i]);
+
+					if (i < ut->commentList.size() - 1 || false == ut->ilist.empty()) {
+						stream << "\n";
+					}
+
+				}
+				*/
+
+				for (int i = 0; i < ut->ilist.size(); ++i) {
+					//std::cout << "ItemList" << endl;
+					if (ut->ilist[i] == 1) {
+						for (int j = 0; j < ut->itemList[itemListCount].size(); j++) {
+							for (int k = 0; k < depth; ++k) {
+								stream << "\t";
+							}
+							if (ut->itemList[itemListCount].GetName() != "") {
+								if (ut->itemList[itemListCount].GetName()[0] == '\"') {
+									stream <<  ut->itemList[itemListCount].GetName() << " : ";
+								}
+								else {
+									stream << "\"" + ut->itemList[itemListCount].GetName() + "\"" << " : ";
+								}
+							}
+							if (ut->itemList[itemListCount].Get(j)[0] == '\"') {
+								if (ut->itemList[itemListCount].Get(j) == "\"\"") {
+									stream << "\" \"";
+								}
+								else {
+									stream << ut->itemList[itemListCount].Get(j);
+								}
+							}
+							else {
+								stream << "\"" + ut->itemList[itemListCount].Get(j) + "\"";
+							}
+						}
+						if (i != ut->ilist.size() - 1) {
+							stream << " ,\n";
+						}
+						itemListCount++;
+					}
+					else if (ut->ilist[i] == 2) {
+						for (int k = 0; k < depth; ++k) {
+							stream << "\t";
+						}
+						// std::cout << "UserTypeList" << endl;
+						if (ut->userTypeList[userTypeListCount]->GetName() != "")
+						{
+							if (ut->userTypeList[userTypeListCount]->GetName()[0] == '\"') {
+								stream <<  ut->userTypeList[userTypeListCount]->GetName()  << " : ";
+							}
+							else {
+								stream << "\"" + ut->userTypeList[userTypeListCount]->GetName() + "\"" << " : ";
+							}
+						}
+						if (IsArrayWithJson(ut->userTypeList[userTypeListCount])) {
+							stream << "[\n";
+						}
+						else {
+							stream << "{\n";
+						}
+
+						SaveWithJson(stream, ut->userTypeList[userTypeListCount], depth + 1);
+						stream << "\n";
+
+						for (int k = 0; k < depth; ++k) {
+							stream << "\t";
+						}
+						
+						if (IsArrayWithJson(ut->userTypeList[userTypeListCount])) {
+							stream << "]";
+						}
+						else {
+							stream << "}";
+						}
+
+						if (i != ut->ilist.size() - 1) {
+							stream << " ,\n";
+						}
+						userTypeListCount++;
+					}
+				}
+			}
 		public:
 			void Save1(ostream& stream, int depth = 0) const {
 				Save1(stream, this, depth);
 			}
 			void Save2(ostream& stream, int depth = 0) const {
 				Save2(stream, this, depth);
+			}
+			void SaveWithJson(ostream& stream, int depth = 0) const
+			{
+				stream << "{\n";
+				SaveWithJson(stream, this, depth + 1);
+				stream << "\n}";
 			}
 			string ItemListToString()const
 			{

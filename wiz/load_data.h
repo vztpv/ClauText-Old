@@ -1726,6 +1726,8 @@ namespace wiz {
 					global.Save1(outFile); // cf) friend
 				else if (option == "2")
 					global.Save2(outFile);
+				else if (option == "3")
+					global.SaveWithJson(outFile);
 
 				outFile.close();
 
