@@ -992,7 +992,16 @@ namespace wiz {
 					}
 				}
 
-				return isArray && 0 == ut->GetUserTypeListSize();
+				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
+					if (ut->GetUserTypeList(i)->GetName().empty()) {
+						isArray = true;
+					}
+					else {
+						return false;
+					}
+				}
+
+				return isArray; // && 0 == ut->GetUserTypeListSize();
 			}
 			
 			// todo - removal?
