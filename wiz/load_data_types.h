@@ -995,7 +995,7 @@ namespace wiz {
 				return isArray && 0 == ut->GetUserTypeListSize();
 			}
 			
-			// todo
+			// todo - removal?
 			void SaveWithJson(ostream& stream, const UserType* ut, const int depth = 0) const {
 				int itemListCount = 0;
 				int userTypeListCount = 0;
@@ -1019,6 +1019,14 @@ namespace wiz {
 				for (int i = 0; i < ut->ilist.size(); ++i) {
 					//std::cout << "ItemList" << endl;
 					if (ut->ilist[i] == 1) {
+						if (userTypeListCount > 0 && 0 == ut->userTypeList[userTypeListCount - 1]->GetIListSize() && ut->userTypeList[userTypeListCount - 1]->GetName().empty())
+						{
+							//
+						}
+						else if (i != 0) {
+							stream << " ,\n";
+						}
+
 						for (int j = 0; j < ut->itemList[itemListCount].size(); j++) {
 							for (int k = 0; k < depth; ++k) {
 								stream << "\t";
@@ -1043,12 +1051,22 @@ namespace wiz {
 								stream << "\"" + ut->itemList[itemListCount].Get(j) + "\"";
 							}
 						}
-						if (i != ut->ilist.size() - 1) {
-							stream << " ,\n";
-						}
+						//if (i != ut->ilist.size() - 1) {
+						//	stream << " ,\n";
+						//}
 						itemListCount++;
 					}
 					else if (ut->ilist[i] == 2) {
+						if (0 == ut->userTypeList[userTypeListCount]->GetIListSize() && ut->userTypeList[userTypeListCount]->GetName().empty())
+						{
+							userTypeListCount++;
+
+							continue;
+						}
+						else if (i != 0) {
+							stream << " ,\n";
+						}
+						
 						for (int k = 0; k < depth; ++k) {
 							stream << "\t";
 						}
@@ -1062,6 +1080,8 @@ namespace wiz {
 								stream << "\"" + ut->userTypeList[userTypeListCount]->GetName() + "\"" << " : ";
 							}
 						}
+
+						
 						if (IsArrayWithJson(ut->userTypeList[userTypeListCount])) {
 							stream << "[\n";
 						}
@@ -1083,9 +1103,9 @@ namespace wiz {
 							stream << "}";
 						}
 
-						if (i != ut->ilist.size() - 1) {
-							stream << " ,\n";
-						}
+						//if (i != ut->ilist.size() - 1) {
+						//	stream << " ,\n";
+						//}
 						userTypeListCount++;
 					}
 				}

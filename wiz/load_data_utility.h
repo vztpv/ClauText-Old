@@ -602,7 +602,7 @@ namespace wiz {
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
 									
- 									aq->push(Token(string(statement.Str()), false));
+ 									aq->push(Token(string(statement.Str(), token_last - token_first + 1), false));
 									statement.LeftShift(i + 1);
 									
 									aq->push(Token("=", false));
@@ -622,7 +622,7 @@ namespace wiz {
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
 									
-									aq->push(Token(string(statement.Str()), false));
+									aq->push(Token(string(statement.Str(), token_last - token_first + 1), false));
 									
 									statement.LeftShift(i + 1);
 									
@@ -642,7 +642,7 @@ namespace wiz {
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
 									
-									aq->push(Token(string(statement.Str()), false));
+									aq->push(Token(string(statement.Str(), token_last - token_first + 1), false));
 									statement.LeftShift(i + 1);
 
 									aq->push(Token("{", false));
@@ -663,7 +663,7 @@ namespace wiz {
 									statement.Divide(i);
 									
 
-									aq->push(Token(string(statement.Str()), false));
+									aq->push(Token(string(statement.Str(), token_last - token_first + 1), false));
 									statement.LeftShift(i + 1);
 
 									aq->push(Token("}", false));
@@ -685,7 +685,7 @@ namespace wiz {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
-									aq->push(Token(string(statement.Str()), false));
+									aq->push(Token(string(statement.Str(), token_last - token_first + 1), false));
 									statement.LeftShift(i + 1);
 									i = 0;
 								}
@@ -701,7 +701,7 @@ namespace wiz {
 								if (j - i + 1 > 0) {
 									statement.Divide(j + 1);
 									
-									aq->push(Token(string(statement.Str()), true));
+									aq->push(Token(string(statement.Str(), j - i + 1), true));
 									statement.LeftShift(j + 2);
 
 									token_first = 0;
@@ -719,7 +719,7 @@ namespace wiz {
 
 						if (token_first < statement.Size())
 						{
-							aq->push(Token(string(statement.Str()), false));
+							aq->push(Token(string(statement.Str(), statement.Size()-1 - token_first + 1), false));
 						}
 					}
 				}

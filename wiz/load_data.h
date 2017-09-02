@@ -785,7 +785,7 @@ namespace wiz {
 				if (ut->GetItem(_var).size() > 0) {
 					string _condition = condition;
 
-					if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "^"); }
+					if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "_"); }
 					else
 						_condition = wiz::String::replace(_condition, "~~", _var); //
 					
@@ -829,7 +829,7 @@ namespace wiz {
 				if (ut->GetUserTypeItem(_var).size() > 0) {
 					string _condition = condition;
 
-					if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "^"); }
+					if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "_"); }
 					else  _condition = wiz::String::replace(_condition, "~~", _var); //
 
 
@@ -1125,7 +1125,7 @@ namespace wiz {
 								if (false == condition.empty()) {
 									string _condition = condition;
 
-									if (utName == "") { _condition = wiz::String::replace(_condition, "~~", "^"); }// do not use ^ in condition!
+									if (utName == "") { _condition = wiz::String::replace(_condition, "~~", "_"); }// do not use ^ in condition!
 									else
 										_condition = wiz::String::replace(_condition, "~~", utName); //
 
@@ -1180,7 +1180,7 @@ namespace wiz {
 							for (int i = 0; i < finded.second.size(); ++i) {
 								if (false == condition.empty()) {
 									string _condition = condition;
-									if (_varName == "" || _varName == " " || _varName == "_" ) { _condition = wiz::String::replace(_condition, "~~", "^"); }
+									if (_varName == "" || _varName == " " || _varName == "_" ) { _condition = wiz::String::replace(_condition, "~~", "_"); }
 									else
 										_condition = wiz::String::replace(_condition, "~~", _varName); //
 									
@@ -1236,7 +1236,7 @@ namespace wiz {
 								for (int i = 0; i < finded.second.size(); ++i) {
 									if (false == condition.empty()) {
 										string _condition = condition;
-										if (_varName == "") { _condition = wiz::String::replace(_condition, "~~", "^"); }
+										if (_varName == "") { _condition = wiz::String::replace(_condition, "~~", "_"); }
 										else
 											_condition = wiz::String::replace(_condition, "~~", _varName); //
 
@@ -1451,7 +1451,7 @@ namespace wiz {
 							string _condition = condition;
 
 							// ~~ and ^ -> do not used other mean?
-							if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "^"); }
+							if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "_"); }
 							else
 								_condition = wiz::String::replace(_condition, "~~", _var); /// varName -> _var.
 							
@@ -1528,7 +1528,7 @@ namespace wiz {
 
 								if (false == condition.empty()) {
 									string _condition = condition;
-									if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "^"); }
+									if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "_"); }
 									else
 										_condition = wiz::String::replace(_condition, "~~", _var); //
 									
@@ -2001,7 +2001,7 @@ namespace wiz {
 					if (ut->GetItemList(i).GetName() == _var) {
 						string _condition = condition;
 
-						if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "^"); }
+						if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "_"); }
 						else {
 							_condition = wiz::String::replace(_condition, "~~~", val); //
 							_condition = wiz::String::replace(_condition, "~~", _var); //
@@ -2059,7 +2059,7 @@ namespace wiz {
 					if (ut->GetUserTypeList(i)->GetName() == _var) {
 						string _condition = condition;
 
-						if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "^"); }
+						if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "_"); }
 						else {
 							_condition = wiz::String::replace(_condition, "~~", _var); //
 						}
@@ -2574,7 +2574,7 @@ namespace wiz {
 			}
 
 			for (int i = 0; i < operandNum; ++i) {
-				if ("^" == operandStack[operandStack.size() - 1 - i]) {
+				if ("_" == operandStack[operandStack.size() - 1 - i]) {
 					operandStack[operandStack.size() - 1 - i] = "";
 				}
 			}
