@@ -1271,6 +1271,7 @@ namespace wiz {
 				if (position == ".") { temp.push_back(global); return{ true, temp }; }
 				if (position == "/./") { temp.push_back(global); return{ true, temp }; } // chk..
 				if (position == "/.") { temp.push_back(global); return{ true, temp }; }
+				if (position == "/") { temp.push_back(global); return{ true, temp }; }
 				if (String::startsWith(position, "/./"))
 				{
 					position = String::substring(position, 3);

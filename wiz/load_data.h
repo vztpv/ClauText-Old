@@ -2106,6 +2106,10 @@ namespace wiz {
 						string _val = val;
 						string _var = ut->GetItemList(i).GetName();
 
+						if (_var.empty()) {
+							_var = "_";
+						}
+
 						_condition = wiz::String::replace(_condition, "~~~", ut->GetItemList(i).Get(0));
 						_condition = wiz::String::replace(_condition, "~~", _var); //
 						_condition = wiz::String::replace(_condition, "////", nowPosition);
