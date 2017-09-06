@@ -27,9 +27,9 @@ namespace wiz {
 			}
 			bool end()const { return pInFile->eof(); }
 		public:
-			bool operator() (ArrayQueue<Token>& strVec)
+			bool operator() (ArrayQueue<Token>& strVec, const wiz::LoadDataOption& option)
 			{
-				return Utility::Reserve2(*pInFile, strVec, Num).second > 0;
+				return Utility::Reserve2(*pInFile, strVec, Num, option).second > 0;
 			}
 		};
 		class NoneReserver
@@ -38,7 +38,7 @@ namespace wiz {
 			int count;
 		public:
 			explicit NoneReserver() : count(0) { }
-			bool operator() (ArrayQueue<Token>& strVec)
+			bool operator() (ArrayQueue<Token>& strVec, const wiz::LoadDataOption&)
 			{
 				count = 1;
 				return false;

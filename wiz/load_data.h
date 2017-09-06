@@ -44,6 +44,25 @@ namespace wiz {
 		explicit Token(string&& str, bool isComment = false) : str(move(str)), isComment(isComment) { }
 		explicit Token(const string& str, bool isComment = false) : str(str), isComment(isComment) { }
 	};
+
+	class LoadDataOption
+	{
+	public:
+		vector<char> LineComment;	// # 
+		vector<char> Left, Right;	// { } , [ ] <- json
+		vector<char> Assignment;	// = , :
+		vector<char> Removal;		// ',', empty. 
+	};
+
+	int Equal(const vector<char>& option, const char ch)
+	{
+		for (int i = 0; i < option.size(); ++i) {
+			if (ch == option[i]) {
+				return i;
+			}
+		}
+		return -1;
+	}
 }
 
 
@@ -54,9 +73,9 @@ namespace wiz {
 #include <wiz/load_data_condition.h>
 
 
-const string LEFT = "{";
-const string RIGHT = "}";
-const string EQ_STR = "="; // EQ 충돌 -> EQ_STR로 변경
+//const string LEFT = "{";
+//const string RIGHT = "}";
+//const string EQ_STR = "="; // EQ 충돌 -> EQ_STR로 변경
 
 class EventInfo
 {
@@ -196,7 +215,7 @@ namespace wiz {
 			/// core
 		public:
 			template <class Reserver>
-			static bool _LoadData(ArrayQueue<Token>& strVec, Reserver& reserver, UserType& global) // first, strVec.empty() must be true!!
+			static bool _LoadData(ArrayQueue<Token>& strVec, Reserver& reserver, UserType& global, const wiz::LoadDataOption& option) // first, strVec.empty() must be true!!
 			{
 				int state = 0;
 				int braceNum = 0;
@@ -208,11 +227,11 @@ namespace wiz {
 
 				nestedUT[0] = &global;
 				{ 
-					reserver(strVec);
+					reserver(strVec, option);
 
 					while (strVec.empty())
 					{
-						reserver(strVec);
+						reserver(strVec, option);
 						if (
 							strVec.empty() &&
 							reserver.end()
@@ -222,50 +241,57 @@ namespace wiz {
 					}
 				}
 
-
 				while (false == strVec.empty()) {
 					switch (state)
 					{
 					case 0:
-						if (LEFT == Utility::Top(strVec, nestedUT[braceNum], reserver)) {
+					{
+						const string top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
+						if (top.size() == 1 && -1 != Equal(option.Left, top[0])) {
 							state = 2;
 						}
 						else {
- 							pair<bool, Token> bsPair = Utility::LookUp(strVec, nestedUT[braceNum], reserver);
+							pair<bool, Token> bsPair = Utility::LookUp(strVec, nestedUT[braceNum], reserver, option);
 							if (bsPair.first) {
-								if (EQ_STR == bsPair.second.str) {
-									Utility::Pop(strVec, &var2, nestedUT[braceNum], reserver);
-									Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver);
+								if (bsPair.second.str.size() == 1 && -1 != Equal(option.Assignment, bsPair.second.str[0])) {
+									Utility::Pop(strVec, &var2, nestedUT[braceNum], reserver, option);
+									Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option);
 									state = 2;
 								}
 								else {
-									if (Utility::Pop(strVec, &var1, nestedUT[braceNum], reserver)) {
+									if (Utility::Pop(strVec, &var1, nestedUT[braceNum], reserver, option)) {
 										nestedUT[braceNum]->AddItem("", move(var1));
 										state = 0;
 									}
 								}
 							}
 							else {
-								if (Utility::Pop(strVec, &var1, nestedUT[braceNum], reserver)) {
+								if (Utility::Pop(strVec, &var1, nestedUT[braceNum], reserver, option)) {
 									nestedUT[braceNum]->AddItem("", move(var1));
 									state = 0;
 								}
 							}
 						}
+					}
 						break;
 					case 1:
-						if (RIGHT == Utility::Top(strVec, nestedUT[braceNum], reserver)) {
-							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver);
+					{
+						const string top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
+ 						if (top.size() == 1 && -1 != Equal(option.Right, top[0])){
+							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option);
 							state = 0;
 						}
 						else {
 							// syntax error.
 							throw "syntax error 1 ";
 						}
+					}
 						break;
 					case 2:
-						if (LEFT == Utility::Top(strVec, nestedUT[braceNum], reserver)) {
-							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver);
+					{
+						const string top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
+ 						if (top.size() == 1 && -1 != Equal(option.Left, top[0])) {
+							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option);
 
 							///
 							nestedUT[braceNum]->AddUserTypeItem(UserType(var2));
@@ -284,7 +310,7 @@ namespace wiz {
 							state = 3;
 						}
 						else {
-							if (Utility::Pop(strVec, &val, nestedUT[braceNum], reserver)) {
+							if (Utility::Pop(strVec, &val, nestedUT[braceNum], reserver, option)) {
 
 								nestedUT[braceNum]->AddItem(move(var2), move(val));
 								var2 = "";
@@ -293,10 +319,13 @@ namespace wiz {
 								state = 0;
 							}
 						}
+					}
 						break;
 					case 3:
-						if (RIGHT == Utility::Top(strVec, nestedUT[braceNum], reserver)) {
-							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver);
+					{
+						const string top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
+						if (top.size() == 1 && -1 != Equal(option.Right, top[0])) {
+							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option);
 
 							nestedUT[braceNum] = nullptr;
 							braceNum--;
@@ -314,10 +343,13 @@ namespace wiz {
 								//	throw  "syntax error 2 ";
 							}
 						}
+					}
 						break;
 					case 4:
-						if (LEFT == Utility::Top(strVec, nestedUT[braceNum], reserver)) {
-							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver);
+					{
+						const string top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
+						if (top.size() == 1 && -1 != Equal(option.Left, top[0])) {
+							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option);
 
 							UserType temp("");
 
@@ -338,8 +370,8 @@ namespace wiz {
 
 							state = 5;
 						}
-						else if (RIGHT == Utility::Top(strVec, nestedUT[braceNum], reserver)) {
-							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver);
+						else if (top.size() == 1 && -1 != Equal(option.Right, top[0])) {
+							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option);
 							state = isState0(state_reserve) ? 0 : 4;
 							state_reserve--;
 
@@ -349,17 +381,17 @@ namespace wiz {
 							}
 						}
 						else {
-							pair<bool, Token> bsPair = Utility::LookUp(strVec, nestedUT[braceNum], reserver);
+							pair<bool, Token> bsPair = Utility::LookUp(strVec, nestedUT[braceNum], reserver, option);
 							if (bsPair.first) {
-								if (EQ_STR == bsPair.second.str) {
+								if (bsPair.second.str.size() == 1 && -1 != Equal(option.Assignment, bsPair.second.str[0])) {
 									// var2
-									Utility::Pop(strVec, &var2, nestedUT[braceNum], reserver);
-									Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver); // pass EQ_STR
+									Utility::Pop(strVec, &var2, nestedUT[braceNum], reserver, option);
+									Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option); // pass EQ_STR
 									state = 6;
 								}
 								else {
 									// var1
-									if (Utility::Pop(strVec, &var1, nestedUT[braceNum], reserver)) {
+									if (Utility::Pop(strVec, &var1, nestedUT[braceNum], reserver, option)) {
 										nestedUT[braceNum]->AddItem("", move(var1));
 										var1 = "";
 
@@ -370,7 +402,7 @@ namespace wiz {
 							else
 							{
 								// var1
-								if (Utility::Pop(strVec, &var1, nestedUT[braceNum], reserver))
+								if (Utility::Pop(strVec, &var1, nestedUT[braceNum], reserver, option))
 								{
 									nestedUT[braceNum]->AddItem("", move(var1));
 									var1 = "";
@@ -379,10 +411,13 @@ namespace wiz {
 								}
 							}
 						}
+					}
 						break;
 					case 5:
-						if (RIGHT == Utility::Top(strVec, nestedUT[braceNum], reserver)) {
-							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver);
+					{
+						const string top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
+						if (top.size() == 1 && -1 != Equal(option.Right, top[0])) {
+							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option);
 
 							//if (flag1 == 0) {
 							nestedUT[braceNum] = nullptr;
@@ -391,12 +426,11 @@ namespace wiz {
 							//
 							state = 4;
 						}
-
 						else {
 							int idx = -1;
 							int num = -1;
 
-							
+
 							{
 								/// uisng struct
 								state_reserve++;
@@ -407,10 +441,13 @@ namespace wiz {
 								//	throw "syntax error 4  ";
 							}
 						}
+					}
 						break;
 					case 6:
-						if (LEFT == Utility::Top(strVec, nestedUT[braceNum], reserver)) {
-							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver);
+					{
+						const string top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
+						if (top.size() == 1 && -1 != Equal(option.Left, top[0])) {
+							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option);
 
 							///
 							{
@@ -431,7 +468,7 @@ namespace wiz {
 							state = 7;
 						}
 						else {
-							if (Utility::Pop(strVec, &val, nestedUT[braceNum], reserver)) {
+							if (Utility::Pop(strVec, &val, nestedUT[braceNum], reserver, option)) {
 
 								nestedUT[braceNum]->AddItem(move(var2), move(val));
 								var2 = ""; val = "";
@@ -439,8 +476,8 @@ namespace wiz {
 								{
 									//
 								}
-								else if (RIGHT == Utility::Top(strVec, nestedUT[braceNum], reserver)) {
-									Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver);
+								else if (top.size() == 1 && -1 != (option.Right, top[0])) {
+									Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option);
 
 									{
 										state = isState0(state_reserve) ? 0 : 4;
@@ -460,10 +497,13 @@ namespace wiz {
 								}
 							}
 						}
+					}
 						break;
 					case 7:
-						if (RIGHT == Utility::Top(strVec, nestedUT[braceNum], reserver)) {
-							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver);
+					{
+						const string top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
+						if (top.size() == 1 && -1 != Equal(option.Right, top[0])) {
+							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option);
 							//
 
 							nestedUT[braceNum] = nullptr;
@@ -474,7 +514,7 @@ namespace wiz {
 						else {
 							int idx = -1;
 							int num = -1;
-							
+
 							{
 								/// uisng struct
 								state_reserve++;
@@ -486,6 +526,7 @@ namespace wiz {
 								//throw "syntax error 5 ";
 							}
 						}
+					}
 						break;
 					default:
 						// syntax err!!
@@ -495,11 +536,11 @@ namespace wiz {
 					}
 
 					if (strVec.size() < 10) {
-						reserver(strVec);
+						reserver(strVec, option);
 
 						while (strVec.empty()) // (strVec.empty())
 						{
-							reserver(strVec);
+							reserver(strVec, option);
 							if (
 								strVec.empty() &&
 								reserver.end()
@@ -535,10 +576,15 @@ namespace wiz {
 
 				try {
 					InFileReserver ifReserver(inFile);
+					wiz::LoadDataOption option;
+					option.Assignment.push_back('=');
+					option.Left.push_back('{');
+					option.LineComment.push_back('#');
+					option.Right.push_back('}');
 
 					ifReserver.Num = 100000;
 					// cf) empty file..
-					if (false == _LoadData(strVec, ifReserver, globalTemp))
+					if (false == _LoadData(strVec, ifReserver, globalTemp, option))
 					{
 						inFile.close();
 						return false; // return true?
@@ -556,87 +602,6 @@ namespace wiz {
 				return true;
 			}
 
-		private:
-			class LoadData2 {
-			public:
-				void operator()(StringBuilder* strVec, NoneReserver* reserver, UserType* global)
-				{
-					ArrayQueue<Token> aq;
-
-					wiz::load_data::Utility::DoThread test(strVec, &aq);
-
-					test();
-
-					_LoadData(aq, *reserver, *global);
-				}
-			};
-		public:
-			static bool LoadDataFromFile2(const string& fileName, UserType& global) /// global should be empty
-			{
-				ifstream inFile;
-				inFile.open(fileName);
-				if (true == inFile.fail())
-				{
-					inFile.close(); return false;
-				}
-				UserType globalTemp = global;
-				vector<StringBuilder> strVec(1, StringBuilder(128));
-				int count = 0;
-
-				try {
-
-					while (wiz::load_data::Utility::Reserve3(inFile, strVec[count], 100000))
-					{
-						count++;
-						strVec.push_back(StringBuilder(128));
-					}
-					strVec.pop_back();
-					inFile.close();
-
-					vector<NoneReserver> noneReserver(strVec.size());
-					vector<UserType> ut(strVec.size());
-					vector<std::thread> test(strVec.size());
-
-					for (int i = 0; i < strVec.size(); ++i) {
-						test[i] = thread(LoadData2(), &strVec[i], &noneReserver[i], &ut[i]);
-					}
-
-					for (int i = 0; i < strVec.size(); ++i) {
-						test[i].join();
-					}
-
-					getchar();
-
-					for (int i = 0; i < ut.size(); ++i) {
-						for (int j = 0; j < ut[i].GetCommentListSize(); ++j) {
-							globalTemp.PushComment(std::move(ut[i].GetCommentList(j)));
-						}
-						int itemCount = 0;
-						int userTypeCount = 0;
-
-						for (int j = 0; j < ut[i].GetIListSize(); ++j) {
-							if (ut[i].IsItemList(j)) {
-								ItemType<string> temp = ut[i].GetItemList(itemCount);
-								globalTemp.AddItem(temp.GetName(), temp.Get(0));
-								itemCount++;
-							}
-							else {
-								globalTemp.AddUserTypeItem(*ut[i].GetUserTypeList(userTypeCount));
-								userTypeCount++;
-							}
-						}
-					}
-					getchar();
-				}
-				catch (Error e) { std::cout << e << endl; if(inFile.is_open()) inFile.close(); return false; }
-				catch (const char* err) { std::cout << err << endl; if (inFile.is_open())inFile.close(); return false; }
-				catch (const string& e) { std::cout << e << endl; if (inFile.is_open())inFile.close(); return false; }
-				catch (exception e) { std::cout << e.what() << endl; if (inFile.is_open())inFile.close(); return false; }
-				catch (...) { std::cout << "not expected error" << endl; if (inFile.is_open())inFile.close(); return false; }
-
-				global = std::move(globalTemp);
-				return true;
-			}
 
 			static bool LoadDataFromString(const string& str, UserType& ut)
 			{
@@ -644,14 +609,20 @@ namespace wiz {
 				ArrayQueue<Token> strVec;
 
 				wiz::StringBuilder builder(str.size(), str.c_str(), str.size());
-				wiz::load_data::Utility::DoThread doThread(&builder, &strVec);
+
+ 				wiz::LoadDataOption option;
+				option.Assignment.push_back('=');
+				option.Left.push_back('{');
+				option.LineComment.push_back('#');
+				option.Right.push_back('}');
+				wiz::load_data::Utility::DoThread doThread(&builder, &strVec, option);
 
 				doThread();
 
 				try {
 					// empty string!
 					NoneReserver nonReserver;
-					if (false == _LoadData(strVec, nonReserver, utTemp))
+					if (false == _LoadData(strVec, nonReserver, utTemp, option))
 					{
 						return true;
 					}

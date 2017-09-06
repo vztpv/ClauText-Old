@@ -544,11 +544,12 @@ namespace wiz {
 				StringBuilder* strVec;
 			public:
 				ArrayQueue<Token>* aq;
+				wiz::LoadDataOption option;
 				//int strVecStart;
 				//int strVecEnd;
 			public:
-				DoThread(StringBuilder* strVec, ArrayQueue<Token>* aq) //, list<string>* aq)//, int strVecStart, int strVecEnd)
-					: strVec(strVec), aq(aq) // , strVecStart(strVecStart), strVecEnd(strVecEnd)
+				DoThread(StringBuilder* strVec, ArrayQueue<Token>* aq, const wiz::LoadDataOption& option) //, list<string>* aq)//, int strVecStart, int strVecEnd)
+					: strVec(strVec), aq(aq), option(option) // , strVecStart(strVecStart), strVecEnd(strVecEnd)
 				{
 					//
 				}
@@ -597,7 +598,32 @@ namespace wiz {
 								state = 0; token_last = i;
 							}
 
-							if (0 == state && '=' == statement[i]) {
+							int idx;
+
+							if (0 == state && -1 != (idx = Equal(option.Removal, statement[i])))
+							{
+								token_last = i - 1;
+								
+								if (token_last >= 0 && token_last - token_first + 1 > 0) {
+									statement.Divide(i);
+
+									aq->push(Token(string(statement.Str(), token_last - token_first + 1), false));
+									statement.LeftShift(i + 1);
+									
+									token_first = 0;
+									token_last = 0;
+									
+									i = -1;
+								}
+								else {
+									statement.LeftShift(1);
+									token_first = 0;
+									token_last = 0;
+									i = -1;
+								}
+								continue;
+							}
+							if (0 == state && -1 != (idx = Equal(option.Assignment, statement[i]))) {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
@@ -605,15 +631,18 @@ namespace wiz {
  									aq->push(Token(string(statement.Str(), token_last - token_first + 1), false));
 									statement.LeftShift(i + 1);
 									
-									aq->push(Token("=", false));
+									aq->push(Token(string("") + option.Assignment[idx], false));
 									token_first = 0;
 									token_last = 0;
+									
 									i = -1;
 								}
 								else {
-									aq->push(Token("=", false));
+									aq->push(Token(string("") + option.Assignment[idx], false));
 									statement.LeftShift(1);
+								
 									token_first = 0;
+									token_last = 0;
 									i = -1;
 								}
 							}
@@ -628,16 +657,18 @@ namespace wiz {
 									
 									token_first = 0;
 									token_last = 0;
+									
 									i = -1;
 								}
 								else
 								{
 									statement.LeftShift(1);
 									token_first = 0;
+									token_last = 0;
 									i = -1;
 								}
 							}
-							else if (0 == state && '{' == statement[i]) {
+							else if (0 == state && -1 != (idx = Equal(option.Left, statement[i]))) {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
@@ -645,19 +676,21 @@ namespace wiz {
 									aq->push(Token(string(statement.Str(), token_last - token_first + 1), false));
 									statement.LeftShift(i + 1);
 
-									aq->push(Token("{", false));
+									aq->push(Token(string("") + option.Left[idx], false));
+									token_first = 0;
+									token_last = 0;
+									
+									i = -1;
+								}
+								else {
+									aq->push(Token(string("") + option.Left[idx], false));
+									statement.LeftShift(1);
 									token_first = 0;
 									token_last = 0;
 									i = -1;
 								}
-								else {
-									aq->push(Token("{", false));
-									statement.LeftShift(1);
-									token_first = 0;
-									i = -1;
-								}
 							}
-							else if (0 == state && '}' == statement[i]) {
+							else if (0 == state && -1 != (idx = Equal(option.Right, statement[i]))) {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
@@ -666,22 +699,24 @@ namespace wiz {
 									aq->push(Token(string(statement.Str(), token_last - token_first + 1), false));
 									statement.LeftShift(i + 1);
 
-									aq->push(Token("}", false));
+									aq->push(Token(string("") + option.Right[idx], false));
 
+									token_first = 0;
+									token_last = 0;
+									
+									i = -1;
+								}
+								else {
+									aq->push(Token(string("") + option.Right[idx], false));
+
+									statement.LeftShift(1);
 									token_first = 0;
 									token_last = 0;
 									i = -1;
 								}
-								else {
-									aq->push(Token("}", false));
-
-									statement.LeftShift(1);
-									token_first = 0;
-									i = -1;
-								}
 							}
 
-							if (0 == state && '#' == statement[i]) { // different from load_data_from_file
+							if (0 == state && -1 != (idx = Equal(option.LineComment, statement[i]))) { // different from load_data_from_file
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
@@ -706,12 +741,14 @@ namespace wiz {
 
 									token_first = 0;
 									token_last = 0;
+									
 									i = -1;
 								}
 								else {
 									statement.LeftShift(j + 2);
 									token_first = 0;
 									token_last = 0;
+									
 									i = -1;
 								}
 							}
@@ -773,7 +810,7 @@ namespace wiz {
 				return count > 0 && 0 == brace;
 			}
 
-			static pair<bool, int> Reserve2(ifstream& inFile, ArrayQueue<Token>& aq, const int num = 1)
+			static pair<bool, int> Reserve2(ifstream& inFile, ArrayQueue<Token>& aq, const int num, const wiz::LoadDataOption& option)
 			{
 				int count = 0;
 				string temp;
@@ -786,7 +823,7 @@ namespace wiz {
 					count++;
 				}
 				
-				DoThread doThread(&builder, &aq);
+				DoThread doThread(&builder, &aq, option);
 				
 				doThread(); // (0, count - 1);
 				
@@ -811,13 +848,13 @@ namespace wiz {
 		private:
 			// chk!!
 			template <class Reserver>
-			static bool ChkComment(ArrayQueue<Token>& strVec, wiz::load_data::UserType* ut, Reserver reserver, const int offset)
+			static bool ChkComment(ArrayQueue<Token>& strVec, wiz::load_data::UserType* ut, Reserver reserver, const int offset, const wiz::LoadDataOption& option)
 			{
 				if (strVec.size() < offset) {
-					reserver(strVec);
+					reserver(strVec, option);
 					while (strVec.size() < offset) // 
 					{
-						reserver(strVec);
+						reserver(strVec, option);
 						if (
 							strVec.size() < offset &&
 							reserver.end()
@@ -845,12 +882,12 @@ namespace wiz {
 					}
 
 					if (x == strVec.end()) {
-						reserver(strVec);
+						reserver(strVec, option);
 						x = strVec.begin(count);
 
 						while (strVec.size() < offset) // 
 						{
-							reserver(strVec);
+							reserver(strVec, option);
 							x = strVec.begin(count);
 							if (
 								strVec.size() < offset &&
@@ -864,10 +901,10 @@ namespace wiz {
 			}
 		public:
 			template<class Reserver>
-			static string Top(ArrayQueue<Token>& strVec, wiz::load_data::UserType* ut, Reserver reserver)
+			static string Top(ArrayQueue<Token>& strVec, wiz::load_data::UserType* ut, Reserver reserver, const wiz::LoadDataOption& option)
 			{
 				if (strVec.empty() || strVec[0].isComment) {
-					if (false == ChkComment(strVec, ut, reserver, 1)) {
+ 					if (false == ChkComment(strVec, ut, reserver, 1, option)) {
  						return string();
 					}
 				}
@@ -875,10 +912,10 @@ namespace wiz {
 				return strVec[0].str;
 			}
 			template <class Reserver>
-			static bool Pop(ArrayQueue<Token>& strVec, string* str, wiz::load_data::UserType* ut, Reserver reserver)
+			static bool Pop(ArrayQueue<Token>& strVec, string* str, wiz::load_data::UserType* ut, Reserver reserver, const wiz::LoadDataOption& option)
 			{
 				if (strVec.empty() || strVec[0].isComment) {
-					if (false == ChkComment(strVec, ut, reserver, 1)) {
+					if (false == ChkComment(strVec, ut, reserver, 1, option)) {
 						return false;
 					}
 				}
@@ -903,10 +940,10 @@ namespace wiz {
 		
 			// lookup just one!
 			template <class Reserver> 
-			static pair<bool, Token> LookUp(ArrayQueue<Token>& strVec, wiz::load_data::UserType* ut, Reserver reserver)
+			static pair<bool, Token> LookUp(ArrayQueue<Token>& strVec, wiz::load_data::UserType* ut, Reserver reserver, const wiz::LoadDataOption& option)
 			{
 				if (!(strVec.size() >= 2 && false == strVec[0].isComment && false == strVec[1].isComment)) {
-					if (false == ChkComment(strVec, ut, reserver, 2)) {
+					if (false == ChkComment(strVec, ut, reserver, 2, option)) {
 						return{ false, Token{"", false} };
 					}
 				}
