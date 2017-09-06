@@ -241,7 +241,14 @@ namespace wiz {
 					}
 				}
 
+			//	for (int i = 0; i < strVec.size(); ++i) {
+			//		cout << strVec[i].str << endl;
+			//	}
+
 				while (false == strVec.empty()) {
+					
+				//	cout << state << " " << Utility::Top(strVec, nestedUT[braceNum], reserver, option) << endl;
+
 					switch (state)
 					{
 					case 0:
@@ -445,7 +452,7 @@ namespace wiz {
 						break;
 					case 6:
 					{
-						const string top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
+						string top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
 						if (top.size() == 1 && -1 != Equal(option.Left, top[0])) {
 							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option);
 
@@ -472,11 +479,14 @@ namespace wiz {
 
 								nestedUT[braceNum]->AddItem(move(var2), move(val));
 								var2 = ""; val = "";
+								
+								top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
+
 								if (strVec.empty())
 								{
 									//
 								}
-								else if (top.size() == 1 && -1 != (option.Right, top[0])) {
+								else if (top.size() == 1 && -1 != Equal(option.Right, top[0])) {
 									Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option);
 
 									{
