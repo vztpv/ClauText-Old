@@ -612,6 +612,46 @@ namespace wiz {
 				return true;
 			}
 
+			static bool LoadDataFromFileWithJson(const string& fileName, UserType& global) /// global should be empty
+			{
+				ifstream inFile;
+				inFile.open(fileName);
+				if (true == inFile.fail())
+				{
+					inFile.close(); return false;
+				}
+				UserType globalTemp = global;
+				ArrayQueue<Token> strVec;
+
+				try {
+					InFileReserver ifReserver(inFile);
+					wiz::LoadDataOption option;
+					option.Assignment.push_back(':');
+					option.Left.push_back('{');
+					option.Left.push_back('[');
+					//option.LineComment.push_back('#');
+					option.Right.push_back('}');
+					option.Right.push_back(']');
+
+					ifReserver.Num = 100000;
+					// cf) empty file..
+					if (false == _LoadData(strVec, ifReserver, globalTemp, option))
+					{
+						inFile.close();
+						return false; // return true?
+					}
+
+					inFile.close();
+				}
+				catch (Error e) { std::cout << e << endl; inFile.close(); return false; }
+				catch (const char* err) { std::cout << err << endl; inFile.close(); return false; }
+				catch (const string& e) { std::cout << e << endl; inFile.close(); return false; }
+				catch (exception e) { std::cout << e.what() << endl; inFile.close(); return false; }
+				catch (...) { std::cout << "not expected error" << endl; inFile.close(); return false; }
+
+				global = move(globalTemp);
+				return true;
+			}
 
 			static bool LoadDataFromString(const string& str, UserType& ut)
 			{
