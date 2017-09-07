@@ -202,23 +202,26 @@ public:
 		Iter(T* ptr, int pos)
 			: ptr(ptr), pos(pos)
 		{
-		
+
 		}
 
-		bool operator==(const Iter& other) {
-			return ptr == other.ptr;
+		bool operator==(const Iter& other) const {
+			return pos == other.pos;
+		}
+		bool operator!=(const Iter& other) const {
+			return pos != other.pos;
 		}
 	};
 
 	Iter begin(int count = 0) { return Iter(&((*this)[count]), count); }
 
-	Iter end() { return Iter(&((*this)[size()]), size()); }
+	Iter end() { return Iter(nullptr, size()); }
 
 	Iter erase(Iter ptr) {
 		for (int i = ptr.pos; i < size() - 1; ++i) {
-			(*this)[i] = (*this)[i + 1];
+			(*this)[i] = move((*this)[i + 1]);
 		}
-		(*this)[size() - 1] = T();
+		//(*this)[size() - 1] = T();
 
 		num--;
 
