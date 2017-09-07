@@ -600,30 +600,7 @@ namespace wiz {
 
 							int idx;
 
-
-							if (0 == state && isWhitespace(statement[i])) { // isspace ' ' \t \r \n , etc... ?
-								token_last = i - 1;
-								if (token_last >= 0 && token_last - token_first + 1 > 0) {
-									statement.Divide(i);
-
-									aq->push(Token(string(statement.Str(), token_last - token_first + 1), false));
-
-									statement.LeftShift(i + 1);
-
-									token_first = 0;
-									token_last = 0;
-
-									i = -1;
-								}
-								else
-								{
-									statement.LeftShift(1);
-									token_first = 0;
-									token_last = 0;
-									i = -1;
-								}
-							}
-							else if (0 == state && -1 != (idx = Equal(option.Removal, statement[i])))
+							if (0 == state && -1 != (idx = Equal(option.Removal, statement[i])))
 							{
 								token_last = i - 1;
 								
@@ -646,7 +623,7 @@ namespace wiz {
 								}
 								continue;
 							}
-							else if (0 == state && -1 != (idx = Equal(option.Assignment, statement[i]))) {
+							if (0 == state && -1 != (idx = Equal(option.Assignment, statement[i]))) {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
@@ -664,6 +641,28 @@ namespace wiz {
 									aq->push(Token(string("") + option.Assignment[idx], false));
 									statement.LeftShift(1);
 								
+									token_first = 0;
+									token_last = 0;
+									i = -1;
+								}
+							}
+							else if (0 == state && isWhitespace(statement[i])) { // isspace ' ' \t \r \n , etc... ?
+								token_last = i - 1;
+								if (token_last >= 0 && token_last - token_first + 1 > 0) {
+									statement.Divide(i);
+									
+									aq->push(Token(string(statement.Str(), token_last - token_first + 1), false));
+									
+									statement.LeftShift(i + 1);
+									
+									token_first = 0;
+									token_last = 0;
+									
+									i = -1;
+								}
+								else
+								{
+									statement.LeftShift(1);
 									token_first = 0;
 									token_last = 0;
 									i = -1;
