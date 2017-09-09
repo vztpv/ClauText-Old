@@ -213,6 +213,10 @@ namespace wiz {
 				}
 			}
 		public:
+			void SetParent(UserType* other)
+			{
+				parent = other;
+			}
 			UserType* GetParent() { return parent; }
 			const UserType* GetParent()const { return parent; }
 
@@ -715,6 +719,7 @@ namespace wiz {
 			}
 			*/
 			//
+
 			void AddItem(string&& name, string&& item) {
 				itemList.emplace_back(move(name), move(item));
 				ilist.push_back(1);

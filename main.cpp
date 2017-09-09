@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
 	}
 	wiz::load_data::UserType global;
 	try {
-			wiz::load_data::LoadData::LoadDataFromFile(fileName, global);
+			wiz::load_data::LoadData::FastLoadDataFromFile(fileName, global);
 			cout << "fileName is " << fileName << endl;
 			cout << "excute result is " << excute_module("", &global, ExcuteData(), 0) << endl;
 	}

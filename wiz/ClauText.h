@@ -20,6 +20,11 @@ using namespace std;
 
 #include <wiz/queues.h>
 
+
+#include "wiz_load_data_user_type.h"
+#include "wiz_load_data.h"
+#include "utility.h"
+
 #include <wiz/load_data.h>
 #include <wiz/stacks.h>
 #include <wiz/cpp_string.h>
@@ -2680,6 +2685,138 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 							int userType_count = 0;
 
 							for (int i = 0; i < ut.GetIListSize(); ++i) { 
+								if (ut.IsItemList(i)) {
+									utTemp->AddItem(std::move(ut.GetItemList(item_count).GetName()),
+										std::move(ut.GetItemList(item_count).Get(0)));
+									item_count++;
+								}
+								else {
+									utTemp->AddUserTypeItem(std::move(*ut.GetUserTypeList(userType_count)));
+									userType_count++;
+								}
+							}
+						}
+
+						//	auto _Main = ut.GetUserTypeItem("Main");
+						//	if (!_Main.empty())
+						//	{
+						// error!
+						//		cout << "err" << endl;
+
+						//			return "ERROR -2"; /// exit?
+						//		}
+					}
+					else {
+						// error!
+					}
+
+					eventStack.top().userType_idx.top()++;
+					break;
+
+				}
+				else if ("$fast_load" == val->GetName())
+				{
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					// to do, load data and events from other file!
+					for (int i = 0; i < val->GetItemListSize(); ++i) {
+						wiz::load_data::UserType ut;
+						string fileName = ToBool4(nullptr, global, val->GetItemList(i).Get(0), _excuteData, &builder);
+						fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
+
+						if (wiz::load_data::LoadData::FastLoadDataFromFile(fileName, ut)) {
+							{
+								int item_count = 0;
+								int userType_count = 0;
+
+								for (int i = 0; i < ut.GetIListSize(); ++i) {
+									if (ut.IsItemList(i)) {
+										global.AddItem(std::move(ut.GetItemList(item_count).GetName()),
+											std::move(ut.GetItemList(item_count).Get(0)));
+										item_count++;
+									}
+									else {
+										global.AddUserTypeItem(std::move(*ut.GetUserTypeList(userType_count)));
+										userType_count++;
+									}
+								}
+							}
+
+							auto _Main = ut.GetUserTypeItem("Main");
+							if (!_Main.empty())
+							{
+								// error!
+								cout << "err" << endl;
+
+								return "ERROR -2"; /// exit?
+							}
+						}
+						else {
+							// error!
+						}
+					}
+
+					{
+						convert.clear();
+						auto _events = global.GetCopyUserTypeItem("Event");
+						for (int i = 0; i < _events.size(); ++i) {
+							eventPtr->LinkUserType(_events[i]);
+						}
+						global.RemoveUserTypeList("Event");
+
+						// event table setting
+						for (int i = 0; i < eventPtr->GetUserTypeListSize(); ++i)
+						{
+							auto x = eventPtr->GetUserTypeList(i)->GetItem("id");
+							if (!x.empty()) {
+								//cout <<	x[0] << endl;
+								convert.insert(pair<string, int>(x[0].Get(0), i));
+							}
+							else {
+								// error
+							}
+						}
+
+						// update no
+						no = convert[str];
+					}
+
+					eventStack.top().userType_idx.top()++;
+					break;
+
+				}
+				else if ("$fast_load_only_data" == val->GetName()) // $load2?
+				{
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					// to do, load data and events from other file!
+					wiz::load_data::UserType ut;
+					string fileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
+					fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
+					string dirName = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
+					wiz::load_data::UserType* utTemp = global.GetUserTypeItem(dirName)[0];
+
+
+
+					if (wiz::load_data::LoadData::FastLoadDataFromFile(fileName, ut)) {
+						{
+							for (int i = 0; i < ut.GetCommentListSize(); ++i) {
+								utTemp->PushComment(move(ut.GetCommentList(i)));
+							}
+							int item_count = 0;
+							int userType_count = 0;
+
+							for (int i = 0; i < ut.GetIListSize(); ++i) {
 								if (ut.IsItemList(i)) {
 									utTemp->AddItem(std::move(ut.GetItemList(item_count).GetName()),
 										std::move(ut.GetItemList(item_count).Get(0)));

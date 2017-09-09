@@ -571,10 +571,98 @@ namespace wiz {
 				return true;
 			}
 
+		private:
+			static const char* _Convert(wiz_string* from)
+			{
+				return (get_cstr_wiz_string(from));
+			}
+			static void Convert(user_type* from, UserType& ut)
+			{
+				// name
+				ut.SetName(_Convert(&from->name));
+				
+				free_wiz_string(&from->name);
+				// parent
+				ut.SetParent(nullptr);
+				// comment
+				for (int i = 0; i < size_wiz_vector_wiz_string(&from->comment_list); ++i) {
+					ut.PushComment(_Convert(get_wiz_vector_wiz_string(&from->comment_list, i)));
+				}
+				// itemtype
+				// usertype
+				int item_count = 0, user_count = 0;
+				for (int i = 0; i < size_wiz_vector_int(&from->ilist); ++i) {
+					if (1 == *get_wiz_vector_int(&from->ilist, i)) {
+						item_type* it = get_wiz_vector_item_type(&from->item_list, item_count);
+						ut.AddItem(_Convert(&it->name), _Convert(&it->value));
+						item_count++;
+						free_item_value_in_item_type(it);
+					}
+					else {
+						user_type* temp = (user_type*)get_wiz_vector_any2(&from->user_type_list, user_count);
+
+						ut.AddUserTypeItem(UserType(""));
+
+						Convert(temp, *ut.GetUserTypeList(user_count));
+						
+						user_count++;
+
+						free_user_type_in_user_type(temp);
+					}
+				}
+
+				free_wiz_vector_int(&from->ilist);
+				free_wiz_vector_any2(&from->user_type_list);
+				free_wiz_vector_item_type(&from->item_list);
+				free_user_type_in_user_type(from);
+			}
 		public:
+			static bool FastLoadDataFromFile(const string& fileName, UserType& global)
+			{
+				bool success = true;
+				wiz_string temp = make_wiz_string("", 0);
+				user_type data; init_in_user_type(&data, &temp);
+				wiz_string _fileName = make_wiz_string(fileName.c_str(), fileName.size());
+
+				try {
+					free_user_type_in_user_type(&data);
+					data = load_data_from_file_in_load_data(&_fileName);
+					Convert(&data, global);
+				}
+				catch (...) {
+					success = false;
+				}
+				
+				free_wiz_string(&_fileName);
+				free_user_type_in_user_type(&data);
+				free_wiz_string(&temp);
+				return success;
+			}
+
+			static bool FastLoadDataFromString(const string& str, UserType& global)
+			{
+				bool success;
+				wiz_string temp = make_wiz_string("", 0);
+				user_type data; init_in_user_type(&data, &temp);
+				wiz_string _str = make_wiz_string(str.c_str(), str.size());
+
+				try {
+					data = load_data_from_string_in_load_data(&_str); 
+					Convert(&data, global);
+				} 
+				catch (...) {
+					success = false;
+				}
+
+				free_wiz_string(&_str);
+				free_user_type_in_user_type(&data);
+				free_wiz_string(&temp);
+				return success;
+			}
 
 			static bool LoadDataFromFile(const string& fileName, UserType& global) /// global should be empty
 			{
+				bool success = true;
 				ifstream inFile;
 				inFile.open(fileName);
 				if (true == inFile.fail())
