@@ -647,6 +647,7 @@ namespace wiz {
 				wiz_string _str = make_wiz_string(str.c_str(), str.size());
 
 				try {
+					free_user_type_in_user_type(&data);
 					data = load_data_from_string_in_load_data(&_str); 
 					Convert(&data, global);
 				} 
