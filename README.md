@@ -1,4 +1,4 @@
-# Using VisualStudio 2017, Windows10, Modern C++
+# Using VisualStudio 2017, Windows10, Modern C++, ClauTextLib Project?
 
 # What is ClauText? 
 	ClauText consists of Data, Event, and Main.
