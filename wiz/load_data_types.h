@@ -719,7 +719,14 @@ namespace wiz {
 			}
 			*/
 			//
-
+			void ReserveItemList(int offset)
+			{
+				itemList.reserve(offset);
+			}
+			void ReserveUserTypeList(int offset)
+			{
+				userTypeList.reserve(offset);
+			}
 			void AddItem(string&& name, string&& item) {
 				itemList.emplace_back(move(name), move(item));
 				ilist.push_back(1);

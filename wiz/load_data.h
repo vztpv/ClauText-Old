@@ -572,9 +572,9 @@ namespace wiz {
 			}
 
 		private:
-			static const char* _Convert(wiz_string* from)
+			static string _Convert(wiz_string* from)
 			{
-				return (get_cstr_wiz_string(from));
+				return string(get_cstr_wiz_string(from), size_wiz_string(from));
 			}
 			static void Convert(user_type* from, UserType& ut)
 			{
@@ -591,7 +591,12 @@ namespace wiz {
 				// itemtype
 				// usertype
 				int item_count = 0, user_count = 0;
-				for (int i = 0; i < size_wiz_vector_int(&from->ilist); ++i) {
+				const int n = size_wiz_vector_int(&from->ilist);
+
+				ut.ReserveItemList(size_wiz_vector_item_type(&from->item_list));
+				ut.ReserveUserTypeList(size_wiz_vector_any2(&from->user_type_list));
+
+				for (int i = 0; i < n; ++i) {
 					if (1 == *get_wiz_vector_int(&from->ilist, i)) {
 						item_type* it = get_wiz_vector_item_type(&from->item_list, item_count);
 						ut.AddItem(_Convert(&it->name), _Convert(&it->value));
