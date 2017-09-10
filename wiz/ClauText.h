@@ -20,10 +20,13 @@ using namespace std;
 
 #include <wiz/queues.h>
 
+#ifdef USE_FAST_LOAD_DATA
 
 #include "wiz_load_data_user_type.h"
 #include "wiz_load_data.h"
 #include "utility.h"
+
+#endif
 
 #include <wiz/load_data.h>
 #include <wiz/stacks.h>
@@ -2714,6 +2717,8 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					break;
 
 				}
+#ifdef USE_FAST_LOAD_DATA
+
 				else if ("$fast_load" == val->GetName())
 				{
 					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
@@ -2846,6 +2851,7 @@ string excute_module(const string& MainStr, wiz::load_data::UserType* _global, c
 					break;
 
 				}
+#endif
 				else if ("$load_json" == val->GetName()) // $load2?
 				{
 					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;

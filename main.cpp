@@ -10,6 +10,7 @@
 // Array idx chk test.
 //#define ARRAYS_DEBUG
 
+#define USE_FAST_LOAD_DATA
 #include <wiz/ClauText.h>
 
 

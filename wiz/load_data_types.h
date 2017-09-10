@@ -719,6 +719,10 @@ namespace wiz {
 			}
 			*/
 			//
+			void ReserveIList(int offset)
+			{
+				ilist.reserve(offset);
+			}
 			void ReserveItemList(int offset)
 			{
 				itemList.reserve(offset);

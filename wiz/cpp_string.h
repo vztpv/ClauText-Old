@@ -1,6 +1,7 @@
 #ifndef CPP_STRING_H_INCLUDED
 #define CPP_STRING_H_INCLUDED
 
+#define _CRT_SECURE_NO_WARNINGS
 
 #include <wiz/global.h>
 #include <cstring>

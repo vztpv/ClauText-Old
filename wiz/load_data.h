@@ -570,6 +570,7 @@ namespace wiz {
 
 				return true;
 			}
+#ifdef USE_FAST_LOAD_DATA
 
 		private:
 			static string _Convert(wiz_string* from)
@@ -593,6 +594,7 @@ namespace wiz {
 				int item_count = 0, user_count = 0;
 				const int n = size_wiz_vector_int(&from->ilist);
 
+				ut.ReserveIList(n);
 				ut.ReserveItemList(size_wiz_vector_item_type(&from->item_list));
 				ut.ReserveUserTypeList(size_wiz_vector_any2(&from->user_type_list));
 
@@ -665,7 +667,8 @@ namespace wiz {
 				free_wiz_string(&temp);
 				return success;
 			}
-
+#endif
+		public:
 			static bool LoadDataFromFile(const string& fileName, UserType& global) /// global should be empty
 			{
 				bool success = true;
