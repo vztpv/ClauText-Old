@@ -2625,6 +2625,7 @@ namespace wiz {
 			}
 			return result;
 		}
+		
 		inline bool Exist(wiz::load_data::UserType* ut, const string& dir, StringBuilder* builder)
 		{
 			auto x = wiz::load_data::UserType::Find(ut, dir, builder);
@@ -3718,7 +3719,7 @@ namespace wiz {
 
 			for (int i = 0; i < tokenVec.size(); ++i)
 			{
-				result = result + "/";
+				result += "/";
 				if (wiz::String::startsWith(tokenVec[i], "$parameter.")) {
 					int last = -1;
 					for (int j = 0; j < tokenVec[i].size(); ++j)
@@ -3772,7 +3773,7 @@ namespace wiz {
 					}
 				}
 
-				result = result + tokenVec[i];
+				result += tokenVec[i];
 			}
 			return result;
 		}
@@ -3796,7 +3797,7 @@ namespace wiz {
 		//	cout << "result is " << result << endl;
 
 			wiz::ArrayStack<string> resultStack;
-			wiz::load_data::UserType ut;
+			//wiz::load_data::UserType ut;
 			bool chk = false;
 			int count_change = 0;
 
@@ -3805,19 +3806,28 @@ namespace wiz {
 			{
 				flag_A = true;
 			}
-			result = ToBool3(global, excuteData.info.parameters, result, excuteData.info, builder);
-			if (result.empty()) { return ""; }
-			if (!flag_A) {
-				result = string(result.c_str() + 1);
+			bool flag_B = false;
+			for (int i = 0; i < result.size(); ++i) {
+				if (result[i] == '/') {
+					flag_B = true;
+					break;
+				}
 			}
-			wiz::load_data::LoadData::LoadDataFromString(result, ut);
-			result = ut.ToString();
+			if (flag_B) {
+				result = ToBool3(global, excuteData.info.parameters, result, excuteData.info, builder);
+			}
+			if (result.empty()) { return ""; }
+			if (!flag_A && flag_B) {
+				result = string(result.c_str() + 1, result.size() - 1);
+			}
+			//wiz::load_data::LoadData::LoadDataFromString(result, ut);
+			//result = ut.ToString();
 			if (result.empty()) { return result; }
 
-			if (ut.empty()) {
-				return "";
-			}
-			if (ut.GetUserTypeListSize() == 0 && ut.GetItemListSize() == 1) /// chk
+			//if (ut.empty()) {
+			//	return "";
+			//}
+		//	if (ut.GetUserTypeListSize() == 0 && ut.GetItemListSize() == 1) /// chk
 			{
 				if ('/' == result[0] && result.size() > 1)
 				{
@@ -3825,19 +3835,22 @@ namespace wiz {
 
 					if (!temp.empty()) {
 						result = move(temp);
-					}return result;
+						return result;
+					}
 				}
 				else if (wiz::String::startsWith(result, "$local.")) {
 					string _temp = FindLocals(excuteData.info.locals, result);
 					if (!_temp.empty()) {
 						result = move(_temp);
-					}return result;
+						return result;
+					}
 				}
 				else if (wiz::String::startsWith(result, "$parameter.")) {
 					string _temp = FindParameters(excuteData.info.parameters, result);
 					if (!_temp.empty()) {
 						result = move(_temp);
-					}return result;
+						return result;
+					}
 				}
 				
 			}
@@ -3914,10 +3927,10 @@ namespace wiz {
 
 			for (int i = tokenVec.size() - 1; i >= 0; --i) {
 				// todo - chk first? functions in Event
-				if ( //String::startsWith(tokenVec[i], "$parameter.") ||
+				if ( String::startsWith(tokenVec[i], "$parameter.") ||
 					//tokenVec[i] == "$parameter" ||
 					//tokenVec[i] == "$local" ||
-					 //String::startsWith(tokenVec[i], "$local.") ||
+					 String::startsWith(tokenVec[i], "$local.") ||
 					//"$return" == tokenVec[i] ||
 					'$' != tokenVec[i][0] || ('$' == tokenVec[i][0] && tokenVec[i].size() == 1)
 					) {
