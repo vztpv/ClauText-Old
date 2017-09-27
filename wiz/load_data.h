@@ -3713,6 +3713,7 @@ namespace wiz {
 			vector<string> tokenVec;
 			string result;
 
+			tokenVec.reserve(tokenizer.countTokens());
 			while (tokenizer.hasMoreTokens()) {
 				tokenVec.push_back(tokenizer.nextToken());
 			}
@@ -3862,6 +3863,7 @@ namespace wiz {
 				
 				//vector<string> tokenVec2;
 
+				tokenVec.reserve(tokenizer.countTokens());
 				while (tokenizer.hasMoreTokens()) {
 					tokenVec.push_back(tokenizer.nextToken());
 				}

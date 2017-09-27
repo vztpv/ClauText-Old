@@ -169,10 +169,13 @@ namespace wiz{
 	private:
 		void Init(const string& str, const vector<string>& separator, StringBuilder* builder) // assumtion : separators are sorted by length?, long -> short
 		{
+			const int str_size = str.size();
 			if (separator.empty() || str.empty()) { return; } // if str.empty() == false then _m_str.push_back(str); // ?
 															  //
 			builder->Clear();
 			builder->Append(str.c_str(), str.size());
+
+			_m_str.reserve(str.size() / 2);
 			int left = 0;
 			int right = 0;
 			int state = 0;
@@ -233,9 +236,10 @@ namespace wiz{
 					continue;
 				}
 
-
-				for (int j = 0; j < separator.size(); ++j) {
-					for (int k = 0; k < separator[j].size() && i + k < str.size(); ++k) {
+				const int sep_size = separator.size();
+				for (int j = 0; j < sep_size; ++j) {
+					const int  sep_j_size = separator[j].size();
+					for (int k = 0; k < sep_j_size && i + k < str_size; ++k) {
 						if (str[i + k] == separator[j][k]) {
 							pass = true;
 						}
