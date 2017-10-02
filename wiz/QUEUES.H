@@ -242,11 +242,11 @@ public:
 public:
 	const T& operator[](const int idx) const
 	{
-		return que[(start + idx) % (que.size())];
+		return que[(start + idx) & (que.size() - 1)];
 	}
 	T& operator[](const int idx)
 	{
-		return que[(start + idx) % (que.size())];
+		return que[(start + idx) & (que.size() - 1)];
 	}
 public:
 	void push(const ArrayQueue<T>& val) {
@@ -254,7 +254,7 @@ public:
 		int newSize = this->que.size();
 
 		while (newSize - num - 1 < val.size()) {
-			newSize = newSize * 1.5;
+			newSize = newSize * 2;
 		}
 		if (newSize != this->que.size()) {
 			// expand array queue.
@@ -284,7 +284,7 @@ public:
 		int newSize = this->que.size();
 
 		while (newSize - num - 1 < val.size()) {
-			newSize = newSize * 1.5;
+			newSize = newSize * 2;
 		}
 		if (newSize != this->que.size()) {
 			// expand array queue.
@@ -309,44 +309,44 @@ public:
 			}
 		}
 	}
-    void push( const T& val )
-    {
-        if( isFull() )
-        {
-            // expand array queue.
-            ArrayQueue temp( que.size() * 1.5 );
-            //
+	void push(const T& val)
+	{
+		if (isFull())
+		{
+			// expand array queue.
+			ArrayQueue temp(que.size() * 2);
+			//
 			for (int i = 0; i < que.size(); ++i) {
-				temp[i] = std::move(que[(start + i) % (que.size())]);
+				temp[i] = std::move(que[(start + i) & (que.size() - 1)]);
 			}
 			temp.start = 0;
 			temp.num = que.size() - 1;
 
-            *this = std::move( temp );
-        }
-        que[(start+num) % (que.size())] = val;
-        num++;
-    }
-	
+			*this = std::move(temp);
+		}
+		que[(start + num) & (que.size() - 1)] = val;
+		num++;
+	}
+
 	void push(T&& val)
 	{
 		if (isFull())
 		{
 			// expand array queue.
-			ArrayQueue temp(que.size() * 1.5);
+			ArrayQueue temp(que.size() * 2);
 			//
 			for (int i = 0; i < que.size(); ++i) {
-				temp[i] = std::move(que[(start + i) % (que.size())]);
+				temp[i] = std::move(que[(start + i) & (que.size() - 1)]);
 			}
 			temp.start = 0;
 			temp.num = que.size() - 1;
-			
+
 			*this = std::move(temp);
 		}
-		que[(start + num) % (que.size())] = std::move(val);
+		que[(start + num) & (que.size() - 1)] = std::move(val);
 		num++;
 	}
-	
+
 	void pop(T* t = nullptr) {
 		if (isEmpty()) { throw QueueEmptyError(); }
 
@@ -354,7 +354,7 @@ public:
 
 		//que[start] = T();
 
-		start = (start + 1) % (que.size()); // % que.size(), 2^n.
+		start = (start + 1) & (que.size() - 1); // % que.size(), 2^n.
 		num--;
 
 		if (nullptr != t) {
@@ -371,52 +371,62 @@ public:
 		T temp = std::move((*this)[num - 1]);
 
 		//(*this)[num - 1] = T();
-		
+
 		num--;
 
 		return temp;
 	}
 
-    bool isFull()const
-    {
-        return num >= ( que.size() - 1);
-    }
+	bool isFull()const
+	{
+		return num >= (que.size() - 1);
+	}
 
-    bool isEmpty()const
-    {
-        return 0 == num;
-    }
-    int size()const{ return num; }
-    bool empty()const { return isEmpty(); }
-    int getNumMax()const { return que.size(); }
-    int getNum()const { return num; }
+	bool isEmpty()const
+	{
+		return 0 == num;
+	}
+	int size()const { return num; }
+	bool empty()const { return isEmpty(); }
+	int getNumMax()const { return que.size(); }
+	int getNum()const { return num; }
 	T& front() { return (*this)[0]; }
 	const T& front()const { return (*this)[0]; }
-    Array<T> toArray()const
-    {
-        Array<T> temp;
+	Array<T> toArray()const
+	{
+		Array<T> temp;
 
-        if( num > 0 )
-        {
-            temp = Array<T>( num );
-            int count=0;
+		if (num > 0)
+		{
+			temp = Array<T>(num);
+			int count = 0;
 
-            for( int i=0; i < num; i++ )
-            {
-                temp[i] = que[ ( start + i ) % (que.size()) ];
-            }
-        }
+			for (int i = 0; i < num; i++)
+			{
+				temp[i] = que[(start + i) & (que.size() - 1)];
+			}
+		}
 
-        return temp;
-    }
+		return temp;
+	}
 
-    ArrayQueue<T>& operator<<( const T& data )
-    {
-        push( data );
+	ArrayQueue<T>& operator<<(const T& data)
+	{
+		push(data);
 
-        return *this;
-    }
+		return *this;
+	}
+public:
+	// size must 2^n!, init?
+	bool reserve(const int size)
+	{
+		que = Array<T>(size);
+		start = 0;
+		num = 0;
+
+		return true;
+	}
 };
-
 }
+
 #endif // QUEUES_H_INCLUDED

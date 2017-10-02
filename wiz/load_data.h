@@ -689,7 +689,8 @@ namespace wiz {
 					option.LineComment.push_back('#');
 					option.Right.push_back('}');
 
-					ifReserver.Num = 100000;
+					ifReserver.Num = 1 << 20;
+					strVec.reserve(ifReserver.Num);
 					// cf) empty file..
 					if (false == _LoadData(strVec, ifReserver, globalTemp, option))
 					{
