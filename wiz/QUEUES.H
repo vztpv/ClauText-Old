@@ -219,7 +219,7 @@ public:
 
 	Iter erase(Iter ptr) {
 		for (int i = ptr.pos; i < size() - 1; ++i) {
-			(*this)[i] = move((*this)[i + 1]);
+			(*this)[i] = std::move((*this)[i + 1]);
 		}
 		//(*this)[size() - 1] = T();
 
@@ -358,7 +358,7 @@ public:
 		num--;
 
 		if (nullptr != t) {
-			*t = move(temp);
+			*t = std::move(temp);
 		}
 	}
 	void pop_front(T* t = nullptr) {

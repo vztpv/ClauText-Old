@@ -4,8 +4,7 @@
 
 #include <vector>
 #include <string>
-#include <algorithm>
-using namespace std;
+#include <algorithm>\
 
 #include <wiz/stacks.h>
 #include <wiz/load_data_types.h>
@@ -16,23 +15,23 @@ namespace wiz {
 		class Condition {
 		private:
 			int braceNum;
-			std::vector<string> tokenVec;
-			ArrayStack<string> tokenStack;
-			string condition;
+			std::vector<std::string> tokenVec;
+			ArrayStack<std::string> tokenStack;
+			std::string condition;
 			int i;
 			UserType* position=nullptr; // need set, get ter!!
 			UserType* global=nullptr;
 			int option; // removal?
 			StringBuilder* builder;
 		public:
-			explicit Condition(const string& condition, UserType* position, UserType* global, StringBuilder* builder, const int option = 0)
+			explicit Condition(const std::string& condition, UserType* position, UserType* global, StringBuilder* builder, const int option = 0)
 				: braceNum(0), condition(condition), i(0), position(position), option(option), global(global), builder(builder)
 			{
 				Init(condition, builder);
 			}
 		private:
-			auto Get(const string& var, const string& position, UserType* utPosition, UserType* global) {
-				string valTemp = position;
+			auto Get(const std::string& var, const std::string& position, UserType* utPosition, UserType* global) {
+				std::string valTemp = position;
 				StringTokenizer tokenizer(position, "/", builder, 1);
 				UserType* utTemp;
 
@@ -44,14 +43,14 @@ namespace wiz {
 						utTemp = utPosition;
 					}
 					else {
-						valTemp = string(position.c_str() + 5);
+						valTemp = std::string(position.c_str() + 5);
 						utTemp = global;
 					}
 				}
 				return UserType::Find(utTemp, valTemp, builder);
 			}
 			// val -> rename?, parameter:option -> removal?
-			string GetValue(const string& op, const string& var, const string& val, UserType* utPosition, UserType* global, const string& option = "0")
+			std::string GetValue(const std::string& op, const std::string& var, const std::string& val, UserType* utPosition, UserType* global, const std::string& option = "0")
 			{
 				/// ExistItem, ExistUserType
 				if (NULL == utPosition) { return "ERROR"; }
@@ -111,15 +110,15 @@ namespace wiz {
 
 				return "ERROR";
 			}
-			string GetValue(const string& op, const string& var1, const string& position1, const string& var2, const string& position2,
-				UserType* utPosition, UserType* global, StringBuilder* builder, string option = "0")
+			std::string GetValue(const std::string& op, const std::string& var1, const std::string& position1, const std::string& var2, const std::string& position2,
+				UserType* utPosition, UserType* global, StringBuilder* builder, std::string option = "0")
 			{
 				// COMP<, COMP>, EQ, NOTEQ
 				if (NULL == utPosition) { return "ERROR"; }
 
 				int mode = 0; // 0 : defualt, 1 : only position1 is /$digit, 2: only position2 is /$digit 3 : position1 and position2 are /$digit
-				string position1_temp = position1;
-				string position2_temp = position2;
+				std::string position1_temp = position1;
+				std::string position2_temp = position2;
 
 				if (wiz::String::startsWith(position1, "/$")) { // cf) position1 == /$0 or /$1 or ...
 					position1_temp = "/";
@@ -146,14 +145,14 @@ namespace wiz {
 					return "ERROR GV3";
 				}
 
-				vector<ItemType<string>> value1;  // Item<string> <- 
-				vector<ItemType<string>> value2;
+				std::vector<ItemType<std::string>> value1;  // Item<std::string> <- 
+				std::vector<ItemType<std::string>> value2;
 				
 				if (position1 != "~") {
 					int idx = 0;
 					if (mode & 1) {
 						idx = stoi(wiz::String::substring(position1, 2));
-						value1.push_back(ItemType<string>());
+						value1.push_back(ItemType<std::string>());
 						value1[0].Push(x.second[0]->GetItemList(idx).Get(0));
 					}
 					else {
@@ -164,7 +163,7 @@ namespace wiz {
 					int idx = 0;
 					if (mode & 2) {
 						idx = stoi(wiz::String::substring(position2, 2));
-						value2.push_back(ItemType<string>());
+						value2.push_back(ItemType<std::string>());
 						value2[0].Push(y.second[0]->GetItemList(idx).Get(0));
 					}
 					else {
@@ -173,11 +172,11 @@ namespace wiz {
 				}
 				//
 				if (position1 == "~" ) {
-					value1.push_back(ItemType<string>()); // var1
+					value1.push_back(ItemType<std::string>()); // var1
 					value1[0].Push(var1);
 				}
 				if (position2 == "~") {
-					value2.push_back(ItemType<string>()); // var2
+					value2.push_back(ItemType<std::string>()); // var2
 					value2[0].Push(var2);
 				}
 
@@ -221,7 +220,7 @@ namespace wiz {
 					if ("0" != option) { /// ToDo.. // 0. just 1-1, // 1. for any case // 2. for all case
 						for (int i = 0; i < value1.size(); ++i) {
 							for (int j = 0; j < value2.size(); ++j) {
-								string temp = Utility::Compare(value1[i].Get(0), value2[j].Get(0), builder);
+								std::string temp = Utility::Compare(value1[i].Get(0), value2[j].Get(0), builder);
 									if (temp == "< 0" || temp == "== 0") {
 										if ("1" == option) { return "TRUE"; }
 									}
@@ -236,7 +235,7 @@ namespace wiz {
 						}
 					}
 					else {
-						string temp = Utility::Compare(value1[0].Get(0), value2[0].Get(0), builder);
+						std::string temp = Utility::Compare(value1[0].Get(0), value2[0].Get(0), builder);
 						if (temp == "< 0" || temp == "== 0") {
 							return "TRUE";
 						}
@@ -271,7 +270,7 @@ namespace wiz {
 					if ("0" != option) { /// ToDo.. // 0. just 1-1, // 1. for any case // 2. for all case
 						for (int i = 0; i < value1.size(); ++i) {
 							for (int j = 0; j < value2.size(); ++j) {
-								string temp = Utility::Compare(value1[i].Get(0), value2[j].Get(0), builder);
+								std::string temp = Utility::Compare(value1[i].Get(0), value2[j].Get(0), builder);
 								if (temp == "> 0" || temp == "== 0") {
 									if ("1" == option) { return "TRUE"; }
 								}
@@ -286,7 +285,7 @@ namespace wiz {
 						}
 					}
 					else {
-						string temp = Utility::Compare(value1[0].Get(0), value2[0].Get(0), builder);
+						std::string temp = Utility::Compare(value1[0].Get(0), value2[0].Get(0), builder);
 						if (temp == "> 0" || temp == "== 0") {
 							return "TRUE";
 						}
@@ -372,7 +371,7 @@ namespace wiz {
 				
 				return "ERROR GV7";
 			}
-			string GetValue3(const string& op, const string& val, const string& dir, UserType* utPosition, UserType* global)
+			std::string GetValue3(const std::string& op, const std::string& val, const std::string& dir, UserType* utPosition, UserType* global)
 			{
 				if (NULL == utPosition) { return "ERROR"; }
 
@@ -394,17 +393,17 @@ namespace wiz {
 
 				return "ERROR";
 			}
-			void Init(const string& conditionm, StringBuilder* builder)
+			void Init(const std::string& conditionm, StringBuilder* builder)
 			{
 				bool evalue = false;
 
-				string str;
+				std::string str;
 				Utility::AddSpace(condition, str);
 				
 				StringTokenizer tokenizer(str, { " ", "\t", "\n", "\r" }, builder, 1);
 
 				while (tokenizer.hasMoreTokens()) {
-					string temp = tokenizer.nextToken();
+					std::string temp = tokenizer.nextToken();
 
 					if (temp == "_") { // 
 						temp = "";
@@ -442,12 +441,12 @@ namespace wiz {
 								|| "REGEX" == tokenStack[tokenStack.size() - 6]
 								))
 							{
-								const string op = tokenStack[tokenStack.size() - 6];
-								const string var1 = tokenStack[tokenStack.size() - 5];
-								const string position1 = tokenStack[tokenStack.size() - 4];
-								const string var2 = tokenStack[tokenStack.size() - 3];
-								const string position2 = tokenStack[tokenStack.size() - 2];
-								const string option = tokenStack[tokenStack.size() - 1];
+								const std::string op = tokenStack[tokenStack.size() - 6];
+								const std::string var1 = tokenStack[tokenStack.size() - 5];
+								const std::string position1 = tokenStack[tokenStack.size() - 4];
+								const std::string var2 = tokenStack[tokenStack.size() - 3];
+								const std::string position2 = tokenStack[tokenStack.size() - 2];
+								const std::string option = tokenStack[tokenStack.size() - 1];
 								tokenStack.pop();
 								tokenStack.pop();
 								tokenStack.pop();
@@ -459,9 +458,9 @@ namespace wiz {
 							}
 							else if (tokenStack.size() >= 3 && "EXISTITEMBYVALUE" == tokenStack[tokenStack.size() - 3])
 							{
-								const string op = tokenStack[tokenStack.size() - 3];
-								const string val = tokenStack[tokenStack.size() - 2];
-								const string dir = tokenStack[tokenStack.size() - 1];
+								const std::string op = tokenStack[tokenStack.size() - 3];
+								const std::string val = tokenStack[tokenStack.size() - 2];
+								const std::string dir = tokenStack[tokenStack.size() - 1];
 
 								tokenStack.pop();
 								tokenStack.pop();
@@ -469,9 +468,9 @@ namespace wiz {
 								tokenStack.push(GetValue3(op, val, dir, position, global));
 							}
 							else if (tokenStack.size() >= 3 && "NOT" != tokenStack[tokenStack.size() - 2]) {
-								string op = tokenStack[tokenStack.size() - 3];
-								const string operand1 = tokenStack[tokenStack.size() - 2];
-								const string operand2 = tokenStack[tokenStack.size() - 1];
+								std::string op = tokenStack[tokenStack.size() - 3];
+								const std::string operand1 = tokenStack[tokenStack.size() - 2];
+								const std::string operand2 = tokenStack[tokenStack.size() - 1];
 
 								if (op == "AND" || op == "OR") {
 									tokenStack.pop();
@@ -489,8 +488,8 @@ namespace wiz {
 								}
 							}
 							else if (tokenStack.size() >= 2 && "NOT" == tokenStack[tokenStack.size() - 2]) {
-								const string op = tokenStack[tokenStack.size() - 2];
-								const string operand1 = tokenStack[tokenStack.size() - 1];
+								const std::string op = tokenStack[tokenStack.size() - 2];
+								const std::string operand1 = tokenStack[tokenStack.size() - 1];
 
 								tokenStack.pop();
 								tokenStack.pop();
@@ -500,15 +499,15 @@ namespace wiz {
 						++i;
 					}
 				}
-				catch (const char* err) { cout << err << endl; return false; }
-				catch (string err) { cout << err << endl; return false; }
-				catch (Error& e) { cout << e << endl; return false; }
+				catch (const char* err) { std::cout << err << std::endl; return false; }
+				catch (std::string err) { std::cout << err << std::endl; return false; }
+				catch (Error& e) { std::cout << e << std::endl; return false; }
 				return true;
 			}
 		public:
 			int NowIndex()const { return i; }
-			const ArrayStack<string>& Now()const { return tokenStack; }
-			ArrayStack<string>& Now() { return tokenStack; }
+			const ArrayStack<std::string>& Now()const { return tokenStack; }
+			ArrayStack<std::string>& Now() { return tokenStack; }
 			bool IsNowImportant() const { // ??
 				return "}" == tokenVec[i] && "NOT" != tokenStack[tokenStack.size() - 2];
 			}

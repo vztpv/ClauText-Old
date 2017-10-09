@@ -5,7 +5,6 @@
 #include <vector>
 #include <fstream>
 #include <string>
-using namespace std;
 
 #include <wiz/cpp_string.h>
 #include <wiz/load_data_utility.h>
@@ -16,11 +15,11 @@ namespace wiz {
 		class InFileReserver
 		{
 		private:
-			ifstream* pInFile;
+			std::ifstream* pInFile;
 		public:
 			int Num;
 		public:
-			explicit InFileReserver(ifstream& inFile)
+			explicit InFileReserver(std::ifstream& inFile)
 			{
 				pInFile = &inFile;
 				Num = 1;

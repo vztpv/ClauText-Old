@@ -12,7 +12,6 @@
 #include <set>
 #include <map>
 #include <thread>
-using namespace std;
 
 #include <wiz/global.h>
 //#include <wiz/Dictionary.h> /// change to map
@@ -22,11 +21,13 @@ using namespace std;
 #include <wiz/stacks.h>
 //#include <wiz/deck.h>
 
+#include <string_view> //c++17
+
 namespace wiz {
 	class Token
 	{
 	public:
-		string str;
+		std::string str; // cf) && ?
 		bool isComment;
 	public:
 		Token& operator=(const Token& token) {
@@ -38,23 +39,24 @@ namespace wiz {
 			str = move(token.str);
 			isComment = token.isComment;
 		}
-		Token(Token&& token) : str(move(token.str)), isComment(token.isComment) { }
+		
+		Token(Token&& token) : str(std::move(token.str)), isComment(token.isComment) { }
 		Token(const Token& token) : str(token.str), isComment(token.isComment) { }
 		explicit Token() : isComment(false) { }
-		explicit Token(string&& str, bool isComment = false) : str(move(str)), isComment(isComment) { }
-		explicit Token(const string& str, bool isComment = false) : str(str), isComment(isComment) { }
+		explicit Token(std::string&& str, bool isComment = false) : str(std::move(str)), isComment(isComment) { }
+		explicit Token(const std::string& str, bool isComment = false) : str(str), isComment(isComment) { }
 	};
 
 	class LoadDataOption
 	{
 	public:
-		vector<char> LineComment;	// # 
-		vector<char> Left, Right;	// { } , [ ] <- json
-		vector<char> Assignment;	// = , :
-		vector<char> Removal;		// ',', empty. 
+		std::vector<char> LineComment;	// # 
+		std::vector<char> Left, Right;	// { } , [ ] <- json
+		std::vector<char> Assignment;	// = , :
+		std::vector<char> Removal;		// ',', empty. 
 	};
 
-	int Equal(const vector<char>& option, const char ch)
+	int Equal(const std::vector<char>& option, const char ch)
 	{
 		for (int i = 0; i < option.size(); ++i) {
 			if (ch == option[i]) {
@@ -65,17 +67,15 @@ namespace wiz {
 	}
 }
 
-
-
 #include <wiz/load_data_types.h>
 #include <wiz/load_data_utility.h>
 #include <wiz/load_data_reservers.h>
 #include <wiz/load_data_condition.h>
 
 
-//const string LEFT = "{";
-//const string RIGHT = "}";
-//const string EQ_STR = "="; // EQ 충돌 -> EQ_STR로 변경
+//const std::string LEFT = "{";
+//const std::string RIGHT = "}";
+//const std::string EQ_STR = "="; // EQ 충돌 -> EQ_STR로 변경
 
 class EventInfo
 {
@@ -83,13 +83,13 @@ public:
 	wiz::load_data::UserType* eventUT;
 	wiz::ArrayStack< wiz::load_data::UserType* > nowUT; //
 	wiz::ArrayStack<int> userType_idx;
-	map<string, string> parameters;
-	map<string, string> locals;
-	string id; //
-	wiz::ArrayStack<string> conditionStack;
+	std::map<std::string, std::string> parameters;
+	std::map<std::string, std::string> locals;
+	std::string id; //
+	wiz::ArrayStack<std::string> conditionStack;
 	wiz::ArrayStack<int> state;
-	string return_value;
-	string option;
+	std::string return_value;
+	std::string option;
 public:
 	EventInfo() : eventUT(nullptr), return_value("")
 	{
@@ -103,8 +103,8 @@ public:
 	wiz::load_data::UserType* pEvents;
 	EventInfo info; // chk!
 	bool chkInfo;
-	map<string, wiz::load_data::UserType>* pObjectMap;
-	map<string, wiz::load_data::UserType>* pModule;
+	std::map<std::string, wiz::load_data::UserType>* pObjectMap;
+	std::map<std::string, wiz::load_data::UserType>* pModule;
 
 	long long depth;
 
@@ -122,13 +122,13 @@ public:
 class SortInfo // need to rename
 {
 public:
-	string data;
+	std::string data;
 	int iElement; // 2 : userType, // 1 : item
 	size_t idx; // for stable? - chk!!
 	wiz::StringBuilder* builder;
 public:
 	SortInfo(wiz::StringBuilder* builder=nullptr) : idx(-1), builder(builder) { }
-	SortInfo(const string& data, int iElement, size_t idx, wiz::StringBuilder* builder)
+	SortInfo(const std::string& data, int iElement, size_t idx, wiz::StringBuilder* builder)
 		: data(data), iElement(iElement), idx(idx), builder(builder)
 	{
 
@@ -136,7 +136,7 @@ public:
 	// for sorting..
 	bool operator<(const SortInfo& info) const
 	{
-		string temp = wiz::load_data::Utility::Compare(this->data, info.data, builder);
+		std::string temp = wiz::load_data::Utility::Compare(this->data, info.data, builder);
 
 		if (this->data == "") {
 			return false;
@@ -159,13 +159,13 @@ public:
 class SortInfo2 // need to rename, sortinfo by dsc..
 {
 public:
-	string data;
+	std::string data;
 	int iElement; // 2 : userType, // 1 : item
 	size_t idx; // for stable? - chk!!
 	wiz::StringBuilder* builder;
 public:
 	SortInfo2(wiz::StringBuilder* builder=nullptr) : idx(-1), builder(builder) { }
-	SortInfo2(const string& data, int iElement, size_t idx, wiz::StringBuilder* builder)
+	SortInfo2(const std::string& data, int iElement, size_t idx, wiz::StringBuilder* builder)
 		: data(data), iElement(iElement), idx(idx)
 	{
 
@@ -184,26 +184,26 @@ public:
 			return false;
 		}
 
-		string temp = wiz::load_data::Utility::Compare(this->data, info.data, builder);
+		std::string temp = wiz::load_data::Utility::Compare(this->data, info.data, builder);
 		if (temp == "< 0") { return false; }
 		else if (temp == "> 0") { return true; }
 		else if (temp == "== 0") {
 			return idx < info.idx;
 		}
 		else {
-			cout << "sortInfo2" << endl;
-			cout << data << " " << info.data << endl;
+			std::cout << "sortInfo2" << std::endl;
+			std::cout << data << " " << info.data << std::endl;
 			throw "temp is not valid in sortinfo2";
 		}
 	}
 };
 
-string excute_module(const string& mainStr, wiz::load_data::UserType* _global, const ExcuteData& excuteData, int chk);
+std::string excute_module(const std::string& mainStr, wiz::load_data::UserType* _global, const ExcuteData& excuteData, int chk);
 
 namespace wiz {
 		
 	namespace load_data {
-		string ToBool4(wiz::load_data::UserType* now, wiz::load_data::UserType& global, const string& str, const ExcuteData& excuteData, wiz::StringBuilder* builder);
+		std::string ToBool4(wiz::load_data::UserType* now, wiz::load_data::UserType& global, const std::string& str, const ExcuteData& excuteData, wiz::StringBuilder* builder);
 	
 		class LoadData
 		{
@@ -220,8 +220,8 @@ namespace wiz {
 				int state = 0;
 				int braceNum = 0;
 				long long state_reserve=0;
-				vector< UserType* > nestedUT(1);
-				string var1, var2, val;
+				std::vector< UserType* > nestedUT(1);
+				std::string var1, var2, val;
 
 				bool varOn = false;
 
@@ -236,7 +236,7 @@ namespace wiz {
 							strVec.empty() &&
 							reserver.end()
 							) {
-							return false; // throw "Err nextToken does not exist"; // cf) or empty file or empty string!
+							return false; // throw "Err nextToken does not exist"; // cf) or empty file or empty std::string!
 						}
 					}
 				}
@@ -253,14 +253,14 @@ namespace wiz {
 					{
 					case 0:
 					{
-						const string top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
+						const std::string_view top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
 						if (top.size() == 1 && -1 != Equal(option.Left, top[0])) {
 							state = 2;
 						}
 						else {
-							pair<bool, Token> bsPair = Utility::LookUp(strVec, nestedUT[braceNum], reserver, option);
+							std::pair<bool, std::string_view> bsPair = Utility::LookUp(strVec, nestedUT[braceNum], reserver, option);
 							if (bsPair.first) {
-								if (bsPair.second.str.size() == 1 && -1 != Equal(option.Assignment, bsPair.second.str[0])) {
+								if (bsPair.second.size() == 1 && -1 != Equal(option.Assignment, bsPair.second[0])) {
 									Utility::Pop(strVec, &var2, nestedUT[braceNum], reserver, option);
 									Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option);
 									state = 2;
@@ -283,7 +283,7 @@ namespace wiz {
 						break;
 					case 1:
 					{
-						const string top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
+						const std::string_view top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
  						if (top.size() == 1 && -1 != Equal(option.Right, top[0])){
 							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option);
 							state = 0;
@@ -296,7 +296,7 @@ namespace wiz {
 						break;
 					case 2:
 					{
-						const string top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
+						const std::string_view top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
  						if (top.size() == 1 && -1 != Equal(option.Left, top[0])) {
 							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option);
 
@@ -330,7 +330,7 @@ namespace wiz {
 						break;
 					case 3:
 					{
-						const string top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
+						const std::string_view top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
 						if (top.size() == 1 && -1 != Equal(option.Right, top[0])) {
 							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option);
 
@@ -354,7 +354,7 @@ namespace wiz {
 						break;
 					case 4:
 					{
-						const string top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
+						const std::string_view top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
 						if (top.size() == 1 && -1 != Equal(option.Left, top[0])) {
 							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option);
 
@@ -388,9 +388,9 @@ namespace wiz {
 							}
 						}
 						else {
-							pair<bool, Token> bsPair = Utility::LookUp(strVec, nestedUT[braceNum], reserver, option);
+							std::pair<bool, std::string_view> bsPair = Utility::LookUp(strVec, nestedUT[braceNum], reserver, option);
 							if (bsPair.first) {
-								if (bsPair.second.str.size() == 1 && -1 != Equal(option.Assignment, bsPair.second.str[0])) {
+								if (bsPair.second.size() == 1 && -1 != Equal(option.Assignment, bsPair.second[0])) {
 									// var2
 									Utility::Pop(strVec, &var2, nestedUT[braceNum], reserver, option);
 									Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option); // pass EQ_STR
@@ -422,7 +422,7 @@ namespace wiz {
 						break;
 					case 5:
 					{
-						const string top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
+						const std::string_view top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
 						if (top.size() == 1 && -1 != Equal(option.Right, top[0])) {
 							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option);
 
@@ -452,7 +452,7 @@ namespace wiz {
 						break;
 					case 6:
 					{
-						string top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
+						std::string_view top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
 						if (top.size() == 1 && -1 != Equal(option.Left, top[0])) {
 							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option);
 
@@ -511,7 +511,7 @@ namespace wiz {
 						break;
 					case 7:
 					{
-						const string top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
+						const std::string_view top = Utility::Top(strVec, nestedUT[braceNum], reserver, option);
 						if (top.size() == 1 && -1 != Equal(option.Right, top[0])) {
 							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option);
 							//
@@ -562,10 +562,10 @@ namespace wiz {
 					}
 				}
 				if (state != 0) {
-					throw string("error final state is not 0!  : ") + toStr(state);
+					throw std::string("error final state is not 0!  : ") + toStr(state);
 				}
 				if (braceNum != 0) {
-					throw string("chk braceNum is ") + toStr(braceNum);
+					throw std::string("chk braceNum is ") + toStr(braceNum);
 				}
 
 				return true;
@@ -573,9 +573,9 @@ namespace wiz {
 #ifdef USE_FAST_LOAD_DATA
 
 		private:
-			static string _Convert(wiz_string* from)
+			static std::string _Convert(wiz_string* from)
 			{
-				return string(get_cstr_wiz_string(from), size_wiz_string(from));
+				return std::string(get_cstr_wiz_string(from), size_wiz_string(from));
 			}
 			static void Convert(user_type* from, UserType& ut)
 			{
@@ -624,7 +624,7 @@ namespace wiz {
 				free_user_type_in_user_type(from);
 			}
 		public:
-			static bool FastLoadDataFromFile(const string& fileName, UserType& global)
+			static bool FastLoadDataFromFile(const std::string& fileName, UserType& global)
 			{
 				bool success = true;
 				wiz_string temp = make_wiz_string("", 0);
@@ -646,7 +646,7 @@ namespace wiz {
 				return success;
 			}
 
-			static bool FastLoadDataFromString(const string& str, UserType& global)
+			static bool FastLoadDataFromString(const std::string& str, UserType& global)
 			{
 				bool success;
 				wiz_string temp = make_wiz_string("", 0);
@@ -669,10 +669,10 @@ namespace wiz {
 			}
 #endif
 		public:
-			static bool LoadDataFromFile(const string& fileName, UserType& global) /// global should be empty
+			static bool LoadDataFromFile(const std::string& fileName, UserType& global) /// global should be empty
 			{
 				bool success = true;
-				ifstream inFile;
+				std::ifstream inFile;
 				inFile.open(fileName);
 				if (true == inFile.fail())
 				{
@@ -700,19 +700,19 @@ namespace wiz {
 
 					inFile.close();
 				}
-				catch (Error e) { std::cout << e << endl; inFile.close(); return false; }
-				catch (const char* err) { std::cout << err << endl; inFile.close(); return false; }
-				catch (const string& e) { std::cout << e << endl; inFile.close(); return false; }
-				catch (exception e) { std::cout << e.what() << endl; inFile.close(); return false; }
-				catch (...) { std::cout << "not expected error" << endl; inFile.close(); return false; }
+				catch (Error e) { std::cout << e << std::endl; inFile.close(); return false; }
+				catch (const char* err) { std::cout << err << std::endl; inFile.close(); return false; }
+				catch (const std::string& e) { std::cout << e << std::endl; inFile.close(); return false; }
+				catch (std::exception e) { std::cout << e.what() << std::endl; inFile.close(); return false; }
+				catch (...) { std::cout << "not expected error" << std::endl; inFile.close(); return false; }
 
-				global = move(globalTemp);
+				global = std::move(globalTemp);
 				return true;
 			}
 
-			static bool LoadDataFromFileWithJson(const string& fileName, UserType& global) /// global should be empty
+			static bool LoadDataFromFileWithJson(const std::string& fileName, UserType& global) /// global should be empty
 			{
-				ifstream inFile;
+				std::ifstream inFile;
 				inFile.open(fileName);
 				if (true == inFile.fail())
 				{
@@ -741,17 +741,17 @@ namespace wiz {
 
 					inFile.close();
 				}
-				catch (Error e) { std::cout << e << endl; inFile.close(); return false; }
-				catch (const char* err) { std::cout << err << endl; inFile.close(); return false; }
-				catch (const string& e) { std::cout << e << endl; inFile.close(); return false; }
-				catch (exception e) { std::cout << e.what() << endl; inFile.close(); return false; }
-				catch (...) { std::cout << "not expected error" << endl; inFile.close(); return false; }
+				catch (Error e) { std::cout << e << std::endl; inFile.close(); return false; }
+				catch (const char* err) { std::cout << err << std::endl; inFile.close(); return false; }
+				catch (const std::string& e) { std::cout << e << std::endl; inFile.close(); return false; }
+				catch (std::exception e) { std::cout << e.what() << std::endl; inFile.close(); return false; }
+				catch (...) { std::cout << "not expected error" << std::endl; inFile.close(); return false; }
 
-				global = move(globalTemp);
+				global = std::move(globalTemp);
 				return true;
 			}
 
-			static bool LoadDataFromString(const string& str, UserType& ut)
+			static bool LoadDataFromString(const std::string& str, UserType& ut)
 			{
 				UserType utTemp = ut; 
 				ArrayQueue<Token> strVec;
@@ -768,18 +768,18 @@ namespace wiz {
 				doThread();
 
 				try {
-					// empty string!
+					// empty std::string!
 					NoneReserver nonReserver;
 					if (false == _LoadData(strVec, nonReserver, utTemp, option))
 					{
 						return true;
 					}
 				}
-				catch (Error& e) { std::cout << e << endl; return false; }
-				catch (const char* err) { std::cout << err << endl; return false; }
-				catch (exception& e) { std::cout << e.what() << endl; return false; }
-				catch (string str) { std::cout << str << endl; return false; }
-				catch (...) { std::cout << "not expected error" << endl; return  false; }
+				catch (Error& e) { std::cout << e << std::endl; return false; }
+				catch (const char* err) { std::cout << err << std::endl; return false; }
+				catch (std::exception& e) { std::cout << e.what() << std::endl; return false; }
+				catch (std::string str) { std::cout << str << std::endl; return false; }
+				catch (...) { std::cout << "not expected error" << std::endl; return  false; }
 
 				ut = std::move(utTemp);
 				return true;
@@ -817,92 +817,92 @@ namespace wiz {
 				return AllRemoveWizDB(global);
 			}
 			// AddQuery AddData, AddUserTypeData
-			bool AddData(const string& position, const string& data, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
+			bool AddData(const std::string& position, const std::string& data, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
 				return AddData(global, position, data, condition, excuteData, builder);
 			}
 			// 
-			bool AddNoNameUserType(const string& position, const string& data, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+			bool AddNoNameUserType(const std::string& position, const std::string& data, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
 				return AddNoNameUserType(global, position, data, condition, excuteData, builder);
 			}
 			// SetQuery
-			bool SetData(const string& position, const string& varName, const string& data, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+			bool SetData(const std::string& position, const std::string& varName, const std::string& data, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
 				return SetData(global, position, varName, data, condition, excuteData, builder);
 			}
 			/// 
-			string GetData(const string& position, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)  {
+			std::string GetData(const std::string& position, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)  {
 				return GetData(global, position, condition, excuteData, builder);
 			}
-			string GetItemListData(const string& position, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+			std::string GetItemListData(const std::string& position, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
 				return GetItemListData(global, position, condition, excuteData, builder);
 			}
-			string GetItemListNamesData(const string& position, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+			std::string GetItemListNamesData(const std::string& position, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
 				return GetItemListNamesData(global, position, condition, excuteData, builder);
 			}
-			string GetUserTypeListNamesData(const string& position, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+			std::string GetUserTypeListNamesData(const std::string& position, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
 				return GetUserTypeListNamesData(global, position, condition, excuteData, builder);
 			}
 			/// varName = val - do
 			/// varName = { val val val } - GetData(position+"/varName", ""); 
 			/// varName = { var = val } - GetData(position+"/varname", var);
-			string GetData(const string& position, const string& varName, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) // 
+			std::string GetData(const std::string& position, const std::string& varName, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) // 
 			{
 				return GetData(global, position, varName, condition, excuteData, builder);
 			}
-			bool Remove(const string& position, const string& var, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
+			bool Remove(const std::string& position, const std::string& var, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
 				return Remove(global, position, var, condition, excuteData, builder);
 			}
 
-			bool LoadWizDB(const string& fileName) {
+			bool LoadWizDB(const std::string& fileName) {
 				return LoadWizDB(global, fileName);
 			}
 			// SaveQuery
-			bool SaveWizDB(const string& fileName, const string& option = "0") { /// , int option
+			bool SaveWizDB(const std::string& fileName, const std::string& option = "0") { /// , int option
 				return SaveWizDB(global, fileName, option);
 			}
 
 			/// To Do - ExistItem, ExistUserType, SetUserType GetUserType
-			bool ExistData(const string& position, const string& varName, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) // 
+			bool ExistData(const std::string& position, const std::string& varName, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) // 
 			{
 				return ExistData(global, position, varName, condition, excuteData, builder);
 			}
 
 			/// ToDo - recursive function
-			string SearchItem(const string& var, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+			std::string SearchItem(const std::string& var, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
 				return SearchItem(global, var, condition, excuteData, "root", builder);
 			}
-			string SearchUserType(const string& var, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+			std::string SearchUserType(const std::string& var, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
 				return SearchUserType(global, var, condition, excuteData, builder);
 			}
 		private:
-			void SearchItem(vector<string>& positionVec, const string& var, const string& nowPosition,
-				UserType* ut, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+			void SearchItem(std::vector<std::string>& positionVec, const std::string& var, const std::string& nowPosition,
+				UserType* ut, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
 				SearchItem(global, positionVec, var, nowPosition, ut, condition, excuteData, builder);
 			}
-			void SearchUserType(vector<string>& positionVec, const string& var, const string& nowPosition,
-				UserType* ut, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+			void SearchUserType(std::vector<std::string>& positionVec, const std::string& var, const std::string& nowPosition,
+				UserType* ut, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
 				SearchUserType(global, positionVec, var, nowPosition, ut, condition, excuteData, builder);
 			}
 		private:
 			// chk - Search(item or usertype) : add ~~~ (option?)?? and ToBool4? // chk more thinking!!
-			static void SearchItem(UserType& global, vector<string>& positionVec, const string& var, const string& nowPosition,
-				UserType* ut, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+			static void SearchItem(UserType& global, std::vector<std::string>& positionVec, const std::string& var, const std::string& nowPosition,
+				UserType* ut, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
-				string _var = var;
+				std::string _var = var;
 				if (_var == " " || _var == "_") { _var = ""; }
 
 				// $it?
 
 				if (ut->GetItem(_var).size() > 0) {
-					string _condition = condition;
+					std::string _condition = condition;
 
 					if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "_"); }
 					else
@@ -923,7 +923,7 @@ namespace wiz {
 				}
 
 				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
-					string temp = ut->GetUserTypeList(i)->GetName();
+					std::string temp = ut->GetUserTypeList(i)->GetName();
 					if (temp == "") { temp = " "; }
 					SearchItem(
 						global,
@@ -938,15 +938,15 @@ namespace wiz {
 				}
 			}
 
-			static void SearchUserType(UserType& global, vector<string>& positionVec, const string& var, const string& nowPosition,
-				UserType* ut, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+			static void SearchUserType(UserType& global, std::vector<std::string>& positionVec, const std::string& var, const std::string& nowPosition,
+				UserType* ut, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
-				string _var = var;
+				std::string _var = var;
 				if (_var == " " || _var == "_") {
 					_var = "";
 				}
 				if (ut->GetUserTypeItem(_var).size() > 0) {
-					string _condition = condition;
+					std::string _condition = condition;
 
 					if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "_"); }
 					else  _condition = wiz::String::replace(_condition, "~~", _var); //
@@ -966,7 +966,7 @@ namespace wiz {
 				}
 
 				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
-					string temp = ut->GetUserTypeList(i)->GetName();
+					std::string temp = ut->GetUserTypeList(i)->GetName();
 
 					if (temp == "") { temp = " "; }
 					SearchUserType(
@@ -993,7 +993,7 @@ namespace wiz {
 				return true;
 			}
 			// AddQuery AddData, AddUserTypeData
-			static bool AddDataAtFront(UserType& global, const string& position, const string& data, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
+			static bool AddDataAtFront(UserType& global, const std::string& position, const std::string& data, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
 				UserType utTemp = UserType("global");
 				bool isTrue = false;
 
@@ -1011,7 +1011,7 @@ namespace wiz {
 						//if (finded.second[i]->GetItem("base_tax").GetCount() > 0) { continue; }
 						///~end
 						if (false == condition.empty()) {
-							string _condition = condition;
+							std::string _condition = condition;
 
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
@@ -1044,7 +1044,7 @@ namespace wiz {
 					return false;
 				}
 			}
-			static bool AddData(UserType& global, const string& position, const string& data, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
+			static bool AddData(UserType& global, const std::string& position, const std::string& data, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
 				UserType utTemp = UserType("global");
 				bool isTrue = false;
 
@@ -1059,7 +1059,7 @@ namespace wiz {
 						int user_n = 0;
 
 						if (false == condition.empty()) {
-							string _condition = condition;
+							std::string _condition = condition;
 							
 							_condition = ToBool4(finded.second[i], global,  _condition, excuteData, builder);
 
@@ -1092,7 +1092,7 @@ namespace wiz {
 					return false;
 				}
 			}
-			static bool Insert(UserType& global, const string& position, const int idx, const string& data, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
+			static bool Insert(UserType& global, const std::string& position, const int idx, const std::string& data, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
 				UserType utTemp = UserType("global");
 				bool isTrue = false;
 
@@ -1110,7 +1110,7 @@ namespace wiz {
 						//if (finded.second[i]->GetItem("base_tax").GetCount() > 0) { continue; }
 						///~end
 						if (false == condition.empty()) {
-							string _condition = condition;
+							std::string _condition = condition;
 
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 							
@@ -1144,7 +1144,7 @@ namespace wiz {
 					return false;
 				}
 			}
-			static bool AddNoNameUserType(UserType& global, const string& position, const string& data, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+			static bool AddNoNameUserType(UserType& global, const std::string& position, const std::string& data, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
 				UserType utTemp = UserType("");
 				bool isTrue = false;
@@ -1163,7 +1163,7 @@ namespace wiz {
 						//if (finded.second[i]->GetItem("base_tax").GetCount() > 0) { continue; }
 						///~end
 						if (false == condition.empty()) {
-							string _condition = condition;
+							std::string _condition = condition;
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
 							Condition cond(_condition, finded.second[i], &global, builder);
@@ -1188,12 +1188,12 @@ namespace wiz {
 			}
 
 			// todo - find example code?  a/b/c/d/e/f/ ??
-			static bool AddUserType(UserType& global, const string& position, const string& var, const string& data, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+			static bool AddUserType(UserType& global, const std::string& position, const std::string& var, const std::string& data, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
 				bool isTrue = false;
 				auto finded = UserType::Find(&global, position, builder);
 				if (finded.first) {
-					string temp = var;
+					std::string temp = var;
 					if (temp == "") { temp = " "; }
 					StringTokenizer tokenizer(temp, "/", builder, 1);
 					UserType utTemp = UserType("");
@@ -1203,13 +1203,13 @@ namespace wiz {
 					}
 
 					while (tokenizer.hasMoreTokens()) {
-						string utName = tokenizer.nextToken();
-						vector<string> strVec;
+						std::string utName = tokenizer.nextToken();
+						std::vector<std::string> strVec;
 						if (utName == " " || utName == "_") { utName = ""; }
 
 						if (utName.size() >= 3 && utName[0] == '[' && utName[utName.size() - 1] == ']')
 						{
-							StringTokenizer tokenizer2(utName, vector<string>{ "[", "~", "]" }, builder, 1);
+							StringTokenizer tokenizer2(utName, std::vector<std::string>{ "[", "~", "]" }, builder, 1);
 							while (tokenizer2.hasMoreTokens())
 							{
 								strVec.push_back(tokenizer2.nextToken());
@@ -1223,8 +1223,8 @@ namespace wiz {
 							chkInt = true;
 							a = atoll(strVec[0].c_str());
 							b = atoll(strVec[1].c_str());
-							Min = min(a, b);
-							Max = max(a, b);
+							Min = std::min(a, b);
+							Max = std::max(a, b);
 						}
 
 						for (auto x = Min; x <= Max; ++x)
@@ -1242,7 +1242,7 @@ namespace wiz {
 
 
 								if (false == condition.empty()) {
-									string _condition = condition;
+									std::string _condition = condition;
 
 									if (utName == "") { _condition = wiz::String::replace(_condition, "~~", "_"); }// do not use ^ in condition!
 									else
@@ -1278,13 +1278,13 @@ namespace wiz {
 				}
 			}
 			/// SetData - Re Do!
-			static bool SetData(UserType& global, const string& position, const string& varName, const string& data, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+			static bool SetData(UserType& global, const std::string& position, const std::string& varName, const std::string& data, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
 				auto finded = UserType::Find(&global, position, builder);
 				bool isTrue = false;
 
 				if (finded.first) {
-					string temp = varName;
+					std::string temp = varName;
 					if (temp == "") { temp = " "; }
 					StringTokenizer tokenizer(temp, "/", builder, 1);
 					UserType utTemp("");
@@ -1292,13 +1292,13 @@ namespace wiz {
 						return false;
 					}
 					while (tokenizer.hasMoreTokens()) {
-						string _varName = tokenizer.nextToken();
+						std::string _varName = tokenizer.nextToken();
 						/// todo - if varName is "" then data : val val val ... 
 						if (_varName == "" || _varName == " " || _varName == "_" ) { // re?
 							const int n = utTemp.GetItem("").size();
 							for (int i = 0; i < finded.second.size(); ++i) {
 								if (false == condition.empty()) {
-									string _condition = condition;
+									std::string _condition = condition;
 									if (_varName == "" || _varName == " " || _varName == "_" ) { _condition = wiz::String::replace(_condition, "~~", "_"); }
 									else
 										_condition = wiz::String::replace(_condition, "~~", _varName); //
@@ -1324,11 +1324,11 @@ namespace wiz {
 							}
 						}
 						else {
-							vector<string> strVec;
+							std::vector<std::string> strVec;
 
 							if (_varName.size() >= 3 && _varName[0] == '[' && _varName[_varName.size() - 1] == ']')
 							{
-								StringTokenizer tokenizer2(_varName, vector<string>{ "[", "~", "]" }, builder, 1);
+								StringTokenizer tokenizer2(_varName, std::vector<std::string>{ "[", "~", "]" }, builder, 1);
 								while (tokenizer2.hasMoreTokens())
 								{
 									strVec.push_back(tokenizer2.nextToken());
@@ -1342,8 +1342,8 @@ namespace wiz {
 								chkInt = true;
 								a = atoll(strVec[0].c_str());
 								b = atoll(strVec[1].c_str());
-								Min = min(a, b);
-								Max = max(a, b);
+								Min = std::min(a, b);
+								Max = std::max(a, b);
 							}
 							for (long long x = Min; x <= Max; ++x) {
 								if (strVec.size() == 2 && chkInt)
@@ -1354,7 +1354,7 @@ namespace wiz {
 
 								for (int i = 0; i < finded.second.size(); ++i) {
 									if (false == condition.empty()) {
-										string _condition = condition;
+										std::string _condition = condition;
 										if (_varName == "") { _condition = wiz::String::replace(_condition, "~~", "_"); }
 										else
 											_condition = wiz::String::replace(_condition, "~~", _varName); //
@@ -1395,7 +1395,7 @@ namespace wiz {
 				}
 			}
 
-			static bool SetData(UserType& global, const string& position, const int var_idx, const string& data, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+			static bool SetData(UserType& global, const std::string& position, const int var_idx, const std::string& data, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
 				auto finded = UserType::Find(&global, position, builder);
 				bool isTrue = false;
@@ -1410,7 +1410,7 @@ namespace wiz {
 					for (long long x = Min; x <= Max; ++x) {
 						for (int i = 0; i < finded.second.size(); ++i) {
 							if (false == condition.empty()) {
-								string _condition = condition;
+								std::string _condition = condition;
 
 
 								_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
@@ -1439,13 +1439,13 @@ namespace wiz {
 				}
 			}
 			/// 
-			static string GetData(UserType& global, const string& position, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
-				string str;
+			static std::string GetData(UserType& global, const std::string& position, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
+				std::string str;
 				auto finded = UserType::Find(&global, position, builder);
 				if (finded.first) {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						if (false == condition.empty()) {
-							string _condition = condition;
+							std::string _condition = condition;
 
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
@@ -1467,14 +1467,14 @@ namespace wiz {
 					return "";
 				}
 			}
-			static string GetItemListData(UserType& global, const string& position, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+			static std::string GetItemListData(UserType& global, const std::string& position, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
-				string str;
+				std::string str;
 				auto finded = UserType::Find(&global, position, builder);
 				if (finded.first) {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						if (false == condition.empty()) {
-							string _condition = condition;
+							std::string _condition = condition;
 							
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
@@ -1496,14 +1496,14 @@ namespace wiz {
 					return "";
 				}
 			}
-			static string GetItemListNamesData(UserType& global, const string& position, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+			static std::string GetItemListNamesData(UserType& global, const std::string& position, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
-				string str;
+				std::string str;
 				auto finded = UserType::Find(&global, position, builder);
 				if (finded.first) {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						if (false == condition.empty()) {
-							string _condition = condition;
+							std::string _condition = condition;
 
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
@@ -1525,14 +1525,14 @@ namespace wiz {
 					return "";
 				}
 			}
-			static string GetUserTypeListNamesData(UserType& global, const string& position, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+			static std::string GetUserTypeListNamesData(UserType& global, const std::string& position, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
-				string str;
+				std::string str;
 				auto finded = UserType::Find(&global, position, builder);
 				if (finded.first) {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						if (false == condition.empty()) {
-							string _condition = condition;
+							std::string _condition = condition;
 
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
@@ -1557,17 +1557,17 @@ namespace wiz {
 			/// varName = val - do
 			/// varName = { val val val } - GetData(position+"/varName", ""); 
 			/// varName = { var = val } - GetData(position+"/varname", var);
-			static string GetData(UserType& global, const string& position, const string& varName, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) // 
+			static std::string GetData(UserType& global, const std::string& position, const std::string& varName, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) // 
 			{
-				string str;
-				string _var = varName;
+				std::string str;
+				std::string _var = varName;
 				if (_var == " " || _var == "_") { _var = ""; }
 
 				auto finded = UserType::Find(&global, position, builder);
 				if (finded.first) {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						if (false == condition.empty()) {
-							string _condition = condition;
+							std::string _condition = condition;
 
 							// ~~ and ^ -> do not used other mean?
 							if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "_"); }
@@ -1603,22 +1603,22 @@ namespace wiz {
 				return str;
 			}
 
-			static bool Remove(UserType& global, const string& position, const string& var, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
+			static bool Remove(UserType& global, const std::string& position, const std::string& var, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
 				auto finded = UserType::Find(&global, position, builder);
 				bool isTrue = false;
 
 				if (finded.first) {
-					string temp = var;
+					std::string temp = var;
 					if (temp == "") { temp = " "; }
 					StringTokenizer tokenizer(temp, "/", builder, 1);
 					while (tokenizer.hasMoreTokens()) {
-						string _var = tokenizer.nextToken();
+						std::string _var = tokenizer.nextToken();
 						if (_var == " " || _var == "_") { _var = ""; }
-						vector<string> strVec;
+						std::vector<std::string> strVec;
 
 						if (_var.size() >= 3 && _var[0] == '[' && _var[_var.size() - 1] == ']')
 						{
-							StringTokenizer tokenizer2(_var, vector<string>{ "[", "~", "]" }, builder, 1);
+							StringTokenizer tokenizer2(_var, std::vector<std::string>{ "[", "~", "]" }, builder, 1);
 							while (tokenizer2.hasMoreTokens())
 							{
 								strVec.push_back(tokenizer2.nextToken());
@@ -1632,8 +1632,8 @@ namespace wiz {
 							chkInt = true;
 							a = atoll(strVec[0].c_str());
 							b = atoll(strVec[1].c_str());
-							Min = min(a, b);
-							Max = max(a, b);
+							Min = std::min(a, b);
+							Max = std::max(a, b);
 						}
 						for (long long x = Min; x <= Max; ++x) {
 							if (strVec.size() == 2 && chkInt)
@@ -1646,7 +1646,7 @@ namespace wiz {
 								UserType* temp = finded.second[i];
 
 								if (false == condition.empty()) {
-									string _condition = condition;
+									std::string _condition = condition;
 									if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "_"); }
 									else
 										_condition = wiz::String::replace(_condition, "~~", _var); //
@@ -1678,7 +1678,7 @@ namespace wiz {
 					return false;
 				}
 			}
-			static bool Remove(UserType& global, const string& position, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
+			static bool Remove(UserType& global, const std::string& position, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
 				auto finded = UserType::Find(&global, position, builder);
 				bool isTrue = false;
 
@@ -1687,7 +1687,7 @@ namespace wiz {
 						UserType* temp = finded.second[i];
 
 						if (false == condition.empty()) {
-							string _condition = condition;
+							std::string _condition = condition;
 
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 							
@@ -1711,7 +1711,7 @@ namespace wiz {
 					return false;
 				}
 			}
-			static bool RemoveUserType(UserType& global, const string& position, const string& name, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
+			static bool RemoveUserType(UserType& global, const std::string& position, const std::string& name, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
 				auto finded = UserType::Find(&global, position, builder);
 				bool isTrue = false;
 
@@ -1720,7 +1720,7 @@ namespace wiz {
 						UserType* temp = finded.second[i];
 
 						if (false == condition.empty()) {
-							string _condition = condition;
+							std::string _condition = condition;
 
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
@@ -1746,7 +1746,7 @@ namespace wiz {
 			}
 
 
-			static bool RemoveItemType(UserType& global, const string& position, const string& name, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
+			static bool RemoveItemType(UserType& global, const std::string& position, const std::string& name, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
 				auto finded = UserType::Find(&global, position, builder);
 				bool isTrue = false;
 
@@ -1755,7 +1755,7 @@ namespace wiz {
 						UserType* temp = finded.second[i];
 
 						if (false == condition.empty()) {
-							string _condition = condition;
+							std::string _condition = condition;
 
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
@@ -1780,8 +1780,8 @@ namespace wiz {
 				}
 			}
 
-			// todo - static bool Remove(UserType& global, const string& positiion, oonst int idx, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
-			static bool Remove(UserType& global, const string& position, const int idx, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
+			// todo - static bool Remove(UserType& global, const std::string& positiion, oonst int idx, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+			static bool Remove(UserType& global, const std::string& position, const int idx, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) {
 				auto finded = UserType::Find(&global, position, builder);
 				bool isTrue = false;
 
@@ -1790,7 +1790,7 @@ namespace wiz {
 						UserType* temp = finded.second[i];
 
 						if (false == condition.empty()) {
-							string _condition = condition;
+							std::string _condition = condition;
 							
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
@@ -1815,26 +1815,26 @@ namespace wiz {
 				}
 			}
 			
-			static bool LoadWizDB(UserType& global, const string& fileName) {
+			static bool LoadWizDB(UserType& global, const std::string& fileName) {
 				UserType globalTemp = UserType("global");
 
 				// Scan + Parse 
 				if (false == LoadDataFromFile(fileName, globalTemp)) { return false; }
-				std::cout << "LoadData End" << endl;
+				std::cout << "LoadData End" << std::endl;
 
-				global = move(globalTemp);
+				global = std::move(globalTemp);
 				return true;
 			}
 			// SaveQuery
-			static bool SaveWizDB(const UserType& global, const string& fileName, const string& option = "0", const string& option2 = "") { /// , int option
-				ofstream outFile;
+			static bool SaveWizDB(const UserType& global, const std::string& fileName, const std::string& option = "0", const std::string& option2 = "") { /// , int option
+				std::ofstream outFile;
 				if (fileName.empty()) { return false; }
 				if (option2 == "") {
 					outFile.open(fileName);
 					if (outFile.fail()) { return false; }
 				}
 				else {
-					outFile.open(fileName, ios::app);
+					outFile.open(fileName, std::ios::app);
 					if (outFile.fail()) { return false; }
 
 					outFile << "\n";
@@ -1854,17 +1854,17 @@ namespace wiz {
 			}
 
 			/// To Do - ExistItem, ExistUserType, SetUserType GetUserType
-			static bool ExistData(UserType& global, const string& position, const string& varName, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) // 
+			static bool ExistData(UserType& global, const std::string& position, const std::string& varName, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder) // 
 			{
 				int count = 0;
-				string _var = varName;
+				std::string _var = varName;
 				if (_var == " " || _var == "_") { _var = ""; }
 
 				auto finded = UserType::Find(&global, position, builder);
 				if (finded.first) {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						if (false == condition.empty()) {
-							string _condition = condition;
+							std::string _condition = condition;
 
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
@@ -1889,7 +1889,7 @@ namespace wiz {
 				}
 				return 0 != count;
 			}
-			static bool ExistUserType(UserType& global, const string& position, const string& condition, 
+			static bool ExistUserType(UserType& global, const std::string& position, const std::string& condition, 
 				const ExcuteData& excuteData, wiz::StringBuilder* builder) // 
 			{
 				int count = 0;
@@ -1898,7 +1898,7 @@ namespace wiz {
 				if (finded.first) {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						if (false == condition.empty()) {
-							string _condition = condition;
+							std::string _condition = condition;
 							
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
@@ -1917,7 +1917,7 @@ namespace wiz {
 				}
 				return 0 != count;
 			}
-			static bool ExistOneUserType(UserType& global, const string& position, const string& condition, 
+			static bool ExistOneUserType(UserType& global, const std::string& position, const std::string& condition, 
 				const ExcuteData& excuteData, wiz::StringBuilder* builder) // 
 			{
 				int count = 0;
@@ -1929,7 +1929,7 @@ namespace wiz {
 				if (finded.first) {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						if (false == condition.empty()) {
-							string _condition = condition;
+							std::string _condition = condition;
 							
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 							
@@ -1948,18 +1948,18 @@ namespace wiz {
 				}
 				return 1 == count;
 			}
-			static bool ExistItem(UserType& global, const string& position, const string& varName, const string& condition, 
+			static bool ExistItem(UserType& global, const std::string& position, const std::string& varName, const std::string& condition, 
 				const ExcuteData& excuteData, wiz::StringBuilder* builder) // 
 			{
 				int count = 0;
-				string _var = varName;
+				std::string _var = varName;
 				if (_var == " " || _var == "_") { _var = ""; }
 
 				auto finded = UserType::Find(&global, position, builder);
 				if (finded.first) {
 					for (int i = 0; i < finded.second.size(); ++i) {
 						if (false == condition.empty()) {
-							string _condition = condition;
+							std::string _condition = condition;
 
 							_condition = ToBool4(finded.second[i], global, _condition, excuteData, builder);
 
@@ -1987,13 +1987,13 @@ namespace wiz {
 
 			/// ToDo - global, position, var, condition + var is " "!
 			// "root" -> position.
-			static string SearchItem(UserType& global, const string& var, const string& condition, 
+			static std::string SearchItem(UserType& global, const std::string& var, const std::string& condition, 
 				const ExcuteData& excuteData, 
-				const string& start_dir = "root",
+				const std::string& start_dir = "root",
 				StringBuilder* builder = nullptr)
 			{
-				vector<string> positionVec;
-				string temp;
+				std::vector<std::string> positionVec;
+				std::string temp;
 
 				SearchItem(global, positionVec, var, start_dir, &global, condition, excuteData, builder);
 
@@ -2004,11 +2004,11 @@ namespace wiz {
 
 				return temp;
 			}
-			static string SearchUserType(UserType& global, const string& var, const string& condition, 
+			static std::string SearchUserType(UserType& global, const std::string& var, const std::string& condition, 
 				const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
-				vector<string> positionVec;
-				string temp;
+				std::vector<std::string> positionVec;
+				std::string temp;
 
 				SearchUserType(global, positionVec, var, "root", &global, condition, excuteData, builder);
 
@@ -2019,7 +2019,7 @@ namespace wiz {
 
 				return temp;
 			}
-			static void ReplaceItem(UserType& global, const string& var, const string& val, const string& condition, const string& start_dir,
+			static void ReplaceItem(UserType& global, const std::string& var, const std::string& val, const std::string& condition, const std::string& start_dir,
 				const ExcuteData& excuteData, bool recursive, wiz::StringBuilder* builder)
 			{
 				auto temp = wiz::load_data::UserType::Find(&global, start_dir, builder);
@@ -2031,7 +2031,7 @@ namespace wiz {
 					}
 				}
 			}
-			static void RemoveUserTypeTotal(UserType& global, const string& ut_name, const string& condition, const string& start_dir,
+			static void RemoveUserTypeTotal(UserType& global, const std::string& ut_name, const std::string& condition, const std::string& start_dir,
 				const ExcuteData& excuteData, bool recursive, wiz::StringBuilder* builder)
 			{
 				auto temp = wiz::load_data::UserType::Find(&global, start_dir, builder);
@@ -2043,7 +2043,7 @@ namespace wiz {
 					}
 				}
 			}
-			static void ReplaceDateType(UserType& global, const string& val, const string& condition, const string& start_dir,
+			static void ReplaceDateType(UserType& global, const std::string& val, const std::string& condition, const std::string& start_dir,
 				const ExcuteData& excuteData, bool recursive, wiz::StringBuilder* builder
 				) {
 				auto temp = wiz::load_data::UserType::Find(&global, start_dir, builder);
@@ -2055,7 +2055,7 @@ namespace wiz {
 					}
 				}
 			}
-			static void ReplaceDateType2(UserType& global, const string& val, const string& condition, const string& start_dir,
+			static void ReplaceDateType2(UserType& global, const std::string& val, const std::string& condition, const std::string& start_dir,
 				const ExcuteData& excuteData, bool recursive, wiz::StringBuilder* builder)
 			{
 				auto temp = wiz::load_data::UserType::Find(&global, start_dir, builder);
@@ -2067,8 +2067,8 @@ namespace wiz {
 					}
 				}
 			}
-			static void ReplaceDataType1(UserType& global, const string& rex, const vector<string>& val, const vector<string>& condition,
-				const string& start_dir, const ExcuteData& excuteData, bool recursive, wiz::StringBuilder* builder)
+			static void ReplaceDataType1(UserType& global, const std::string& rex, const std::vector<std::string>& val, const std::vector<std::string>& condition,
+				const std::string& start_dir, const ExcuteData& excuteData, bool recursive, wiz::StringBuilder* builder)
 			{
 				std::regex rgx(rex);
 				auto temp = wiz::load_data::UserType::Find(&global, start_dir, builder);
@@ -2080,8 +2080,8 @@ namespace wiz {
 					}
 				}
 			}
-			static void ReplaceDataType1_2(UserType& global, const string& rex, const vector<string>& val, const vector<string>& condition,
-				const string& start_dir, const ExcuteData& excuteData, bool recursive, wiz::StringBuilder* builder)
+			static void ReplaceDataType1_2(UserType& global, const std::string& rex, const std::vector<std::string>& val, const std::vector<std::string>& condition,
+				const std::string& start_dir, const ExcuteData& excuteData, bool recursive, wiz::StringBuilder* builder)
 			{
 				std::regex rgx(rex);
 
@@ -2095,8 +2095,8 @@ namespace wiz {
 					}
 				}
 			}
-			static void ReplaceDataType2(UserType& global, const string& rex, const vector<string>& val, const vector<string>& condition,
-				const string& start_dir, const ExcuteData& excuteData, bool recursive, wiz::StringBuilder* builder)
+			static void ReplaceDataType2(UserType& global, const std::string& rex, const std::vector<std::string>& val, const std::vector<std::string>& condition,
+				const std::string& start_dir, const ExcuteData& excuteData, bool recursive, wiz::StringBuilder* builder)
 			{
 				std::regex rgx(rex);
 
@@ -2110,15 +2110,15 @@ namespace wiz {
 				}
 			}
 		private:
-			static void ReplaceItem(UserType& global, const string& var, const string& nowPosition,
-				UserType* ut, const string& val, const string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder, bool recursive)
+			static void ReplaceItem(UserType& global, const std::string& var, const std::string& nowPosition,
+				UserType* ut, const std::string& val, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder, bool recursive)
 			{
-				string _var = var;
+				std::string _var = var;
 				if (_var == " " || _var == "_") { _var = ""; }
 
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
 					if (ut->GetItemList(i).GetName() == _var) {
-						string _condition = condition;
+						std::string _condition = condition;
 
 						if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "_"); }
 						else {
@@ -2135,7 +2135,7 @@ namespace wiz {
 
 						if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
 						{
-							string _val = val;
+							std::string _val = val;
 							_val = wiz::String::replace(_val, "~~~", val); //
 							_val = wiz::String::replace(_val, "~~", _var); //
 	
@@ -2150,7 +2150,7 @@ namespace wiz {
 
 				if (recursive) {
 					for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
-						string temp = ut->GetUserTypeList(i)->GetName();
+						std::string temp = ut->GetUserTypeList(i)->GetName();
 						if (temp == "") { temp = " "; }
 						ReplaceItem(
 							global,
@@ -2166,17 +2166,17 @@ namespace wiz {
 					}
 				}
 			}
-			static void RemoveUserTypeTotal(UserType& global, const string& ut_name, const string& nowPosition,
-				UserType* ut, const string& condition, 
+			static void RemoveUserTypeTotal(UserType& global, const std::string& ut_name, const std::string& nowPosition,
+				UserType* ut, const std::string& condition, 
 				const ExcuteData& excuteData, wiz::StringBuilder* builder, bool recursive)
 			{
-				string _var = ut_name;
+				std::string _var = ut_name;
 				
 				if (_var == " " || _var == "_") { _var = ""; }
 
 				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
 					if (ut->GetUserTypeList(i)->GetName() == _var) {
-						string _condition = condition;
+						std::string _condition = condition;
 
 						if (_var == "") { _condition = wiz::String::replace(_condition, "~~", "_"); }
 						else {
@@ -2200,7 +2200,7 @@ namespace wiz {
 				}
 				if (recursive) {
 					for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
-						string temp = ut->GetUserTypeList(i)->GetName();
+						std::string temp = ut->GetUserTypeList(i)->GetName();
 						if (temp == "") { temp = " "; }
 						RemoveUserTypeTotal(
 							global,
@@ -2215,15 +2215,15 @@ namespace wiz {
 					}
 				}
 			}
-			static void ReplaceDateType(UserType& global, const string& nowPosition,
-				UserType* ut, const string& val, const string& condition, 
+			static void ReplaceDateType(UserType& global, const std::string& nowPosition,
+				UserType* ut, const std::string& val, const std::string& condition, 
 				const ExcuteData& excuteData, wiz::StringBuilder* builder, bool recursive)
 			{
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
 					if (Utility::IsDate(ut->GetItemList(i).GetName()) || Utility::IsDate(ut->GetItemList(i).Get(0))) {
-						string _condition = condition;
-						string _val = val;
-						string _var = ut->GetItemList(i).GetName();
+						std::string _condition = condition;
+						std::string _val = val;
+						std::string _var = ut->GetItemList(i).GetName();
 
 						if (_var.empty()) {
 							_var = "_";
@@ -2259,7 +2259,7 @@ namespace wiz {
 				}
 				if (recursive) {
 					for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
-						string temp = ut->GetUserTypeList(i)->GetName();
+						std::string temp = ut->GetUserTypeList(i)->GetName();
 						if (temp == "") { temp = " "; }
 
 						ReplaceDateType(
@@ -2275,19 +2275,19 @@ namespace wiz {
 					}
 				}
 			}
-			static void ReplaceDateType2(UserType& global, const string& nowPosition,
-				UserType* ut, const string& val, const string& condition, 
+			static void ReplaceDateType2(UserType& global, const std::string& nowPosition,
+				UserType* ut, const std::string& val, const std::string& condition, 
 				const ExcuteData& excuteData, wiz::StringBuilder* builder, bool recursive)
 			{
 				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
-					string temp = ut->GetUserTypeList(i)->GetName();
+					std::string temp = ut->GetUserTypeList(i)->GetName();
 					if (temp == "") { temp = " "; }
 
 					if (Utility::IsDate(temp)) {
-						string _condition = condition;
-						string _val = val;
+						std::string _condition = condition;
+						std::string _val = val;
 
-						string _var = ut->GetUserTypeList(i)->GetName();
+						std::string _var = ut->GetUserTypeList(i)->GetName();
 
 						_condition = wiz::String::replace(_condition, "~~", _var); //
 
@@ -2323,16 +2323,16 @@ namespace wiz {
 					}
 				}
 			}
-			static void ReplaceDataType1(UserType& global, const string& nowPosition,
-				UserType* ut, const std::regex& rgx, const vector<string>& val, const vector<string>& condition, 
+			static void ReplaceDataType1(UserType& global, const std::string& nowPosition,
+				UserType* ut, const std::regex& rgx, const std::vector<std::string>& val, const std::vector<std::string>& condition,
 				const ExcuteData& excuteData, wiz::StringBuilder* builder, bool recursive)
 			{
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
 					if (std::regex_match(ut->GetItemList(i).GetName(), rgx)) { // || Utility::IsDate(ut->GetItemList(i).Get(0))) {
 						for (int k = 0; k < val.size(); ++k) {
-							string _condition = condition[k];
-							string _val = val[k];
-							string _var = ut->GetItemList(i).GetName();
+							std::string _condition = condition[k];
+							std::string _val = val[k];
+							std::string _var = ut->GetItemList(i).GetName();
 
 							
 							_condition = wiz::String::replace(_condition, "~~~", ut->GetItemList(i).Get(0));
@@ -2357,7 +2357,7 @@ namespace wiz {
 							
 								//if (_val[0] == '@') { _val.erase(_val.begin()); }
 								//_val = wiz::String::replace(_val, "~~", _var);
-								//_val = ToBool4(ut, global, map<string, string>(), _val, EventInfo(), objectMapPtr,  excuteData.pEvents);
+								//_val = ToBool4(ut, global, map<std::string, std::string>(), _val, EventInfo(), objectMapPtr,  excuteData.pEvents);
 
 								ut->GetItemList(i).SetName(_val);
 								break;
@@ -2367,7 +2367,7 @@ namespace wiz {
 				}
 				if (recursive) {
 					for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
-						string temp = ut->GetUserTypeList(i)->GetName();
+						std::string temp = ut->GetUserTypeList(i)->GetName();
 						if (temp == "") { temp = " "; }
 
 						ReplaceDataType1(
@@ -2384,16 +2384,16 @@ namespace wiz {
 					}
 				}
 			}
-			static void ReplaceDataType1_2(UserType& global, const string& nowPosition,
-				UserType* ut, const std::regex& rgx, const vector<string>& val, const vector<string>& condition, 
+			static void ReplaceDataType1_2(UserType& global, const std::string& nowPosition,
+				UserType* ut, const std::regex& rgx, const std::vector<std::string>& val, const std::vector<std::string>& condition,
 				const ExcuteData& excuteData, wiz::StringBuilder* builder, bool recursive)
 			{
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
 					if (std::regex_match(ut->GetItemList(i).GetName(), rgx)) { // || Utility::IsDate(ut->GetItemList(i).Get(0))) {
 						for (int k = 0; k < val.size(); ++k) {
-							string _condition = condition[k];
-							string _val = val[k];
-							string _var = ut->GetItemList(i).GetName();
+							std::string _condition = condition[k];
+							std::string _val = val[k];
+							std::string _var = ut->GetItemList(i).GetName();
 							// ~~~ -> _val?
 
 							_condition = wiz::String::replace(_condition, "~~~", ut->GetItemList(i).Get(0));
@@ -2417,7 +2417,7 @@ namespace wiz {
 								// remove 3 lines?
 							//	if (_val[0] == '@') { _val.erase(_val.begin()); } // chk, same do(chk @) to other functions?
 							//	_val = wiz::String::replace(_val, "~~", _var);
-						//		_val = ToBool4(ut, global, map<string, string>(), _val, EventInfo(), objectMapPtr,  excuteData.pEvents); // chk!!
+						//		_val = ToBool4(ut, global, map<std::string, std::string>(), _val, EventInfo(), objectMapPtr,  excuteData.pEvents); // chk!!
 
 								ut->GetItemList(i).Set(0, _val);
 								break;
@@ -2427,7 +2427,7 @@ namespace wiz {
 				}
 				if (recursive) {
 					for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
-						string temp = ut->GetUserTypeList(i)->GetName();
+						std::string temp = ut->GetUserTypeList(i)->GetName();
 						if (temp == "") { temp = " "; }
 
 						ReplaceDataType1_2(
@@ -2444,17 +2444,17 @@ namespace wiz {
 					}
 				}
 			}
-			static void ReplaceDataType1_3(UserType& global, const string& nowPosition,
-				UserType* ut, const std::regex& rgx, const vector<string>& val, const vector<string>& condition, 
+			static void ReplaceDataType1_3(UserType& global, const std::string& nowPosition,
+				UserType* ut, const std::regex& rgx, const std::vector<std::string>& val, const std::vector<std::string>& condition,
 				const ExcuteData& excuteData, wiz::StringBuilder* builder, bool recursive)
 			{
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
 					if (std::regex_match(ut->GetItemList(i).Get(0), rgx)) {
 						for (int k = 0; k < val.size(); ++k) {
-							string _condition = condition[k];
-							string _val = val[k];
+							std::string _condition = condition[k];
+							std::string _val = val[k];
 
-							string _var = ut->GetItemList(i).GetName();
+							std::string _var = ut->GetItemList(i).GetName();
 
 							
 							_condition = wiz::String::replace(_condition, "~~~", ut->GetItemList(i).Get(0));
@@ -2478,7 +2478,7 @@ namespace wiz {
 							
 								//if (_val[0] == '@') { _val.erase(_val.begin()); }
 								//_val = wiz::String::replace(_val, "~~", _var);
-								//_val = ToBool4(ut, global, map<string, string>(), _val, EventInfo(), objectMapPtr,  excuteData.pEvents);
+								//_val = ToBool4(ut, global, map<std::string, std::string>(), _val, EventInfo(), objectMapPtr,  excuteData.pEvents);
 								ut->GetItemList(i).Set(0, _val); 
 								break;
 							}
@@ -2487,7 +2487,7 @@ namespace wiz {
 				}
 				if (recursive) {
 					for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
-						string temp = ut->GetUserTypeList(i)->GetName();
+						std::string temp = ut->GetUserTypeList(i)->GetName();
 						if (temp == "") { temp = " "; }
 
 						ReplaceDataType1_3(
@@ -2507,19 +2507,19 @@ namespace wiz {
 
 			// cf) replacedatatype1_4  match value, change var_name?
 
-			static void ReplaceDataType2(UserType& global, const string& nowPosition,
-				UserType* ut, const std::regex& rgx, const vector<string>& val, const vector<string>& condition, 
+			static void ReplaceDataType2(UserType& global, const std::string& nowPosition,
+				UserType* ut, const std::regex& rgx, const std::vector<std::string>& val, const std::vector<std::string>& condition,
 				const ExcuteData& excuteData, wiz::StringBuilder* builder, bool recursive) // first val test
 			{
 				for (int i = 0; i < ut->GetUserTypeListSize(); ++i) {
-					string temp = ut->GetUserTypeList(i)->GetName();
+					std::string temp = ut->GetUserTypeList(i)->GetName();
 					if (temp == "") { temp = " "; }
 
 					if (std::regex_match(temp, rgx)) {
 						for (int k = 0; k < val.size(); ++k) {
-							string _condition = condition[k];
-							string _val = val[k];
-							string _var = ut->GetUserTypeList(i)->GetName(); 
+							std::string _condition = condition[k];
+							std::string _val = val[k];
+							std::string _var = ut->GetUserTypeList(i)->GetName(); 
 							
 							
 							_condition = wiz::String::replace(_condition, "~~", _var); //
@@ -2541,7 +2541,7 @@ namespace wiz {
 								//if (_val[0] == '@') { _val.erase(_val.begin()); } // removal?
 
 								//_val = wiz::String::replace(_val, "~~", _var);
-								//_val = ToBool4(ut, global, map<string, string>(), _val, EventInfo(), objectMapPtr,  excuteData.pEvents);
+								//_val = ToBool4(ut, global, map<std::string, std::string>(), _val, EventInfo(), objectMapPtr,  excuteData.pEvents);
 								ut->GetUserTypeList(i)->SetName(_val);
 								break;
 							}
@@ -2565,16 +2565,16 @@ namespace wiz {
 		};
 
 		// only one exist or do not exist
-		inline wiz::load_data::ItemType<string> GetItem(const wiz::load_data::UserType* ut, const string& name) {
+		inline wiz::load_data::ItemType<std::string> GetItem(const wiz::load_data::UserType* ut, const std::string& name) {
 			return ut->GetItem(name)[0];
 		}
 
-		inline vector<wiz::load_data::UserType*> GetUserType(const wiz::load_data::UserType* ut, const string& name)
+		inline std::vector<wiz::load_data::UserType*> GetUserType(const wiz::load_data::UserType* ut, const std::string& name)
 		{
 			return ut->GetUserTypeItem(name);
 		}
-		string Find(wiz::load_data::UserType* ut, const string& str, StringBuilder* builder)
-		{ // string 대신 vector<string> ??
+		std::string Find(wiz::load_data::UserType* ut, const std::string& str, StringBuilder* builder)
+		{ // std::string 대신 vector<std::string> ??
 			int count = 0;
 			int idx = -1;
 			for (int i = str.size() - 1; i >= 0; --i) {
@@ -2586,7 +2586,7 @@ namespace wiz {
 				}
 			}
 			
-			string result;
+			std::string result;
 			if (count == 1)
 			{
 				return "";
@@ -2596,7 +2596,7 @@ namespace wiz {
 					wiz::String::substring(str, 0, idx), builder);
 				if (x.first == false) { return ""; }
 				for (int i = 0; i < x.second.size(); ++i) {
-					string itemName = wiz::String::substring(str, idx + 1);
+					std::string itemName = wiz::String::substring(str, idx + 1);
 					if (wiz::String::startsWith(itemName, "$it") && itemName.size() >= 4 ){
 						int itemIdx = stoi(wiz::String::substring(itemName, 3));
 						
@@ -2627,13 +2627,13 @@ namespace wiz {
 			return result;
 		}
 		
-		inline bool Exist(wiz::load_data::UserType* ut, const string& dir, StringBuilder* builder)
+		inline bool Exist(wiz::load_data::UserType* ut, const std::string& dir, StringBuilder* builder)
 		{
 			auto x = wiz::load_data::UserType::Find(ut, dir, builder);
 			return x.first;
 		}
 		// to do - rename!
-		pair<string, string> Find2(wiz::load_data::UserType* ut, const string& str)
+		std::pair<std::string, std::string> Find2(wiz::load_data::UserType* ut, const std::string& str)
 		{
 			int idx = -1;
 			for (int i = str.size() - 1; i >= 0; --i) {
@@ -2645,9 +2645,9 @@ namespace wiz {
 			return{ wiz::String::substring(str, 0, idx), wiz::String::substring(str,idx + 1) };
 		}
 
-		inline string FindParameters(const map<string, string>& parameters, const string& operand)
+		inline std::string FindParameters(const std::map<std::string, std::string>& parameters, const std::string& operand)
 		{
-			map<string, string>::const_iterator x;
+			std::map<std::string, std::string>::const_iterator x;
 			for (int i = 0; i < parameters.size(); ++i) {
 				if (wiz::String::startsWith(operand, "$parameter.")
 					&& (x = parameters.find( wiz::String::substring(operand, 11) ) ) != parameters.end())  {
@@ -2656,7 +2656,7 @@ namespace wiz {
 			}
 			return "";
 		}
-		inline string FindLocals(const map<string, string>& locals, const string& operand)
+		inline std::string FindLocals(const std::map<std::string, std::string>& locals, const std::string& operand)
 		{
 			if (wiz::String::startsWith(operand, "$local.") && locals.end() != locals.find(wiz::String::substring(operand, 7)))
 			{
@@ -2667,9 +2667,9 @@ namespace wiz {
 		//need to renewal. add $AND $OR $NOT
 	
 		/// remove /, parameter chk!!
-		string ToBool4(wiz::load_data::UserType* now, wiz::load_data::UserType& global, const string& temp, const ExcuteData& excuteData, wiz::StringBuilder* builder);
-		bool operation(wiz::load_data::UserType* now, wiz::load_data::UserType& global, const string& str,
-			wiz::ArrayStack<string>& operandStack, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+		std::string ToBool4(wiz::load_data::UserType* now, wiz::load_data::UserType& global, const std::string& temp, const ExcuteData& excuteData, wiz::StringBuilder* builder);
+		bool operation(wiz::load_data::UserType* now, wiz::load_data::UserType& global, const std::string& str,
+			wiz::ArrayStack<std::string>& operandStack, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 		{
 			if (!operandStack.empty() && operandStack.top() == "ERROR") {
 				return false;
@@ -2704,7 +2704,7 @@ namespace wiz {
 			}
 
 			if ("$EQ" == str) {
-				string x, y;
+				std::string x, y;
 				int idx = -1;
 				x = operandStack.pop();
 				y = operandStack.pop();
@@ -2718,7 +2718,7 @@ namespace wiz {
 			}
 			else if ("$NOTEQ" == str)
 			{
-				string x, y;
+				std::string x, y;
 				x = operandStack.pop();
 				y = operandStack.pop();
 
@@ -2731,7 +2731,7 @@ namespace wiz {
 			}
 			else if ("$AND" == str)
 			{
-				string x, y;
+				std::string x, y;
 				x = operandStack.pop();
 				y = operandStack.pop();
 
@@ -2743,7 +2743,7 @@ namespace wiz {
 				}
 			}
 			else if ("$AND_ALL" == str) {
-				vector<string> store;
+				std::vector<std::string> store;
 				for (int i = 0; i < operandNum; ++i) {
 					store.push_back(operandStack.pop());
 				}
@@ -2757,7 +2757,7 @@ namespace wiz {
 			}
 			else if ("$OR" == str)
 			{
-				string x, y;
+				std::string x, y;
 				x = operandStack.pop();
 				y = operandStack.pop();
 
@@ -2770,7 +2770,7 @@ namespace wiz {
 			}
 			else if ("$OR_ALL" == str)
 			{
-				vector<string> store;
+				std::vector<std::string> store;
 
 				for (int i = 0; i < operandNum; ++i) {
 					store.push_back(operandStack.pop());
@@ -2785,7 +2785,7 @@ namespace wiz {
 			}
 			else if ("$NOT" == str)
 			{
-				string x;
+				std::string x;
 				x = operandStack.pop();
 
 				if (x == "TRUE") {
@@ -2797,7 +2797,7 @@ namespace wiz {
 			}
 			else if ("$COMP<" == str)
 			{
-				string x, y;
+				std::string x, y;
 				x = operandStack.pop();
 				y = operandStack.pop();
 
@@ -2811,7 +2811,7 @@ namespace wiz {
 			}
 			else if ("$COMP>" == str)
 			{
-				string x, y;
+				std::string x, y;
 				x = operandStack.pop();
 				y = operandStack.pop();
 
@@ -2825,7 +2825,7 @@ namespace wiz {
 			}
 			else if ("$COMP<EQ" == str)
 			{
-				string x, y;
+				std::string x, y;
 				x = operandStack.pop();
 				y = operandStack.pop();
 
@@ -2839,7 +2839,7 @@ namespace wiz {
 			}
 			else if ("$COMP>EQ" == str)
 			{
-				string x, y;
+				std::string x, y;
 				x = operandStack.pop();
 				y = operandStack.pop();
 
@@ -2853,11 +2853,11 @@ namespace wiz {
 			}
 			else if ("$add" == str) // todo! = int operator double => double operator double!
 			{
-				string x, y;
+				std::string x, y;
 				x = operandStack.pop();
 				y = operandStack.pop();
 
-				string typex, typey; // other *, /, mod, ..
+				std::string typex, typey; // other *, /, mod, ..
 				typex = wiz::load_data::Utility::GetType(x);
 				typey = wiz::load_data::Utility::GetType(y);
 				if (typex == typey && typey == "INTEGER") { /// only integer -> BigInteger
@@ -2873,7 +2873,7 @@ namespace wiz {
 			}
 			else if ("$multiple" == str) // todo! = int operator double => double operator double!
 			{
-				string x, y;
+				std::string x, y;
 				x = operandStack.pop();
 				y = operandStack.pop();
 
@@ -2892,7 +2892,7 @@ namespace wiz {
 			}
 			else if ("$divide" == str) // todo! = int operator double => double operator double!
 			{
-				string x, y;
+				std::string x, y;
 				x = operandStack.pop();
 				y = operandStack.pop();
 
@@ -2909,7 +2909,7 @@ namespace wiz {
 			}
 			else if ("$modular" == str)
 			{
-				string x, y;
+				std::string x, y;
 				x = operandStack.pop();
 				y = operandStack.pop();
 
@@ -2923,7 +2923,7 @@ namespace wiz {
 			}
 			else if ("$rand" == str)
 			{
-				string x, y;
+				std::string x, y;
 				x = operandStack.pop();
 				y = operandStack.pop();
 
@@ -2953,14 +2953,14 @@ namespace wiz {
 					for (int i = 0; i < 2; ++i)
 					{
 						total_size += operandStack.top().size();
-						string temp = operandStack.pop();
+						std::string temp = operandStack.pop();
 						builder->Append(temp.c_str(), temp.size()); // chk
 					}
 
-					operandStack.push(string(builder->Str(), total_size));
+					operandStack.push(std::string(builder->Str(), total_size));
 				}
 				else {
-					string x, y;
+					std::string x, y;
 					x = operandStack.pop();
 					y = operandStack.pop();
 
@@ -2969,7 +2969,7 @@ namespace wiz {
 			}
 			else if ("$concat2" == str) /// with space
 			{
-				string x, y;
+				std::string x, y;
 				x = operandStack.pop();
 				y = operandStack.pop();
 
@@ -2985,14 +2985,14 @@ namespace wiz {
 					for (int i = 0; i < operandNum; ++i)
 					{
 						total_size += operandStack.top().size();
-						string temp = operandStack.pop();
+						std::string temp = operandStack.pop();
 						builder->Append(temp.c_str(), temp.size()); // chk
 					}
 
-					operandStack.push(string(builder->Str(), total_size));
+					operandStack.push(std::string(builder->Str(), total_size));
 				}
 				else {
-					string result;
+					std::string result;
 
 					for (int i = 0; i < operandNum; ++i) {
 						result = result + operandStack.pop();
@@ -3004,7 +3004,7 @@ namespace wiz {
 			}
 			else if ("$concat_all2" == str)
 			{
-				string result;
+				std::string result;
 
 				for (int i = 0; i < operandNum; ++i) {
 					result += operandStack.pop();
@@ -3015,10 +3015,10 @@ namespace wiz {
 				operandStack.push(result);
 			}
 			else if ("$concat3" == str) { // for special case? "abc" "def" "ghi" -> "abcdefghi"
-				string result;
+				std::string result;
 
 				for (int i = 0; i < operandNum; ++i) {
-					string temp = operandStack.pop();
+					std::string temp = operandStack.pop();
 					if (temp.size() >= 3 && temp.back() == temp.front() && temp.back() == '\"') {}
 					else {
 						operandStack.push("ERROR in $concat3, 1. must be \" \" ");
@@ -3051,9 +3051,9 @@ namespace wiz {
 			///ToDo - GetList -> // GetItemListIdxByIListIdx, GetUserTypeLisIdxtByIListIdx ?
 			else if ("$back" == str) // ex) for x  = { 0 1 2 3 .. }, for usertaypelist? and mixed? and need more test!
 			{
-				string x = operandStack.pop();
+				std::string x = operandStack.pop();
 
-				string value = wiz::load_data::LoadData::GetItemListData(global, x, "TRUE", excuteData, builder);
+				std::string value = wiz::load_data::LoadData::GetItemListData(global, x, "TRUE", excuteData, builder);
 				wiz::load_data::UserType ut;
 				wiz::load_data::LoadData::LoadDataFromString(value, ut);
 
@@ -3071,8 +3071,8 @@ namespace wiz {
 			// pop_back or front - remove this function?
 			else if ("$pop_back" == str) // and for usertypelist? and mixed?, usertype-> "~"
 			{
-				string x = operandStack.pop();
-				string name;
+				std::string x = operandStack.pop();
+				std::string name;
 				for (int i = x.size() - 1; i >= 0; --i)
 				{
 					if (x[i] == '/' && i != 0) {
@@ -3103,9 +3103,9 @@ namespace wiz {
 			// todo - $front, pop-front.
 			else if ("$front" == str)
 			{
-				string x = operandStack.pop();
+				std::string x = operandStack.pop();
 
-				string value = wiz::load_data::LoadData::GetItemListData(global, x, "TRUE", excuteData, builder);
+				std::string value = wiz::load_data::LoadData::GetItemListData(global, x, "TRUE", excuteData, builder);
 				wiz::load_data::UserType ut;
 				wiz::load_data::LoadData::LoadDataFromString(value, ut);
 
@@ -3121,8 +3121,8 @@ namespace wiz {
 			}
 			else if ("$pop_front" == str)
 			{
-				string x = operandStack.pop();
-				string name;
+				std::string x = operandStack.pop();
+				std::string name;
 				for (int i = x.size() - 1; i >= 0; --i)
 				{
 					if (x[i] == '/' && i != 0) {
@@ -3152,7 +3152,7 @@ namespace wiz {
 			}
 			else if ("$get" == str)
 			{
-				string x = operandStack.pop();
+				std::string x = operandStack.pop();
 
 				if ('@' == x[0]) { // chk..
 					x.erase(x.begin());
@@ -3164,22 +3164,22 @@ namespace wiz {
 					x = "/./" + x;
 					if ('/' == x[0])
 					{
-						string temp = Find(now, x, builder); if (!temp.empty()) { x = temp; }
+						std::string temp = Find(now, x, builder); if (!temp.empty()) { x = temp; }
 					}
 				}
 				else {
 					if ('/' == x[0])
 					{
-						string temp = Find(&global, x, builder); if (!temp.empty()) { x = temp; }
+						std::string temp = Find(&global, x, builder); if (!temp.empty()) { x = temp; }
 					}
 				}
 
 				{
-					string temp = FindParameters(excuteData.info.parameters, x);
+					std::string temp = FindParameters(excuteData.info.parameters, x);
 					if (!temp.empty()) { x = temp; }
 				}
 				{
-					string temp = FindLocals(excuteData.info.locals, x);
+					std::string temp = FindLocals(excuteData.info.locals, x);
 					if (!temp.empty()) { x = temp; }
 				}
 
@@ -3187,7 +3187,7 @@ namespace wiz {
 			}
 			else if ("$size" == str)
 			{
-				string x = operandStack.pop();
+				std::string x = operandStack.pop();
 
 				if ('/' == x[0])
 				{
@@ -3203,7 +3203,7 @@ namespace wiz {
 			}
 			else if ("$size2" == str)
 			{
-				string x = operandStack.pop();
+				std::string x = operandStack.pop();
 
 				if ('/' == x[0])
 				{
@@ -3219,8 +3219,8 @@ namespace wiz {
 			}
 			else if ("$element" == str) // for list
 			{
-				string x = operandStack.pop(); // list_name
-				string y = operandStack.pop(); // idx
+				std::string x = operandStack.pop(); // list_name
+				std::string y = operandStack.pop(); // idx
 				int idx = atoi(y.c_str());
 
 				if ('/' == x[0])
@@ -3236,8 +3236,8 @@ namespace wiz {
 				operandStack.push(x);
 			}
 			else if ("$regex" == str) {
-				string str = operandStack.pop();
-				string rgx_str = operandStack.pop();
+				std::string str = operandStack.pop();
+				std::string rgx_str = operandStack.pop();
 
 				// " ~ " , "제거?
 				if (rgx_str.size() > 2 && rgx_str[0] == rgx_str.back() && rgx_str[0] == '\"') {
@@ -3256,7 +3256,7 @@ namespace wiz {
 				}
 			}
 			else if ("$eval" == str) {
-				string str = operandStack.pop();
+				std::string str = operandStack.pop();
 
 				bool chk = wiz::load_data::Utility::ChkExist(str);
 				if (chk) {
@@ -3267,7 +3267,7 @@ namespace wiz {
 				}
 				str = str.substr(1, str.size() - 2);
 				{
-					string result = ToBool4(now, global, str, excuteData, builder);
+					std::string result = ToBool4(now, global, str, excuteData, builder);
 
 					operandStack.push(move(result));
 				}
@@ -3275,7 +3275,7 @@ namespace wiz {
 			// big
 			else if ("$is_quoted_str" == str)
 			{
-				string str = operandStack.pop();
+				std::string str = operandStack.pop();
 				if (str.size() >= 2 && str[0] == str.back() && '\"' == str[0])
 				{
 					operandStack.push("TRUE");
@@ -3287,7 +3287,7 @@ namespace wiz {
 			// small
 			else if ("$is_quoted_str2" == str) 
 			{
-				string str = operandStack.pop();
+				std::string str = operandStack.pop();
 				if (str.size() >= 2 && str[0] == str.back() && '\'' == str[0])
 				{
 					operandStack.push("TRUE");
@@ -3297,25 +3297,25 @@ namespace wiz {
 				}
 			}
 			else if ("$toQuotedStr" == str) {
-				string str = operandStack.pop();
+				std::string str = operandStack.pop();
 				str.push_back('\"');
 				str.insert(str.begin(), '\"');
 				operandStack.push(str);
 			}
 			else if ("$toQuotedStr2" == str) {
-				string str = operandStack.pop();
+				std::string str = operandStack.pop();
 				str.push_back('\'');
 				str.insert(str.begin(), '\'');
 				operandStack.push(str);
 			}
 			else if ("$addSmallQuoted" == str) {
-				string str = operandStack.pop();
+				std::string str = operandStack.pop();
 				str.push_back('\'');
 				str.insert(str.begin(), '\'');
 				operandStack.push(str);
 			}
-			else if ("$removeQuoted" == str) { // chk "" string problem?
-				string str = operandStack.pop();
+			else if ("$removeQuoted" == str) { // chk "" std::string problem?
+				std::string str = operandStack.pop();
 
 				if (str.size() > 0 && str.front() == str.back()
 					&& '\"' == str.back()
@@ -3327,9 +3327,9 @@ namespace wiz {
 				operandStack.push(str);
 			}
 			else if ("$getObjectStr" == str) {
-				string object_name = operandStack.pop();
+				std::string object_name = operandStack.pop();
 				object_name = wiz::String::substring(object_name, 1, object_name.size() - 2);
-				string event_id = operandStack.pop();
+				std::string event_id = operandStack.pop();
 
 				wiz::load_data::UserType ut = (*excuteData.pObjectMap)[object_name];
 
@@ -3347,11 +3347,11 @@ namespace wiz {
 				operandStack.push("ERROR in $getOjbectStr");
 			}
 			else if ("$add_paren" == str) { // removal?
-				string temp = operandStack.pop();
+				std::string temp = operandStack.pop();
 				operandStack.push(" { " + temp + " } ");
 			}
 			else if ("$test" == str) { // for lambda test.
-				string temp = operandStack.pop();
+				std::string temp = operandStack.pop();
 
 				temp = wiz::String::replace(temp, "\"", "");
 				
@@ -3360,19 +3360,19 @@ namespace wiz {
 				operandStack.push(temp);
 			}
 			else if ("$test2" == str) { // for lambda test?
-				string temp = operandStack.pop();
+				std::string temp = operandStack.pop();
 
 				temp = wiz::String::substring(temp, 1, temp.size() - 2);
 
 				operandStack.push(temp);
 			}
 			else if ("$test3" == str) { // for lambda test?
-				string temp = operandStack.pop();
+				std::string temp = operandStack.pop();
 
 				operandStack.push(temp);
 			}
 			else if ("$test4" == str) {
-				string temp = operandStack.pop();
+				std::string temp = operandStack.pop();
 
 				if (temp.size() >= 3 && temp.back() == temp.front() && temp.back() == '\"') {
 					temp = wiz::String::substring(temp, 1, temp.size() - 2);
@@ -3381,7 +3381,7 @@ namespace wiz {
 				operandStack.push(temp);
 			}
 			else if ("$test5" == str) { // chk!!
-				string temp = operandStack.pop();
+				std::string temp = operandStack.pop();
 				int braceNum = 0;
 				bool first = true;
 
@@ -3408,7 +3408,7 @@ namespace wiz {
 				operandStack.push(temp);
 			}
 			else if ("$test6" == str) { // for lambda test.
-				vector<string> vec;
+				std::vector<std::string> vec;
 				for (int i = 0; i < operandNum; ++i) {
 					vec.push_back(operandStack.pop());
 				}
@@ -3419,7 +3419,7 @@ namespace wiz {
 			}
 			else if ("$get_item_name" == str) {
 				wiz::load_data::UserType ut;
-				string statement;
+				std::string statement;
 				
 				for (int i = 0; i < operandNum; ++i) {
 					statement = statement + operandStack.pop();
@@ -3430,7 +3430,7 @@ namespace wiz {
 			}
 			else if ("$get_item_value" == str) { // why?
 				wiz::load_data::UserType ut;
-				string statement;
+				std::string statement;
 				int idx = 0;
 
 				for (int i = 0; i < operandNum - 1; ++i) {
@@ -3444,7 +3444,7 @@ namespace wiz {
 			}
 			else if ("$get_item_size" == str) {
 				wiz::load_data::UserType ut;
-				string statement;
+				std::string statement;
 
 				for (int i = 0; i < operandNum; ++i) {
 					statement = statement + operandStack.pop();
@@ -3453,16 +3453,16 @@ namespace wiz {
 
 				operandStack.push(wiz::_toString(ut.GetItem(ut.GetItemList(0).GetName()).size()));
 			}
-			else if ("$is_empty_string" == str) {
+			else if ("$is_empty_std::string" == str) {
 				operandStack.push(operandStack.pop().empty() ? "TRUE" : "FALSE");
 			}
 			else if ("$event_result" == str) {
-				vector<string> eventVec;
+				std::vector<std::string> eventVec;
 				for (int i = 0; i < operandNum; ++i) {
 					eventVec.push_back(operandStack.pop());
 				}
 				
-				string statements2 = "Event = { id = NONE" + wiz::toStr(excuteData.depth + 1) + " $call = { ";
+				std::string statements2 = "Event = { id = NONE" + wiz::toStr(excuteData.depth + 1) + " $call = { ";
 				for (int i = 0; i < eventVec.size(); ++i) {
 					statements2 = statements2 + eventVec[i] + " ";
 				}
@@ -3510,10 +3510,10 @@ namespace wiz {
 				return true;
 			}
 			else if ("$move_up" == str) {
-				string dir;
+				std::string dir;
 				
 				for (int i = 0; i < operandNum; ++i) {
-					string temp = operandStack.pop();
+					std::string temp = operandStack.pop();
 					dir = dir + temp;
 				//	cout << "temp is " << temp << endl;
 				}
@@ -3525,7 +3525,7 @@ namespace wiz {
 				}
 
 				StringTokenizer tokenizer(dir, "/", builder, 1);
-				vector<string> tokenVec;
+				std::vector<std::string> tokenVec;
 				while (tokenizer.hasMoreTokens()) {
 					tokenVec.push_back(tokenizer.nextToken());
 				}
@@ -3538,7 +3538,7 @@ namespace wiz {
 				return true;
 			}
 			else if ("$lambda" == str) {
-				vector<string> store;
+				std::vector<std::string> store;
 				for (int i = 0; i < operandNum; ++i) {
 					store.push_back(operandStack.pop());
 					if (store[i][0] != store[i][store[i].size() - 1] || '\'' != store[i][0])
@@ -3551,10 +3551,10 @@ namespace wiz {
 				
 				
 				if (operandNum >= 1) {
-					vector<wiz::load_data::UserType*> param = ut.GetUserTypeItem("Event")[0]->GetUserTypeItem("$parameter");
+					std::vector<wiz::load_data::UserType*> param = ut.GetUserTypeItem("Event")[0]->GetUserTypeItem("$parameter");
 					// in order.
-					string mainStr = "Main = { $call = { id = NONE } } ";
-					string eventStr = "Event = { id = NONE $call = { id = " +
+					std::string mainStr = "Main = { $call = { id = NONE } } ";
+					std::string eventStr = "Event = { id = NONE $call = { id = " +
 						ut.GetUserTypeItem("Event")[0]->GetItem("id")[0].Get(0) + " ";
 
 					// if opeandNum != ut[0].GetUserType("$parameter").size() then push error?
@@ -3569,7 +3569,7 @@ namespace wiz {
 					ut.Remove();
 					wiz::load_data::LoadData::LoadDataFromString(eventStr, ut);
 
-					string result;
+					std::string result;
 					{
 						ExcuteData _excuteData;
 						_excuteData.noUseInput = excuteData.noUseInput;
@@ -3582,10 +3582,10 @@ namespace wiz {
 						wiz::load_data::LoadData::LoadDataFromString(result.substr(1, result.size() - 2), ut);
 		
 						if (0 == ut.GetUserTypeListSize()) {
-							string param = ut.ToString();
+							std::string param = ut.ToString();
 							if (wiz::String::startsWith(param, "$parameter.")) { // 
 								param = param.substr(11);
-								result = string("\'Event = { id = identity ") + "$parameter = { " + param + " } $return = { $parameter." + param + " } }\'";
+								result = std::string("\'Event = { id = identity ") + "$parameter = { " + param + " } $return = { $parameter." + param + " } }\'";
 							}
 						}
 					}
@@ -3597,7 +3597,7 @@ namespace wiz {
 			}
 			
 			else if("$to_float_from_integer" == str) { // integer, floating point number -> floating point number(long double)
-				string value = operandStack.pop();
+				std::string value = operandStack.pop();
 				if (wiz::load_data::Utility::IsInteger(value)) {
 					long double x = stoll(value);
 					operandStack.push(wiz::_toString(x));
@@ -3607,7 +3607,7 @@ namespace wiz {
 				}
 			}
 			else if ("$to_integer_from_float" == str) { // integer, floating point number -> floating point number(long double)
-				string value = operandStack.pop();
+				std::string value = operandStack.pop();
 				if (wiz::load_data::Utility::IsDouble(value)) {
 					long long x = stold(value);
 					operandStack.push(wiz::_toString(x));
@@ -3618,7 +3618,7 @@ namespace wiz {
 			}
 			//floor, ceiling, round,
 			else if ("$floor" == str) {
-				string value = operandStack.pop();
+				std::string value = operandStack.pop();
 				if (wiz::load_data::Utility::IsDouble) {
 					long double x = floor(stold(value));
 					operandStack.push(wiz::_toString(x));
@@ -3628,7 +3628,7 @@ namespace wiz {
 				}
 			}
 			else if ("$ceiling" == str) {
-				string value = operandStack.pop();
+				std::string value = operandStack.pop();
 				if (wiz::load_data::Utility::IsDouble) {
 					long double x = ceil(stold(value));
 					operandStack.push(wiz::_toString(x));
@@ -3638,7 +3638,7 @@ namespace wiz {
 				}
 			}
 			else if ("$round" == str) {
-				string value = operandStack.pop();
+				std::string value = operandStack.pop();
 				if (wiz::load_data::Utility::IsDouble) {
 					long double x = round(stold(value));
 					operandStack.push(wiz::_toString(x));
@@ -3649,33 +3649,33 @@ namespace wiz {
 			}
 			//contains,
 			else if ("$contains" == str) {
-				string str = operandStack.pop();
-				string chk_str = operandStack.pop();
+				std::string str = operandStack.pop();
+				std::string chk_str = operandStack.pop();
 
-				operandStack.push(string::npos != str.find(chk_str) ? "TRUE" : "FALSE");
+				operandStack.push(std::string::npos != str.find(chk_str) ? "TRUE" : "FALSE");
 			}
 			//starts_with, ends_with,
 			else if ("$starts_with" == str) {
-				string str = operandStack.pop();
-				string chk_str = operandStack.pop();
+				std::string str = operandStack.pop();
+				std::string chk_str = operandStack.pop();
 
 				operandStack.push(wiz::String::startsWith(str, chk_str) ? "TRUE" : "FALSE");
 			}
 			else if ("$ends_with" == str) {
-				string str = operandStack.pop();
-				string chk_str = operandStack.pop();
+				std::string str = operandStack.pop();
+				std::string chk_str = operandStack.pop();
 
 				operandStack.push(wiz::String::endsWith(str, chk_str) ? "TRUE" : "FALSE");
 			}
-			//string - length,
-			else if ("$string_length" == str) {
-				string str = operandStack.pop();
+			//std::string - length,
+			else if ("$std::string_length" == str) {
+				std::string str = operandStack.pop();
 				
 				operandStack.push(wiz::_toString(str.size()));
 			}
 			//substring ?
 			else if ("$substring" == str) {
-				string str = operandStack.pop();
+				std::string str = operandStack.pop();
 				long long begin = stoll(operandStack.pop());
 				long long end = stoll(operandStack.pop());
 
@@ -3689,7 +3689,7 @@ namespace wiz {
 			else if ("$is_float_type" == str) {
 				operandStack.push(wiz::load_data::Utility::IsDouble(operandStack.pop()) ? "TRUE" : "FALSE");
 			}
-			else if ("$is_pure_string_type" == str) {
+			else if ("$is_pure_std::string_type" == str) {
 				operandStack.push("STRING" == wiz::load_data::Utility::GetType(operandStack.pop())? "TRUE" : "FALSE");
 			}
 			else if ("$get_type" == str) {
@@ -3707,12 +3707,12 @@ namespace wiz {
 			// remove "
 		}
 
-		string ToBool3(wiz::load_data::UserType& global, const map<string, string>& parameters, const string& temp,
+		std::string ToBool3(wiz::load_data::UserType& global, const std::map<std::string, std::string>& parameters, const std::string& temp,
 			 EventInfo info, StringBuilder* builder) /// has bug!
 		{
-			wiz::StringTokenizer tokenizer(temp, vector<string>{ "/" }, builder, 1);
-			vector<string> tokenVec;
-			string result;
+			wiz::StringTokenizer tokenizer(temp, std::vector<std::string>{ "/" }, builder, 1);
+			std::vector<std::string> tokenVec;
+			std::string result;
 
 			tokenVec.reserve(tokenizer.countTokens());
 			while (tokenizer.hasMoreTokens()) {
@@ -3733,7 +3733,7 @@ namespace wiz {
 					}
 					if (last != -1)
 					{
-						string temp = FindParameters(parameters, wiz::String::substring(tokenVec[i], 0, last));
+						std::string temp = FindParameters(parameters, wiz::String::substring(tokenVec[i], 0, last));
 
 						if (!temp.empty()) {
 							tokenVec[i] = wiz::String::replace(wiz::String::substring(tokenVec[i], 0, last), wiz::String::substring(tokenVec[i], 0, last), temp)
@@ -3742,7 +3742,7 @@ namespace wiz {
 					}
 					else
 					{
-						string temp = FindParameters(parameters, tokenVec[i]);
+						std::string temp = FindParameters(parameters, tokenVec[i]);
 						if (!temp.empty()) {
 							tokenVec[i] = temp;
 						}
@@ -3759,7 +3759,7 @@ namespace wiz {
 					}
 					if (last != -1)
 					{
-						string temp = FindLocals(info.locals, wiz::String::substring(tokenVec[i], 0, last));
+						std::string temp = FindLocals(info.locals, wiz::String::substring(tokenVec[i], 0, last));
 
 						if (!temp.empty()) {
 							tokenVec[i] = wiz::String::replace(wiz::String::substring(tokenVec[i], 0, last), wiz::String::substring(tokenVec[i], 0, last), temp)
@@ -3768,7 +3768,7 @@ namespace wiz {
 					}
 					else
 					{
-						string temp = FindLocals(info.locals, tokenVec[i]);
+						std::string temp = FindLocals(info.locals, tokenVec[i]);
 						if (!temp.empty()) {
 							tokenVec[i] = temp;
 						}
@@ -3779,11 +3779,11 @@ namespace wiz {
 			}
 			return result;
 		}
-		string ToBool4(wiz::load_data::UserType* now, wiz::load_data::UserType& global, const string& temp, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+		std::string ToBool4(wiz::load_data::UserType* now, wiz::load_data::UserType& global, const std::string& temp, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 		{ 
-			string result = temp;
+			std::string result = temp;
 			//cout << "temp is " << temp << endl;
-			/*set<string> utNames; // rename?
+			/*set<std::string> utNames; // rename?
 			{ // removal??
 				UserType utTemp;
 				LoadData::LoadDataFromString(result, utTemp);
@@ -3798,7 +3798,7 @@ namespace wiz {
 			}*/
 		//	cout << "result is " << result << endl;
 
-			wiz::ArrayStack<string> resultStack;
+			wiz::ArrayStack<std::string> resultStack;
 			//wiz::load_data::UserType ut;
 			bool chk = false;
 			int count_change = 0;
@@ -3820,7 +3820,7 @@ namespace wiz {
 			}
 			if (result.empty()) { return ""; }
 			if (!flag_A && flag_B) {
-				result = string(result.c_str() + 1, result.size() - 1);
+				result = std::string(result.c_str() + 1, result.size() - 1);
 			}
 			//wiz::load_data::LoadData::LoadDataFromString(result, ut);
 			//result = ut.ToString();
@@ -3833,7 +3833,7 @@ namespace wiz {
 			{
 				if ('/' == result[0] && result.size() > 1)
 				{
-					string temp = Find(&global, result, builder);
+					std::string temp = Find(&global, result, builder);
 
 					if (!temp.empty()) {
 						result = move(temp);
@@ -3841,14 +3841,14 @@ namespace wiz {
 					}
 				}
 				else if (wiz::String::startsWith(result, "$local.")) {
-					string _temp = FindLocals(excuteData.info.locals, result);
+					std::string _temp = FindLocals(excuteData.info.locals, result);
 					if (!_temp.empty()) {
 						result = move(_temp);
 						return result;
 					}
 				}
 				else if (wiz::String::startsWith(result, "$parameter.")) {
-					string _temp = FindParameters(excuteData.info.parameters, result);
+					std::string _temp = FindParameters(excuteData.info.parameters, result);
 					if (!_temp.empty()) {
 						result = move(_temp);
 						return result;
@@ -3857,12 +3857,12 @@ namespace wiz {
 				
 			}
 		
-			vector<string> tokenVec;
+			std::vector<std::string> tokenVec;
 			{
 				wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" }, builder, 1); // , "{", "=", "}" }); //
 				//wiz::StringTokenizer tokenizer2(result, { " ", "\n", "\t", "\r" } ); //
 				
-				//vector<string> tokenVec2;
+				//vector<std::string> tokenVec2;
 
 				tokenVec.reserve(tokenizer.countTokens());
 				while (tokenizer.hasMoreTokens()) {
@@ -3871,23 +3871,23 @@ namespace wiz {
 
 				for (int i = tokenVec.size() - 1; i >= 0; --i)
 				{
-					string before = tokenVec[i];
+					std::string before = tokenVec[i];
 					if ('/' == tokenVec[i][0] && tokenVec[i].size() > 1)
 					{
-						string _temp = Find(&global, tokenVec[i], builder);
+						std::string _temp = Find(&global, tokenVec[i], builder);
 
 						if ("" != _temp) {
 							tokenVec[i] = move(_temp);
 						}
 					}
 					else if (wiz::String::startsWith(tokenVec[i], "$local.")) { // && length?
-						string _temp = FindLocals(excuteData.info.locals, tokenVec[i]);
+						std::string _temp = FindLocals(excuteData.info.locals, tokenVec[i]);
 						if (!_temp.empty()) {
 							tokenVec[i] = move(_temp);
 						}
 					}
 					else if (wiz::String::startsWith(tokenVec[i], "$parameter.")) { // && length?
-						string _temp = FindParameters(excuteData.info.parameters, tokenVec[i]);
+						std::string _temp = FindParameters(excuteData.info.parameters, tokenVec[i]);
 						if (!_temp.empty()) {
 							tokenVec[i] = move(_temp);
 						}
@@ -3919,10 +3919,10 @@ namespace wiz {
 			}
 			//cout << "result is " << result << endl;
 			//
-			wiz::ArrayStack<string> operandStack;
-			wiz::ArrayStack<string> operatorStack; 
+			wiz::ArrayStack<std::string> operandStack;
+			wiz::ArrayStack<std::string> operatorStack; 
 			//wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" }, builder, 1);
-			//vector<string> tokenVec;
+			//vector<std::string> tokenVec;
 
 			//while (tokenizer.hasMoreTokens()) {
 		//		tokenVec.push_back(tokenizer.nextToken());
@@ -3949,7 +3949,7 @@ namespace wiz {
 					if (false == operation(now, global, tokenVec[i], operandStack, excuteData, builder)) // chk!!
 					{
 						// chk removal here?
-						cout << " false " << endl;
+						std::cout << " false " << std::endl;
 						_getch();
 						//
 						operatorStack.pop();
@@ -3968,8 +3968,8 @@ namespace wiz {
 			// =>  A = { B = 1 $C = 3  }  D = E $F = G 
 			// =>  A = { B = 1 $C = { 3 } } D = E  $F = { G } : ToDo!
 
-			vector<string> strVec;
-			stack<int> chkBrace;
+			std::vector<std::string> strVec;
+			std::stack<int> chkBrace;
 
 			chkBrace.push(0);
 
@@ -3979,7 +3979,7 @@ namespace wiz {
 					chkBrace.top()++;
 					if (chkBrace.top() == 2 && !(i + 4 <= operandStack.size() - 1 && operandStack[i+3] == "=" && operandStack[i+4][0] == '$' && operandStack[i+4].size() > 1))
 					{
-						string temp = strVec.back();
+						std::string temp = strVec.back();
 						strVec.pop_back();
 						strVec.pop_back();
 						strVec.push_back(temp);
@@ -4012,7 +4012,7 @@ namespace wiz {
 			//	builder->Append(strVec[i].c_str(), strVec[i].size());
 			//	builder->Append(" ", 1);
 			//}
-			//result = string(builder->Str(), builder->size());
+			//result = std::string(builder->Str(), builder->size());
 			// todo!  $C = 3 => $C = { 3 } 
 			{
 				//StringTokenizer tokenizer(result, builder, 1);
@@ -4021,7 +4021,7 @@ namespace wiz {
 
 				//while (tokenizer.hasMoreTokens()) {
 				for (int i = 0; i < strVec.size(); ++i) {
-					const string temp = strVec[i]; // tokenizer.nextToken();
+					const std::string temp = strVec[i]; // tokenizer.nextToken();
 					/*
 					// chk!! @$paramter - removal? @$. (for regex)??
 					if (temp.size() >= 3 && String::startsWith(temp, "$.")) { // cf) @$. ?
@@ -4043,7 +4043,7 @@ namespace wiz {
 						(temp.size() >= 3 && temp[0] == '@' && temp[1] == '$')) { // chk - removal??
 						++i; // tokenizer.nextToken(); // = 
 						++i;
-						string temp2 = strVec[i]; //tokenizer.nextToken(); // " ~~ "
+						std::string temp2 = strVec[i]; //tokenizer.nextToken(); // " ~~ "
 						//result = result + temp + " = { " + temp2 + " } ";
 
 						builder->Append(temp.c_str() + 1, temp.size());
@@ -4061,7 +4061,7 @@ namespace wiz {
 					}
 				}
 			}
-			result = string(builder->Str(), builder->Size());
+			result = std::string(builder->Str(), builder->Size());
 			if (!result.empty()) {
 				result.erase(result.begin() + result.size() - 1);
 			}
@@ -4086,12 +4086,12 @@ namespace wiz {
 
 			{ // chk.. - removal?
 				for (auto x = excuteData.info.parameters.rbegin(); x != excuteData.info.parameters.rend(); ++x) {
-					string temp;
+					std::string temp;
 					Utility::ChangeStr(result, { "$parameter." + x->first }, { x->second }, temp);
 					result = move(temp);
 				}
 				for (auto x = excuteData.info.locals.rbegin(); x != excuteData.info.locals.rend(); ++x) {
-					string temp;
+					std::string temp;
 					Utility::ChangeStr(result, { "$local." + x->first }, { x->second }, temp);
 					result = move(temp);
 				}

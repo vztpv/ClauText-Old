@@ -11,7 +11,6 @@
 #include <fstream>
 #include <thread>
 #include <algorithm>
-using namespace std;
 
 #include <wiz/cpp_string.h>
 #include <wiz/STRINGBUILDER.H>
@@ -23,7 +22,7 @@ namespace wiz {
 		class Utility
 		{
 		public:
-			static bool IsInteger(string str) {
+			static bool IsInteger(std::string str) {
 				if (str.size() > 2 && str[0] == str.back() && str[0] == '\"') {
 					str = str.substr(1, str.size() - 2);
 				}
@@ -50,7 +49,7 @@ namespace wiz {
 				}
 				return 1 == state; /// chk..
 			}
-			static bool IsNumberInJson(string str)
+			static bool IsNumberInJson(std::string str)
 			{
 				if (str.size() > 2 && str[0] == str.back() && str[0] == '\"') {
 					str = str.substr(1, str.size() - 2);
@@ -118,7 +117,7 @@ namespace wiz {
 				}
 				return 3 == state || 6 == state;
 			}
-			static bool IsDouble(string str) {
+			static bool IsDouble(std::string str) {
 				if (str.size() > 2 && str[0] == str.back() && str[0] == '\"') {
 					str = str.substr(1, str.size() - 2);
 				}
@@ -183,7 +182,7 @@ namespace wiz {
 				}
 				return 3 == state || 6 == state;
 			}
-			static bool IsDate(string str) /// chk!!
+			static bool IsDate(std::string str) /// chk!!
 			{
 				if (str.size() > 2 && str[0] == str.back() && str[0] == '\"') {
 					str = str.substr(1, str.size() - 2);
@@ -231,7 +230,7 @@ namespace wiz {
 				}
 				return 5 == state;
 			}
-			static bool IsDateTimeA(string str) // yyyy.MM.dd.hh
+			static bool IsDateTimeA(std::string str) // yyyy.MM.dd.hh
 			{
 				if (str.size() > 2 && str[0] == str.back() && str[0] == '\"') {
 					str = str.substr(1, str.size() - 2);
@@ -288,7 +287,7 @@ namespace wiz {
 				}
 				return 7 == state;
 			}
-			static bool IsDateTimeB(string str) // yyyy.MM.dd.hh.mm
+			static bool IsDateTimeB(std::string str) // yyyy.MM.dd.hh.mm
 			{
 				if (str.size() > 2 && str[0] == str.back() && str[0] == '\"') {
 					str = str.substr(1, str.size() - 2);
@@ -356,7 +355,7 @@ namespace wiz {
 				}
 				return 9 == state;
 			}
-			static bool IsMinus(string str)
+			static bool IsMinus(std::string str)
 			{
 				if (str.size() > 2 && str[0] == str.back() && str[0] == '\"') {
 					str = str.substr(1, str.size() - 2);
@@ -364,11 +363,11 @@ namespace wiz {
 				return str.empty() == false && str[0] == '-';
 			}
 
-			static string reverse(string str) { /// to std::reverse ?
+			static std::string reverse(std::string str) { /// to std::reverse ?
 				std::reverse(str.begin(), str.end());
 				return str;
 			}
-			static string GetType(string str) {
+			static std::string GetType(std::string str) {
 				if (IsInteger(str)) { return "INTEGER"; }
 				else if (IsDouble(str)) { return "DOUBLE"; }
 				else if (IsDateTimeB(str)) { return "DATETIMEB"; }
@@ -376,7 +375,7 @@ namespace wiz {
 				else if (IsDate(str)) { return "DATE"; }
 				else return "STRING";
 			}
-			static string Compare(string str1, string str2, wiz::StringBuilder* builder, const int type = 0)
+			static std::string Compare(std::string str1, std::string str2, wiz::StringBuilder* builder, const int type = 0)
 			{
 				if (str1.size() > 2 && str1[0] == str1.back() && str1[0] == '\"')
 				{
@@ -387,8 +386,8 @@ namespace wiz {
 					str2 = str2.substr(1, str2.size() - 2);
 				}
 
-				string type1 = GetType(str1);
-				string type2 = GetType(str2);
+				std::string type1 = GetType(str1);
+				std::string type2 = GetType(str2);
 
 				if (type1 != type2) {
 					return "ERROR";
@@ -412,13 +411,13 @@ namespace wiz {
 					const bool minusComp = Utility::IsMinus(str1) && Utility::IsMinus(str2);
 
 					if (false == minusComp) {
-						if (str1[0] == '+') { str1 = string(str1.c_str() + 1); }
-						if (str2[0] == '+') { str2 = string(str2.c_str() + 1); }
+						if (str1[0] == '+') { str1 = std::string(str1.c_str() + 1); }
+						if (str2[0] == '+') { str2 = std::string(str2.c_str() + 1); }
 
-						string x = reverse(str1);
-						string y = reverse(str2);
+						std::string x = reverse(str1);
+						std::string y = reverse(str2);
 
-						
+
 
 						if (x.size() < y.size()) {
 							while (x.size() < y.size()) {
@@ -433,18 +432,18 @@ namespace wiz {
 						return Compare(reverse(x), reverse(y), builder, 1);
 					}
 					else {
-						return Compare(string(str2.c_str() + 1), string(str1.c_str() + 1), builder);
+						return Compare(std::string(str2.c_str() + 1), std::string(str1.c_str() + 1), builder);
 					}
 				}
 				else if ("DOUBLE" == type1)
 				{
-  					StringTokenizer tokenizer1(str1, ".", builder);
+					StringTokenizer tokenizer1(str1, ".", builder);
 					StringTokenizer tokenizer2(str2, ".", builder);
 
-					string x = tokenizer1.nextToken();
-					string y = tokenizer2.nextToken();
+					std::string x = tokenizer1.nextToken();
+					std::string y = tokenizer2.nextToken();
 
-					string z = Compare(x, y, builder);
+					std::string z = Compare(x, y, builder);
 					if ("== 0" == z)
 					{
 						x = tokenizer1.nextToken();
@@ -473,10 +472,10 @@ namespace wiz {
 					StringTokenizer tokenizer2(str2, ".", builder);
 
 					for (int i = 0; i < 3; ++i) {
-						const string x = tokenizer1.nextToken();
-						const string y = tokenizer2.nextToken();
+						const std::string x = tokenizer1.nextToken();
+						const std::string y = tokenizer2.nextToken();
 
-						const string comp = Compare(x, y, builder);
+						const std::string comp = Compare(x, y, builder);
 
 						if (comp == "< 0") { return comp; }
 						else if (comp == "> 0") { return comp; }
@@ -488,10 +487,10 @@ namespace wiz {
 					StringTokenizer tokenizer2(str2, ".", builder);
 
 					for (int i = 0; i < 4; ++i) {
-						const string x = tokenizer1.nextToken();
-						const string y = tokenizer2.nextToken();
+						const std::string x = tokenizer1.nextToken();
+						const std::string y = tokenizer2.nextToken();
 
-						const string comp = Compare(x, y, builder);
+						const std::string comp = Compare(x, y, builder);
 
 						if (comp == "< 0") { return comp; }
 						else if (comp == "> 0") { return comp; }
@@ -503,10 +502,10 @@ namespace wiz {
 					StringTokenizer tokenizer2(str2, ".", builder);
 
 					for (int i = 0; i < 5; ++i) {
-						const string x = tokenizer1.nextToken();
-						const string y = tokenizer2.nextToken();
+						const std::string x = tokenizer1.nextToken();
+						const std::string y = tokenizer2.nextToken();
 
-						const string comp = Compare(x, y, builder);
+						const std::string comp = Compare(x, y, builder);
 
 						if (comp == "< 0") { return comp; }
 						else if (comp == "> 0") { return comp; }
@@ -516,7 +515,7 @@ namespace wiz {
 				return "ERROR";
 			}
 
-			static string BoolOperation(const string& op, const string& x, const string& y)
+			static std::string BoolOperation(const std::string& op, const std::string& x, const std::string& y)
 			{
 				if (x == "ERROR" || y == "ERROR") { return "ERROR"; }
 				if ("NOT" == op) { return x == "TRUE" ? "FALSE" : "TRUE"; }
@@ -548,13 +547,13 @@ namespace wiz {
 				//int strVecStart;
 				//int strVecEnd;
 			public:
-				DoThread(StringBuilder* strVec, ArrayQueue<Token>* aq, const wiz::LoadDataOption& option) //, list<string>* aq)//, int strVecStart, int strVecEnd)
+				DoThread(StringBuilder* strVec, ArrayQueue<Token>* aq, const wiz::LoadDataOption& option) //, list<std::string>* aq)//, int strVecStart, int strVecEnd)
 					: strVec(strVec), aq(aq), option(option) // , strVecStart(strVecStart), strVecEnd(strVecEnd)
 				{
 					//
 				}
 				void operator() () {
-					//string* strVecTemp = strVec; // enterkey 기준으로 나뉘어져있다고 가정한다.
+					//std::string* strVecTemp = strVec; // enterkey 기준으로 나뉘어져있다고 가정한다.
 
 					//for (int x = 0; x <= 0; ++x)
 					{
@@ -566,7 +565,7 @@ namespace wiz {
 						int token_first = 0, token_last = 0; // idx of token in statement.
 						int state = 0;
 
- 						for (int i = 0; i < statement.Size(); ++i) {
+						for (int i = 0; i < statement.Size(); ++i) {
 
 
 							if (0 == state && '\'' == statement[i]) {
@@ -603,16 +602,16 @@ namespace wiz {
 							if (0 == state && -1 != (idx = Equal(option.Removal, statement[i])))
 							{
 								token_last = i - 1;
-								
+
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
 
-									aq->push(Token(string(statement.Str(), token_last - token_first + 1), false));
+									aq->push(Token(std::string(statement.Str(), token_last - token_first + 1), false));
 									statement.LeftShift(i + 1);
-									
+
 									token_first = 0;
 									token_last = 0;
-									
+
 									i = -1;
 								}
 								else {
@@ -627,20 +626,20 @@ namespace wiz {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
-									
- 									aq->push(Token(string(statement.Str(), token_last - token_first + 1), false));
+
+									aq->push(Token(std::string(statement.Str(), token_last - token_first + 1), false));
 									statement.LeftShift(i + 1);
-									
-									aq->push(Token(string("") + option.Assignment[idx], false));
+
+									aq->push(Token(std::string("") + option.Assignment[idx], false));
 									token_first = 0;
 									token_last = 0;
-									
+
 									i = -1;
 								}
 								else {
-									aq->push(Token(string("") + option.Assignment[idx], false));
+									aq->push(Token(std::string("") + option.Assignment[idx], false));
 									statement.LeftShift(1);
-								
+
 									token_first = 0;
 									token_last = 0;
 									i = -1;
@@ -650,14 +649,14 @@ namespace wiz {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
-									
-									aq->push(Token(string(statement.Str(), token_last - token_first + 1), false));
-									
+
+									aq->push(Token(std::string(statement.Str(), token_last - token_first + 1), false));
+
 									statement.LeftShift(i + 1);
-									
+
 									token_first = 0;
 									token_last = 0;
-									
+
 									i = -1;
 								}
 								else
@@ -672,18 +671,18 @@ namespace wiz {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
-									
-									aq->push(Token(string(statement.Str(), token_last - token_first + 1), false));
+
+									aq->push(Token(std::string(statement.Str(), token_last - token_first + 1), false));
 									statement.LeftShift(i + 1);
 
-									aq->push(Token(string("") + option.Left[idx], false));
+									aq->push(Token(std::string("") + option.Left[idx], false));
 									token_first = 0;
 									token_last = 0;
-									
+
 									i = -1;
 								}
 								else {
-									aq->push(Token(string("") + option.Left[idx], false));
+									aq->push(Token(std::string("") + option.Left[idx], false));
 									statement.LeftShift(1);
 									token_first = 0;
 									token_last = 0;
@@ -694,20 +693,20 @@ namespace wiz {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
-									
 
-									aq->push(Token(string(statement.Str(), token_last - token_first + 1), false));
+
+									aq->push(Token(std::string(statement.Str(), token_last - token_first + 1), false));
 									statement.LeftShift(i + 1);
 
-									aq->push(Token(string("") + option.Right[idx], false));
+									aq->push(Token(std::string("") + option.Right[idx], false));
 
 									token_first = 0;
 									token_last = 0;
-									
+
 									i = -1;
 								}
 								else {
-									aq->push(Token(string("") + option.Right[idx], false));
+									aq->push(Token(std::string("") + option.Right[idx], false));
 
 									statement.LeftShift(1);
 									token_first = 0;
@@ -720,7 +719,7 @@ namespace wiz {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
-									aq->push(Token(string(statement.Str(), token_last - token_first + 1), false));
+									aq->push(Token(std::string(statement.Str(), token_last - token_first + 1), false));
 									statement.LeftShift(i + 1);
 									i = 0;
 								}
@@ -735,20 +734,20 @@ namespace wiz {
 
 								if (j - i + 1 > 0) {
 									statement.Divide(j + 1);
-									
-									aq->push(Token(string(statement.Str(), j - i + 1), true));
+
+									aq->push(Token(std::string(statement.Str(), j - i + 1), true));
 									statement.LeftShift(j + 2);
 
 									token_first = 0;
 									token_last = 0;
-									
+
 									i = -1;
 								}
 								else {
 									statement.LeftShift(j + 2);
 									token_first = 0;
 									token_last = 0;
-									
+
 									i = -1;
 								}
 							}
@@ -756,7 +755,7 @@ namespace wiz {
 
 						if (token_first < statement.Size())
 						{
-							aq->push(Token(string(statement.Str(), statement.Size()-1 - token_first + 1), false));
+							aq->push(Token(std::string(statement.Str(), statement.Size() - 1 - token_first + 1), false));
 						}
 					}
 				}
@@ -771,10 +770,10 @@ namespace wiz {
 				//}
 			};
 		public:
-			static bool Reserve3(ifstream& inFile, StringBuilder& strVecTemp, const int min_num = 1)
+			static bool Reserve3(std::ifstream& inFile, StringBuilder& strVecTemp, const int min_num = 1)
 			{
 				int count = 0;
-				string temp;
+				std::string temp;
 				int brace = 0;
 				int i = 0;
 
@@ -810,33 +809,33 @@ namespace wiz {
 				return count > 0 && 0 == brace;
 			}
 
-			static pair<bool, int> Reserve2(ifstream& inFile, ArrayQueue<Token>& aq, const int num, const wiz::LoadDataOption& option)
+			static std::pair<bool, int> Reserve2(std::ifstream& inFile, ArrayQueue<Token>& aq, const int num, const wiz::LoadDataOption& option)
 			{
 				int count = 0;
-				string temp;
-				wiz::StringBuilder builder(128 * num);				//vector<string> strVecTemp;
+				std::string temp;
+				wiz::StringBuilder builder(128 * num);				//vector<std::string> strVecTemp;
 
-				for (int i = 0; i < num && (getline(inFile, temp)); ++i) {
+				for (int i = 0; i < num && (std::getline(inFile, temp)); ++i) {
 					if (temp.empty()) { continue; }
 					builder.Append(temp.c_str(), temp.size());
 					builder.AppendChar('\n');
 					count++;
 				}
-				
+
 				DoThread doThread(&builder, &aq, option);
-				
+
 				doThread(); // (0, count - 1);
-				
+
 				//tbb::parallel_reduce(tbb::blocked_range<size_t>(0, count), doThread);
 				//aq.push(std::move(doThread.aq));
-				
+
 				return{ count > 0, count };
 			}
 
 			/// must lineNum > 0
-			static pair<bool, int> Reserve(ifstream& inFile, list<string>& strVec, const int num = 1)
+			static std::pair<bool, int> Reserve(std::ifstream& inFile, std::list<std::string>& strVec, const int num = 1)
 			{
-				string temp;
+				std::string temp;
 				int count = 0;
 
 				for (int i = 0; i < num && (inFile >> temp); ++i) {
@@ -863,12 +862,12 @@ namespace wiz {
 						}
 					}
 				}
-				
+
 				auto x = strVec.begin();
 				int count = 0;
 
 				do {
- 					if (x.ptr->isComment) {
+					if (x.ptr->isComment) {
 						ut->PushComment((std::move(x.ptr->str)));
 						x = strVec.erase(x);
 					}
@@ -901,18 +900,18 @@ namespace wiz {
 			}
 		public:
 			template<class Reserver>
-			static string Top(ArrayQueue<Token>& strVec, wiz::load_data::UserType* ut, Reserver reserver, const wiz::LoadDataOption& option)
+			static std::string_view Top(ArrayQueue<Token>& strVec, wiz::load_data::UserType* ut, Reserver reserver, const wiz::LoadDataOption& option)
 			{
 				if (strVec.empty() || strVec[0].isComment) {
- 					if (false == ChkComment(strVec, ut, reserver, 1, option)) {
- 						return string();
+					if (false == ChkComment(strVec, ut, reserver, 1, option)) {
+						return std::string_view();
 					}
 				}
-				if (strVec.empty()) { return string(); }
+				if (strVec.empty()) { return std::string_view(); }
 				return strVec[0].str;
 			}
 			template <class Reserver>
-			static bool Pop(ArrayQueue<Token>& strVec, string* str, wiz::load_data::UserType* ut, Reserver reserver, const wiz::LoadDataOption& option)
+			static bool Pop(ArrayQueue<Token>& strVec, std::string* str, wiz::load_data::UserType* ut, Reserver reserver, const wiz::LoadDataOption& option)
 			{
 				if (strVec.empty() || strVec[0].isComment) {
 					if (false == ChkComment(strVec, ut, reserver, 1, option)) {
@@ -937,29 +936,29 @@ namespace wiz {
 
 				return true;
 			}
-		
+
 			// lookup just one!
-			template <class Reserver> 
-			static pair<bool, Token> LookUp(ArrayQueue<Token>& strVec, wiz::load_data::UserType* ut, Reserver reserver, const wiz::LoadDataOption& option)
+			template <class Reserver>
+			static std::pair<bool, std::string_view> LookUp(ArrayQueue<Token>& strVec, wiz::load_data::UserType* ut, Reserver reserver, const wiz::LoadDataOption& option)
 			{
 				if (!(strVec.size() >= 2 && false == strVec[0].isComment && false == strVec[1].isComment)) {
 					if (false == ChkComment(strVec, ut, reserver, 2, option)) {
-						return{ false, Token{"", false} };
+						return{ false, "" };
 					}
 				}
-
+			
 				if (strVec.size() >= 2) {
-					return{ true, strVec[1] };
+					return{ true, strVec[1].str };
 				}
-				return{ false, Token{"", false} };
+				return{ false, "" };
 			}
 		public:
 			//
-			static bool ChkExist(const string& str) // for \"
+			static bool ChkExist(const std::string& str) // for \"
 			{
 				int state = -1;
 
-				for (string::size_type i = 0; i < str.size(); ++i)
+				for (std::string::size_type i = 0; i < str.size(); ++i)
 				{
 					if (0 >= state && i == 0 && '\"' == str[i]) {
 						state = 1;
@@ -977,10 +976,10 @@ namespace wiz {
 				}
 
 				return 0 == state; // exist and valid !! chk - todo!
-			} 
+			}
 
-			// AddSpace : return string
-			static void AddSpace(const string& str, string& temp)
+			// AddSpace : return std::string
+			static void AddSpace(const std::string& str, std::string& temp)
 			{
 				temp = "";
 
@@ -1011,7 +1010,7 @@ namespace wiz {
 			}
 
 			/// need testing!
-			static void PassSharp(const string& str, string& temp) { // txt file로 들어온다?
+			static void PassSharp(const std::string& str, std::string& temp) { // txt file로 들어온다?
 				temp = "";
 				int state = 0;
 
@@ -1026,8 +1025,8 @@ namespace wiz {
 				//return temp;
 			}
 
-			static bool _ChangeStr(const string& str, const vector<string>& changed_str, const vector<string>& result_str, string::size_type& i, int& state, string& temp) {
-				for (string::size_type j = 0; j < changed_str.size(); ++j) {
+			static bool _ChangeStr(const std::string& str, const std::vector<std::string>& changed_str, const std::vector<std::string>& result_str, std::string::size_type& i, int& state, std::string& temp) {
+				for (std::string::size_type j = 0; j < changed_str.size(); ++j) {
 					if (wiz::String::Comp(changed_str[j].c_str(), str.c_str() + i, changed_str[j].size())) {
 						state = 1;
 						temp.append(result_str[j]);
@@ -1038,12 +1037,12 @@ namespace wiz {
 				return false;
 			}
 			// 길이가 긴 문자열이 먼저 나와야 한다?
-			static void ChangeStr(const string& str, const vector<string>& changed_str, const vector<string>& result_str, string& temp) {
+			static void ChangeStr(const std::string& str, const std::vector<std::string>& changed_str, const std::vector<std::string>& result_str, std::string& temp) {
 				temp = "";
 				int state = 0;
 
 
-				for (string::size_type i = 0; i < str.size(); ++i)
+				for (std::string::size_type i = 0; i < str.size(); ++i)
 				{
 					if (0 == state && i == 0 && '\"' == str[i]) {
 						state = 1;

@@ -8,12 +8,11 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-using namespace std;
 
 namespace wiz{
     class String{
     public:
-        static int find( const string& str, const string& dilim, const int start_index )
+        static int find( const std::string& str, const std::string& dilim, const int start_index )
         {
             if( str.empty() || dilim.empty() ) { return -1; }
 
@@ -37,7 +36,7 @@ namespace wiz{
             }
             return true;
         }
-        static bool Comp( const string& str1, const string& str2, const int n ) /// isSameData
+        static bool Comp( const std::string& str1, const std::string& str2, const int n ) /// isSameData
         {
             for( int i=0; i < n; i++ )
             {
@@ -45,13 +44,13 @@ namespace wiz{
             }
             return true;
         }
-        static string replace( const string& str, const string& str1, const string& str2 )
+        static std::string replace( const std::string& str, const std::string& str1, const std::string& str2 )
         {
             if( str1.empty() ) { return str; }
 
             // if str1 is empty, then infinite loop.
             const char* pStr = str.c_str();
-            string result;
+            std::string result;
 
             for( int i=0; i < str.size(); i++ ) {
                 if( strlen( pStr+i ) >= str1.size()
@@ -68,12 +67,12 @@ namespace wiz{
 
             return result;
         }
-        static string remove( const string& str, const string& str1 )
+        static std::string remove( const std::string& str, const std::string& str1 )
         {
-            return replace( str, str1, string("") );
+            return replace( str, str1, std::string("") );
         }
         //start index
-        static int indexOf( const string& str, const char ch )
+        static int indexOf( const std::string& str, const char ch )
         {
             for( int i=0; i < str.size(); i++ )
             {
@@ -82,22 +81,22 @@ namespace wiz{
             return -1;
         }
 		// chk..
-		static std::pair< bool, size_t > indexOf(const string& str, const string& str1, const int fromIndex)
+		static std::pair< bool, size_t > indexOf(const std::string& str, const std::string& str1, const int fromIndex)
         {
 			if (str1.empty()) { return{ false, 0 }; }
 			auto idx = str.find(str1, fromIndex);
 			if (idx == std::string::npos) { return{ false, 0 }; }
 			return{ true, idx };
         }
-        static auto indexOf(const string& str, const string& str1 )
+        static auto indexOf(const std::string& str, const std::string& str1 )
         {
             return indexOf( str, str1, 0 );
         }
         /// chk....
-        static vector<string> split( const string& str, const string& filter )
+        static std::vector<std::string> split( const std::string& str, const std::string& filter )
         {
             if( filter.empty()) {
-                vector<string> result;
+                std::vector<std::string> result;
                 if( !str.empty() ) {
                     result.push_back( str );
                 }
@@ -108,7 +107,7 @@ namespace wiz{
             /// .www.naver.com. -> www, naver, com!!
             const char* pStr = str.c_str();
             char* pTemp = new char[str.size()+1];
-            vector<string> result;
+            std::vector<std::string> result;
 
             strcpy( pTemp, str.c_str() );
 
@@ -128,7 +127,7 @@ namespace wiz{
             {
                 if( pTemp[i] != '\0' )
                 {
-                    result.push_back( string( pTemp+i ) );
+                    result.push_back( std::string( pTemp+i ) );
                     i = i + strlen( pTemp+i ) - 1;
                 }
             }
@@ -137,20 +136,20 @@ namespace wiz{
             delete[] pTemp;
             return result;
         }
-        static string substring( const string& str, const int start, const int last )
+        static std::string substring( const std::string& str, const int start, const int last )
         {
 			return str.substr(start, last - start + 1);
         }
-        static string substring( const string& str, const int start )
+        static std::string substring( const std::string& str, const int start )
         {
             return substring( str, start, str.size()-1 );
         }
-        static bool startsWith( const string& str, const string& start )
+        static bool startsWith( const std::string& str, const std::string& start )
         {
             if( str.size() < start.size() ) { return false; }
             return Comp( str.c_str(), start.c_str(), start.size() );
         }
-        static bool endsWith( const string& str, const string& last )
+        static bool endsWith( const std::string& str, const std::string& last )
         {
             if( str.size() < last.size() ) { return false; }
             if( last.empty() ) { return true; } /// chk... return false; 
@@ -161,13 +160,13 @@ namespace wiz{
 	class StringTokenizer
 	{
 	private:
-		vector<string> _m_str;
+		std::vector<std::string> _m_str;
 		int count;
 		bool exist;
-		static const vector<string> whitespaces;
+		static const std::vector<std::string> whitespaces;
 		int option;
 	private:
-		void Init(const string& str, const vector<string>& separator, StringBuilder* builder) // assumtion : separators are sorted by length?, long -> short
+		void Init(const std::string& str, const std::vector<std::string>& separator, StringBuilder* builder) // assumtion : separators are sorted by length?, long -> short
 		{
 			const int str_size = str.size();
 			if (separator.empty() || str.empty()) { return; } // if str.empty() == false then _m_str.push_back(str); // ?
@@ -284,23 +283,23 @@ namespace wiz{
 		}
 	public:
 		explicit StringTokenizer() : count(0), exist(false), option(0) { }
-		explicit StringTokenizer(const string& str, const string& separator, StringBuilder* builder, int option = 0)
+		explicit StringTokenizer(const std::string& str, const std::string& separator, StringBuilder* builder, int option = 0)
 			: count(0), exist(false), option(option)
 		{
-			vector<string> vec; vec.push_back(separator);
+			std::vector<std::string> vec; vec.push_back(separator);
 			Init(str, vec, builder);
 		}
-		explicit StringTokenizer(const string& str, const vector<string>& separator, StringBuilder* builder, int option = 0)
+		explicit StringTokenizer(const std::string& str, const std::vector<std::string>& separator, StringBuilder* builder, int option = 0)
 			: count(0), exist(false), option(option)
 		{
 			Init(str, separator, builder);
 		}
-		explicit StringTokenizer(const string& str, StringBuilder* builder, int option = 0)
+		explicit StringTokenizer(const std::string& str, StringBuilder* builder, int option = 0)
 			: count(0), exist(false), option(option)
 		{
 			Init(str, whitespaces, builder);
 		}
-		explicit StringTokenizer(string&& str, StringBuilder* builder, int option = 0)
+		explicit StringTokenizer(std::string&& str, StringBuilder* builder, int option = 0)
 			: count(0), exist(false), option(option)
 		{
 			Init(std::move(str), whitespaces, builder);
@@ -309,7 +308,7 @@ namespace wiz{
 		{
 			return _m_str.size();
 		}
-		string nextToken()
+		std::string nextToken()
 		{
 			if (hasMoreTokens())
 				return _m_str[count++];
@@ -327,18 +326,18 @@ namespace wiz{
 		}
 
 	};
-	const vector<string> StringTokenizer::whitespaces = { " ", "\t", "\r", "\n" };
+	const std::vector<std::string> StringTokenizer::whitespaces = { " ", "\t", "\r", "\n" };
 /*
 	class StringTokenizer
 	{
 	private:
-		vector<string> _m_str;
+		std::vector<std::string> _m_str;
 		int count;
 		bool exist;
-		static const vector<string> whitespaces;
+		static const std::vector<std::string> whitespaces;
 		int option;
 	private:
-		void Init(string str, const vector<string>& separator) // assumtion : separators are sorted by length?, long -> short
+		void Init(std::string str, const std::vector<std::string>& separator) // assumtion : separators are sorted by length?, long -> short
 		{
 			if (separator.empty() || str.empty()) { return; } // if str.empty() == false then _m_str.push_back(str); // ?
 
@@ -395,7 +394,7 @@ namespace wiz{
 					this->exist = true;
 
 					if (right-1 - left + 1 > 0) {
-						_m_str.push_back(String::substring(str, left, right-1));
+						_m_str.push_back(String::substd::string(str, left, right-1));
 					}
 					i = i + separator[_select].size() - 1;
 					left = i + 1;
@@ -403,7 +402,7 @@ namespace wiz{
 				}
 				else if (!pass && i == str.size() - 1) {
 					if (right - left + 1 > 0) {
-						_m_str.push_back(String::substring(str, left, right));
+						_m_str.push_back(String::substd::string(str, left, right));
 					}
 				}
 			}
@@ -412,23 +411,23 @@ namespace wiz{
 		
 	public:
 		explicit StringTokenizer() : count(0), exist(false), option(0) { }
-		explicit StringTokenizer(const string& str, const string& separator, int option=0)
+		explicit StringTokenizer(const std::string& str, const std::string& separator, int option=0)
 			: count(0), exist(false), option(option)
 		{
-			vector<string> vec; vec.push_back(separator);
+			std::vector<std::string> vec; vec.push_back(separator);
 			Init(str, vec);
 		}
-		explicit StringTokenizer(const string& str, const vector<string>& separator, int option = 0)
+		explicit StringTokenizer(const std::string& str, const std::vector<std::string>& separator, int option = 0)
 			: count(0), exist(false), option(option)
 		{
 			Init(str, separator);
 		}
-		explicit StringTokenizer(const string& str, int option = 0)
+		explicit StringTokenizer(const std::string& str, int option = 0)
 			: count(0), exist(false), option(option)
 		{
 			Init(str, whitespaces);
 		}
-		explicit StringTokenizer(string&& str, int option = 0)
+		explicit StringTokenizer(std::string&& str, int option = 0)
 			: count(0), exist(false), option(option)
 		{
 			Init(std::move(str), whitespaces);
@@ -437,7 +436,7 @@ namespace wiz{
 		{
 			return _m_str.size();
 		}
-		string nextToken()
+		std::string nextToken()
 		{
 			if (hasMoreTokens())
 				return _m_str[count++];
@@ -455,7 +454,7 @@ namespace wiz{
 		}
 
 	};
-	const vector<string> StringTokenizer::whitespaces = { " ", "\t", "\r", "\n" };
+	const std::vector<std::string> StringTokenizer::whitespaces = { " ", "\t", "\r", "\n" };
 	*/
 }
 #endif // CPP_STRING_H_INCLUDED

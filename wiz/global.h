@@ -6,7 +6,7 @@
 #include <sstream>
 #include <utility>
 #include <type_traits> /// for is_class, ...
-using namespace std;
+
 
 ///
 /// GLOBAL_DEBUG
@@ -162,7 +162,7 @@ namespace wiz{
     /// PASC_PEE, PDSC_PEE, PNOT_EE, PEE_SAME_VALUE, PNOT_EE_SAME_VALUE
     /// LEFT_HAS_SMALL_VALUE, LEFT_HAS_LARGE_VALUE, PLEFT_HAS_SMALL_VALUE, PLEFT_HAS_LARGE_VALUE
 	template <typename T> /// T <- char, int, long, long long...
-	string toStr(const T x, const int base); /// chk!!
+	std::string toStr(const T x, const int base); /// chk!!
 
 	template <class T, class COMP = ASC<T>, class COMP2 = ASC<int>, class EE = EQ<T> > /// 쒖꽌 諛붽씀湲 - 2015.07.18
 	class WrapForInfinity
@@ -268,7 +268,7 @@ namespace wiz{
 				throw string(" - Error in wrapforinfiinity");
 			}
 		}
-		string toString()const
+		std::string toString()const
 		{
 			if (this->op == MIF) return "minus infinity";
 			else if (this->op == IF) return "plus infinity";
@@ -276,7 +276,7 @@ namespace wiz{
 		}
 
 		friend
-        ostream& operator<<(ostream& stream, const WrapForInfinity<T,COMP,COMP2,EE>& wfi)
+			std::ostream& operator<<(std::ostream& stream, const WrapForInfinity<T,COMP,COMP2,EE>& wfi)
 		{
 		    if( wfi.op == MIF ) stream << "minus infinity";
             else if(wfi.op == IF ) stream << "plus infinity";
@@ -302,14 +302,14 @@ namespace wiz{
 		// -( x - ( (x/10) * 10 ) )
 	}
 	template <typename T> /// T <- char, int, long, long long...
-	string toStr(const T x, const int base=10 ) /// chk!!
+	std::string toStr(const T x, const int base=10 ) /// chk!!
 	{
 		if( base < 2 || base > 16 ) { return "base is not valid"; }
 		T i = x;
 
 		const int INT_SIZE = sizeof(T) << 3; ///*8
 		char* temp = new char[INT_SIZE + 1 + 1]; /// 1 NULL, 1 minus
-		string tempString;
+		std::string tempString;
 		int k;
 		bool isMinus = (i < 0);
 		temp[INT_SIZE+1] = '\0'; ///臾몄옄쒖떆..
@@ -330,10 +330,10 @@ namespace wiz{
 
 		if (isMinus){
 			temp[k] = '-';
-			tempString = string(temp + k);//
+			tempString = std::string(temp + k);//
 		}
 		else{
-			tempString = string(temp + k + 1); //
+			tempString = std::string(temp + k + 1); //
 		}
 		delete[] temp;
 
@@ -342,7 +342,7 @@ namespace wiz{
 
     /// chk.... need more thinking..., ToDo...
 	template <typename T> /// T <- char, int, long, long long...
-    string toStr2(const T x, const int str_space, const int base=10 ) /// chk!!
+	std::string toStr2(const T x, const int str_space, const int base=10 ) /// chk!!
 	{
 	    if( base < 2 || base > 16 ) { return "base is not valid"; }
 		T i = x;
@@ -351,7 +351,7 @@ namespace wiz{
 		const int INT_SIZE = sizeof(T) << 3; ///*8
 		char* temp = new char[INT_SIZE + 1 + 1]; /// 1 NULL, 1 minus
 		for(int i=0; i < INT_SIZE+2; ++i ) { temp[i] = '0'; }//
-		string tempString;
+		std::string tempString;
 		int k;
 		bool isMinus = (i < 0);
 		temp[INT_SIZE+1] = '\0'; ///臾몄옄쒖떆..
@@ -372,7 +372,7 @@ namespace wiz{
 
 		if (isMinus){
 			temp[k] = '-';
-			tempString = string(temp + k);//
+			tempString = std::string(temp + k);//
 		}
 		else{
             if( INT_SIZE+1 - (k+1) +1 < str_space+1 )
@@ -383,36 +383,36 @@ namespace wiz{
             {
                 k2 = 0;
             }
-			tempString = string(temp + k + 1 - k2 ); //
+			tempString = std::string(temp + k + 1 - k2 ); //
 		}
 		delete[] temp;
 
 		return tempString;
 	}
 
-	inline string str(const int x)
+	inline std::string str(const int x)
 	{
 		return toStr<int>(x);
 	}
 
 	template <typename T> /// 몄텧좊븣 뚯븘泥댄겕쒕떎
-	inline string _toString(const T x)
+	inline std::string _toString(const T x)
 	{
 		std::stringstream strs;
 		strs << x;
 		return strs.str();
 	}
 	template <>
-	inline string _toString(const long double x)
+	inline std::string _toString(const long double x)
 	{
 		std::stringstream strs;
-		strs << fixed << x;
-		string temp = strs.str();
-		size_t idx = temp.find('.');
+		strs << std::fixed << x;
+		std::string temp = strs.str();
+		std::size_t idx = temp.find('.');
 		if (idx == temp.size()-1) {
 			temp.push_back('0');
 		}
-		else if (idx == string::npos) {
+		else if (idx == std::string::npos) {
 			temp.push_back('.');
 			temp.push_back('0');
 		}
@@ -420,17 +420,17 @@ namespace wiz{
 	}
 
 	template <>
-	inline string _toString(const long long x)
+	inline std::string _toString(const long long x)
 	{
 		return toStr(x);
 	}
 	template <>
-	inline string _toString(const int x)
+	inline std::string _toString(const int x)
 	{
 		return str(x);
 	}
     template <>
-	inline string _toString(const bool x)
+	inline std::string _toString(const bool x)
 	{
 		if (x) { return "true"; }
 		return "false";
@@ -483,9 +483,9 @@ namespace wiz{
         {
             return Unsigned_Maximum<T>();
         }
-        throw string( "unsupport type : double, class, and etc..." );
+        throw std::string( "unsupport type : double, class, and etc..." );
     }
-	inline int getFirstIndex(const string& str, const char ch)
+	inline int getFirstIndex(const std::string& str, const char ch)
 	{
 		for (int i = 0; i < str.size(); ++i)
 		{
