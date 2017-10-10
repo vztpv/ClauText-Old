@@ -853,6 +853,10 @@ void MStyleTest(wiz::load_data::UserType* pUt)
 
 std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* _global, const ExcuteData& excuteData, int chk)
 {
+
+	std::map<std::string, std::pair<std::vector<std::string>, bool>> _map; // todo - fixed max size? and rename
+	
+	//
 	wiz::load_data::UserType& global = *_global;
 	std::vector<std::thread*> waits;
 	std::map<std::string, wiz::load_data::UserType> objectMap; // std::string -> wiz::load_data::UserType
@@ -3232,7 +3236,18 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					_excuteData.pModule = moduleMapPtr;
 
 					std::string temp = val->GetUserTypeList(0)->ToString();
-					temp = ToBool4(nullptr, global, temp, _excuteData, &builder);
+					
+					std::pair<std::vector<std::string>, bool> x;
+					if (_map.end() == _map.find(temp)) {
+						x = ToBool4_A(nullptr, global, temp, _excuteData, &builder);
+						_map.insert(std::make_pair(temp, x));
+					}
+					else {
+						x = _map[temp];
+					}
+
+					temp = ToBool4_B(nullptr, global, x.first, _excuteData, &builder);
+
 
 					if (!eventStack.top().conditionStack.empty())
 					{

@@ -3708,7 +3708,7 @@ namespace wiz {
 		}
 
 		std::string ToBool3(wiz::load_data::UserType& global, const std::map<std::string, std::string>& parameters, const std::string& temp,
-			 EventInfo info, StringBuilder* builder) /// has bug!
+			 const EventInfo& info, StringBuilder* builder) /// has bug!
 		{
 			wiz::StringTokenizer tokenizer(temp, std::vector<std::string>{ "/" }, builder, 1);
 			std::vector<std::string> tokenVec;
@@ -3736,7 +3736,7 @@ namespace wiz {
 						std::string temp = FindParameters(parameters, wiz::String::substring(tokenVec[i], 0, last));
 
 						if (!temp.empty()) {
-							tokenVec[i] = wiz::String::replace(wiz::String::substring(tokenVec[i], 0, last), wiz::String::substring(tokenVec[i], 0, last), temp)
+							tokenVec[i] = wiz::String::replace(wiz::String::substring(tokenVec[i], 0, last), wiz::String::substring(tokenVec[i], 0, last), std::move(temp))
 								+ wiz::String::substring(tokenVec[i], last + 1);
 						}
 					}
@@ -3744,7 +3744,7 @@ namespace wiz {
 					{
 						std::string temp = FindParameters(parameters, tokenVec[i]);
 						if (!temp.empty()) {
-							tokenVec[i] = temp;
+							tokenVec[i] = std::move(temp);
 						}
 					}
 				}
@@ -3762,7 +3762,7 @@ namespace wiz {
 						std::string temp = FindLocals(info.locals, wiz::String::substring(tokenVec[i], 0, last));
 
 						if (!temp.empty()) {
-							tokenVec[i] = wiz::String::replace(wiz::String::substring(tokenVec[i], 0, last), wiz::String::substring(tokenVec[i], 0, last), temp)
+							tokenVec[i] = wiz::String::replace(wiz::String::substring(tokenVec[i], 0, last), wiz::String::substring(tokenVec[i], 0, last), std::move(temp))
 								+ wiz::String::substring(tokenVec[i], last + 1);
 						}
 					}
@@ -3770,15 +3770,292 @@ namespace wiz {
 					{
 						std::string temp = FindLocals(info.locals, tokenVec[i]);
 						if (!temp.empty()) {
-							tokenVec[i] = temp;
+							tokenVec[i] = std::move(temp);
 						}
 					}
 				}
 
-				result += tokenVec[i];
+				result += std::move(tokenVec[i]);
 			}
 			return result;
 		}
+		std::string ToBool3(wiz::load_data::UserType& global, const std::map<std::string, std::string>& parameters, std::string&& temp,
+			const EventInfo& info, StringBuilder* builder) /// has bug!
+		{
+			wiz::StringTokenizer tokenizer(std::move(temp), std::vector<std::string>{ "/" }, builder, 1);
+			std::vector<std::string> tokenVec;
+			std::string result;
+
+			tokenVec.reserve(tokenizer.countTokens());
+			while (tokenizer.hasMoreTokens()) {
+				tokenVec.push_back(tokenizer.nextToken());
+			}
+
+			for (int i = 0; i < tokenVec.size(); ++i)
+			{
+				result += "/";
+				if (wiz::String::startsWith(tokenVec[i], "$parameter.")) {
+					int last = -1;
+					for (int j = 0; j < tokenVec[i].size(); ++j)
+					{
+						if (wiz::isWhitespace(tokenVec[i][j]) || tokenVec[i][j] == '{' || tokenVec[i][j] == '}' || tokenVec[i][j] == '=') {
+							last = j - 1;
+							break;
+						}
+					}
+					if (last != -1)
+					{
+						std::string temp = FindParameters(parameters, wiz::String::substring(tokenVec[i], 0, last));
+
+						if (!temp.empty()) {
+							tokenVec[i] = wiz::String::replace(wiz::String::substring(tokenVec[i], 0, last), wiz::String::substring(tokenVec[i], 0, last), std::move(temp))
+								+ wiz::String::substring(tokenVec[i], last + 1);
+						}
+					}
+					else
+					{
+						std::string temp = FindParameters(parameters, tokenVec[i]);
+						if (!temp.empty()) {
+							tokenVec[i] = std::move(temp);
+						}
+					}
+				}
+				else if (wiz::String::startsWith(tokenVec[i], "$local.")) {
+					int last = -1;
+					for (int j = 0; j < tokenVec[i].size(); ++j)
+					{
+						if (wiz::isWhitespace(tokenVec[i][j]) || tokenVec[i][j] == '{' || tokenVec[i][j] == '}' || tokenVec[i][j] == '=') {
+							last = j - 1;
+							break;
+						}
+					}
+					if (last != -1)
+					{
+						std::string temp = FindLocals(info.locals, wiz::String::substring(tokenVec[i], 0, last));
+
+						if (!temp.empty()) {
+							tokenVec[i] = wiz::String::replace(wiz::String::substring(tokenVec[i], 0, last), wiz::String::substring(tokenVec[i], 0, last), std::move(temp))
+								+ wiz::String::substring(tokenVec[i], last + 1);
+						}
+					}
+					else
+					{
+						std::string temp = FindLocals(info.locals, tokenVec[i]);
+						if (!temp.empty()) {
+							tokenVec[i] = std::move(temp);
+						}
+					}
+				}
+
+				result += std::move(tokenVec[i]);
+			}
+			return result;
+		}
+		std::pair<std::vector<std::string>, bool> ToBool4_A(wiz::load_data::UserType* now, wiz::load_data::UserType& global, const std::string& temp, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+		{
+			std::vector<std::string> return_value;
+			std::string result = temp;
+			
+			//	cout << "result is " << result << endl;
+			bool flag_A = false;
+			if (result.size() > 1 && result[0] == '/')
+			{
+				flag_A = true;
+			}
+
+			wiz::ArrayStack<std::string> resultStack;
+
+			std::vector<std::string> tokenVec;
+			{
+				wiz::StringTokenizer tokenizer(std::move(result), { " ", "\n", "\t", "\r" }, builder, 1); // , "{", "=", "}" }); //
+																										  //wiz::StringTokenizer tokenizer2(result, { " ", "\n", "\t", "\r" } ); //
+
+																										  //vector<std::string> tokenVec2;
+
+				tokenVec.reserve(tokenizer.countTokens());
+				while (tokenizer.hasMoreTokens()) {
+					tokenVec.push_back(tokenizer.nextToken());
+				}
+			}
+			return { tokenVec, flag_A };
+		}
+		std::string ToBool4_B(wiz::load_data::UserType* now, wiz::load_data::UserType& global,  std::vector<std::string> tokenVec, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+		{
+			
+			bool chk = false;
+			int count_change = 0;
+
+			for (int i = 0; i < tokenVec.size(); ++i) {
+				std::string result = tokenVec[i];
+				bool flag_A = false;
+				if (result.size() > 1 && result[0] == '/')
+				{
+					flag_A = true;
+				}
+
+				bool flag_B = false;
+				for (int j = 0; j < result.size(); ++j) {
+					if (result[j] == '/') {
+						flag_B = true;
+						break;
+					}
+				}
+				if (flag_B) {
+					result = ToBool3(global, excuteData.info.parameters, std::move(result), excuteData.info, builder);
+				}
+				if (result.empty()) {
+					//tokenVec.erase(tokenVec.begin() + i);
+					//i--;
+					continue;
+				}
+				if (!flag_A && flag_B) {
+					result = std::string(result.c_str() + 1, result.size() - 1);
+				}
+
+				{
+					if ('/' == result[0] && result.size() > 1)
+					{
+						std::string _temp = Find(&global, result, builder);
+
+						if ("" != _temp) {
+							result = std::move(_temp);
+						}
+					}
+					else if (wiz::String::startsWith(result, "$local.")) { // && length?
+						std::string _temp = FindLocals(excuteData.info.locals, result);
+						if (!_temp.empty()) {
+							result = std::move(_temp);
+						}
+					}
+					else if (wiz::String::startsWith(result, "$parameter.")) { // && length?
+						std::string _temp = FindParameters(excuteData.info.parameters, result);
+						if (!_temp.empty()) {
+							result = std::move(_temp);
+						}
+					}
+				}
+
+				tokenVec[i] = result;
+			}
+
+			if (tokenVec.empty()) {
+				return "";
+			}
+			if (1 == tokenVec.size())
+			{
+				return tokenVec[0];
+			}
+
+			std::string result;
+			//
+			wiz::ArrayStack<std::string> operandStack;
+			wiz::ArrayStack<std::string> operatorStack;
+			//wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" }, builder, 1);
+			//vector<std::string> tokenVec;
+
+			//while (tokenizer.hasMoreTokens()) {
+			//		tokenVec.push_back(tokenizer.nextToken());
+			//}
+
+			for (int i = tokenVec.size() - 1; i >= 0; --i) {
+				// todo - chk first? functions in Event
+				if (String::startsWith(tokenVec[i], "$parameter.") ||
+					//tokenVec[i] == "$parameter" ||
+					//tokenVec[i] == "$local" ||
+					String::startsWith(tokenVec[i], "$local.") ||
+					//"$return" == tokenVec[i] ||
+					'$' != tokenVec[i][0] || ('$' == tokenVec[i][0] && tokenVec[i].size() == 1)
+					) {
+					operandStack.push(tokenVec[i]);
+				}
+				else
+				{
+					// cout << tokenVec[i] << endl;
+					operandStack.pop(); // =
+					operandStack.pop(); // {
+					operatorStack.push(tokenVec[i]);
+
+					if (false == operation(now, global, tokenVec[i], operandStack, excuteData, builder)) // chk!!
+					{
+						// chk removal here?
+						std::cout << " false " << std::endl;
+						_getch();
+						//
+						operatorStack.pop();
+						operandStack.push("{");
+						operandStack.push("=");
+						operandStack.push(tokenVec[i]);
+						continue;
+					}
+
+					operandStack[operandStack.size() - 2] = operandStack[operandStack.size() - 1];
+					operandStack.pop(); // } 
+				}
+			}
+
+			// ex) A = { B = 1 $C = { 3 } } D = { E }  $F = { G }
+			// =>  A = { B = 1 $C = 3  }  D = E $F = G 
+			// =>  A = { B = 1 $C = { 3 } } D = E  $F = { G } : ToDo!
+
+			std::vector<std::string> strVec;
+			std::stack<int> chkBrace;
+
+			chkBrace.push(0);
+
+			for (int i = operandStack.size() - 1; i >= 0; --i)
+			{
+				if (operandStack[i] == "}") {
+					chkBrace.top()++;
+					if (chkBrace.top() == 2 && !(i + 4 <= operandStack.size() - 1 && operandStack[i + 3] == "=" && operandStack[i + 4][0] == '$' && operandStack[i + 4].size() > 1))
+					{
+						std::string temp = strVec.back();
+						strVec.pop_back();
+						strVec.pop_back();
+						strVec.push_back(temp);
+
+						chkBrace.pop();
+						continue;
+					}
+					chkBrace.pop();
+				}
+				else if (operandStack[i] == "{") {
+					chkBrace.top()++;
+					chkBrace.push(0);
+				}
+				else {
+					chkBrace.top()++;
+				}
+
+				strVec.push_back(operandStack[i]);
+			}
+
+			//result = std::string(builder->Str(), builder->size());
+			// todo!  $C = 3 => $C = { 3 } 
+			{
+				//StringTokenizer tokenizer(result, builder, 1);
+				//result = "";
+				builder->Clear();
+
+				//while (tokenizer.hasMoreTokens()) {
+				for (int i = 0; i < strVec.size(); ++i) {
+					//const std::string temp = strVec[i]; // tokenizer.nextToken();
+
+					{
+						//result = result + temp + " "; 
+						// temp -> strVec
+						builder->Append(strVec[i].c_str(), strVec[i].size());
+						builder->Append(" ", 1);
+					}
+				}
+			}
+			result = std::string(builder->Str(), builder->Size());
+			if (!result.empty()) {
+				result.erase(result.begin() + result.size() - 1);
+			}
+
+			return std::move(result);
+		}
+
 		std::string ToBool4(wiz::load_data::UserType* now, wiz::load_data::UserType& global, const std::string& temp, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 		{ 
 			std::string result = temp;
@@ -3816,7 +4093,7 @@ namespace wiz {
 				}
 			}
 			if (flag_B) {
-				result = ToBool3(global, excuteData.info.parameters, result, excuteData.info, builder);
+				result = ToBool3(global, excuteData.info.parameters, std::move(result), excuteData.info, builder);
 			}
 			if (result.empty()) { return ""; }
 			if (!flag_A && flag_B) {
@@ -3836,21 +4113,21 @@ namespace wiz {
 					std::string temp = Find(&global, result, builder);
 
 					if (!temp.empty()) {
-						result = move(temp);
+						result = std::move(temp);
 						return result;
 					}
 				}
 				else if (wiz::String::startsWith(result, "$local.")) {
 					std::string _temp = FindLocals(excuteData.info.locals, result);
 					if (!_temp.empty()) {
-						result = move(_temp);
+						result = std::move(_temp);
 						return result;
 					}
 				}
 				else if (wiz::String::startsWith(result, "$parameter.")) {
 					std::string _temp = FindParameters(excuteData.info.parameters, result);
 					if (!_temp.empty()) {
-						result = move(_temp);
+						result = std::move(_temp);
 						return result;
 					}
 				}
@@ -3859,7 +4136,7 @@ namespace wiz {
 		
 			std::vector<std::string> tokenVec;
 			{
-				wiz::StringTokenizer tokenizer(result, { " ", "\n", "\t", "\r" }, builder, 1); // , "{", "=", "}" }); //
+				wiz::StringTokenizer tokenizer(std::move(result), { " ", "\n", "\t", "\r" }, builder, 1); // , "{", "=", "}" }); //
 				//wiz::StringTokenizer tokenizer2(result, { " ", "\n", "\t", "\r" } ); //
 				
 				//vector<std::string> tokenVec2;
@@ -3877,19 +4154,19 @@ namespace wiz {
 						std::string _temp = Find(&global, tokenVec[i], builder);
 
 						if ("" != _temp) {
-							tokenVec[i] = move(_temp);
+							tokenVec[i] = std::move(_temp);
 						}
 					}
 					else if (wiz::String::startsWith(tokenVec[i], "$local.")) { // && length?
 						std::string _temp = FindLocals(excuteData.info.locals, tokenVec[i]);
 						if (!_temp.empty()) {
-							tokenVec[i] = move(_temp);
+							tokenVec[i] = std::move(_temp);
 						}
 					}
 					else if (wiz::String::startsWith(tokenVec[i], "$parameter.")) { // && length?
 						std::string _temp = FindParameters(excuteData.info.parameters, tokenVec[i]);
 						if (!_temp.empty()) {
-							tokenVec[i] = move(_temp);
+							tokenVec[i] = std::move(_temp);
 						}
 					}
 				}
@@ -4021,7 +4298,7 @@ namespace wiz {
 
 				//while (tokenizer.hasMoreTokens()) {
 				for (int i = 0; i < strVec.size(); ++i) {
-					const std::string temp = strVec[i]; // tokenizer.nextToken();
+					//const std::string temp = strVec[i]; // tokenizer.nextToken();
 					/*
 					// chk!! @$paramter - removal? @$. (for regex)??
 					if (temp.size() >= 3 && String::startsWith(temp, "$.")) { // cf) @$. ?
@@ -4055,8 +4332,9 @@ namespace wiz {
 					else 
 					*/
 					{
-						//result = result + temp + " ";
-						builder->Append(temp.c_str(), temp.size());
+						//result = result + temp + " "; 
+						// temp -> strVec
+						builder->Append(strVec[i].c_str(), strVec[i].size());
 						builder->Append(" ", 1);
 					}
 				}
@@ -4099,7 +4377,7 @@ namespace wiz {
 		*/
 		//	cout << "result is " << result << endl;
 		//	cout << endl;
-			return result;
+			return std::move(result);
 		}
 
 	}
