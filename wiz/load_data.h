@@ -3853,7 +3853,6 @@ namespace wiz {
 		}
 		std::pair<std::vector<std::string>, bool> ToBool4_A(wiz::load_data::UserType* now, wiz::load_data::UserType& global, const std::string& temp, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 		{
-			std::vector<std::string> return_value;
 			std::string result = temp;
 			
 			//	cout << "result is " << result << endl;
@@ -3879,7 +3878,7 @@ namespace wiz {
 			}
 			return { tokenVec, flag_A };
 		}
-		std::string ToBool4_B(wiz::load_data::UserType* now, wiz::load_data::UserType& global,  std::vector<std::string> tokenVec, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+		std::string ToBool4_B(wiz::load_data::UserType* now, wiz::load_data::UserType& global,  std::vector<std::string>& tokenVec, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 		{
 			
 			bool chk = false;
@@ -3904,8 +3903,6 @@ namespace wiz {
 					result = ToBool3(global, excuteData.info.parameters, std::move(result), excuteData.info, builder);
 				}
 				if (result.empty()) {
-					//tokenVec.erase(tokenVec.begin() + i);
-					//i--;
 					continue;
 				}
 				if (!flag_A && flag_B) {
@@ -3935,7 +3932,7 @@ namespace wiz {
 					}
 				}
 
-				tokenVec[i] = result;
+				tokenVec[i] = std::move(result);
 			}
 
 			if (tokenVec.empty()) {
@@ -3966,7 +3963,7 @@ namespace wiz {
 					//"$return" == tokenVec[i] ||
 					'$' != tokenVec[i][0] || ('$' == tokenVec[i][0] && tokenVec[i].size() == 1)
 					) {
-					operandStack.push(tokenVec[i]);
+					operandStack.push(std::move(tokenVec[i]));
 				}
 				else
 				{
@@ -3980,7 +3977,7 @@ namespace wiz {
 						// chk removal here?
 						std::cout << " false " << std::endl;
 						_getch();
-						//
+						// todo - exit ? or throw?
 						operatorStack.pop();
 						operandStack.push("{");
 						operandStack.push("=");
@@ -4011,7 +4008,7 @@ namespace wiz {
 						std::string temp = strVec.back();
 						strVec.pop_back();
 						strVec.pop_back();
-						strVec.push_back(temp);
+						strVec.push_back(std::move(temp));
 
 						chkBrace.pop();
 						continue;
@@ -4026,7 +4023,7 @@ namespace wiz {
 					chkBrace.top()++;
 				}
 
-				strVec.push_back(operandStack[i]);
+				strVec.push_back(std::move(operandStack[i]));
 			}
 
 			//result = std::string(builder->Str(), builder->size());

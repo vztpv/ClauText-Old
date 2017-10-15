@@ -2113,6 +2113,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
+
 					std::pair<std::string, std::string> dir = Find2(&global, ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder));
 					std::string data = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), _excuteData, &builder);
 
@@ -2200,10 +2201,10 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					else ///val->Ge
 					{
 						dir = std::string(val->GetUserTypeList(0)->ToString());
-						dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
+						dir = ToBool4(nullptr, global, std::move(dir), _excuteData, &builder);
 					}
 
-					value = ToBool4(nullptr, global, value, _excuteData, &builder);
+					value = ToBool4(nullptr, global, std::move(value), _excuteData, &builder);
 
 					std::string condition = "TRUE";
 					if (val->GetUserTypeListSize() >= 3) {
@@ -3236,7 +3237,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					_excuteData.pModule = moduleMapPtr;
 
 					std::string temp = val->GetUserTypeList(0)->ToString();
-					
+					/*
 					std::pair<std::vector<std::string>, bool> x;
 					if (_map.end() == _map.find(temp)) {
 						x = ToBool4_A(nullptr, global, temp, _excuteData, &builder);
@@ -3245,8 +3246,8 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					else {
 						x = _map[temp];
 					}
-
-					temp = ToBool4_B(nullptr, global, x.first, _excuteData, &builder);
+					*/
+					temp = ToBool4(nullptr, global, temp, _excuteData, &builder);
 
 
 					if (!eventStack.top().conditionStack.empty())
