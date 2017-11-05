@@ -299,8 +299,12 @@ public:
 		if( nullptr != p )
 		{
 		    // 2012.5.8
-			const int newN = 2 * N;
-            T* temp = new T[2*N]; // new Array!
+			int newN = 1.5 * N;
+
+			if (N < 2) {
+				newN = 2 * N;
+			}
+			T* temp = new T[2*N]; // new Array!
 
             // data copy!
 		    for( int i=0; i < N; i++ )

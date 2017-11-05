@@ -554,7 +554,6 @@ namespace wiz {
 				}
 				void operator() () {
 					//std::string* strVecTemp = strVec; // enterkey 기준으로 나뉘어져있다고 가정한다.
-
 					//for (int x = 0; x <= 0; ++x)
 					{
 						//StringTokenizer tokenizer(std::move( (*strVecTemp)[x] ) );
@@ -566,8 +565,6 @@ namespace wiz {
 						int state = 0;
 
 						for (int i = 0; i < statement.Size(); ++i) {
-
-
 							if (0 == state && '\'' == statement[i]) {
 								//token_last = i - 1;
 								//if (token_last >= 0 && token_last - token_first + 1 > 0) {
@@ -626,8 +623,8 @@ namespace wiz {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
-
-									aq->push(Token(std::string(statement.Str(), token_last - token_first + 1), false));
+									Token temp(std::string(statement.Str(), token_last - token_first + 1), false);
+									aq->push(std::move(temp));
 									statement.LeftShift(i + 1);
 
 									aq->push(Token(std::string("") + option.Assignment[idx], false));
@@ -650,7 +647,8 @@ namespace wiz {
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
 
-									aq->push(Token(std::string(statement.Str(), token_last - token_first + 1), false));
+									Token temp(std::string(statement.Str(), token_last - token_first + 1), false);
+									aq->push(std::move(temp));
 
 									statement.LeftShift(i + 1);
 
@@ -1036,6 +1034,7 @@ namespace wiz {
 				}
 				return false;
 			}
+
 			// 길이가 긴 문자열이 먼저 나와야 한다?
 			static void ChangeStr(const std::string& str, const std::vector<std::string>& changed_str, const std::vector<std::string>& result_str, std::string& temp) {
 				temp = "";
@@ -1062,6 +1061,23 @@ namespace wiz {
 					}
 					else
 					{
+						temp.push_back(str[i]);
+					}
+				}
+
+				//return temp;
+			}
+			// no chk "
+			static void ChangeStr2(const std::string& str, const std::vector<std::string>& changed_str, const std::vector<std::string>& result_str, std::string& temp) {
+				temp = "";
+				int state = 1;
+
+				for (std::string::size_type i = 0; i < str.size(); ++i)
+				{
+					if(_ChangeStr(str, changed_str, result_str, i, state, temp)) {
+						//
+					}
+					else {
 						temp.push_back(str[i]);
 					}
 				}

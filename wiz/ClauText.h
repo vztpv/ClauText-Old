@@ -2031,7 +2031,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 						eventStack.top().userType_idx.top()++;
 
 						// remove remove_now_event_stack_a?
-						if (eventStack.top().option == "REMOVE_NOW_EVENT_STACK_A" || "REMOVE_IF_CALL_ONESELF_EVENT" == eventStack.top().option) //
+						if ("REMOVE_IF_CALL_ONESELF_EVENT" == eventStack.top().option) //
 						{
 							eventStack.pop();
 						}
@@ -3237,6 +3237,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					_excuteData.pModule = moduleMapPtr;
 
 					std::string temp = val->GetUserTypeList(0)->ToString();
+					
 					/*
 					std::pair<std::vector<std::string>, bool> x;
 					if (_map.end() == _map.find(temp)) {

@@ -39,7 +39,9 @@ namespace wiz {
 			str = move(token.str);
 			isComment = token.isComment;
 		}
-		
+		virtual ~Token() {
+
+		}
 		Token(Token&& token) : str(std::move(token.str)), isComment(token.isComment) { }
 		Token(const Token& token) : str(token.str), isComment(token.isComment) { }
 		explicit Token() : isComment(false) { }
@@ -3893,20 +3895,20 @@ namespace wiz {
 				}
 
 				bool flag_B = false;
-				for (int j = 0; j < result.size(); ++j) {
-					if (result[j] == '/') {
-						flag_B = true;
-						break;
-					}
-				}
+				//for (int j = 0; j < result.size(); ++j) {
+				//	if (result[j] == '/') {
+				//		flag_B = true;
+				//		break;
+				//	}
+				//}
 				if (flag_B) {
-					result = ToBool3(global, excuteData.info.parameters, std::move(result), excuteData.info, builder);
+				//	result = ToBool3(global, excuteData.info.parameters, std::move(result), excuteData.info, builder);
 				}
 				if (result.empty()) {
 					continue;
 				}
 				if (!flag_A && flag_B) {
-					result = std::string(result.c_str() + 1, result.size() - 1);
+				//	result = std::string(result.c_str() + 1, result.size() - 1);
 				}
 
 				{

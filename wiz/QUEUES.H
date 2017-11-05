@@ -350,7 +350,7 @@ public:
 	void pop(T* t = nullptr) {
 		if (isEmpty()) { throw QueueEmptyError(); }
 
-		T temp = std::move(que[start]);
+		int before_start = start;
 
 		//que[start] = T();
 
@@ -358,7 +358,7 @@ public:
 		num--;
 
 		if (nullptr != t) {
-			*t = std::move(temp);
+			*t = std::move(std::move(que[before_start]));
 		}
 	}
 	void pop_front(T* t = nullptr) {
@@ -368,13 +368,12 @@ public:
 	T pop_back()
 	{
 		if (isEmpty()) { throw QueueEmptyError(); }
-		T temp = std::move((*this)[num - 1]);
-
+		
 		//(*this)[num - 1] = T();
 
 		num--;
 
-		return temp;
+		return std::move((*this)[num]);
 	}
 
 	bool isFull()const
