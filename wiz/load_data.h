@@ -3301,7 +3301,7 @@ namespace wiz {
 					operandStack.push("ERROR in $regex");
 				}
 			}
-			else if ("$eval" == str) {
+			else if ("$eval" == str) { //// now, no need ?
 				std::string str = operandStack.pop();
 
 				bool chk = wiz::load_data::Utility::ChkExist(str);

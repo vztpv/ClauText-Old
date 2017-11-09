@@ -955,7 +955,7 @@ namespace wiz {
 			}
 		public:
 			//
-			static bool ChkExist(const std::string& str) // for \"
+			static bool ChkExist(const std::string& str) // for \", str is separated by enterkey
 			{
 				int state = -1;
 
@@ -964,11 +964,21 @@ namespace wiz {
 					if (0 >= state && i == 0 && '\"' == str[i]) {
 						state = 1;
 					}
+					else if (0 >= state&& i == 0 && '\'' == str[i]) {
+						state = 2;
+					}
 					else if (0 >= state && i > 0 && '\"' == str[i] && '\\' != str[i - 1])
 					{
 						state = 1;
 					}
+					else if (0 >= state && i > 0 && '\'' == str[i] && '\\' != str[i - 1])
+					{
+						state = 2;
+					}
 					else if (1 == state && i > 0 && '\\' != str[i - 1] && '\"' == str[i]) {
+						state = 0;
+					}
+					else if (2 == state&& i > 0 && '\\' != str[i - 1] && '\'' == str[i]) {
 						state = 0;
 					}
 					else if (0 >= state && str[i] == '#') {
@@ -978,6 +988,7 @@ namespace wiz {
 
 				return 0 == state; // exist and valid !! chk - todo!
 			}
+			
 
 			// AddSpace : return std::string
 			static void AddSpace(const std::string& str, std::string& temp)
@@ -1025,7 +1036,7 @@ namespace wiz {
 				}
 				//return temp;
 			}
-
+			/*
 			static bool _ChangeStr(const std::string& str, const std::vector<std::string>& changed_str, const std::vector<std::string>& result_str, std::string::size_type& i, int& state, std::string& temp) {
 				for (std::string::size_type j = 0; j < changed_str.size(); ++j) {
 					if (wiz::String::Comp(changed_str[j].c_str(), str.c_str() + i, changed_str[j].size())) {
@@ -1087,6 +1098,8 @@ namespace wiz {
 
 				//return temp;
 			}
+
+			*/
 		};
 	}
 }
