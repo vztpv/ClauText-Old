@@ -119,7 +119,7 @@ namespace wiz {
 			}
 			bool Push(T&& val) {
 				if (inited) { throw "ItemType already inited"; }
-				data = val;
+				data = std::move(val);
 				inited = true;
 
 				return true;
@@ -136,9 +136,9 @@ namespace wiz {
 				if (!inited) { throw "ItemType, not inited"; } // removal?
 				data = val;
 			}
-			void Set(const int index, const T&& val) {
+			void Set(const int index, T&& val) {
 				if (!inited) { throw "ItemType, not inited"; } // removal?
-				data = val;
+				data = std::move(val);
 			}
 			int size()const {
 				return inited? 1 : 0;

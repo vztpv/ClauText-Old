@@ -358,7 +358,7 @@ public:
 		num--;
 
 		if (nullptr != t) {
-			*t = std::move(std::move(que[before_start]));
+			*t = std::move(que[before_start]);
 		}
 	}
 	void pop_front(T* t = nullptr) {

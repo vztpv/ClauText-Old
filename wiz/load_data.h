@@ -2862,6 +2862,16 @@ namespace wiz {
 				std::string typex, typey; // other *, /, mod, ..
 				typex = wiz::load_data::Utility::GetType(x);
 				typey = wiz::load_data::Utility::GetType(y);
+
+				if (x.size() > 2 && x.back() == x.front() && (x.back() == '\"' || x.back() == '\''))
+				{
+					x = x.substr(1, x.size() - 2);
+				}
+				if (y.size() > 2 && y.back() == y.front() && (y.back() == '\"' || y.back() == '\''))
+				{
+					y = y.substr(1, y.size() - 2);
+				}
+
 				if (typex == typey && typey == "INTEGER") { /// only integer -> BigInteger
 					operandStack.push(wiz::toStr(atoll(x.c_str()) + atoll(y.c_str())));
 				}
@@ -2879,7 +2889,14 @@ namespace wiz {
 				x = operandStack.pop();
 				y = operandStack.pop();
 
-
+				if (x.size() > 2 && x.back() == x.front() && (x.back() == '\"' || x.back() == '\''))
+				{
+					x = x.substr(1, x.size() - 2);
+				}
+				if (y.size() > 2 && y.back() == y.front() && (y.back() == '\"' || y.back() == '\''))
+				{
+					y = y.substr(1, y.size() - 2);
+				}
 
 				if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && (wiz::load_data::Utility::GetType(y) == "INTEGER")) { /// only integer -> BigInteger
 					operandStack.push(wiz::toStr(atoll(x.c_str()) * atoll(y.c_str())));
@@ -2898,6 +2915,15 @@ namespace wiz {
 				x = operandStack.pop();
 				y = operandStack.pop();
 
+				if (x.size() > 2 && x.back() == x.front() && (x.back() == '\"' || x.back() == '\''))
+				{
+					x = x.substr(1, x.size() - 2);
+				}
+				if (y.size() > 2 && y.back() == y.front() && (y.back() == '\"' || y.back() == '\''))
+				{
+					y = y.substr(1, y.size() - 2);
+				}
+
 				if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && (wiz::load_data::Utility::GetType(y) == "INTEGER")) { /// only integer -> BigInteger
 					operandStack.push(wiz::toStr(atoll(x.c_str()) / atoll(y.c_str())));
 				}
@@ -2915,6 +2941,15 @@ namespace wiz {
 				x = operandStack.pop();
 				y = operandStack.pop();
 
+				if (x.size() > 2 && x.back() == x.front() && (x.back() == '\"' || x.back() == '\''))
+				{
+					x = x.substr(1, x.size() - 2);
+				}
+				if (y.size() > 2 && y.back() == y.front() && (y.back() == '\"' || y.back() == '\''))
+				{
+					y = y.substr(1, y.size() - 2);
+				}
+
 				if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && (wiz::load_data::Utility::GetType(y) == "INTEGER")) { /// only integer -> BigInteger
 					operandStack.push(wiz::toStr(atoll(x.c_str()) % atoll(y.c_str())));
 				}
@@ -2928,6 +2963,15 @@ namespace wiz {
 				std::string x, y;
 				x = operandStack.pop();
 				y = operandStack.pop();
+
+				if (x.size() > 2 && x.back() == x.front() && (x.back() == '\"' || x.back() == '\''))
+				{
+					x = x.substr(1, x.size() - 2);
+				}
+				if (y.size() > 2 && y.back() == y.front() && (y.back() == '\"' || y.back() == '\''))
+				{
+					y = y.substr(1, y.size() - 2);
+				}
 
 				if (wiz::load_data::Utility::GetType(x) == wiz::load_data::Utility::GetType(y) && (wiz::load_data::Utility::GetType(y) == "INTEGER")) { /// only integer -> BigInteger
 					int _x = atoi(x.c_str());
@@ -3287,7 +3331,7 @@ namespace wiz {
 				}
 			}
 			// small
-			else if ("$is_quoted_str2" == str) 
+			else if ("$is_quoted_str2" == str)
 			{
 				std::string str = operandStack.pop();
 				if (str.size() >= 2 && str[0] == str.back() && '\'' == str[0])
@@ -3356,7 +3400,7 @@ namespace wiz {
 				std::string temp = operandStack.pop();
 
 				temp = wiz::String::replace(temp, "\"", "");
-				
+
 				temp = "\"" + temp + "\"";
 
 				operandStack.push(temp);
@@ -3406,7 +3450,7 @@ namespace wiz {
 					}
 					//cout << temp << endl;
 				}
-				
+
 				operandStack.push(temp);
 			}
 			else if ("$test6" == str) { // for lambda test.
@@ -3414,7 +3458,7 @@ namespace wiz {
 				for (int i = 0; i < operandNum; ++i) {
 					vec.push_back(operandStack.pop());
 				}
-				for (int i = vec.size()-1; i >= 0; --i) {
+				for (int i = vec.size() - 1; i >= 0; --i) {
 					vec[i] = wiz::String::replace(vec[i], "\"", "");
 					operandStack.push(vec[i]);
 				}
@@ -3422,7 +3466,7 @@ namespace wiz {
 			else if ("$get_item_name" == str) {
 				wiz::load_data::UserType ut;
 				std::string statement;
-				
+
 				for (int i = 0; i < operandNum; ++i) {
 					statement = statement + operandStack.pop();
 				}
@@ -3463,7 +3507,7 @@ namespace wiz {
 				for (int i = 0; i < operandNum; ++i) {
 					eventVec.push_back(operandStack.pop());
 				}
-				
+
 				std::string statements2 = "Event = { id = NONE" + wiz::toStr(excuteData.depth + 1) + " $call = { ";
 				for (int i = 0; i < eventVec.size(); ++i) {
 					statements2 = statements2 + eventVec[i] + " ";
@@ -3481,7 +3525,7 @@ namespace wiz {
 				_excuteData.noUseOutput = excuteData.noUseOutput;
 
 				operandStack.push(excute_module("Main = { $call = { id = NONE" + wiz::toStr(_excuteData.depth) + " } }", &global, _excuteData, 0));
-				
+
 				{
 					for (int idx = 0; idx < eventsTemp->GetUserTypeListSize(); ++idx) {
 						if (eventsTemp->GetUserTypeList(idx)->GetItem("id")[0].Get(0) == "NONE" + wiz::toStr(_excuteData.depth)) {
@@ -3513,11 +3557,11 @@ namespace wiz {
 			}
 			else if ("$move_up" == str) {
 				std::string dir;
-				
+
 				for (int i = 0; i < operandNum; ++i) {
 					std::string temp = operandStack.pop();
 					dir = dir + temp;
-				//	cout << "temp is " << temp << endl;
+					//	cout << "temp is " << temp << endl;
 				}
 
 				//cout << " dir is  " << dir << endl;
@@ -3533,8 +3577,8 @@ namespace wiz {
 				}
 				dir = "/./";
 				if (tokenVec.empty()) { operandStack.push(dir); return true; }
-				for (int i = 0; i < tokenVec.size()-1; ++i) {
-					dir = dir + tokenVec[i] +"/";
+				for (int i = 0; i < tokenVec.size() - 1; ++i) {
+					dir = dir + tokenVec[i] + "/";
 				}
 				operandStack.push(dir);
 				return true;
@@ -3550,8 +3594,8 @@ namespace wiz {
 				}
 				wiz::load_data::UserType ut;
 				wiz::load_data::LoadData::LoadDataFromString(store[0].substr(1, store[0].size() - 2), ut);
-				
-				
+
+
 				if (operandNum >= 1) {
 					std::vector<wiz::load_data::UserType*> param = ut.GetUserTypeItem("Event")[0]->GetUserTypeItem("$parameter");
 					// in order.
@@ -3582,7 +3626,7 @@ namespace wiz {
 					{
 						wiz::load_data::UserType ut;
 						wiz::load_data::LoadData::LoadDataFromString(result.substr(1, result.size() - 2), ut);
-		
+
 						if (0 == ut.GetUserTypeListSize()) {
 							std::string param = ut.ToString();
 							if (wiz::String::startsWith(param, "$parameter.")) { // 
@@ -3592,13 +3636,13 @@ namespace wiz {
 						}
 					}
 
- 					operandStack.push(result);
+					operandStack.push(result);
 				}
 
 				return true;
 			}
-			
-			else if("$to_float_from_integer" == str) { // integer, floating point number -> floating point number(long double)
+
+			else if ("$to_float_from_integer" == str) { // integer, floating point number -> floating point number(long double)
 				std::string value = operandStack.pop();
 				if (wiz::load_data::Utility::IsInteger(value)) {
 					long double x = stoll(value);
@@ -3672,7 +3716,7 @@ namespace wiz {
 			//std::string - length,
 			else if ("$std::string_length" == str) {
 				std::string str = operandStack.pop();
-				
+
 				operandStack.push(wiz::_toString(str.size()));
 			}
 			//substring ?
@@ -3681,18 +3725,18 @@ namespace wiz {
 				long long begin = stoll(operandStack.pop());
 				long long end = stoll(operandStack.pop());
 
-				operandStack.push(wiz::String::substring(str, begin, end-1));
+				operandStack.push(wiz::String::substring(str, begin, end - 1));
 			}
 
 			// todo - Is~ ?? others ??
 			else if ("$is_integer_type" == str) {
-				operandStack.push(wiz::load_data::Utility::IsInteger(operandStack.pop())? "TRUE" : "FALSE");
+				operandStack.push(wiz::load_data::Utility::IsInteger(operandStack.pop()) ? "TRUE" : "FALSE");
 			}
 			else if ("$is_float_type" == str) {
 				operandStack.push(wiz::load_data::Utility::IsDouble(operandStack.pop()) ? "TRUE" : "FALSE");
 			}
 			else if ("$is_pure_std::string_type" == str) {
-				operandStack.push("STRING" == wiz::load_data::Utility::GetType(operandStack.pop())? "TRUE" : "FALSE");
+				operandStack.push("STRING" == wiz::load_data::Utility::GetType(operandStack.pop()) ? "TRUE" : "FALSE");
 			}
 			else if ("$get_type" == str) {
 				operandStack.push(wiz::load_data::Utility::GetType(operandStack.pop()));

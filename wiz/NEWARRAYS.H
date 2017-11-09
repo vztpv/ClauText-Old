@@ -146,7 +146,7 @@ public:
     }
 
 
-    explicit Array( initializer_list<T> args )
+    explicit Array( std::initializer_list<T> args )
     {
         N = args.size();
 
@@ -299,8 +299,12 @@ public:
 		if( nullptr != p )
 		{
 		    // 2012.5.8
-			const int newN = 2 * N;
-            T* temp = new T[2*N]; // new Array!
+			int newN = 1.5 * N;
+
+			if (N < 2) {
+				newN = 2 * N;
+			}
+			T* temp = new T[2*N]; // new Array!
 
             // data copy!
 		    for( int i=0; i < N; i++ )
@@ -335,7 +339,7 @@ template <class T>
 T Array<T>::sEnd = T();
 // not use debug() and use below!
 template <class T>
-inline ostream& operator<<( ostream& stream, const Array<T>& arr )
+inline std::ostream& operator<<(std::ostream& stream, const Array<T>& arr )
 {
     if( arr.empty() ) { return stream; }
 
@@ -346,7 +350,7 @@ inline ostream& operator<<( ostream& stream, const Array<T>& arr )
     return stream;
 }
 template <class T>
-inline istream& operator>>( istream& stream, Array<T>& arr )
+inline std::istream& operator>>(std::istream& stream, Array<T>& arr )
 {
     for( int i=0; i < arr.size(); ++i )
     {
@@ -599,7 +603,7 @@ public:
 };
 // not use debug() and use below!
 template <class T>
-inline ostream& operator<<( ostream& stream, const SecondArray<T>& arr )
+inline std::ostream& operator<<(std::ostream& stream, const SecondArray<T>& arr )
 {
     for( int i=0; i < arr.getRowN(); i++ )
     {
@@ -611,7 +615,7 @@ inline ostream& operator<<( ostream& stream, const SecondArray<T>& arr )
 }
 
 template <class T>
-inline istream& operator>>( istream& stream, SecondArray<T>& arr )
+inline std::istream& operator>>(std::istream& stream, SecondArray<T>& arr )
 {
     for( int i=0; i < arr.getRowN(); ++i )
     {

@@ -23,7 +23,7 @@ namespace wiz {
 		{
 		public:
 			static bool IsInteger(std::string str) {
-				if (str.size() > 2 && str[0] == str.back() && str[0] == '\"') {
+				if (str.size() > 2 && str[0] == str.back() && (str[0] == '\"' || str[0] == '\'')) {
 					str = str.substr(1, str.size() - 2);
 				}
 				int state = 0;
@@ -51,7 +51,7 @@ namespace wiz {
 			}
 			static bool IsNumberInJson(std::string str)
 			{
-				if (str.size() > 2 && str[0] == str.back() && str[0] == '\"') {
+				if (str.size() > 2 && str[0] == str.back() && (str[0] == '\"' || str[0] == '\'')) {
 					str = str.substr(1, str.size() - 2);
 				}
 				int state = 0;
@@ -118,7 +118,7 @@ namespace wiz {
 				return 3 == state || 6 == state;
 			}
 			static bool IsDouble(std::string str) {
-				if (str.size() > 2 && str[0] == str.back() && str[0] == '\"') {
+				if (str.size() > 2 && str[0] == str.back() && (str[0] == '\"' || str[0] == '\'')) {
 					str = str.substr(1, str.size() - 2);
 				}
 				int state = 0;
@@ -184,7 +184,7 @@ namespace wiz {
 			}
 			static bool IsDate(std::string str) /// chk!!
 			{
-				if (str.size() > 2 && str[0] == str.back() && str[0] == '\"') {
+				if (str.size() > 2 && str[0] == str.back() && (str[0] == '\"' || str[0] == '\'')) {
 					str = str.substr(1, str.size() - 2);
 				}
 				int state = 0;
@@ -232,7 +232,7 @@ namespace wiz {
 			}
 			static bool IsDateTimeA(std::string str) // yyyy.MM.dd.hh
 			{
-				if (str.size() > 2 && str[0] == str.back() && str[0] == '\"') {
+				if (str.size() > 2 && str[0] == str.back() && (str[0] == '\"' || str[0] == '\'')) {
 					str = str.substr(1, str.size() - 2);
 				}
 				int state = 0;
@@ -289,7 +289,7 @@ namespace wiz {
 			}
 			static bool IsDateTimeB(std::string str) // yyyy.MM.dd.hh.mm
 			{
-				if (str.size() > 2 && str[0] == str.back() && str[0] == '\"') {
+				if (str.size() > 2 && str[0] == str.back() && (str[0] == '\"' || str[0] == '\'')) {
 					str = str.substr(1, str.size() - 2);
 				}
 				int state = 0;
@@ -357,7 +357,7 @@ namespace wiz {
 			}
 			static bool IsMinus(std::string str)
 			{
-				if (str.size() > 2 && str[0] == str.back() && str[0] == '\"') {
+				if (str.size() > 2 && str[0] == str.back() && (str[0] == '\"' || str[0] == '\'')) {
 					str = str.substr(1, str.size() - 2);
 				}
 				return str.empty() == false && str[0] == '-';
@@ -377,11 +377,11 @@ namespace wiz {
 			}
 			static std::string Compare(std::string str1, std::string str2, wiz::StringBuilder* builder, const int type = 0)
 			{
-				if (str1.size() > 2 && str1[0] == str1.back() && str1[0] == '\"')
+				if (str1.size() > 2 && str1[0] == str1.back() && (str1[0] == '\"' || str1[0] == '\''))
 				{
 					str1 = str1.substr(1, str1.size() - 2);
 				}
-				if (str2.size() > 2 && str2[0] == str2.back() && str2[0] == '\"')
+				if (str2.size() > 2 && str2[0] == str2.back() && (str2[0] == '\"' || str2[0] == '\''))
 				{
 					str2 = str2.substr(1, str2.size() - 2);
 				}
@@ -572,6 +572,9 @@ namespace wiz {
 								//}
 								state = 2;
 								//token_first = i; 
+								token_last = i;
+							}
+							else if (2 == state && '\\' == statement[i - 1] && '\'' == statement[i]) {
 								token_last = i;
 							}
 							else if (2 == state && '\'' == statement[i]) {
