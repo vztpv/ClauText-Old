@@ -957,36 +957,41 @@ namespace wiz {
 			//
 			static bool ChkExist(const std::string& str) // for \", str is separated by enterkey
 			{
-				int state = -1;
+				bool start = false;
+				int state = 0;
 
 				for (std::string::size_type i = 0; i < str.size(); ++i)
 				{
-					if (0 >= state && i == 0 && '\"' == str[i]) {
+					if (0 == state && i == 0 && '\"' == str[i]) {
 						state = 1;
+						start = true;
 					}
-					else if (0 >= state&& i == 0 && '\'' == str[i]) {
+					else if (0 == state && i == 0 && '\'' == str[i]) {
 						state = 2;
+						start = true;
 					}
-					else if (0 >= state && i > 0 && '\"' == str[i] && '\\' != str[i - 1])
+					else if (0 == state && i > 0 && '\"' == str[i] && '\\' != str[i - 1])
 					{
 						state = 1;
+						start = true;
 					}
-					else if (0 >= state && i > 0 && '\'' == str[i] && '\\' != str[i - 1])
+					else if (0 == state && i > 0 && '\'' == str[i] && '\\' != str[i - 1])
 					{
 						state = 2;
+						start = true;
 					}
 					else if (1 == state && i > 0 && '\\' != str[i - 1] && '\"' == str[i]) {
 						state = 0;
 					}
-					else if (2 == state&& i > 0 && '\\' != str[i - 1] && '\'' == str[i]) {
+					else if (2 == state && i > 0 && '\\' != str[i - 1] && '\'' == str[i]) {
 						state = 0;
 					}
-					else if (0 >= state && str[i] == '#') {
+					else if (0 == state && str[i] == '#') {
 						break;
 					}
 				}
 
-				return 0 == state; // exist and valid !! chk - todo!
+				return start && 0 == state; // exist and valid !! chk - todo!
 			}
 			
 
