@@ -814,7 +814,8 @@ namespace wiz {
 			{
 				int count = 0;
 				std::string temp;
-				wiz::StringBuilder builder(128 * num);				//vector<std::string> strVecTemp;
+				wiz::StringBuilder builder(128 * num); // *num;
+
 
 				for (int i = 0; i < num && (std::getline(inFile, temp)); ++i) {
 					if (temp.empty()) { continue; }
@@ -1041,7 +1042,7 @@ namespace wiz {
 				}
 				//return temp;
 			}
-			/*
+			
 			static bool _ChangeStr(const std::string& str, const std::vector<std::string>& changed_str, const std::vector<std::string>& result_str, std::string::size_type& i, int& state, std::string& temp) {
 				for (std::string::size_type j = 0; j < changed_str.size(); ++j) {
 					if (wiz::String::Comp(changed_str[j].c_str(), str.c_str() + i, changed_str[j].size())) {
@@ -1053,6 +1054,7 @@ namespace wiz {
 				}
 				return false;
 			}
+			/*
 
 			// 길이가 긴 문자열이 먼저 나와야 한다?
 			static void ChangeStr(const std::string& str, const std::vector<std::string>& changed_str, const std::vector<std::string>& result_str, std::string& temp) {
@@ -1086,6 +1088,7 @@ namespace wiz {
 
 				//return temp;
 			}
+			*/
 			// no chk "
 			static void ChangeStr2(const std::string& str, const std::vector<std::string>& changed_str, const std::vector<std::string>& result_str, std::string& temp) {
 				temp = "";
@@ -1103,8 +1106,6 @@ namespace wiz {
 
 				//return temp;
 			}
-
-			*/
 		};
 	}
 }

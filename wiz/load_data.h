@@ -3210,26 +3210,27 @@ namespace wiz {
 					x = "/./" + x;
 					if ('/' == x[0])
 					{
-						std::string temp = Find(now, x, builder); if (!temp.empty()) { x = temp; }
+						std::string temp = Find(now, x, builder); if (!temp.empty()) { x = temp; operandStack.push(x); return true; }
 					}
 				}
 				else {
 					if ('/' == x[0])
 					{
-						std::string temp = Find(&global, x, builder); if (!temp.empty()) { x = temp; }
+						std::string temp = Find(&global, x, builder); if (!temp.empty()) { x = temp; operandStack.push(x); return true; }
 					}
 				}
 
 				{
 					std::string temp = FindParameters(excuteData.info.parameters, x);
-					if (!temp.empty()) { x = temp; }
+					if (!temp.empty()) { x = temp; operandStack.push(x); return true;  }
 				}
 				{
 					std::string temp = FindLocals(excuteData.info.locals, x);
-					if (!temp.empty()) { x = temp; }
+					if (!temp.empty()) { x = temp; operandStack.push(x); return true; }
 				}
 
 				operandStack.push(x);
+				return true;
 			}
 			else if ("$size" == str)
 			{
@@ -4150,7 +4151,7 @@ namespace wiz {
 			//	return "";
 			//}
 		//	if (ut.GetUserTypeListSize() == 0 && ut.GetItemListSize() == 1) /// chk
-			{
+			if(!flag_B) { // chk
 				if ('/' == result[0] && result.size() > 1)
 				{
 					std::string temp = Find(&global, result, builder);

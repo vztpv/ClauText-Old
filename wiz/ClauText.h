@@ -2080,7 +2080,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 
 					break;
 				}
-
+				//// no $parameter.~
 				else if ("$assign" == val->GetName()) /// -> assign2?
 				{
 					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;

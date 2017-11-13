@@ -221,8 +221,8 @@ public:
 		for (int i = ptr.pos; i < size() - 1; ++i) {
 			(*this)[i] = std::move((*this)[i + 1]);
 		}
-		//(*this)[size() - 1] = T();
-
+			//(*this)[size() - 1] = T();
+		
 		num--;
 
 		return ptr;
