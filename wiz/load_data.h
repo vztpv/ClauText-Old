@@ -3584,6 +3584,7 @@ namespace wiz {
 				operandStack.push(dir);
 				return true;
 			}
+			/*
 			else if ("$lambda" == str) {
 				std::vector<std::string> store;
 				for (int i = 0; i < operandNum; ++i) {
@@ -3642,7 +3643,7 @@ namespace wiz {
 
 				return true;
 			}
-
+			*/
 			else if ("$to_float_from_integer" == str) { // integer, floating point number -> floating point number(long double)
 				std::string value = operandStack.pop();
 				if (wiz::load_data::Utility::IsInteger(value)) {

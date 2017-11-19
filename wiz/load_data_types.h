@@ -476,12 +476,12 @@ namespace wiz {
 			void Remove()
 			{
 				/// parent->removeUserType(name); - ToDo - X
-				ilist = std::vector<int>();
-				itemList = std::vector< ItemType<std::string> >();
+				ilist.resize(0);// = std::vector<int>();
+				itemList.resize(0);// = std::vector< ItemType<std::string> >();
 
 				RemoveUserTypeList();
 
-				commentList.clear();
+				commentList.resize(0);
 			}
 			void RemoveUserTypeList() { /// chk memory leak test!!
 				for (int i = 0; i < userTypeList.size(); i++) {
@@ -491,7 +491,7 @@ namespace wiz {
 					}
 				}
 				// DO Empty..
-				userTypeList = std::vector< UserType* >();
+				userTypeList.resize(0);
 
 				std::vector<int> temp;
 				for (int i = 0; i < ilist.size(); ++i) {

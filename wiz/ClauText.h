@@ -1051,6 +1051,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 				// $filter = { utDir = { /./test } 
 				// condition = { AND = { EXSITITEMBYVAL = { base_tax root/list } COMP> = { ~~ / 5.000 ~ 0 } } } 
 				// recursive = { false or true } } // return UserType.?
+				/** it has bug?
 				if ("$for_each" == val->GetName()) {
 					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
@@ -1161,7 +1162,9 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$while" == val->GetName()) {
+				else 
+				*/	
+				if ("$while" == val->GetName()) {
 					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
@@ -1652,7 +1655,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$register_object_from_std::string" == val->GetName()) {
+				else if ("$register_object_from_string" == val->GetName()) {
 					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
@@ -2064,7 +2067,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 						waits.resize(0);
 					}
 
-					if (false == val->GetItem("option").empty() && val->GetItem("option")[0].Get(0) == "USE_THREAD") {
+					/*if (false == val->GetItem("option").empty() && val->GetItem("option")[0].Get(0) == "USE_THREAD") {
 						_excuteData.info = info;
 						
 						_excuteData.noUseInput = excuteData.noUseInput;
@@ -2073,10 +2076,10 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 						std::thread* A = new std::thread(excute_module, "", &global, _excuteData, 0);
 
 						waits.push_back(A);
-					}
-					else {
+					}*/
+					//else {
 						eventStack.push(info);
-					}
+					//}
 
 					break;
 				}
