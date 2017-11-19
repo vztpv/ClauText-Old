@@ -3373,6 +3373,30 @@ namespace wiz {
 
 				operandStack.push(str);
 			}
+			else if ("$removeQuoted2" == str) { // chk "" std::string problem?
+				std::string str = operandStack.pop();
+
+				if (str.size() > 0 && str.front() == str.back()
+					&& '\'' == str.back()
+					)
+				{
+					str = wiz::String::substring(str, 1, str.size() - 2);
+				}
+
+				operandStack.push(str);
+			}
+			else if ("$removeSmallQuoted" == str) { // chk "" std::string problem?
+				std::string str = operandStack.pop();
+
+				if (str.size() > 0 && str.front() == str.back()
+					&& '\'' == str.back()
+					)
+				{
+					str = wiz::String::substring(str, 1, str.size() - 2);
+				}
+
+				operandStack.push(str);
+			}
 			else if ("$getObjectStr" == str) {
 				std::string object_name = operandStack.pop();
 				object_name = wiz::String::substring(object_name, 1, object_name.size() - 2);
@@ -3397,6 +3421,7 @@ namespace wiz {
 				std::string temp = operandStack.pop();
 				operandStack.push(" { " + temp + " } ");
 			}
+			/*
 			else if ("$test" == str) { // for lambda test.
 				std::string temp = operandStack.pop();
 
@@ -3464,6 +3489,7 @@ namespace wiz {
 					operandStack.push(vec[i]);
 				}
 			}
+			*/
 			else if ("$get_item_name" == str) {
 				wiz::load_data::UserType ut;
 				std::string statement;
@@ -3500,7 +3526,7 @@ namespace wiz {
 
 				operandStack.push(wiz::_toString(ut.GetItem(ut.GetItemList(0).GetName()).size()));
 			}
-			else if ("$is_empty_std::string" == str) {
+			else if ("$is_empty_string" == str) {
 				operandStack.push(operandStack.pop().empty() ? "TRUE" : "FALSE");
 			}
 			else if ("$event_result" == str) {
@@ -3716,7 +3742,7 @@ namespace wiz {
 				operandStack.push(wiz::String::endsWith(str, chk_str) ? "TRUE" : "FALSE");
 			}
 			//std::string - length,
-			else if ("$std::string_length" == str) {
+			else if ("$string_length" == str) {
 				std::string str = operandStack.pop();
 
 				operandStack.push(wiz::_toString(str.size()));
@@ -3737,7 +3763,7 @@ namespace wiz {
 			else if ("$is_float_type" == str) {
 				operandStack.push(wiz::load_data::Utility::IsDouble(operandStack.pop()) ? "TRUE" : "FALSE");
 			}
-			else if ("$is_pure_std::string_type" == str) {
+			else if ("$is_pure_string_type" == str) {
 				operandStack.push("STRING" == wiz::load_data::Utility::GetType(operandStack.pop()) ? "TRUE" : "FALSE");
 			}
 			else if ("$get_type" == str) {
