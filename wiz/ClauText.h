@@ -858,7 +858,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 	
 	//
 	wiz::load_data::UserType& global = *_global;
-	std::vector<std::thread*> waits;
+	//std::vector<std::thread*> waits;
 	std::map<std::string, wiz::load_data::UserType> objectMap; // std::string -> wiz::load_data::UserType
 	std::map<std::string, wiz::load_data::UserType> moduleMap;
 	std::map<std::string, wiz::load_data::UserType>* objectMapPtr = nullptr;
@@ -1909,6 +1909,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
+				/*
 				else if ("$wait" == val->GetName()) {
 					for (int i = 0; i < waits.size(); ++i) {
 						waits[i]->join();
@@ -1919,6 +1920,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
+				*/
 				/*
 				else if ("$call_lambda" == val->GetName())
 				{
@@ -2058,7 +2060,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 							break;
 						}
 					}
-
+					/*
 					if (waits.size() >= 4) {
 						for (int i = 0; i < waits.size(); ++i) {
 							waits[i]->join();
@@ -2066,6 +2068,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 						}
 						waits.resize(0);
 					}
+					*/
 
 					/*if (false == val->GetItem("option").empty() && val->GetItem("option")[0].Get(0) == "USE_THREAD") {
 						_excuteData.info = info;
@@ -3337,13 +3340,13 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 			}
 		}
 	}
-
+	/*
 	for (int i = 0; i < waits.size(); ++i) {
 		waits[i]->join();
 		delete waits[i];
 	}
 	waits.resize(0);
-
+	*/
 
 	if (1 == chk && !events.empty()) {
 		auto _events = events.GetCopyUserTypeItem("Event");
