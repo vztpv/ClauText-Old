@@ -1,0 +1,37 @@
+
+size  = 300
+
+Main = {
+	$call = { id = 0 }
+}
+
+Event = {
+	id = 0
+	
+	$local = { i j }
+	
+	$make = { /./table }
+	
+	$assign = { $local.i data = { 1 } }
+	$while = {
+		cond = { 
+			$COMP< = { $local.i /./size }
+		}
+		then = { 
+			$assign = { $local.j data = { 1 } }
+			$while = {
+				cond = {
+					$COMP< = { $local.j /./size }
+				}
+				then = {
+					
+					$assign = { $local.j data = { $add = { $local.j 1 } } }
+				}
+			}
+			$assign = { $local.i data = { $add = { $local.i 1 } } }
+		}
+	}
+	$print = { data = { chk } }
+	$print2 = { data = { /./ } }
+	$_getch = { }
+}

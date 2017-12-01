@@ -22,9 +22,9 @@ Event =
 
 	$assign_local = { dir = { $local.y } value = { y } }
 
-	$assign = { $local.x value = { $concat = { Test2/$ut $concat = { 0 /no } } } }
-	$assign_global = { dir = { $concat = { / $local.x } } value = { CCC } condition = { TRUE } }
-	$assign_global = { dir = { $concat = { / $local.x } } value = { CCCA } condition = { TRUE } }
+	$assign = { $local.x value ={ $concat = { Test2/$ut $concat = { 0 /no } } } }
+	$assign_global = { dir = { $concat ={ / $local.x } } value = { CCC } condition = { TRUE } }
+	$assign_global = { dir = { $concat ={ / $local.x } } value = { CCCA } condition = { TRUE } }
 	$print = { value = { /Test2/$ut0/no } } # chk! $ut0 - todo/done list? cf) @ + dir
 	$print = { value = { \n } }
 
@@ -64,7 +64,8 @@ Event =
 
 	$make = { /eu4Game }
 									# input.eu4
-	$load_only_data = { fileName = { "input.eu4" } dirName = { eu4Game } } # input.txt or input2.txt
+	#$fast_load_only_data = 
+	$load_only_data = { fileName = { "input.eu4" } dir = { eu4Game } } # input.txt or input2.txt
 	$print = { value= { "load_only_data end" } }
 	$print = { value = { \n } }
 	
@@ -104,36 +105,42 @@ Event =
 		# ToDo - condition == TRUE, then chk val! # /./name? 
 		# ToDo - cf) empty -> "/ /" ? and ///test ??  ~~/test / ? chk name that is empty.
 		# ToDo - condition - no first ToBool4!
+		
+		#val = { @$eval = { " $concat = { /~~/university test! } " } } # using @/~~
+		
+		
 													### now.var? if var is empty!! - then err -> use { $getItemValue = { /// } 
 		val = { $event_result = { id = { test } x = { $get_item_value2 = { /// } } y = 2.0 } } #{ $get = { now.~~ } } y = 2.0 } }
-		##val = { @$eval = { "$concat_all = { $add = { 2.700 /./~~ } chk_base_tax  /./~~ } " } }
+		#val = { @$eval = { "$concat_all = { $add = { 2.700 /./~~ } chk_base_tax  /./~~ } " } } # test??
+		
 		#val = { $concat_all = { $add = { 2.700 /./~~ } chk_base_tax  /./~~ } }
-		condition = {
+		condition = { # 
 			#REGEX = { ~~ ~ "^1821\.1\.1$" ~ 0 } # option : 0, 1, 2 ?? - chk!!
 			AND = {
-				EQ = { ~~ ~ base_tax ~ 1 }
-				COMP> = { ~~ / 5.000 ~ 0 }
+				EQ = { ~~ ~ base_tax ~ 1 } # any
+				COMP> = { ~~ /$/// 5.000 ~ 0 } # 1 vs 1?? chk!! # /$it/// ?
+					#    /// $it ??
 			}
 		}
 		
-		val = { $event_result = { id = { test } x = { $get = { now.~~ } } y = 1.0 } }
-		##val = { @$eval = { " $concat_all = { $add = { 1.000 /./~~ } chk_base_tax  /./~~ } " } }
+		val = { $event_result = { id = { test } x = { $get_item_value2 = { /// } } y = 1.0 } } # $get = { now.~~ } } y = 1.0 } }
+		#val = { @$eval = { " $concat_all = { $add = { 1.000 /./~~ } chk_base_tax  /./~~ } " } }
 		#val = { $concat_all = { $add = { 2.700 /./~~ } chk_base_tax  /./~~ } }
 		condition = {
 			#REGEX = { ~~ ~ "^1821\.1\.1$" ~ 0 } # option : 0, 1, 2 ?? - chk!!
 			AND = { 
 				EQ = { ~~ ~ base_tax ~ 1 }
-				COMP<EQ = { ~~ / 5.000 ~ 0 }
+				COMP<EQ = { ~~ /$/// 5.000 ~ 0 }
 			}
 		}
 		start_dir = { /eu4Game/provinces/$/history/ }
-		recursive = { TRUE }
-	}
+		recursive = { FALSE }
+	 }
 	$print = { val = { "change end" } }
 	$print = { val = { \n } }
-	$call = { id = save option = USE_THREAD }
-	$call = { id = save2 option = USE_THREAD }
-	$wait = { }
+	$call = { id = save } #option = USE_THREAD }
+	$call = { id = save2 } #option = USE_THREAD }
+	#$wait = { }
 	
 	$_getch = { }
 }
@@ -182,8 +189,8 @@ Event =
 Event =
 {
 	id = save
-	
-	$save_data_only2 = { dirName = { eu4Game } fileName = { "save1.eu4" } option = { 1 } } # 1 - eu4 style? 2 - general style?
+	# option 3 ?
+	$save_data_only2 = { dirName = { eu4Game } fileName = { "save1.eu4" } option = { 1 } } # 1 - eu4 style? 2 - general style? 3 - json style
 	
 	$print = { value = { "save_data_end" } }
 	$print = { value = { \n } }
@@ -191,7 +198,9 @@ Event =
 Event = 
 {
 	id = save2
-	$save = { fileName = { "save2.txt" } option = { 1 } } # 1 - eu4 style? 2 - general style?
+	#$save
+	$save_data_only2 = { dirName= { eu4Game } fileName = { "save2.txt" } option = { 3 } } 
+	# 1 - eu4 style? 2 - general style? 3 =- json
 	$print = { value = { "save_end" } }
 	$print = { value = { \n } }
 }

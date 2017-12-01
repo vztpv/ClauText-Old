@@ -1,15 +1,13 @@
-﻿
-# Data
+
 x = 9
 y = 9
 count = 0
 
-#Event
 Event =
 {
     id = 1
 
-    $option = { REMOVE_IF_CALL_ONESELF_EVENT } # REMOVE_IF_CALL_ONESELF_EVENT.
+    $option = { REMOVE_IF_CALL_ONESELF_EVENT } 
     $parameter = { i j }
 	
 	$assign = { /./x value = { 6 } }
@@ -18,16 +16,14 @@ Event =
         condition = { $COMP<EQ = { $parameter.i /./x } }
         then = {	
 		$assign = { /./count value = { $add = {  1  /./count } } }
-	$print = { value = { /./count } }
-	$print = { value = { "th" } }
-	$print = { enter = { \n } }
-            $call = { id = { $concat = { x $add = { 1 1 } } } i = $parameter.i j = 1 }
+		$print = { value = { /./count } }
+		$print = { value = { "th" } }
+		$print = { enter = { \n } }
+            $call = { id = { $concat = { x $add = { 1 1 } } } i = { $parameter.i } j = 1 }
 			$call = { id = 1 i = { $add = { $parameter.i 1 } } j = 1 }
         }
     }
 	
-	#$wait = { }
-	#$_getch = { }
 	$return = { END }
 }
 
@@ -35,7 +31,7 @@ Event =
 {
     id = x2
     $parameter = { i j }
-    $option = { REMOVE_IF_CALL_ANY_EVENT }
+    $option = { REMOVE_IF_CALL_ONESELF_EVENT }
 
     $if = {
         condition = { $COMP<EQ = { $parameter.j /./y } }
@@ -46,7 +42,7 @@ Event =
             $print = { value = { " = " } }
             $print = { value = { $multiple = { $parameter.i $parameter.j } } }
             $print = { value = { \n } }
-            $call = { id = x2 i = $parameter.i j = { $add = { $parameter.j 1 } } }
+            $call = { id = x2 i = { $parameter.i } j = { $add = { $parameter.j 1 } } }
         }
     }
 	$print = { value = { \n } }
