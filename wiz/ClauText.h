@@ -1870,7 +1870,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					std::string dir;
 					if (val->GetUserTypeList(0)->GetItemListSize() > 0) {
 						dir = val->GetUserTypeList(0)->GetItemList(0).Get(0);
-						dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
+						//dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
 					}
 					else ///val->Ge
 					{
@@ -1990,7 +1990,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 						for (int j = 0; j < val->GetItemListSize(); ++j) {
 							if (val->GetItemListSize() > 0) {
 								_excuteData.info = info2;
-								std::string temp = ToBool4(nullptr, global, val->GetItemList(j).Get(0), _excuteData, &builder);
+								std::string temp = val->GetItemList(j).Get(0);
 								info.parameters.insert(make_pair(val->GetItemList(j).GetName(), temp));
 							}
 						}
@@ -2009,7 +2009,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 								_excuteData.info = info;
 								_excuteData.info.parameters = info2.parameters;
 
-								std::string temp = ToBool4(nullptr, global, val->GetItemList(j).Get(0), _excuteData, &builder);
+								std::string temp = val->GetItemList(j).Get(0);
 
 								std::map<std::string, std::string>::iterator x;
 								if ((x = info.parameters.find(val->GetItemList(j).GetName())) != info.parameters.end())
@@ -2202,7 +2202,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					std::string dir;
 					if (val->GetUserTypeList(0)->GetItemListSize() > 0) {
 						dir = val->GetUserTypeList(0)->GetItemList(0).Get(0);
-						dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
+						//dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
 					}
 					else ///val->Ge
 					{
@@ -2253,7 +2253,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					std::string dir;
 					if (val->GetUserTypeList(0)->GetItemListSize() > 0) {
 						dir = val->GetUserTypeList(0)->GetItemList(0).Get(0);
-						dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
+						//dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
 					}
 					else ///val->Ge
 					{
@@ -2286,7 +2286,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					bool is2 = false;
 					if (val->GetItemListSize() > 0) { // remove?
 						dir = val->GetItemList(0).Get(0);
-						dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
+						//dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
 					}
 					else // 
 					{
@@ -2356,7 +2356,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 
 					std::string dir = std::string(val->GetItemList(0).Get(0).c_str()); // item -> userType
 
-					dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
+					//dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
 
 					std::string condition = "TRUE";
 					if (val->GetUserTypeListSize() >= 1) {
@@ -2378,7 +2378,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					_excuteData.pModule = moduleMapPtr;
 
 					std::string dir = std::string(val->GetItemList(0).Get(0).c_str()); // item -> userType
-					dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
+					//dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
 					std::string name;
 					for (int i = dir.size() - 1; i >= 0; --i)
 					{
@@ -2608,7 +2608,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					// itemlist -> usertypelist.tostring?
 					for (int i = 0; i < val->GetItemListSize(); ++i) {
 						wiz::load_data::UserType ut;
-						std::string fileName = ToBool4(nullptr, global, val->GetItemList(i).Get(0), _excuteData, &builder);
+						std::string fileName = val->GetItemList(i).Get(0);
 						fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
 
 						if (wiz::load_data::LoadData::LoadDataFromFile(fileName, ut)) {
@@ -2742,7 +2742,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					// to do, load data and events from other file!
 					for (int i = 0; i < val->GetItemListSize(); ++i) {
 						wiz::load_data::UserType ut;
-						std::string fileName = ToBool4(nullptr, global, val->GetItemList(i).Get(0), _excuteData, &builder);
+						std::string fileName = val->GetItemList(i).Get(0);
 						fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
 
 						if (wiz::load_data::LoadData::FastLoadDataFromFile(fileName, ut)) {
