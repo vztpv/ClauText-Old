@@ -1781,7 +1781,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$object_from_std::string" == val->GetName()) {
+				else if ("$object_from_string" == val->GetName()) {
 					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
@@ -2284,7 +2284,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 
 					std::string dir;
 					bool is2 = false;
-					if (val->GetItemListSize() > 0) {
+					if (val->GetItemListSize() > 0) { // remove?
 						dir = val->GetItemList(0).Get(0);
 						dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
 					}
@@ -2359,8 +2359,8 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
 
 					std::string condition = "TRUE";
-					if (val->GetUserTypeListSize() >= 2) {
-						condition = val->GetUserTypeList(1)->ToString();
+					if (val->GetUserTypeListSize() >= 1) {
+						condition = val->GetUserTypeList(0)->ToString();
 					}
 					wiz::load_data::LoadData::Remove(global, dir, condition, _excuteData, &builder);
 
@@ -2390,8 +2390,8 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					}
 
 					std::string condition = "TRUE";
-					if (val->GetUserTypeListSize() >= 2) {
-						condition = val->GetUserTypeList(1)->ToString();
+					if (val->GetUserTypeListSize() >= 1) {
+						condition = val->GetUserTypeList(0)->ToString();
 					}
 					wiz::load_data::LoadData::Remove(global, dir, name, condition, _excuteData, &builder);
 
@@ -2604,7 +2604,8 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
 
-					// to do, load data and events from other file!
+					// load data and events from other file! 
+					// itemlist -> usertypelist.tostring?
 					for (int i = 0; i < val->GetItemListSize(); ++i) {
 						wiz::load_data::UserType ut;
 						std::string fileName = ToBool4(nullptr, global, val->GetItemList(i).Get(0), _excuteData, &builder);
@@ -2949,6 +2950,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 				}
 				else if ("$return" == val->GetName())
 				{
+					//// can $return = { a b c }
 					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();
@@ -2974,7 +2976,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					eventStack.pop();
 					break;
 				}
-				else if ("$return_data" == val->GetName()) { // for functional programming??
+				/*else if ("$return_data" == val->GetName()) { // for functional programming??
 					eventStack.top().userType_idx.top()++;
 
 					if (eventStack.size() > 1)
@@ -2994,6 +2996,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
+				*/
 				else if ("$parameter" == val->GetName())
 				{
 					eventStack.top().userType_idx.top()++;

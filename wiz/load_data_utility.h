@@ -9,7 +9,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
-#include <thread>
+//#include <thread>
 #include <algorithm>
 
 #include <wiz/cpp_string.h>

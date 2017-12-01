@@ -4,7 +4,7 @@
 
 #include <vector>
 #include <string>
-#include <algorithm>\
+#include <algorithm>
 
 #include <wiz/stacks.h>
 #include <wiz/load_data_types.h>

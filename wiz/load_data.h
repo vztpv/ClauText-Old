@@ -11,7 +11,6 @@
 #include <algorithm>
 #include <set>
 #include <map>
-#include <thread>
 
 #include <wiz/global.h>
 //#include <wiz/Dictionary.h> /// change to map
