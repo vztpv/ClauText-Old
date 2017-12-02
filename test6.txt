@@ -7,9 +7,9 @@ Main =
 } 
 
 Test = { x = { y = { z = { 1 3 }  5 4 3 } w = 1 a = { 7 3  } } k = 1 }
-Test = { x = { y = 1 w = 0 } k = 0 } # "test test	test  !!" }
+Test = { x = { y = 1 x = 5 w = 0 } k = 0 } # "test test	test  !!" }
 Test2 = { { no = BBB } }
-x = 6
+x = 0 #
 
 Event =
 {
@@ -18,7 +18,8 @@ Event =
 	$local = { x y }
 
 	#$remove = { /Test/x }
-	$insert2 = { dir = { /Test/x } value = { { n = { 1 } } { m = 2 } } condition = { EQ = { w / /./x  ~ 0 } } }
+	#check /./x -> EQ
+	$insert2 = { dir = { /Test/x } value = { { n = { 1 } } { m = 2 } } condition = { EQ = { w / /./x ~ 0 } } }
 
 	$assign_local = { dir = { $local.y } value = { y } }
 
@@ -130,7 +131,7 @@ Event =
 			#REGEX = { ~~ ~ "^1821\.1\.1$" ~ 0 } # option : 0, 1, 2 ?? - chk!!
 			AND = { 
 				EQ = { ~~ ~ base_tax ~ 1 }
-				COMP<EQ = { ~~ /$/// 5.000 ~ 0 }
+				COMP< = { ~~ /$/// 5.000 ~ 0 } 
 			}
 		}
 		start_dir = { /eu4Game/provinces/$/history/ }

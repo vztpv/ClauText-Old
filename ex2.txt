@@ -1,14 +1,20 @@
 
-#Main
 Main =
 {
-	$call = { id = 0 }  # " test "
+	$call = { id = 0 }  
 }
 
 x =  { y = 2 }
+  
+A = {
+	{
+		val = 5
+	}
+	{
+		val = 6
+	}
+}
    
-   
-#Event
 Event =
 {
 	id = 0
@@ -26,7 +32,9 @@ Event =
 
 	$print = { value = { \n } }
 	
-	$_getch = { } # do not use in acroEdit!
+	$print = { value = { /A/_/val } }
+	$print = { enter = { \n } }
+	$_getch = { } 
 	
 	$return = { $return_value = { } }
 }

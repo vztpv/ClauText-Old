@@ -4314,14 +4314,15 @@ namespace wiz {
 			// ex) A = { B = 1 $C = { 3 } } D = { E }  $F = { G }
 			// =>  A = { B = 1 $C = 3  }  D = E $F = G 
 			// =>  A = { B = 1 $C = { 3 } } D = E  $F = { G } : ToDo!
-
+			
 			std::vector<std::string> strVec;
-			std::stack<int> chkBrace;
+			//std::stack<int> chkBrace;
 
-			chkBrace.push(0);
+			//chkBrace.push(0);
 
 			for (int i = operandStack.size() - 1; i >= 0; --i)
 			{
+				/*
 				if (operandStack[i] == "}") {
 					chkBrace.top()++;
 					if (chkBrace.top() == 2 && !(i + 4 <= operandStack.size() - 1 && operandStack[i+3] == "=" && operandStack[i+4][0] == '$' && operandStack[i+4].size() > 1))
@@ -4343,10 +4344,10 @@ namespace wiz {
 				else {
 					chkBrace.top()++;
 				}
-
+				*/
 				strVec.push_back(operandStack[i]);
 			}
-
+			
 			//cout << "result is " << result << endl;
 			//result = "";
 			//builder->Clear();
