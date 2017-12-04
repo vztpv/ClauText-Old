@@ -679,7 +679,7 @@ namespace wiz {
 				{
 					inFile.close(); return false;
 				}
-				UserType globalTemp = global;
+				UserType globalTemp = global; // &?
 				ArrayQueue<Token> strVec;
 
 				try {
@@ -725,6 +725,7 @@ namespace wiz {
 				try {
 					InFileReserver ifReserver(inFile);
 					wiz::LoadDataOption option;
+					option.Removal.push_back(',');
 					option.Assignment.push_back(':');
 					option.Left.push_back('{');
 					option.Left.push_back('[');

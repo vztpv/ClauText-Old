@@ -814,7 +814,7 @@ namespace wiz {
 			{
 				int count = 0;
 				std::string temp;
-				static wiz::StringBuilder builder(128 * num); // *num;
+				wiz::StringBuilder builder(128 * num); // *num;
 
 				builder.Clear();
 
