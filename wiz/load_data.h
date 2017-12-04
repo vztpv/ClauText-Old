@@ -3342,25 +3342,25 @@ namespace wiz {
 					operandStack.push("FALSE");
 				}
 			}
-			else if ("$toQuotedStr" == str) {
+			else if ("$to_quoted_str" == str) {
 				std::string str = operandStack.pop();
 				str.push_back('\"');
 				str.insert(str.begin(), '\"');
 				operandStack.push(str);
 			}
-			else if ("$toQuotedStr2" == str) {
+			else if ("$to_quoted_str2" == str) {
 				std::string str = operandStack.pop();
 				str.push_back('\'');
 				str.insert(str.begin(), '\'');
 				operandStack.push(str);
 			}
-			else if ("$addSmallQuoted" == str) {
+			else if ("$add_small_quoted" == str) {
 				std::string str = operandStack.pop();
 				str.push_back('\'');
 				str.insert(str.begin(), '\'');
 				operandStack.push(str);
 			}
-			else if ("$removeQuoted" == str) { // chk "" std::string problem?
+			else if ("$remove_quoted" == str) { // chk "" std::string problem?
 				std::string str = operandStack.pop();
 
 				if (str.size() > 0 && str.front() == str.back()
@@ -3372,7 +3372,7 @@ namespace wiz {
 
 				operandStack.push(str);
 			}
-			else if ("$removeQuoted2" == str) { // chk "" std::string problem?
+			else if ("$remove_quoted2" == str) { // chk "" std::string problem?
 				std::string str = operandStack.pop();
 
 				if (str.size() > 0 && str.front() == str.back()
@@ -3384,7 +3384,7 @@ namespace wiz {
 
 				operandStack.push(str);
 			}
-			else if ("$removeSmallQuoted" == str) { // chk "" std::string problem?
+			else if ("$remove_small_quoted" == str) { // chk "" std::string problem?
 				std::string str = operandStack.pop();
 
 				if (str.size() > 0 && str.front() == str.back()
@@ -3396,7 +3396,7 @@ namespace wiz {
 
 				operandStack.push(str);
 			}
-			else if ("$getObjectStr" == str) {
+			else if ("$get_object_str" == str) {
 				std::string object_name = operandStack.pop();
 				object_name = wiz::String::substring(object_name, 1, object_name.size() - 2);
 				std::string event_id = operandStack.pop();

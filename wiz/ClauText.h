@@ -2587,9 +2587,11 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					std::string dir = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), _excuteData, &builder);
 					auto x = wiz::load_data::UserType::Find(&global, dir, &builder);
 
-					for (auto& ut : x.second) {
-						std::cout << ut->ToString();
-						std::cout << std::endl;
+					for (int idx=0; idx < x.second.size(); ++idx) {
+						std::cout << x.second[idx]->ToString();
+						if (idx < x.second.size() - 1) {
+							std::cout << "\n";
+						}
 					}
 
 					eventStack.top().userType_idx.top()++;
