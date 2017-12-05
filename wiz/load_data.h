@@ -679,7 +679,7 @@ namespace wiz {
 				{
 					inFile.close(); return false;
 				}
-				UserType globalTemp = global; // &?
+				UserType globalTemp = global;
 				ArrayQueue<Token> strVec;
 
 				try {
@@ -749,7 +749,8 @@ namespace wiz {
 				catch (std::exception e) { std::cout << e.what() << std::endl; inFile.close(); return false; }
 				catch (...) { std::cout << "not expected error" << std::endl; inFile.close(); return false; }
 
-				global = std::move(globalTemp);
+				global = std::move(*globalTemp.GetUserTypeList(0));
+			
 				return true;
 			}
 
