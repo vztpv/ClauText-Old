@@ -1,0 +1,31 @@
+
+Test = 3
+
+Test = {
+	Main = {
+		$call = { id = 0 } 
+	}
+
+	Event = {
+		id = 0
+		
+		$print = { data = { "Hello World B" } }
+		$print = { enter = { \n } }
+	}
+}
+
+Main = {
+	$call = { id = 0 } 
+}
+
+Event = {
+	id = 0
+	
+	$print = { data = { "Hello World A" } }
+	$print = { enter = { \n } }
+	
+	$call_by_data = { Test } # add to ecilpse!
+	
+	$_getch = { }
+}
+

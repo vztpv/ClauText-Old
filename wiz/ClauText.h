@@ -1192,7 +1192,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					_excuteData.pObjectMap = objectMapPtr;
 					_excuteData.pEvents = eventPtr;
 					_excuteData.pModule = moduleMapPtr;
-					_excuteData.noUseInput = excuteData.noUseInput;
+					_excuteData.noUseInput = excuteData.noUseInput; //// check!
 					_excuteData.noUseOutput = excuteData.noUseOutput;
 
 
@@ -2084,6 +2084,32 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 						eventStack.push(info);
 					//}
 
+					break;
+				}
+				else if ("$call_by_data" == val->GetName()) {
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+					_excuteData.noUseInput = excuteData.noUseInput; //// check!
+					_excuteData.noUseOutput = excuteData.noUseOutput;
+
+
+					std::string dir = val->GetItemList(0).ToString();
+					wiz::load_data::UserType subGlobal;
+					wiz::load_data::LoadData::LoadDataFromString(global.GetUserTypeItem(dir)[0]->ToString(), subGlobal);
+
+					{
+						ExcuteData _excuteData;
+						_excuteData.noUseInput = excuteData.noUseInput;
+						_excuteData.noUseOutput = excuteData.noUseOutput;
+
+						eventStack.top().return_value = excute_module("", &subGlobal, _excuteData, 0);  // return ?
+					}
+
+					eventStack.top().userType_idx.top()++;
 					break;
 				}
 				//// no $parameter.~
