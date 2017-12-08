@@ -953,6 +953,61 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 		}
 
 		eventStack.push(info);
+
+		{
+			wiz::load_data::UserType* val = nullptr;
+			auto x = info.eventUT->GetUserTypeItem("$load_only_data");
+			if (!x.empty()) {
+				for (int i = 0; i < x.size(); ++i) {
+					val = x[i];
+
+					wiz::load_data::UserType ut;
+					std::string fileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), ExcuteData(), &builder);
+					fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
+					std::string dirName = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), ExcuteData(), &builder);
+					wiz::load_data::UserType* utTemp = global.GetUserTypeItem(dirName)[0];
+					std::string option;
+
+					if (val->GetUserTypeListSize() >= 3) {
+						option = val->GetUserTypeList(2)->ToString();
+					}
+
+					if (wiz::load_data::LoadData::LoadDataFromFile(fileName, ut)) {
+						{
+							for (int i = 0; i < ut.GetCommentListSize(); ++i) {
+								utTemp->PushComment(std::move(ut.GetCommentList(i)));
+							}
+							int item_count = 0;
+							int userType_count = 0;
+
+							for (int i = 0; i < ut.GetIListSize(); ++i) {
+								if (ut.IsItemList(i)) {
+									utTemp->AddItem(std::move(ut.GetItemList(item_count).GetName()),
+										std::move(ut.GetItemList(item_count).Get(0)));
+									item_count++;
+								}
+								else {
+									utTemp->AddUserTypeItem(std::move(*ut.GetUserTypeList(userType_count)));
+									userType_count++;
+								}
+							}
+						}
+
+						//	auto _Main = ut.GetUserTypeItem("Main");
+						//	if (!_Main.empty())
+						//	{
+						// error!
+						//		std::cout << "err" << std::endl;
+
+						//			return "ERROR -2"; /// exit?
+						//		}
+					}
+					else {
+						// error!
+					}
+				}
+			}
+		}
 	}
 	else {
 		eventStack.push(excuteData.info);
@@ -1968,6 +2023,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 						info.id = val->GetItem("id")[0].Get(0);
 					}
 					else {
+						//// removal?
 						info.id = ToBool4(nullptr, global, val->GetUserTypeItem("id")[0]->ToString(), _excuteData, &builder);
 					}
 
@@ -2623,6 +2679,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
+				// comment copy??
 				else if ("$load" == val->GetName())
 				{
 					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;

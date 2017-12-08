@@ -675,6 +675,8 @@ namespace wiz {
 				bool success = true;
 				std::ifstream inFile;
 				inFile.open(fileName);
+			
+
 				if (true == inFile.fail())
 				{
 					inFile.close(); return false;
