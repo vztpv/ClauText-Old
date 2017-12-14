@@ -873,44 +873,6 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 	wiz::load_data::UserType Main;
 	wiz::StringBuilder builder(102400);
 
-	if (nullptr == excuteData.pModule) {
-		moduleMapPtr = &moduleMap;
-	}
-	else {
-		moduleMapPtr = excuteData.pModule;
-	}
-
-	if (nullptr == excuteData.pObjectMap) {
-		objectMapPtr = &objectMap;
-	}
-	else {
-		objectMapPtr = excuteData.pObjectMap;
-	}
-
-	if (nullptr == excuteData.pEvents) {
-		_events = global.GetCopyUserTypeItem("Event");
-		for (int i = 0; i < _events.size(); ++i) {
-			events.LinkUserType(_events[i]);
-		}
-		global.RemoveUserTypeList("Event");
-		eventPtr = &events;
-	}
-	else {
-		eventPtr = excuteData.pEvents;
-	}
-	// event table setting
-	for (int i = 0; i < eventPtr->GetUserTypeListSize(); ++i)
-	{
-		auto x = eventPtr->GetUserTypeList(i)->GetItem("id");
-		if (!x.empty()) {
-			//std::cout <<	x[0] << std::endl;
-			convert.insert(std::pair<std::string, int>(x[0].Get(0), i));
-		}
-		else {
-			// error
-		}
-	}
-
 	// start from Main.
 	if (excuteData.chkInfo == false) { /// chk smartpointer.
 		if (global.GetUserTypeItem("Main").empty() && MainStr.empty())
@@ -918,7 +880,6 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 			std::cout << "do not exist Main" << std::endl;
 			return "ERROR -1";
 		}
-
 
 		wiz::load_data::UserType* _Main = nullptr;
 
@@ -940,18 +901,6 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 		);
 		info.id = info.parameters["id"];
 
-		const int no = convert.at(info.id);
-		for (int i = 0; i < eventPtr->GetUserTypeList(no)->GetUserTypeListSize(); ++i) {
-			if (eventPtr->GetUserTypeList(no)->GetUserTypeList(i)->GetName() == "$local") {
-				for (int j = 0; j < eventPtr->GetUserTypeList(no)->GetUserTypeList(i)->GetItemListSize(); ++j) {
-					std::string name = eventPtr->GetUserTypeList(no)->GetUserTypeList(i)->GetItemList(j).Get(0);
-					std::string value = "";
-					info.locals.insert(make_pair(name, value));
-				}
-				break;
-			}
-		}
-
 		eventStack.push(info);
 
 		{
@@ -964,8 +913,16 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					wiz::load_data::UserType ut;
 					std::string fileName = ToBool4(nullptr, global, val->GetUserTypeList(0)->ToString(), ExcuteData(), &builder);
 					fileName = wiz::String::substring(fileName, 1, fileName.size() - 2);
-					std::string dirName = ToBool4(nullptr, global, val->GetUserTypeList(1)->ToString(), ExcuteData(), &builder);
-					wiz::load_data::UserType* utTemp = global.GetUserTypeItem(dirName)[0];
+					std::string dirName = val->GetUserTypeList(1)->ToString();
+					wiz::load_data::UserType* utTemp;
+					
+					if (dirName == "/./" || dirName == "root") {
+						utTemp = &global;
+					}
+					else {
+						dirName = ToBool4(nullptr, global, dirName, ExcuteData(), &builder);
+						utTemp = global.GetUserTypeItem(dirName)[0];
+					}
 					std::string option;
 
 					if (val->GetUserTypeListSize() >= 3) {
@@ -1006,6 +963,57 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 						// error!
 					}
 				}
+			}
+		}
+
+		if (nullptr == excuteData.pModule) {
+			moduleMapPtr = &moduleMap;
+		}
+		else {
+			moduleMapPtr = excuteData.pModule;
+		}
+
+		if (nullptr == excuteData.pObjectMap) {
+			objectMapPtr = &objectMap;
+		}
+		else {
+			objectMapPtr = excuteData.pObjectMap;
+		}
+
+		if (nullptr == excuteData.pEvents) {
+			_events = global.GetCopyUserTypeItem("Event");
+			for (int i = 0; i < _events.size(); ++i) {
+				events.LinkUserType(_events[i]);
+			}
+			global.RemoveUserTypeList("Event");
+			eventPtr = &events;
+		}
+		else {
+			eventPtr = excuteData.pEvents;
+		}
+
+		// event table setting
+		for (int i = 0; i < eventPtr->GetUserTypeListSize(); ++i)
+		{
+			auto x = eventPtr->GetUserTypeList(i)->GetItem("id");
+			if (!x.empty()) {
+				//std::cout <<	x[0] << std::endl;
+				convert.insert(std::pair<std::string, int>(x[0].Get(0), i));
+			}
+			else {
+				// error
+			}
+		}
+
+		const int no = convert.at(info.id);
+		for (int i = 0; i < eventPtr->GetUserTypeList(no)->GetUserTypeListSize(); ++i) {
+			if (eventPtr->GetUserTypeList(no)->GetUserTypeList(i)->GetName() == "$local") {
+				for (int j = 0; j < eventPtr->GetUserTypeList(no)->GetUserTypeList(i)->GetItemListSize(); ++j) {
+					std::string name = eventPtr->GetUserTypeList(no)->GetUserTypeList(i)->GetItemList(j).Get(0);
+					std::string value = "";
+					info.locals.insert(make_pair(name, value));
+				}
+				break;
 			}
 		}
 	}
