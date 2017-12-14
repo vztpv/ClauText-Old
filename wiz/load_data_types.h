@@ -880,6 +880,8 @@ namespace wiz {
 				int itemListCount = 0;
 				int userTypeListCount = 0;
 
+				const bool existUserType = ut->GetUserTypeListSize() > 0;
+
 				for (int i = 0; i < ut->commentList.size(); ++i) {
 					for (int k = 0; k < depth; ++k) {
 						stream << "\t";
@@ -896,21 +898,28 @@ namespace wiz {
 					if (ut->ilist[i] == 1) {
 						for (int j = 0; j < ut->itemList[itemListCount].size(); j++) {
 							std::string temp;
-							//for (int k = 0; k < depth; ++k) {
-							//	temp += "\t";
-							//}
+							if (existUserType) {
+								for (int k = 0; k < depth; ++k) {
+									temp += "\t";
+								}
+							}
 							if (ut->itemList[itemListCount].GetName() != "") {	
 								temp += ut->itemList[itemListCount].GetName();
 								temp += "=";
 							}
 							temp += ut->itemList[itemListCount].Get(j);
 							if (j != ut->itemList[itemListCount].size() - 1) {
-								temp += " "; // \n
+								temp += " "; 
 							}
 							stream << temp;
 						}
 						if (i != ut->ilist.size() - 1) {
-							stream << " ";
+							if (existUserType) {
+								stream << "\n";
+							}
+							else {
+								stream << " "; // \n
+							}
 						}
 						itemListCount++;
 					}
@@ -941,7 +950,7 @@ namespace wiz {
 					}
 				}
 			}
-			/// save2 - for more seed loading data!
+			/// save2 - for more speed loading data!
 			void Save2(std::ostream& stream, const UserType* ut, const int depth = 0) const {
 				int itemListCount = 0;
 				int userTypeListCount = 0;
@@ -961,9 +970,9 @@ namespace wiz {
 					//std::cout << "ItemList" << endl;
 					if (ut->ilist[i] == 1) {
 						for (int j = 0; j < ut->itemList[itemListCount].size(); j++) {
-							for (int k = 0; k < depth; ++k) {
-								stream << "\t";
-							}
+							//for (int k = 0; k < depth; ++k) {
+							//	stream << "\t";
+							//}
 							if (ut->itemList[itemListCount].GetName() != "")
 								stream << ut->itemList[itemListCount].GetName() << " = ";
 							stream << ut->itemList[itemListCount].Get(j);
@@ -971,7 +980,7 @@ namespace wiz {
 								stream << " ";
 						}
 						if (i != ut->ilist.size() - 1) {
-							stream << "\n";
+							stream << " ";//"\n";
 						}
 						itemListCount++;
 					}
