@@ -896,21 +896,21 @@ namespace wiz {
 					if (ut->ilist[i] == 1) {
 						for (int j = 0; j < ut->itemList[itemListCount].size(); j++) {
 							std::string temp;
-							for (int k = 0; k < depth; ++k) {
-								temp += "\t";
-							}
+							//for (int k = 0; k < depth; ++k) {
+							//	temp += "\t";
+							//}
 							if (ut->itemList[itemListCount].GetName() != "") {	
 								temp += ut->itemList[itemListCount].GetName();
 								temp += "=";
 							}
 							temp += ut->itemList[itemListCount].Get(j);
 							if (j != ut->itemList[itemListCount].size() - 1) {
-								temp += "\n";
+								temp += " "; // \n
 							}
 							stream << temp;
 						}
 						if (i != ut->ilist.size() - 1) {
-							stream << "\n";
+							stream << " ";
 						}
 						itemListCount++;
 					}
