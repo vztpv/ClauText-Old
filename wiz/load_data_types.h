@@ -1009,6 +1009,10 @@ namespace wiz {
 		
 			bool IsArrayWithJson(const UserType* ut) const
 			{
+				if (ut->GetIListSize() == 0) {
+					return false;
+				}
+
 				bool isArray = true;
 
 				for (int i = 0; i < ut->GetItemListSize(); ++i) {
@@ -1032,7 +1036,7 @@ namespace wiz {
 				return isArray; // && 0 == ut->GetUserTypeListSize();
 			}
 			
-			// todo - removal?
+			// todo - fix bug?
 			void SaveWithJson(std::ostream& stream, const UserType* ut, const int depth = 0) const {
 				int itemListCount = 0;
 				int userTypeListCount = 0;
@@ -1076,6 +1080,9 @@ namespace wiz {
 									stream << "\"" + ut->itemList[itemListCount].GetName() + "\"" << " : ";
 								}
 							}
+							else {
+								stream << "\"_ANY\" : ";
+							}
 							if (ut->itemList[itemListCount].Get(j)[0] == '\"') {
 								if (ut->itemList[itemListCount].Get(j) == "\"\"") {
 									stream << "\" \"";
@@ -1094,13 +1101,14 @@ namespace wiz {
 						itemListCount++;
 					}
 					else if (ut->ilist[i] == 2) {
-						if (0 == ut->userTypeList[userTypeListCount]->GetIListSize() && ut->userTypeList[userTypeListCount]->GetName().empty())
-						{
-							userTypeListCount++;
-
-							continue;
-						}
-						else if (i != 0) {
+						//if (0 == ut->userTypeList[userTypeListCount]->GetIListSize() && ut->userTypeList[userTypeListCount]->GetName().empty())
+						//{
+						//	userTypeListCount++;
+						//
+						//	continue;
+						//}
+						//else 
+						if (i != 0) {
 							stream << " ,\n";
 						}
 						
@@ -1117,14 +1125,16 @@ namespace wiz {
 								stream << "\"" + ut->userTypeList[userTypeListCount]->GetName() + "\"" << " : ";
 							}
 						}
-
-						
-						if (IsArrayWithJson(ut->userTypeList[userTypeListCount])) {
-							stream << "[\n";
-						}
 						else {
-							stream << "{\n";
+							stream << "\"_ANY\"" << " : ";
 						}
+						
+						//if (IsArrayWithJson(ut->userTypeList[userTypeListCount])) {
+						//	stream << "[\n";
+						//}
+						//else {
+							stream << "{\n";
+						//}
 
 						SaveWithJson(stream, ut->userTypeList[userTypeListCount], depth + 1);
 						stream << "\n";
@@ -1133,12 +1143,12 @@ namespace wiz {
 							stream << "\t";
 						}
 						
-						if (IsArrayWithJson(ut->userTypeList[userTypeListCount])) {
-							stream << "]";
-						}
-						else {
+						//if (IsArrayWithJson(ut->userTypeList[userTypeListCount])) {
+						//	stream << "]";
+						//}
+						//else {
 							stream << "}";
-						}
+						//}
 
 						//if (i != ut->ilist.size() - 1) {
 						//	stream << " ,\n";
