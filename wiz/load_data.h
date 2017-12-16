@@ -571,6 +571,157 @@ namespace wiz {
 
 				return true;
 			}
+		private:
+			bool isOpenTagStart(const std::string& word) {
+				return wiz::String::startsWith(word, "<");
+			}
+			bool isOpenTagEnd(const std::string& word) {
+				return wiz::String::endsWith(word, ">");
+			}
+			bool isCloseTagStart(const std::string& word) {
+				return wiz::String::startsWith(word, "</");
+			}
+			bool isCloseTagEnd(const std::string& word) {
+				return wiz::String::endsWith(word, ">");
+			}
+			// return wiz::String::endsWith(word, "/>");
+		public:
+			/// assume valid html file?
+			template <class Reserver>
+			static bool _LoadDataHTML(ArrayQueue<Token>& strVec, Reserver& reserver, UserType& global, const wiz::LoadDataOption& option) // first, strVec.empty() must be true!!
+			{
+				int state = 0;
+				UserType* now = &global; // global`s parent is nullptr
+
+				{
+					reserver(strVec, option);
+
+					while (strVec.empty())
+					{
+						reserver(strVec, option);
+						if (
+							strVec.empty() &&
+							reserver.end()
+							) {
+							return false; // throw "Err nextToken does not exist"; // cf) or empty file or empty std::string!
+						}
+					}
+				}
+
+				while (false == strVec.empty()) {
+					switch (state)
+					{
+					case 0:
+						if (isOpenTagStart(Utility::Top(strVec))) {
+							std::string tagName;
+							const std::string token = Utility::Pop(strVec);
+							// ex)  <test>
+							if (isOpenTagEnd(token)) {
+								tagName = token.substr(1, token.size() - 2);
+								state = 4; // ?
+							}
+							// <test/>
+							else if (wiz::String::endsWith(token, "/>")) {
+								tagName = token.substr(1, token.size() - 3);
+								state = 2;
+							}
+							// <test aa> or <test aa/>
+							else {
+								tagName = token.substr(1, token.size() - 1);
+								state = 1;
+							}
+							// make, test = { }
+							now->AddUserTypeItem(UserType(tagName));
+							now = now->GetUserTypeList(0);
+						}
+						else {
+							// err
+							throw "err 0";
+						}
+						break;
+					case 1:
+						
+						break;
+					case 2:
+						now->addUserTypeItem(UserType(""));+
+						now = now->GetUserTypeList(0);
+						state = 5;
+						break;
+					case 4:
+						now->addUserTypeItem(UserType(""));
+						now = now->GetUserTypeList(0);
+
+						// </test>
+						if (isCloseTagStart(Utility::Top(strVec)) && 
+							isCloseTagEnd(Utility::Top(strVec))) {
+							now = now->parent->parent;
+							state = 5;
+						}
+						//
+						else {
+							now->AddItem("", Utility::Top(strVec));
+							state = 6;
+						}
+
+						Utility::Pop(strVec);
+						break;
+					case 5:
+						if (isOpenTagStart(Utility::Top(strVec))) {
+							state = 0;
+						}
+						else if (isCloseTagStart(Utility::Top(strVec)) &&
+							isCloseTagEnd(Utility::Top(strVec))) {
+							now = now->parent;
+							Utility::Pop();
+							state = 5;
+						}
+						else {
+							throw "err 5";
+						}
+
+						break;
+					case 6:
+						// </test>
+						if (isCloseTagStart(Utility::Top(strVec)) &&
+							isCloseTagEnd(Utility::Top(strVec))) {
+							now = now->parent->parent;
+							state = 5;
+						}
+						//
+						else {
+							now->AddItem("", Utility::Top(strVec));
+							state = 6;
+						}
+
+						break;
+					default:
+						// syntax err!!
+						break;
+					}
+
+					if (strVec.size() < 10) {
+						reserver(strVec, option);
+
+						while (strVec.empty()) // (strVec.empty())
+						{
+							reserver(strVec, option);
+							if (
+								strVec.empty() &&
+								reserver.end()
+								) {
+								// throw "Err nextToken does not exist2";
+								break;
+							}
+						}
+					}
+				}
+
+				if (state != 0) {
+					throw std::string("error final state is not 0!  : ") + toStr(state);
+				}
+
+				return true;
+			}
 #ifdef USE_FAST_LOAD_DATA
 
 		private:
@@ -753,6 +904,50 @@ namespace wiz {
 
 				global = std::move(*globalTemp.GetUserTypeList(0));
 			
+				return true;
+			}
+			
+			static bool LoadDataFromFileWithHtml(const std::string& fileName, UserType& global) /// global should be empty
+			{
+				bool success = true;
+				std::ifstream inFile;
+				inFile.open(fileName);
+
+
+				if (true == inFile.fail())
+				{
+					inFile.close(); return false;
+				}
+				UserType globalTemp = global;
+				ArrayQueue<Token> strVec;
+
+				try {
+					InFileReserver ifReserver(inFile);
+					wiz::LoadDataOption option;
+					
+					//option.Assignment.push_back('=');
+					//option.Left.push_back('{');
+					//option.LineComment.push_back('#');
+					//option.Right.push_back('}');
+
+					ifReserver.Num = 1 << 20;
+					strVec.reserve(ifReserver.Num);
+					// cf) empty file..
+					if (false == _LoadDataHTML(strVec, ifReserver, globalTemp, option))
+					{
+						inFile.close();
+						return false; // return true?
+					}
+
+					inFile.close();
+				}
+				catch (Error e) { std::cout << e << std::endl; inFile.close(); return false; }
+				catch (const char* err) { std::cout << err << std::endl; inFile.close(); return false; }
+				catch (const std::string& e) { std::cout << e << std::endl; inFile.close(); return false; }
+				catch (std::exception e) { std::cout << e.what() << std::endl; inFile.close(); return false; }
+				catch (...) { std::cout << "not expected error" << std::endl; inFile.close(); return false; }
+
+				global = std::move(globalTemp);
 				return true;
 			}
 
