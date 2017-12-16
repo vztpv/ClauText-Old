@@ -572,17 +572,17 @@ namespace wiz {
 				return true;
 			}
 		private:
-			bool isOpenTagStart(const std::string& word) {
-				return wiz::String::startsWith(word, "<");
+			static bool isOpenTagStart(const std::string_view& word) {
+				return wiz::String::startsWith(word, "<") && !wiz::String::startsWith(word, "</");
 			}
-			bool isOpenTagEnd(const std::string& word) {
-				return wiz::String::endsWith(word, ">");
+			static bool isOpenTagEnd(const std::string_view& word) {
+				return wiz::String::endsWith(word, ">") && !wiz::String::endsWith(word, "/>");
 			}
-			bool isCloseTagStart(const std::string& word) {
+			static bool isCloseTagStart(const std::string_view& word) {
 				return wiz::String::startsWith(word, "</");
 			}
-			bool isCloseTagEnd(const std::string& word) {
-				return wiz::String::endsWith(word, ">");
+			static bool isCloseTagEnd(const std::string_view& word) {
+				return wiz::String::endsWith(word, ">") && !wiz::String::endsWith(word, "/>");
 			}
 			// return wiz::String::endsWith(word, "/>");
 		public:
@@ -590,6 +590,7 @@ namespace wiz {
 			template <class Reserver>
 			static bool _LoadDataHTML(ArrayQueue<Token>& strVec, Reserver& reserver, UserType& global, const wiz::LoadDataOption& option) // first, strVec.empty() must be true!!
 			{
+				int before_state = -1;
 				int state = 0;
 				UserType* now = &global; // global`s parent is nullptr
 
@@ -609,12 +610,16 @@ namespace wiz {
 				}
 
 				while (false == strVec.empty()) {
+
+					std::cout << state << " " << Utility::Top(strVec, now, reserver, option) << std::endl;
+
 					switch (state)
 					{
 					case 0:
-						if (isOpenTagStart(Utility::Top(strVec))) {
+						if (isOpenTagStart(Utility::Top(strVec, now, reserver, option))) {
 							std::string tagName;
-							const std::string token = Utility::Pop(strVec);
+							std::string token;
+							Utility::Pop(strVec, &token, now, reserver, option);
 							// ex)  <test>
 							if (isOpenTagEnd(token)) {
 								tagName = token.substr(1, token.size() - 2);
@@ -625,14 +630,15 @@ namespace wiz {
 								tagName = token.substr(1, token.size() - 3);
 								state = 2;
 							}
-							// <test aa> or <test aa/>
+							// <test aa=bb > or <test aa=bb />
 							else {
 								tagName = token.substr(1, token.size() - 1);
 								state = 1;
 							}
+
 							// make, test = { }
 							now->AddUserTypeItem(UserType(tagName));
-							now = now->GetUserTypeList(0);
+							now = now->GetUserTypeList(now->GetUserTypeListSize()-1);
 						}
 						else {
 							// err
@@ -640,59 +646,132 @@ namespace wiz {
 						}
 						break;
 					case 1:
-						
+						if ((isCloseTagStart(Utility::Top(strVec, now, reserver, option)) && isCloseTagEnd(Utility::Top(strVec, now, reserver, option))) ||
+							wiz::String::endsWith(Utility::Top(strVec, now, reserver, option), "/>")) {
+							now->AddUserTypeItem(UserType(""));
+							now = now->GetUserTypeList(now->GetUserTypeListSize() - 1);
+
+							state = 5;
+						}
+						else {
+							std::string token;
+							Utility::Pop(strVec, &token, now, reserver, option); 
+							std::string::size_type equal_idx = token.find('=');
+
+							if (equal_idx == std::string::npos) {
+								throw "err 1";
+							}
+							else {
+								now->AddItem(token.substr(0, equal_idx), token.substr(equal_idx + 1, token.size() - equal_idx - 1));
+							}
+							state = 1;
+						}
 						break;
 					case 2:
-						now->addUserTypeItem(UserType(""));+
-						now = now->GetUserTypeList(0);
+						now->AddUserTypeItem(UserType(""));
+						now = now->GetUserTypeList(now->GetUserTypeListSize() - 1);
 						state = 5;
 						break;
 					case 4:
-						now->addUserTypeItem(UserType(""));
-						now = now->GetUserTypeList(0);
+						now->AddUserTypeItem(UserType(""));
+						now = now->GetUserTypeList(now->GetUserTypeListSize() - 1);
 
 						// </test>
-						if (isCloseTagStart(Utility::Top(strVec)) && 
-							isCloseTagEnd(Utility::Top(strVec))) {
-							now = now->parent->parent;
-							state = 5;
+						if (isCloseTagStart(Utility::Top(strVec, now, reserver, option)) &&
+							isCloseTagEnd(Utility::Top(strVec, now, reserver, option))) {
+							
+							Utility::Pop(strVec, nullptr, now, reserver, option);
+							if (nullptr == now->GetParent()) {
+								state = 0;
+							}
+							else {
+								now = now->GetParent()->GetParent();
+								state = 5;
+							}
+							if (nullptr == now->GetParent()) {
+								state = 0;
+							}
+							
 						}
-						//
-						else {
-							now->AddItem("", Utility::Top(strVec));
-							state = 6;
-						}
-
-						Utility::Pop(strVec);
-						break;
-					case 5:
-						if (isOpenTagStart(Utility::Top(strVec))) {
+						else if (isOpenTagStart(Utility::Top(strVec, now, reserver, option))) {
 							state = 0;
 						}
-						else if (isCloseTagStart(Utility::Top(strVec)) &&
-							isCloseTagEnd(Utility::Top(strVec))) {
-							now = now->parent;
-							Utility::Pop();
+						else { 
+							std::string token;
+
+							Utility::Pop(strVec, &token, now, reserver, option);
+							now->AddItem("", token);
 							state = 5;
 						}
+
+						break;
+					case 5:
+						if (isOpenTagStart(Utility::Top(strVec, now, reserver, option))) {
+							state = 0;
+						}
+						else if (isCloseTagStart(Utility::Top(strVec, now, reserver, option)) &&
+							isCloseTagEnd(Utility::Top(strVec, now, reserver, option))) {
+							Utility::Pop(strVec, nullptr, now, reserver, option);
+							if (nullptr == now->GetParent()) {
+								state = 0;
+							}
+							else {
+								now = now->GetParent()->GetParent();
+								state = 5;
+							}
+							if (nullptr == now->GetParent()) {
+								state = 0;
+							}
+						}
+						else if (wiz::String::endsWith(Utility::Top(strVec, now, reserver, option), "/>")) {
+							Utility::Pop(strVec, nullptr, now, reserver, option);
+							if (nullptr == now->GetParent()) {
+								state = 0;
+							}
+							else {
+								now = now->GetParent()->GetParent();
+								state = 5;
+							}
+							if (nullptr == now->GetParent()) {
+								state = 0;
+							}
+						}
 						else {
-							throw "err 5";
+							std::string token;
+							Utility::Pop(strVec, &token, now, reserver, option);
+
+							now->AddItem("", token);
 						}
 
 						break;
 					case 6:
 						// </test>
-						if (isCloseTagStart(Utility::Top(strVec)) &&
-							isCloseTagEnd(Utility::Top(strVec))) {
-							now = now->parent->parent;
-							state = 5;
+						if (isCloseTagStart(Utility::Top(strVec, now, reserver, option)) &&
+							isCloseTagEnd(Utility::Top(strVec, now, reserver, option))) {
+							
+							Utility::Pop(strVec, nullptr, now, reserver, option);
+							if (nullptr == now->GetParent()) {
+								state = 0;
+							}
+							else {
+								now = now->GetParent()->GetParent();
+								state = 5;
+							}
+							if (nullptr == now->GetParent()) {
+								state = 0;
+							}
 						}
 						//
 						else {
-							now->AddItem("", Utility::Top(strVec));
+							std::string token;
+							Utility::Pop(strVec, &token, now, reserver, option);
+							
+							now->AddItem("", token);
+							
 							state = 6;
 						}
 
+						
 						break;
 					default:
 						// syntax err!!
@@ -717,6 +796,7 @@ namespace wiz {
 				}
 
 				if (state != 0) {
+					std::cout << global.ToString() << std::endl;
 					throw std::string("error final state is not 0!  : ") + toStr(state);
 				}
 

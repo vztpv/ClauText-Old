@@ -144,16 +144,16 @@ namespace wiz{
         {
             return substring( str, start, str.size()-1 );
         }
-        static bool startsWith( const std::string& str, const std::string& start )
+        static bool startsWith( const std::string_view& str, const std::string& start )
         {
             if( str.size() < start.size() ) { return false; }
-            return Comp( str.c_str(), start.c_str(), start.size() );
+			return Comp(str.data(), start.c_str(), start.size());
         }
-        static bool endsWith( const std::string& str, const std::string& last )
+        static bool endsWith( const std::string_view& str, const std::string& last )
         {
             if( str.size() < last.size() ) { return false; }
             if( last.empty() ) { return true; } /// chk... return false; 
-            return Comp(  str.c_str() + ( str.size() - last.size() ), last.c_str(), last.size() );
+            return Comp(  str.data() + ( str.size() - last.size() ), last.c_str(), last.size() );
         }
     };
 
