@@ -943,7 +943,50 @@ namespace wiz {
 				global = std::move(globalTemp);
 				return true;
 			}
+		private:
+			static void RemoveQuotation(UserType* ut) {
+				int it_count = 0;
+				int ut_count = 0;
 
+				for (int i = 0; i < ut->GetIListSize(); ++i) {
+					if (ut->IsItemList(i)) {
+						std::string temp = ut->GetItemList(it_count).GetName();
+						ut->GetItemList(it_count).SetName(temp.substr(1, temp.size() - 2));
+						
+						it_count++;
+					}
+					else {
+						std::string temp = ut->GetUserTypeList(ut_count)->GetName();
+						ut->GetUserTypeList(ut_count)->SetName(temp.substr(1, temp.size() - 2));
+						
+						RemoveQuotation(ut->GetUserTypeList(ut_count));
+
+						ut_count++;
+					}
+				}
+			}
+			static void RemoveUnderbar(UserType* ut) {
+				int it_count = 0;
+				int ut_count = 0;
+
+				for (int i = 0; i < ut->GetIListSize(); ++i) {
+					if (ut->IsItemList(i)) {
+						if (ut->GetItemList(it_count).GetName() == "_") {
+							ut->GetItemList(it_count).SetName("");
+						}
+						it_count++;
+					}
+					else {
+						if (ut->GetUserTypeList(ut_count)->GetName() == "_") {
+							ut->GetUserTypeList(ut_count)->SetName("");
+						}
+						RemoveUnderbar(ut->GetUserTypeList(ut_count));
+						ut_count++;
+					}
+				}
+			}
+		public:
+			// global is empty?
 			static bool LoadDataFromFileWithJson(const std::string& fileName, UserType& global) /// global should be empty
 			{
 				std::ifstream inFile;
@@ -982,7 +1025,10 @@ namespace wiz {
 				catch (std::exception e) { std::cout << e.what() << std::endl; inFile.close(); return false; }
 				catch (...) { std::cout << "not expected error" << std::endl; inFile.close(); return false; }
 
-				global = std::move(*globalTemp.GetUserTypeList(0));
+				RemoveQuotation(globalTemp.GetUserTypeList(0));
+				RemoveUnderbar(globalTemp.GetUserTypeList(0));
+
+				global = std::move(*globalTemp.GetUserTypeList(0)->GetUserTypeList(0)); // check!!
 			
 				return true;
 			}
@@ -2127,7 +2173,8 @@ namespace wiz {
 					global.Save2(outFile);
 				else if (option == "3")
 					global.SaveWithJson(outFile);
-
+				else if (option == "4")
+					global.SaveWithHtml(outFile);
 				outFile.close();
 
 				return true;

@@ -1081,7 +1081,7 @@ namespace wiz {
 								}
 							}
 							else {
-								stream << "\"_ANY\" : ";
+								stream << "\"_\" : ";
 							}
 							if (ut->itemList[itemListCount].Get(j)[0] == '\"') {
 								if (ut->itemList[itemListCount].Get(j) == "\"\"") {
@@ -1126,7 +1126,7 @@ namespace wiz {
 							}
 						}
 						else {
-							stream << "\"_ANY\"" << " : ";
+							stream << "\"_\"" << " : ";
 						}
 						
 						//if (IsArrayWithJson(ut->userTypeList[userTypeListCount])) {
@@ -1157,6 +1157,89 @@ namespace wiz {
 					}
 				}
 			}
+			void SaveWithHtml(std::ostream& stream, const UserType* ut, const int depth = 0) const {
+				int itemListCount = 0;
+				int userTypeListCount = 0;
+
+				bool isOpenCloseTag = ut->GetUserTypeListSize() == 1 && ut->GetUserTypeList(0)->GetIListSize() == 0;
+
+				for (int i = 0; i < ut->ilist.size(); ++i) {
+					if (ut->IsItemList(i)) {
+						auto x = ut;
+
+						if (x->GetName().empty() == false) {
+							for (int k = 0; k < depth; ++k) {
+								stream << "\t";
+							}
+							stream << "<" << x->GetName() << " ";
+						}
+						else {
+							for (int k = 0; k < depth; ++k) {
+								stream << "\t";
+							}
+						}
+
+						stream << ut->GetItemList(itemListCount).ToString();
+						
+						if (x->GetName().empty() == false) {
+							{
+								stream << " ";
+								stream << "/>\n";
+							}
+						}
+						else {
+							stream << "\n";
+						}
+
+						itemListCount++;
+					}
+					else {
+						// <test> or <test a=b > or <test/>
+						auto x = ut;
+
+						if (x->GetName().empty() == false && !isOpenCloseTag) {
+							for (int k = 0; k < depth; ++k) {
+								stream << "\t";
+							}
+							stream << "<" << x->GetName() << " ";
+						}
+
+
+
+						// </test> or </test>  or 
+						if (x->GetName().empty() == false && x->GetItemListSize() == 0 && !isOpenCloseTag) {
+							{
+								stream << " ";
+								stream << ">\n";
+							}
+						}
+
+
+						SaveWithHtml(stream, x->GetUserTypeList(userTypeListCount), depth + 1);
+						
+
+						if (x->GetName().empty() == false && x->GetItemListSize() > 0 && !isOpenCloseTag) {
+							{
+								stream << " ";
+								stream << "/>\n";
+							}
+						}
+						else if (x->GetName().empty() == false && !isOpenCloseTag) {
+							for (int k = 0; k < depth; ++k) {
+								stream << "\t";
+							}
+							if (x->GetUserTypeList(userTypeListCount)->GetItem("_").empty() == false) {
+
+							}
+							else {
+								stream << "</" << x->GetName() << ">" << "\n";
+							}
+						}
+
+						userTypeListCount++;
+					}
+				}
+			}
 		public:
 			void Save1(std::ostream& stream, int depth = 0) const {
 				Save1(stream, this, depth);
@@ -1170,6 +1253,13 @@ namespace wiz {
 				SaveWithJson(stream, this, depth + 1);
 				stream << "\n}";
 			}
+
+			void SaveWithHtml(std::ostream& stream, int depth = 0) const
+			{
+				SaveWithHtml(stream, this->GetUserTypeList(0), depth);
+			}
+
+
 			std::string ItemListToString()const
 			{
 				std::string temp;

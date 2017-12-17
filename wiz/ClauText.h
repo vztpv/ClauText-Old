@@ -2976,20 +2976,23 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 
 					if (wiz::load_data::LoadData::LoadDataFromFileWithJson(fileName, ut)) {
 						{
-							for (int i = 0; i < ut.GetCommentListSize(); ++i) {
-								utTemp->PushComment(move(ut.GetCommentList(i)));
-							}
+							//for (int i = 0; i < ut.GetCommentListSize(); ++i) {
+							//	utTemp->PushComment(move(ut.GetCommentList(i)));
+							//}
+
+							wiz::load_data::UserType* _ut = ut.GetUserTypeList(0);
+
 							int item_count = 0;
 							int userType_count = 0;
 
-							for (int i = 0; i < ut.GetIListSize(); ++i) {
-								if (ut.IsItemList(i)) {
-									utTemp->AddItem(std::move(ut.GetItemList(item_count).GetName()),
-										std::move(ut.GetItemList(item_count).Get(0)));
+							for (int i = 0; i < _ut->GetIListSize(); ++i) {
+								if (_ut->IsItemList(i)) {
+									utTemp->AddItem(std::move(_ut->GetItemList(item_count).GetName()),
+										std::move(_ut->GetItemList(item_count).Get(0)));
 									item_count++;
 								}
 								else {
-									utTemp->AddUserTypeItem(std::move(*ut.GetUserTypeList(userType_count)));
+									utTemp->AddUserTypeItem(std::move(*_ut->GetUserTypeList(userType_count)));
 									userType_count++;
 								}
 							}
