@@ -1179,11 +1179,14 @@ namespace wiz {
 							}
 						}
 
-						stream << ut->GetItemList(itemListCount).ToString();
-						
+						if (ut->GetItemList(itemListCount).GetName().empty()) {
+							stream << ut->GetItemList(itemListCount).Get(0);
+						}
+						else {
+							stream << ut->GetItemList(itemListCount).GetName() + "=" + ut->GetItemList(itemListCount).Get(0);
+						}
 						if (x->GetName().empty() == false && isOpenCloseTag) {
 							{
-								stream << " ";
 								stream << "/>\n";
 							}
 						}
@@ -1200,7 +1203,7 @@ namespace wiz {
 						// <test> or <test a=b > or <test/>
 						auto x = ut;
 
-						if (x->GetName().empty() == false && x->GetItemListSize() == 0 && !isOpenCloseTag) {
+						if (x->GetName().empty() == false && x->GetItemListSize() == 0) {
 							for (int k = 0; k < depth; ++k) {
 								stream << "\t";
 							}
@@ -1215,7 +1218,9 @@ namespace wiz {
 								stream << ">\n";
 							}
 						}
-
+						else if (x->GetName().empty() == false && x->GetItemListSize() == 0 && isOpenCloseTag) {
+							stream << "/>\n";
+						}
 
 						SaveWithHtml(stream, x->GetUserTypeList(userTypeListCount), depth + 1);
 						

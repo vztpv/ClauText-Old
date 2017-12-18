@@ -630,7 +630,7 @@ namespace wiz {
 								tagName = token.substr(1, token.size() - 3);
 								state = 2;
 							}
-							// <test aa=bb > or <test aa=bb />
+							// <test aa=bb > or <test aa=bb /> or <test aa=bb>
 							else {
 								tagName = token.substr(1, token.size() - 1);
 								state = 1;
@@ -646,15 +646,19 @@ namespace wiz {
 						}
 						break;
 					case 1:
-						if ((isCloseTagStart(Utility::Top(strVec, now, reserver, option)) && isCloseTagEnd(Utility::Top(strVec, now, reserver, option))) ||
-							wiz::String::endsWith(Utility::Top(strVec, now, reserver, option), "/>")) {
+						if ((isCloseTagStart(Utility::Top(strVec, now, reserver, option)) 
+								&& isCloseTagEnd(Utility::Top(strVec, now, reserver, option))) ||
+								Utility::Top(strVec, now, reserver, option) == "/>") {
 							now->AddUserTypeItem(UserType(""));
 							now = now->GetUserTypeList(now->GetUserTypeListSize() - 1);
 
 							state = 5;
 						}
-						else if (isOpenTagEnd(Utility::Top(strVec, now, reserver, option))) {
+						else if (//isOpenTagEnd(Utility::Top(strVec, now, reserver, option))) {
+									Utility::Top(strVec, now, reserver, option) == ">"
+							) {
 							Utility::Pop(strVec, nullptr, now, reserver, option);
+							
 							state = 3;
 						}
 						else {
@@ -666,14 +670,27 @@ namespace wiz {
 								throw "err 1";
 							}
 							else {
-								now->AddItem(token.substr(0, equal_idx), token.substr(equal_idx + 1, token.size() - equal_idx - 1));
+								if (wiz::String::endsWith(token, "/>")) {
+									now->AddItem(token.substr(0, equal_idx), token.substr(equal_idx + 1, token.size() - equal_idx - 1 - 2));
+									
+									state = 2;
+								}
+								else if (wiz::String::endsWith(token, ">")) {
+									now->AddItem(token.substr(0, equal_idx), token.substr(equal_idx + 1, token.size() - equal_idx - 1 - 1));
+
+									state = 4;
+								}
+								else {
+									now->AddItem(token.substr(0, equal_idx), token.substr(equal_idx + 1, token.size() - equal_idx - 1));
+								
+									state = 1;
+								}
 							}
-							state = 1;
 						}
 						break;
 					case 2:
 						now->AddUserTypeItem(UserType(""));
-						now = now->GetUserTypeList(now->GetUserTypeListSize() - 1);
+						now = now->GetParent();
 						state = 5;
 						break;
 					case 3:
