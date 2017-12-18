@@ -1181,11 +1181,14 @@ namespace wiz {
 
 						stream << ut->GetItemList(itemListCount).ToString();
 						
-						if (x->GetName().empty() == false) {
+						if (x->GetName().empty() == false && isOpenCloseTag) {
 							{
 								stream << " ";
 								stream << "/>\n";
 							}
+						}
+						else if (x->GetName().empty() == false) {
+							stream << ">\n";
 						}
 						else {
 							stream << "\n";
@@ -1197,11 +1200,11 @@ namespace wiz {
 						// <test> or <test a=b > or <test/>
 						auto x = ut;
 
-						if (x->GetName().empty() == false && !isOpenCloseTag) {
+						if (x->GetName().empty() == false && x->GetItemListSize() == 0 && !isOpenCloseTag) {
 							for (int k = 0; k < depth; ++k) {
 								stream << "\t";
 							}
-							stream << "<" << x->GetName() << " ";
+							stream << "<" << x->GetName();
 						}
 
 
@@ -1209,7 +1212,6 @@ namespace wiz {
 						// </test> or </test>  or 
 						if (x->GetName().empty() == false && x->GetItemListSize() == 0 && !isOpenCloseTag) {
 							{
-								stream << " ";
 								stream << ">\n";
 							}
 						}
@@ -1218,11 +1220,8 @@ namespace wiz {
 						SaveWithHtml(stream, x->GetUserTypeList(userTypeListCount), depth + 1);
 						
 
-						if (x->GetName().empty() == false && x->GetItemListSize() > 0 && !isOpenCloseTag) {
-							{
-								stream << " ";
-								stream << "/>\n";
-							}
+						if (x->GetName().empty() == false && x->GetItemListSize() > 0 && isOpenCloseTag) {
+							
 						}
 						else if (x->GetName().empty() == false && !isOpenCloseTag) {
 							for (int k = 0; k < depth; ++k) {

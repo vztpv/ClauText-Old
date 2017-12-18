@@ -586,7 +586,7 @@ namespace wiz {
 			}
 			// return wiz::String::endsWith(word, "/>");
 		public:
-			/// assume valid html file?
+			/// assume valid html file?, no comment!
 			template <class Reserver>
 			static bool _LoadDataHTML(ArrayQueue<Token>& strVec, Reserver& reserver, UserType& global, const wiz::LoadDataOption& option) // first, strVec.empty() must be true!!
 			{
@@ -653,6 +653,10 @@ namespace wiz {
 
 							state = 5;
 						}
+						else if (isOpenTagEnd(Utility::Top(strVec, now, reserver, option))) {
+							Utility::Pop(strVec, nullptr, now, reserver, option);
+							state = 3;
+						}
 						else {
 							std::string token;
 							Utility::Pop(strVec, &token, now, reserver, option); 
@@ -671,6 +675,26 @@ namespace wiz {
 						now->AddUserTypeItem(UserType(""));
 						now = now->GetUserTypeList(now->GetUserTypeListSize() - 1);
 						state = 5;
+						break;
+					case 3:
+						if ((isCloseTagStart(Utility::Top(strVec, now, reserver, option)) && isCloseTagEnd(Utility::Top(strVec, now, reserver, option))) ||
+							wiz::String::endsWith(Utility::Top(strVec, now, reserver, option), "/>")) {
+							now->AddUserTypeItem(UserType(""));
+							now = now->GetUserTypeList(now->GetUserTypeListSize() - 1);
+
+							state = 5;
+						}
+						else {
+							std::string token;
+
+							Utility::Pop(strVec, &token, now, reserver, option);
+							
+							now->AddUserTypeItem(UserType(""));
+							now = now->GetUserTypeList(now->GetUserTypeListSize() - 1);
+
+							now->AddItem("", token);
+							state = 5;
+						}
 						break;
 					case 4:
 						now->AddUserTypeItem(UserType(""));
