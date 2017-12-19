@@ -563,8 +563,12 @@ namespace wiz {
 						StringBuilder& statement = *strVec;
 						int token_first = 0, token_last = 0; // idx of token in statement.
 						int state = 0;
+						std::string token;
+						token.reserve(1024);
 
 						for (int i = 0; i < statement.Size(); ++i) {
+							int idx;
+
 							if (0 == state && '\'' == statement[i]) {
 								//token_last = i - 1;
 								//if (token_last >= 0 && token_last - token_first + 1 > 0) {
@@ -573,15 +577,18 @@ namespace wiz {
 								state = 2;
 								//token_first = i; 
 								token_last = i;
+
+								token.push_back(statement[i]);
 							}
 							else if (2 == state && '\\' == statement[i - 1] && '\'' == statement[i]) {
 								token_last = i;
+								token.push_back(statement[i]);
 							}
 							else if (2 == state && '\'' == statement[i]) {
 								state = 0; token_last = i;
+								token.push_back(statement[i]);
 							}
-
-							if (0 == state && '\"' == statement[i]) {
+							else if (0 == state && '\"' == statement[i]) {
 								//token_last = i - 1;
 								//if (token_last >= 0 && token_last - token_first + 1 > 0) {
 								//	aq->emplace_back(statement.substr(token_first, token_last - token_first + 1));
@@ -589,24 +596,26 @@ namespace wiz {
 								state = 1;
 								//token_first = i; 
 								token_last = i;
+								token.push_back(statement[i]);
 							}
 							else if (1 == state && '\\' == statement[i - 1] && '\"' == statement[i]) {
 								token_last = i;
+								token.push_back(statement[i]);
 							}
 							else if (1 == state && '\"' == statement[i]) {
 								state = 0; token_last = i;
+								token.push_back(statement[i]);
 							}
-
-							int idx;
-
-							if (0 == state && -1 != (idx = Equal(option.Removal, statement[i])))
+							else if (0 == state && -1 != (idx = Equal(option.Removal, statement[i])))
 							{
 								token_last = i - 1;
 
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
 
-									aq->push(Token(std::string(statement.Str(), token_last - token_first + 1), false));
+									aq->push(Token(move(token), false));
+									token = "";
+
 									statement.LeftShift(i + 1);
 
 									token_first = 0;
@@ -616,17 +625,19 @@ namespace wiz {
 								}
 								else {
 									statement.LeftShift(1);
+									token = "";
 									token_first = 0;
 									token_last = 0;
 									i = -1;
 								}
 								continue;
 							}
-							if (0 == state && -1 != (idx = Equal(option.Assignment, statement[i]))) {
+							else if (0 == state && -1 != (idx = Equal(option.Assignment, statement[i]))) {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
-									Token temp(std::string(statement.Str(), token_last - token_first + 1), false);
+									Token temp(std::move(token), false);
+									token = "";
 									aq->push(std::move(temp));
 									statement.LeftShift(i + 1);
 
@@ -640,6 +651,7 @@ namespace wiz {
 									aq->push(Token(std::string("") + option.Assignment[idx], false));
 									statement.LeftShift(1);
 
+									token = "";
 									token_first = 0;
 									token_last = 0;
 									i = -1;
@@ -650,11 +662,11 @@ namespace wiz {
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
 
-									Token temp(std::string(statement.Str(), token_last - token_first + 1), false);
+									Token temp(std::move(token), false);
 									aq->push(std::move(temp));
 
 									statement.LeftShift(i + 1);
-
+									token = "";
 									token_first = 0;
 									token_last = 0;
 
@@ -663,6 +675,7 @@ namespace wiz {
 								else
 								{
 									statement.LeftShift(1);
+									token = "";
 									token_first = 0;
 									token_last = 0;
 									i = -1;
@@ -673,10 +686,11 @@ namespace wiz {
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
 
-									aq->push(Token(std::string(statement.Str(), token_last - token_first + 1), false));
+									aq->push(Token(std::move(token), false));
 									statement.LeftShift(i + 1);
 
 									aq->push(Token(std::string("") + option.Left[idx], false));
+									token = "";
 									token_first = 0;
 									token_last = 0;
 
@@ -685,6 +699,7 @@ namespace wiz {
 								else {
 									aq->push(Token(std::string("") + option.Left[idx], false));
 									statement.LeftShift(1);
+									token = "";
 									token_first = 0;
 									token_last = 0;
 									i = -1;
@@ -696,11 +711,12 @@ namespace wiz {
 									statement.Divide(i);
 
 
-									aq->push(Token(std::string(statement.Str(), token_last - token_first + 1), false));
+									aq->push(Token(std::move(token), false));
 									statement.LeftShift(i + 1);
 
 									aq->push(Token(std::string("") + option.Right[idx], false));
 
+									token = "";
 									token_first = 0;
 									token_last = 0;
 
@@ -710,17 +726,19 @@ namespace wiz {
 									aq->push(Token(std::string("") + option.Right[idx], false));
 
 									statement.LeftShift(1);
+
+									token = "";
 									token_first = 0;
 									token_last = 0;
 									i = -1;
 								}
 							}
-
-							if (0 == state && -1 != (idx = Equal(option.LineComment, statement[i]))) { // different from load_data_from_file
+							else if (0 == state && -1 != (idx = Equal(option.LineComment, statement[i]))) { // different from load_data_from_file
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
-									aq->push(Token(std::string(statement.Str(), token_last - token_first + 1), false));
+									aq->push(Token(std::move(token), false));
+									token = "";
 									statement.LeftShift(i + 1);
 									i = 0;
 								}
@@ -752,11 +770,14 @@ namespace wiz {
 									i = -1;
 								}
 							}
+							else {
+								token.push_back(statement[i]);
+							}
 						}
 
-						if (token_first < statement.Size())
+						if (token.empty() == false)
 						{
-							aq->push(Token(std::string(statement.Str(), statement.Size() - 1 - token_first + 1), false));
+							aq->push(Token(std::move(token), false));
 						}
 					}
 				}
