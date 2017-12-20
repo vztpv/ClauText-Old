@@ -1029,6 +1029,7 @@ namespace wiz {
 					}
 				}
 			}
+		
 		public:
 			// global is empty?
 			static bool LoadDataFromFileWithJson(const std::string& fileName, UserType& global) /// global should be empty
@@ -1076,7 +1077,57 @@ namespace wiz {
 			
 				return true;
 			}
+		private:
+			static void ConvertHtmlToClau(const UserType* htmlUT, UserType* clauUT) {
+				int itemTypeCount = 0;
+				int userTypeCount = 0;
 			
+				clauUT->ReserveIList(htmlUT->GetIListSize());
+				clauUT->ReserveItemList(htmlUT->GetItemListSize());
+				clauUT->ReserveUserTypeList(htmlUT->GetUserTypeListSize());
+
+				for (int i = 0; i < htmlUT->GetIListSize(); ++i) {
+					if (htmlUT->IsItemList(i)) {
+						// additemlist -> rename?
+						clauUT->AddItemList(std::move(htmlUT->GetItemList(itemTypeCount)));
+
+						itemTypeCount++;
+					}
+					else {
+						clauUT->AddUserTypeItem(UserType(std::move(htmlUT->GetUserTypeList(userTypeCount)->GetName())));
+
+						ConvertHtmlToClau(htmlUT->GetUserTypeList(userTypeCount)->GetUserTypeList(0), clauUT->GetUserTypeList(userTypeCount));
+
+						userTypeCount++;
+					}
+				}
+			}
+			static void ConvertClauToHtml(const UserType* clauUT, UserType* htmlUT) {
+				int itemTypeCount = 0;
+				int userTypeCount = 0;
+
+				htmlUT->ReserveIList(clauUT->GetIListSize());
+				htmlUT->ReserveItemList(clauUT->GetItemListSize());
+				htmlUT->ReserveUserTypeList(clauUT->GetUserTypeListSize());
+
+				for (int i = 0; i < clauUT->GetIListSize(); ++i) {
+					if (clauUT->IsItemList(i)) {
+						// additemlist -> rename?
+						htmlUT->AddItemList(std::move(clauUT->GetItemList(itemTypeCount)));
+
+						itemTypeCount++;
+					}
+					else {
+						htmlUT->AddUserTypeItem(UserType(std::move(clauUT->GetUserTypeList(userTypeCount)->GetName())));
+						htmlUT->GetUserTypeList(userTypeCount)->AddUserTypeItem(UserType(""));
+
+						ConvertClauToHtml(clauUT->GetUserTypeList(userTypeCount), htmlUT->GetUserTypeList(userTypeCount)->GetUserTypeList(0));
+
+						userTypeCount++;
+					}
+				}
+			}
+		public:
 			static bool LoadDataFromFileWithHtml(const std::string& fileName, UserType& global) /// global should be empty
 			{
 				bool success = true;
@@ -1117,7 +1168,9 @@ namespace wiz {
 				catch (std::exception e) { std::cout << e.what() << std::endl; inFile.close(); return false; }
 				catch (...) { std::cout << "not expected error" << std::endl; inFile.close(); return false; }
 
-				global = std::move(globalTemp);
+				ConvertHtmlToClau(&globalTemp, &global);
+				
+				//global = std::move(globalTemp);
 				return true;
 			}
 
@@ -2211,16 +2264,24 @@ namespace wiz {
 				}
 
 				/// saveFile
-				if (option == "1") // for eu4.
+				if (option == "1") { // for eu4.
 					global.Save1(outFile); // cf) friend
-				else if (option == "2")
+				}
+				else if (option == "2") {
 					global.Save2(outFile);
-				else if (option == "3")
+				}
+				else if (option == "3") {
 					global.SaveWithJson(outFile);
-				else if (option == "4")
-					global.SaveWithHtml(outFile);
-				else if (option == "5")
+				}
+				else if (option == "4") {
+					UserType temp;
+					ConvertClauToHtml(&global, &temp);
+					temp.SaveWithHtml(outFile);
+				}
+				else if (option == "5") {
 					global.SaveWithHtml2(outFile);
+				}
+
 				outFile.close();
 
 				return true;

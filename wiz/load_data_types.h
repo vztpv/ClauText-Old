@@ -1314,13 +1314,23 @@ namespace wiz {
 
 			void SaveWithHtml(std::ostream& stream, int depth = 0) const
 			{
-				SaveWithHtml(stream, this->GetUserTypeList(0), depth);
+				if (this->GetUserTypeListSize() > 1) {
+					stream << "<_>\n";
+				}
+				SaveWithHtml(stream, this, depth + 1);
+				if (this->GetUserTypeListSize() > 1) {
+					stream << "</_>\n";
+				}
 			}
 			void SaveWithHtml2(std::ostream& stream, int depth = 0) const
 			{
-				stream << "<_>\n";
+				if (this->GetUserTypeListSize() > 1) {
+					stream << "<_>\n";
+				}
 				SaveWithHtml2(stream, this, depth + 1);
-				stream << "</_>";
+				if (this->GetUserTypeListSize() > 1) {
+					stream << "</_>\n";
+				}
 			}
 
 			std::string ItemListToString()const
