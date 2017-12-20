@@ -2219,6 +2219,8 @@ namespace wiz {
 					global.SaveWithJson(outFile);
 				else if (option == "4")
 					global.SaveWithHtml(outFile);
+				else if (option == "5")
+					global.SaveWithHtml2(outFile);
 				outFile.close();
 
 				return true;

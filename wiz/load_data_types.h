@@ -1244,6 +1244,60 @@ namespace wiz {
 					}
 				}
 			}
+			void SaveWithHtml2(std::ostream& stream, const UserType* ut, const int depth = 0) const {
+				int itemListCount = 0;
+				int userTypeListCount = 0;
+
+
+				for (int i = 0; i < ut->GetIListSize(); ++i) {
+					if (ut->IsItemList(i)) {
+						ItemType<std::string> it = ut->GetItemList(itemListCount);
+
+						for (int k = 0; k < depth; ++k) {
+							stream << "\t";
+						}
+
+						if (it.GetName().empty()) {
+							stream << it.Get(0);
+						}
+						else {
+							stream << it.GetName() + "=" + it.Get(0);
+						}
+						stream << "\n";
+
+						itemListCount++;
+					}
+					else {
+						for (int k = 0; k < depth; ++k) {
+							stream << "\t";
+						}
+
+						if (ut->GetUserTypeList(userTypeListCount)->GetName().empty()) {
+							stream << "<_>\n";
+						}
+						else {
+							stream << "<" + ut->GetUserTypeList(userTypeListCount)->GetName() + ">\n";
+						}
+
+						SaveWithHtml2(stream, ut->GetUserTypeList(userTypeListCount), depth + 1);
+
+						for (int k = 0; k < depth; ++k) {
+							stream << "\t";
+						}
+
+						if (ut->GetUserTypeList(userTypeListCount)->GetName().empty()) {
+							stream << "</_>\n";
+						}
+						else {
+							stream << "</" + ut->GetUserTypeList(userTypeListCount)->GetName() + ">\n";
+						}
+
+
+						userTypeListCount++;
+					}
+				}
+			}
+
 		public:
 			void Save1(std::ostream& stream, int depth = 0) const {
 				Save1(stream, this, depth);
@@ -1262,7 +1316,12 @@ namespace wiz {
 			{
 				SaveWithHtml(stream, this->GetUserTypeList(0), depth);
 			}
-
+			void SaveWithHtml2(std::ostream& stream, int depth = 0) const
+			{
+				stream << "<_>\n";
+				SaveWithHtml2(stream, this, depth + 1);
+				stream << "</_>";
+			}
 
 			std::string ItemListToString()const
 			{
