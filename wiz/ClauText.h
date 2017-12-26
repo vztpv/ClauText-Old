@@ -1933,7 +1933,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					std::string dir;
 					if (val->GetUserTypeList(0)->GetItemListSize() > 0) {
 						dir = val->GetUserTypeList(0)->GetItemList(0).Get(0);
-						//dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
+						dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
 					}
 					else ///val->Ge
 					{
@@ -2292,7 +2292,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					std::string dir;
 					if (val->GetUserTypeList(0)->GetItemListSize() > 0) {
 						dir = val->GetUserTypeList(0)->GetItemList(0).Get(0);
-						//dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
+						dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
 					}
 					else ///val->Ge
 					{
@@ -2343,7 +2343,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					std::string dir;
 					if (val->GetUserTypeList(0)->GetItemListSize() > 0) {
 						dir = val->GetUserTypeList(0)->GetItemList(0).Get(0);
-						//dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
+						dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
 					}
 					else ///val->Ge
 					{
@@ -2376,7 +2376,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					bool is2 = false;
 					if (val->GetItemListSize() > 0) { // remove?
 						dir = val->GetItemList(0).Get(0);
-						//dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
+						dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
 					}
 					else // 
 					{
@@ -2446,7 +2446,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 
 					std::string dir = std::string(val->GetItemList(0).Get(0).c_str()); // item -> userType
 
-					//dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
+					dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
 
 					std::string condition = "TRUE";
 					if (val->GetUserTypeListSize() >= 1) {
@@ -2468,7 +2468,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					_excuteData.pModule = moduleMapPtr;
 
 					std::string dir = std::string(val->GetItemList(0).Get(0).c_str()); // item -> userType
-					//dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
+					dir = ToBool4(nullptr, global, dir, _excuteData, &builder);
 					std::string name;
 					for (int i = dir.size() - 1; i >= 0; --i)
 					{
