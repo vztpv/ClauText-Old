@@ -51,7 +51,7 @@ namespace wiz {
 	class LoadDataOption
 	{
 	public:
-		std::vector<char> LineComment;	// # 
+		std::vector<std::string> LineComment;	// # 
 		std::vector<char> Left, Right;	// { } , [ ] <- json
 		std::vector<char> Assignment;	// = , :
 		std::vector<char> Removal;		// ',', empty. 
@@ -961,7 +961,7 @@ namespace wiz {
 					wiz::LoadDataOption option;
 					option.Assignment.push_back('=');
 					option.Left.push_back('{');
-					option.LineComment.push_back('#');
+					option.LineComment.push_back("#");
 					option.Right.push_back('}');
 
 					ifReserver.Num = 1 << 20;
@@ -1184,7 +1184,7 @@ namespace wiz {
  				wiz::LoadDataOption option;
 				option.Assignment.push_back('=');
 				option.Left.push_back('{');
-				option.LineComment.push_back('#');
+				option.LineComment.push_back("#");
 				option.Right.push_back('}');
 				wiz::load_data::Utility::DoThread doThread(&builder, &strVec, option);
 

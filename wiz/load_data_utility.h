@@ -552,6 +552,31 @@ namespace wiz {
 				{
 					//
 				}
+			private:
+				bool checkLineComment(const StringBuilder& statement, int start, const std::vector<std::string>& delimiter)
+				{
+					int sum = 0;
+					for (int delim_num = 0; delim_num < delimiter.size(); ++delim_num) {
+						// size check
+						if (start + delimiter[delim_num].size() - 1 > statement.Size() - 1) {
+							break;
+						}
+
+						for (int i = start; i <= start + delimiter[delim_num].size() - 1; ++i) {
+							if (statement[i] == delimiter[delim_num][i - start]) {
+
+							}
+							else {
+								sum--;
+								break;
+							}
+						}
+						sum++;
+					}
+
+					return 0 < sum;
+				}
+			public:
 				void operator() () {
 					//std::string* strVecTemp = strVec; // enterkey 기준으로 나뉘어져있다고 가정한다.
 					//for (int x = 0; x <= 0; ++x)
@@ -733,7 +758,7 @@ namespace wiz {
 									i = -1;
 								}
 							}
-							else if (0 == state && -1 != (idx = Equal(option.LineComment, statement[i]))) { // different from load_data_from_file
+							else if (0 == state && checkLineComment(statement, i, option.LineComment)) { // different from load_data_from_file
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
@@ -744,7 +769,7 @@ namespace wiz {
 								}
 								int j = 0;
 								for (j = i; j < statement.Size(); ++j) {
-									if (statement[j] == '\n') // cf) '\r' ?
+									if (statement[j] == '\n') // cf) '\r' ? '\0'?
 									{
 										break;
 									}
