@@ -52,6 +52,8 @@ namespace wiz {
 	{
 	public:
 		std::vector<std::string> LineComment;	// # 
+		std::vector<std::string> MuitipleLineCommentStart; // ###  // ?
+		std::vector<std::string> MuitipleLineCommentEnd;   // ### // ?
 		std::vector<char> Left, Right;	// { } , [ ] <- json
 		std::vector<char> Assignment;	// = , :
 		std::vector<char> Removal;		// ',', empty. 
@@ -961,6 +963,8 @@ namespace wiz {
 					wiz::LoadDataOption option;
 					option.Assignment.push_back('=');
 					option.Left.push_back('{');
+					option.MuitipleLineCommentStart.push_back("###");
+					option.MuitipleLineCommentEnd.push_back("###");
 					option.LineComment.push_back("#");
 					option.Right.push_back('}');
 
@@ -1184,6 +1188,10 @@ namespace wiz {
  				wiz::LoadDataOption option;
 				option.Assignment.push_back('=');
 				option.Left.push_back('{');
+
+				option.MuitipleLineCommentStart.push_back("###");
+				option.MuitipleLineCommentEnd.push_back("###");
+
 				option.LineComment.push_back("#");
 				option.Right.push_back('}');
 				wiz::load_data::Utility::DoThread doThread(&builder, &strVec, option);

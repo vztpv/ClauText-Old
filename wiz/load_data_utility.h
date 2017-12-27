@@ -553,13 +553,14 @@ namespace wiz {
 					//
 				}
 			private:
-				bool checkLineComment(const StringBuilder& statement, int start, const std::vector<std::string>& delimiter)
+				int checkDelimiter(const StringBuilder& statement, const int start, const std::vector<std::string>& delimiter)
 				{
+					
 					int sum = 0;
 					for (int delim_num = 0; delim_num < delimiter.size(); ++delim_num) {
 						// size check
 						if (start + delimiter[delim_num].size() - 1 > statement.Size() - 1) {
-							break;
+							continue;
 						}
 
 						for (int i = start; i <= start + delimiter[delim_num].size() - 1; ++i) {
@@ -572,9 +573,13 @@ namespace wiz {
 							}
 						}
 						sum++;
+
+						if (sum > 0) {
+							return delim_num;
+						}
 					}
 
-					return 0 < sum;
+					return -1;
 				}
 			public:
 				void operator() () {
@@ -588,13 +593,41 @@ namespace wiz {
 						StringBuilder& statement = *strVec;
 						int token_first = 0, token_last = 0; // idx of token in statement.
 						int state = 0;
+						bool isMultipleLineComment = false;
 						std::string token;
 						token.reserve(1024);
 
 						for (int i = 0; i < statement.Size(); ++i) {
 							int idx;
 
-							if (0 == state && '\'' == statement[i]) {
+							if (isMultipleLineComment && -1 != (idx = checkDelimiter(statement, i, option.MuitipleLineCommentEnd)))
+							{
+								isMultipleLineComment = false;
+
+								for (int j = 0; j < option.MuitipleLineCommentEnd[idx].size(); ++j)
+								{
+									token.push_back(statement[i + j]);
+								}
+
+								aq->push(Token(std::move(token), true));
+								
+								i = i + option.MuitipleLineCommentEnd[idx].size() - 1;
+
+								statement.Divide(i);
+								statement.LeftShift(i + 1);
+								
+								token = "";
+								token_first = 0;
+								token_last = 0;
+
+								i = -1;
+							}
+							else if (isMultipleLineComment) {
+								token_last = i;
+
+								token.push_back(statement[i]);
+							}
+							else if (0 == state && '\'' == statement[i]) {
 								//token_last = i - 1;
 								//if (token_last >= 0 && token_last - token_first + 1 > 0) {
 								//	aq->emplace_back(statement.substr(token_first, token_last - token_first + 1));
@@ -758,13 +791,40 @@ namespace wiz {
 									i = -1;
 								}
 							}
-							else if (0 == state && checkLineComment(statement, i, option.LineComment)) { // different from load_data_from_file
+							else if (0 == state && option.MuitipleLineCommentStart.empty() == false 
+								&& -1 != (idx = checkDelimiter(statement, i, option.MuitipleLineCommentStart))) { // different from load_data_from_file
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
 									aq->push(Token(std::move(token), false));
+								
+									statement.LeftShift(i + option.MuitipleLineCommentStart[idx].size());
+									i = -1;
+
+									token_first = 0;
+									token_last = 0;
+								}
+								else {
+									statement.LeftShift(i + option.MuitipleLineCommentStart[idx].size());
+									i = -1;
+								}
+
+								token = option.MuitipleLineCommentStart[idx];
+
+								isMultipleLineComment = true;
+							}
+							else if (0 == state && option.LineComment.empty() == false &&
+									-1 != checkDelimiter(statement, i, option.LineComment)) { // different from load_data_from_file
+								token_last = i - 1;
+								if (token_last >= 0 && token_last - token_first + 1 > 0) {
+									char temp = statement[i];
+
+									statement.Divide(i);
+									aq->push(Token(std::move(token), false));
 									token = "";
-									statement.LeftShift(i + 1);
+									
+									statement[i] = temp;
+									statement.LeftShift(i);
 									i = 0;
 								}
 								int j = 0;
