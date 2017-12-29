@@ -9,7 +9,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
-//#include <thread>
+#include <thread> // maybe error with C++/CLI?
 #include <algorithm>
 
 #include <wiz/cpp_string.h>
@@ -876,6 +876,369 @@ namespace wiz {
 				//	aqpush(std::move(other.aq));
 				//}
 			};
+			class DoThread2 // need to rename!
+			{
+			private:
+				StringBuilder * strVec;
+			public:
+				ArrayQueue<Token>* aq;
+				wiz::LoadDataOption option;
+				//int strVecStart;
+				//int strVecEnd;
+			public:
+				DoThread2(StringBuilder* strVec, ArrayQueue<Token>* aq, const wiz::LoadDataOption& option) //, list<std::string>* aq)//, int strVecStart, int strVecEnd)
+					: strVec(strVec), aq(aq), option(option) // , strVecStart(strVecStart), strVecEnd(strVecEnd)
+				{
+					//
+				}
+			private:
+				int checkDelimiter(const StringBuilder& statement, const int start, const std::vector<std::string>& delimiter)
+				{
+
+					int sum = 0;
+					for (int delim_num = 0; delim_num < delimiter.size(); ++delim_num) {
+						// size check
+						if (start + delimiter[delim_num].size() - 1 > statement.Size() - 1) {
+							continue;
+						}
+
+						for (int i = start; i <= start + delimiter[delim_num].size() - 1; ++i) {
+							if (statement[i] == delimiter[delim_num][i - start]) {
+
+							}
+							else {
+								sum--;
+								break;
+							}
+						}
+						sum++;
+
+						if (sum > 0) {
+							return delim_num;
+						}
+					}
+
+					return -1;
+				}
+			public:
+				void operator() () {
+					//std::string* strVecTemp = strVec; // enterkey 기준으로 나뉘어져있다고 가정한다.
+					//for (int x = 0; x <= 0; ++x)
+					{
+						//StringTokenizer tokenizer(std::move( (*strVecTemp)[x] ) );
+						//while (tokenizer.hasMoreTokens()) {
+						//	aq.push(tokenizer.nextToken());
+						//}
+						StringBuilder& statement = *strVec;
+						int token_first = 0, token_last = 0; // idx of token in statement.
+						int state = 0;
+						bool isMultipleLineComment = false;
+						std::string token;
+						token.reserve(1024);
+
+						for (int i = 0; i < statement.Size(); ++i) {
+							int idx;
+
+							if (statement[i] == '\0') {
+								if (token_last >= 0 && token_last - token_first + 1 > 0) {
+									statement.Divide(i);
+
+									aq->push(Token(move(token), false));
+									token = "";
+
+									statement.LeftShift(i + 1);
+
+									token_first = 0;
+									token_last = 0;
+
+									i = -1;
+								}
+								else {
+									statement.LeftShift(1);
+
+									token_first = 0;
+									token_last = 0;
+
+									i = -1;
+								}
+								aq->push(Token("", true)); // chk!
+							}
+							else if (isMultipleLineComment && -1 != (idx = checkDelimiter(statement, i, option.MuitipleLineCommentEnd)))
+							{
+								isMultipleLineComment = false;
+
+								for (int j = 0; j < option.MuitipleLineCommentEnd[idx].size(); ++j)
+								{
+									token.push_back(statement[i + j]);
+								}
+
+								//aq->push(Token(std::move(token), true));
+
+								i = i + option.MuitipleLineCommentEnd[idx].size() - 1;
+
+								statement.Divide(i);
+								statement.LeftShift(i + 1);
+
+								token = "";
+								token_first = 0;
+								token_last = 0;
+
+								i = -1;
+							}
+							else if (isMultipleLineComment) {
+								token_last = i;
+
+								token.push_back(statement[i]);
+							}
+							else if (0 == state && '\'' == statement[i]) {
+								//token_last = i - 1;
+								//if (token_last >= 0 && token_last - token_first + 1 > 0) {
+								//	aq->emplace_back(statement.substr(token_first, token_last - token_first + 1));
+								//}
+								state = 2;
+								//token_first = i; 
+								token_last = i;
+
+								token.push_back(statement[i]);
+							}
+							else if (2 == state && '\\' == statement[i - 1] && '\'' == statement[i]) {
+								token_last = i;
+								token.push_back(statement[i]);
+							}
+							else if (2 == state && '\'' == statement[i]) {
+								state = 0; token_last = i;
+								token.push_back(statement[i]);
+							}
+							else if (0 == state && '\"' == statement[i]) {
+								//token_last = i - 1;
+								//if (token_last >= 0 && token_last - token_first + 1 > 0) {
+								//	aq->emplace_back(statement.substr(token_first, token_last - token_first + 1));
+								//}
+								state = 1;
+								//token_first = i; 
+								token_last = i;
+								token.push_back(statement[i]);
+							}
+							else if (1 == state && '\\' == statement[i - 1] && '\"' == statement[i]) {
+								token_last = i;
+								token.push_back(statement[i]);
+							}
+							else if (1 == state && '\"' == statement[i]) {
+								state = 0; token_last = i;
+								token.push_back(statement[i]);
+							}
+							else if (0 == state && -1 != (idx = Equal(option.Removal, statement[i])))
+							{
+								token_last = i - 1;
+
+								if (token_last >= 0 && token_last - token_first + 1 > 0) {
+									statement.Divide(i);
+
+									aq->push(Token(move(token), false));
+									token = "";
+
+									statement.LeftShift(i + 1);
+
+									token_first = 0;
+									token_last = 0;
+
+									i = -1;
+								}
+								else {
+									statement.LeftShift(1);
+									token = "";
+									token_first = 0;
+									token_last = 0;
+									i = -1;
+								}
+								continue;
+							}
+							else if (0 == state && -1 != (idx = Equal(option.Assignment, statement[i]))) {
+								token_last = i - 1;
+								if (token_last >= 0 && token_last - token_first + 1 > 0) {
+									statement.Divide(i);
+									Token temp(std::move(token), false);
+									token = "";
+									aq->push(std::move(temp));
+									statement.LeftShift(i + 1);
+
+									aq->push(Token(std::string("") + option.Assignment[idx], false));
+									token_first = 0;
+									token_last = 0;
+
+									i = -1;
+								}
+								else {
+									aq->push(Token(std::string("") + option.Assignment[idx], false));
+									statement.LeftShift(1);
+
+									token = "";
+									token_first = 0;
+									token_last = 0;
+									i = -1;
+								}
+							}
+							else if (0 == state && isWhitespace(statement[i])) { // isspace ' ' \t \r \n , etc... ?
+								token_last = i - 1;
+								if (token_last >= 0 && token_last - token_first + 1 > 0) {
+									statement.Divide(i);
+
+									Token temp(std::move(token), false);
+									aq->push(std::move(temp));
+
+									statement.LeftShift(i + 1);
+									token = "";
+									token_first = 0;
+									token_last = 0;
+
+									i = -1;
+								}
+								else
+								{
+									statement.LeftShift(1);
+									token = "";
+									token_first = 0;
+									token_last = 0;
+									i = -1;
+								}
+							}
+							else if (0 == state && -1 != (idx = Equal(option.Left, statement[i]))) {
+								token_last = i - 1;
+								if (token_last >= 0 && token_last - token_first + 1 > 0) {
+									statement.Divide(i);
+
+									aq->push(Token(std::move(token), false));
+									statement.LeftShift(i + 1);
+
+									aq->push(Token(std::string("") + option.Left[idx], false));
+									token = "";
+									token_first = 0;
+									token_last = 0;
+
+									i = -1;
+								}
+								else {
+									aq->push(Token(std::string("") + option.Left[idx], false));
+									statement.LeftShift(1);
+									token = "";
+									token_first = 0;
+									token_last = 0;
+									i = -1;
+								}
+							}
+							else if (0 == state && -1 != (idx = Equal(option.Right, statement[i]))) {
+								token_last = i - 1;
+								if (token_last >= 0 && token_last - token_first + 1 > 0) {
+									statement.Divide(i);
+
+
+									aq->push(Token(std::move(token), false));
+									statement.LeftShift(i + 1);
+
+									aq->push(Token(std::string("") + option.Right[idx], false));
+
+									token = "";
+									token_first = 0;
+									token_last = 0;
+
+									i = -1;
+								}
+								else {
+									aq->push(Token(std::string("") + option.Right[idx], false));
+
+									statement.LeftShift(1);
+
+									token = "";
+									token_first = 0;
+									token_last = 0;
+									i = -1;
+								}
+							}
+							else if (0 == state && option.MuitipleLineCommentStart.empty() == false
+								&& -1 != (idx = checkDelimiter(statement, i, option.MuitipleLineCommentStart))) { // different from load_data_from_file
+								token_last = i - 1;
+								if (token_last >= 0 && token_last - token_first + 1 > 0) {
+									statement.Divide(i);
+									aq->push(Token(std::move(token), false));
+
+									statement.LeftShift(i + option.MuitipleLineCommentStart[idx].size());
+									i = -1;
+
+									token_first = 0;
+									token_last = 0;
+								}
+								else {
+									statement.LeftShift(i + option.MuitipleLineCommentStart[idx].size());
+									i = -1;
+								}
+
+								token = option.MuitipleLineCommentStart[idx];
+
+								isMultipleLineComment = true;
+							}
+							else if (0 == state && option.LineComment.empty() == false &&
+								-1 != checkDelimiter(statement, i, option.LineComment)) { // different from load_data_from_file
+								token_last = i - 1;
+								if (token_last >= 0 && token_last - token_first + 1 > 0) {
+									char temp = statement[i];
+
+									statement.Divide(i);
+									aq->push(Token(std::move(token), false));
+									token = "";
+
+									statement[i] = temp;
+									statement.LeftShift(i);
+									i = 0;
+								}
+								int j = 0;
+								for (j = i; j < statement.Size(); ++j) {
+									if (statement[j] == '\n') // cf) '\r' ? '\0'?
+									{
+										break;
+									}
+								}
+								--j; // "before enter key" or "before end"
+
+								if (j - i + 1 > 0) {
+									statement.Divide(j + 1);
+
+									//aq->push(Token(std::string(statement.Str(), j - i + 1), true));
+									statement.LeftShift(j + 2);
+
+									token_first = 0;
+									token_last = 0;
+
+									i = -1;
+								}
+								else {
+									statement.LeftShift(j + 2);
+									token_first = 0;
+									token_last = 0;
+
+									i = -1;
+								}
+							}
+							else {
+								token.push_back(statement[i]);
+							}
+						}
+
+						if (token.empty() == false)
+						{
+							aq->push(Token(std::move(token), false));
+						}
+					}
+				}
+				//
+				//DoThread(DoThread& other, tbb::split) : strVec(other.strVec) // , aq(other.aq)
+				//{
+				//
+				//}
+				//void join(DoThread& other) 
+				//{
+				//	aqpush(std::move(other.aq));
+				//}
+			};
 		public:
 			static bool Reserve3(std::ifstream& inFile, StringBuilder& strVecTemp, const int min_num = 1)
 			{
@@ -939,6 +1302,56 @@ namespace wiz {
 				//aq.push(std::move(doThread.aq));
 
 				return{ count > 0, count };
+			}
+
+			static std::pair<bool, int> Reserve2_2(std::ifstream& inFile, std::vector<ArrayQueue<Token>>& aq, const int num, const wiz::LoadDataOption& option, const int coreNum, const int offset)
+			{
+				int count = 0;
+				int count2 = 0;
+				std::string temp;
+				std::vector<wiz::StringBuilder> builder(coreNum, wiz::StringBuilder(128 * num / coreNum)); // *num;
+				
+				for (int i = 0; i < coreNum; ++i) {
+					builder[i].Clear();
+				}
+
+				for (int i = 0; // i < num &&
+					(std::getline(inFile, temp)); ++i) {
+					if (temp.empty()) { continue; }
+
+					builder[(count) % coreNum].Append(temp.c_str(), temp.size());
+					builder[(count) % coreNum].AppendChar('\n');
+					
+
+					if ((i + 1) % 100000 == 0)
+					{
+						count++;
+						builder[(count) % coreNum].AppendChar('\0'); // chk!
+					}
+					count2++;
+				}
+				builder[(count) % coreNum].AppendChar('\0');
+
+
+				if (count2) {
+					std::vector<std::thread*> threads(coreNum);
+
+					// do parallel!
+					for (int i = 0; i < coreNum; ++i) {
+						DoThread2 doThread2(&builder[(i + offset) % coreNum], &aq[(i + offset) % coreNum], option);
+						threads[(i + offset) % coreNum] = new std::thread(doThread2);
+					}
+
+					// wait
+					for (int i = 0; i < coreNum; ++i) {
+						threads[i]->join();
+					}
+					for (int i = 0; i < coreNum; ++i) {
+						delete threads[i];
+					}
+				}
+
+				return{ count2 > 0, count2 };
 			}
 
 			/// must lineNum > 0
@@ -1061,6 +1474,116 @@ namespace wiz {
 				}
 				return{ false, "" };
 			}
+			
+			template<class Reserver>
+			static std::string_view Top(std::vector<ArrayQueue<Token>>& strVec, wiz::load_data::UserType* ut, Reserver reserver, const wiz::LoadDataOption& option, int* thread_id)
+			{
+				const int coreNum = strVec.size();
+				int next_thread_id = *thread_id;
+				int ok = 0;
+
+				while (strVec[next_thread_id].empty()) {
+					next_thread_id = (*thread_id + 1) % coreNum;
+					*thread_id = next_thread_id;
+					ok++;
+					if (ok == strVec.size() && strVec[next_thread_id].empty()) {
+						//std::cout << "errorA" << std::endl;
+						break;
+					}
+				}
+
+				while (strVec[next_thread_id].empty() == false && strVec[next_thread_id].front().str.empty()) {
+					strVec[next_thread_id].pop_front();
+
+					next_thread_id = (*thread_id + 1) % coreNum;
+
+					*thread_id = next_thread_id;
+				}
+
+				if (strVec[next_thread_id].empty()) { return std::string_view(); }
+				return strVec[next_thread_id][0].str;
+			}
+			template <class Reserver>
+			static bool Pop(std::vector<ArrayQueue<Token>>& strVec, std::string* str, wiz::load_data::UserType* ut, Reserver reserver, const wiz::LoadDataOption& option, int* thread_id)
+			{
+				const int coreNum = strVec.size();
+				int next_thread_id = *thread_id;
+				int ok = 0;
+
+				while (strVec[next_thread_id].empty()) {
+					next_thread_id = (*thread_id + 1) % coreNum;
+					*thread_id = next_thread_id;
+					ok++;
+					if (ok == strVec.size() && strVec[next_thread_id].empty()) {
+						//std::cout << "errorB" << std::endl;
+						break;
+					}
+				}
+
+				while (strVec[next_thread_id].empty() == false && strVec[next_thread_id].front().str.empty()) {
+					strVec[next_thread_id].pop_front();
+					next_thread_id = (*thread_id + 1) % coreNum;
+
+					*thread_id = next_thread_id;
+				}
+
+				if (strVec[next_thread_id].empty()) {
+					return false;
+				}
+
+				if (str) {
+					Token token;
+					strVec[next_thread_id].pop_front(&token);
+					*str = (std::move(token.str));
+					//*str = move(strVec.front().str);
+				}
+				else {
+					strVec[next_thread_id].pop_front();
+				}
+				//strVec.pop_front();
+
+				return true;
+			}
+
+			// lookup just one!
+			template <class Reserver>
+			static std::pair<bool, std::string_view> LookUp(std::vector<ArrayQueue<Token>>& strVec, wiz::load_data::UserType* ut, Reserver reserver, const wiz::LoadDataOption& option, int* thread_id)
+			{
+				const int coreNum = strVec.size();
+				int next_thread_id = *thread_id;
+				int next_thread_id2 = *thread_id;
+				int ok = 0;
+
+				while (strVec[next_thread_id].empty()) {
+					next_thread_id = (*thread_id + 1) % coreNum;
+					*thread_id = next_thread_id;
+					ok++;
+					if (ok == strVec.size() && strVec[next_thread_id].empty()) {
+						//std::cout << "errorC" << std::endl;
+						break;
+					}
+				}
+
+				while (strVec[next_thread_id].empty() == false && strVec[next_thread_id].front().str.empty()) {
+					strVec[next_thread_id].pop_front();
+
+					next_thread_id = (*thread_id + 1) % coreNum;
+					next_thread_id2 = next_thread_id;
+
+					if (strVec[next_thread_id].size() == 1) {
+						next_thread_id2 = (next_thread_id + 1) % coreNum;
+					}
+					
+					*thread_id = next_thread_id2;
+				}
+
+				if (strVec[next_thread_id].size() >= 2) {
+					return{ true, strVec[next_thread_id][1].str };
+				}
+
+				return{ false, "" };
+			}
+
 		public:
 			//
 			static bool ChkExist(const std::string& str) // for \", str is separated by enterkey

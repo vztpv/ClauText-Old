@@ -188,16 +188,31 @@ namespace wiz{
 
 
 				if (1 == option && 0 == state && '\'' == str[i]) {
-					state = 2;
-					continue;
+					if (i == 0) {
+						state = 2;
+						continue;
+					}
+					else if (i > 0 && '\\' == str[i - 1]) {
+						throw "ERROR for Init 1 on StringTokenizer"; // error!
+					}
+					else if (i > 0) {
+						state = 2;
+						continue;
+					}
 				}
 				else if (1 == option && 2 == state && '\'' == str[i]) {
-					state = 0;
-					if (i == str.size() - 1) {
-						if (right - left + 1 > 0) {
-							_m_str.emplace_back(builder->Divide(right - left + 1), right - left + 1);
-							builder->LeftShift(right - left + 2);
+					if ('\\' == str[i - 1]) {
+						continue;
+					}
+					else {
+						state = 0;
+						if (i == str.size() - 1) {
+							if (right - left + 1 > 0) {
+								_m_str.emplace_back(builder->Divide(right - left + 1), right - left + 1);
+								builder->LeftShift(right - left + 2);
+							}
 						}
+						continue;
 					}
 					continue;
 				}
@@ -210,7 +225,7 @@ namespace wiz{
 						continue;
 					}
 					else if (i > 0 && '\\' == str[i - 1]) {
-						throw "ERROR for Init on StringTokenizer"; // error!
+						throw "ERROR for Init 2 on StringTokenizer"; // error!
 					}
 					else if (i > 0) {
 						state = 1;

@@ -1227,7 +1227,46 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 				}
 				else 
 				*/	
-				if ("$while" == val->GetName()) {
+				if ("$cond" == val->GetName()) {
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					std::string cond = val->ToString();
+					
+
+					cond = wiz::load_data::LoadData::DoCondition(global, cond, _excuteData, &builder);
+
+					eventStack[eventStack.size() - 1].return_value = cond;
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$iterate" == val->GetName()) {
+					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
+					_excuteData.chkInfo = true;
+					_excuteData.info = eventStack.top();
+					_excuteData.pObjectMap = objectMapPtr;
+					_excuteData.pEvents = eventPtr;
+					_excuteData.pModule = moduleMapPtr;
+
+					std::string dir = val->GetUserTypeList(0)->ToString();
+					std::vector<std::string> events; // event_ids
+
+					for (int i = 0; i < val->GetUserTypeList(1)->GetItemListSize(); ++i) {
+						events.push_back(val->GetUserTypeList(1)->GetItemList(i).Get(0));
+					}
+
+					wiz::load_data::LoadData::Iterate(global, dir, events, _excuteData, &builder);
+
+
+					eventStack.top().userType_idx.top()++;
+					break;
+				}
+				else if ("$while" == val->GetName()) {
 					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();

@@ -573,6 +573,405 @@ namespace wiz {
 
 				return true;
 			}
+			
+		private:
+			static bool _Empty(std::vector<ArrayQueue<Token>>& strVec) // chk!!
+			{
+				for (int i = 0; i < strVec.size(); ++i) {
+					if (strVec[i].empty()) {
+						continue;
+					}
+					else {
+						return false;
+					}
+				}
+
+				return true;
+			}
+			static int _Size(std::vector<ArrayQueue<Token>>& strVec) // chk!!
+			{
+				int sum = 0;
+
+				for (int i = 0; i < strVec.size(); ++i) {
+					bool isEmpty = false;
+					for (int j = 0; j < strVec[i].size(); ++j) {
+						if (strVec[i][j].str == "") {
+							isEmpty = true;
+						}
+						else {
+							isEmpty = false;
+							break;
+						}
+					}
+					if (isEmpty == false) {
+						sum = sum + strVec[i].size();
+					}
+				}
+
+				return sum;
+			}
+		public:
+			template <class Reserver>
+			static bool _LoadData2(std::vector<ArrayQueue<Token>>& strVec, Reserver& reserver, UserType& global, const wiz::LoadDataOption& option) // first, strVec.empty() must be true!!
+			{
+				int state = 0;
+				int braceNum = 0;
+				long long state_reserve = 0;
+				std::vector< UserType* > nestedUT(1);
+				std::string var1, var2, val;
+				
+				int now_thread = 0; // strVec no?
+
+				bool varOn = false;
+
+				nestedUT[0] = &global;
+				{
+					reserver(strVec, option, now_thread);
+
+					while (_Empty(strVec))
+					{
+						reserver(strVec, option, now_thread);
+						if (
+							_Empty(strVec) &&
+							reserver.end()
+							) {
+							return false; // throw "Err nextToken does not exist"; // cf) or empty file or empty std::string!
+						}
+					}
+				}
+
+				//for (int i = 0; i < strVec[0].size(); ++i) {
+				//	std::cout << strVec[0][i].str << std::endl;
+				//	_getch();
+				//}
+
+				while (false == _Empty(strVec)) {
+
+					//std::cout << state << " " << Utility::Top(strVec, nestedUT[braceNum], reserver, option, &now_thread) << " " << now_thread << std::endl;
+					//_getch();
+
+					switch (state)
+					{
+					case 0:
+					{
+						const std::string_view top = Utility::Top(strVec, nestedUT[braceNum], reserver, option, &now_thread);
+						if (top.size() == 1 && -1 != Equal(option.Left, top[0])) {
+							state = 2;
+						}
+						else {
+							std::pair<bool, std::string_view> bsPair = Utility::LookUp(strVec, nestedUT[braceNum], reserver, option, &now_thread);
+							if (bsPair.first) {
+								if (bsPair.second.size() == 1 && -1 != Equal(option.Assignment, bsPair.second[0])) {
+									Utility::Pop(strVec, &var2, nestedUT[braceNum], reserver, option, &now_thread);
+									Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option, &now_thread);
+									state = 2;
+								}
+								else {
+									if (Utility::Pop(strVec, &var1, nestedUT[braceNum], reserver, option, &now_thread)) {
+										nestedUT[braceNum]->AddItem("", move(var1));
+										state = 0;
+									}
+								}
+							}
+							else {
+								if (Utility::Pop(strVec, &var1, nestedUT[braceNum], reserver, option, &now_thread)) {
+									nestedUT[braceNum]->AddItem("", move(var1));
+									state = 0;
+								}
+							}
+						}
+					}
+					break;
+					case 1:
+					{
+						const std::string_view top = Utility::Top(strVec, nestedUT[braceNum], reserver, option, &now_thread);
+						if (top.size() == 1 && -1 != Equal(option.Right, top[0])) {
+							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option, &now_thread);
+							state = 0;
+						}
+						else {
+							// syntax error.
+							throw "syntax error 1 ";
+						}
+					}
+					break;
+					case 2:
+					{
+						const std::string_view top = Utility::Top(strVec, nestedUT[braceNum], reserver, option, &now_thread);
+						if (top.size() == 1 && -1 != Equal(option.Left, top[0])) {
+							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option, &now_thread);
+
+							///
+							nestedUT[braceNum]->AddUserTypeItem(UserType(var2));
+							UserType* pTemp;
+							nestedUT[braceNum]->GetLastUserTypeItemRef(var2, pTemp);
+
+							braceNum++;
+
+							/// new nestedUT
+							if (nestedUT.size() == braceNum) /// changed 2014.01.23..
+								nestedUT.push_back(nullptr);
+
+							/// initial new nestedUT.
+							nestedUT[braceNum] = pTemp;
+							///
+							state = 3;
+						}
+						else {
+							if (Utility::Pop(strVec, &val, nestedUT[braceNum], reserver, option, &now_thread)) {
+
+								nestedUT[braceNum]->AddItem(move(var2), move(val));
+								var2 = "";
+								val = "";
+
+								state = 0;
+							}
+						}
+					}
+					break;
+					case 3:
+					{
+						const std::string_view top = Utility::Top(strVec, nestedUT[braceNum], reserver, option, &now_thread);
+						if (top.size() == 1 && -1 != Equal(option.Right, top[0])) {
+							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option, &now_thread);
+
+							nestedUT[braceNum] = nullptr;
+							braceNum--;
+
+							state = 0;
+						}
+						else {
+							{
+								/// uisng struct
+								state_reserve++;
+								state = 4;
+							}
+							//else
+							{
+								//	throw  "syntax error 2 ";
+							}
+						}
+					}
+					break;
+					case 4:
+					{
+						const std::string_view top = Utility::Top(strVec, nestedUT[braceNum], reserver, option, &now_thread);
+						if (top.size() == 1 && -1 != Equal(option.Left, top[0])) {
+							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option, &now_thread);
+
+							UserType temp("");
+
+							nestedUT[braceNum]->AddUserTypeItem(temp);
+							UserType* pTemp;
+							nestedUT[braceNum]->GetLastUserTypeItemRef("", pTemp);
+
+							braceNum++;
+
+							/// new nestedUT
+							if (nestedUT.size() == braceNum) /// changed 2014.01.23..
+								nestedUT.push_back(nullptr);
+
+							/// initial new nestedUT.
+							nestedUT[braceNum] = pTemp;
+							///
+							//}
+
+							state = 5;
+						}
+						else if (top.size() == 1 && -1 != Equal(option.Right, top[0])) {
+							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option, &now_thread);
+							state = isState0(state_reserve) ? 0 : 4;
+							state_reserve--;
+
+							{
+								nestedUT[braceNum] = nullptr;
+								braceNum--;
+							}
+						}
+						else {
+							std::pair<bool, std::string_view> bsPair = Utility::LookUp(strVec, nestedUT[braceNum], reserver, option, &now_thread);
+							if (bsPair.first) {
+								if (bsPair.second.size() == 1 && -1 != Equal(option.Assignment, bsPair.second[0])) {
+									// var2
+									Utility::Pop(strVec, &var2, nestedUT[braceNum], reserver, option, &now_thread);
+									Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option, &now_thread); // pass EQ_STR
+									state = 6;
+								}
+								else {
+									// var1
+									if (Utility::Pop(strVec, &var1, nestedUT[braceNum], reserver, option, &now_thread)) {
+										nestedUT[braceNum]->AddItem("", move(var1));
+										var1 = "";
+
+										state = 4;
+									}
+								}
+							}
+							else
+							{
+								// var1
+								if (Utility::Pop(strVec, &var1, nestedUT[braceNum], reserver, option, &now_thread))
+								{
+									nestedUT[braceNum]->AddItem("", move(var1));
+									var1 = "";
+
+									state = 4;
+								}
+							}
+						}
+					}
+					break;
+					case 5:
+					{
+						const std::string_view top = Utility::Top(strVec, nestedUT[braceNum], reserver, option, &now_thread);
+						if (top.size() == 1 && -1 != Equal(option.Right, top[0])) {
+							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option, &now_thread);
+
+							//if (flag1 == 0) {
+							nestedUT[braceNum] = nullptr;
+							braceNum--;
+							// }
+							//
+							state = 4;
+						}
+						else {
+							int idx = -1;
+							int num = -1;
+
+
+							{
+								/// uisng struct
+								state_reserve++;
+								state = 4;
+							}
+							//else
+							{
+								//	throw "syntax error 4  ";
+							}
+						}
+					}
+					break;
+					case 6:
+					{
+						std::string_view top = Utility::Top(strVec, nestedUT[braceNum], reserver, option, &now_thread);
+						if (top.size() == 1 && -1 != Equal(option.Left, top[0])) {
+							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option, &now_thread);
+
+							///
+							{
+								nestedUT[braceNum]->AddUserTypeItem(UserType(var2));
+								UserType* pTemp;
+								nestedUT[braceNum]->GetLastUserTypeItemRef(var2, pTemp);
+								var2 = "";
+								braceNum++;
+
+								/// new nestedUT
+								if (nestedUT.size() == braceNum) /// changed 2014.01.23..
+									nestedUT.push_back(nullptr);
+
+								/// initial new nestedUT.
+								nestedUT[braceNum] = pTemp;
+							}
+							///
+							state = 7;
+						}
+						else {
+							if (Utility::Pop(strVec, &val, nestedUT[braceNum], reserver, option, &now_thread)) {
+
+								nestedUT[braceNum]->AddItem(move(var2), move(val));
+								var2 = ""; val = "";
+
+								top = Utility::Top(strVec, nestedUT[braceNum], reserver, option, &now_thread);
+
+								if (strVec.empty())
+								{
+									//
+								}
+								else if (top.size() == 1 && -1 != Equal(option.Right, top[0])) {
+									Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option, &now_thread);
+
+									{
+										state = isState0(state_reserve) ? 0 : 4;
+										state_reserve--;
+
+										{
+											nestedUT[braceNum] = nullptr;
+											braceNum--;
+										}
+									}
+									{
+										//state = 4;
+									}
+								}
+								else {
+									state = 4;
+								}
+							}
+						}
+					}
+					break;
+					case 7:
+					{
+						const std::string_view top = Utility::Top(strVec, nestedUT[braceNum], reserver, option, &now_thread);
+						if (top.size() == 1 && -1 != Equal(option.Right, top[0])) {
+							Utility::Pop(strVec, nullptr, nestedUT[braceNum], reserver, option, &now_thread);
+							//
+
+							nestedUT[braceNum] = nullptr;
+							braceNum--;
+							//
+							state = 4;
+						}
+						else {
+							int idx = -1;
+							int num = -1;
+
+							{
+								/// uisng struct
+								state_reserve++;
+
+								state = 4;
+							}
+							//else
+							{
+								//throw "syntax error 5 ";
+							}
+						}
+					}
+					break;
+					default:
+						// syntax err!!
+
+						throw "syntax error 6 ";
+						break;
+					}
+
+					if (_Size(strVec) < 10) {
+						reserver(strVec, option, now_thread);
+
+						while (_Empty(strVec)) // (strVec.empty())
+						{
+							reserver(strVec, option, now_thread);
+							if (
+								_Empty(strVec) &&
+								reserver.end()
+								) {
+								// throw "Err nextToken does not exist2";
+								break;
+							}
+						}
+					}
+				}
+				if (state != 0) {
+					throw std::string("error final state is not 0!  : ") + toStr(state);
+				}
+				if (braceNum != 0) {
+					throw std::string("chk braceNum is ") + toStr(braceNum);
+				}
+
+				return true;
+			}
+
 		private:
 			static bool isOpenTagStart(const std::string_view& word) {
 				return wiz::String::startsWith(word, "<") && !wiz::String::startsWith(word, "</");
@@ -988,6 +1387,52 @@ namespace wiz {
 				global = std::move(globalTemp);
 				return true;
 			}
+			
+			// no multiple line comment, no multiple line string!
+			static bool LoadDataFromFile2(const std::string& fileName, UserType& global) /// global should be empty
+			{
+				bool success = true;
+				std::ifstream inFile;
+				inFile.open(fileName);
+
+
+				if (true == inFile.fail())
+				{
+					inFile.close(); return false;
+				}
+				UserType globalTemp = global;
+				std::vector<ArrayQueue<Token>> strVec(3);
+
+				//try 
+				{
+					InFileReserver2 ifReserver(inFile, 3);
+					wiz::LoadDataOption option;
+					option.Assignment.push_back('=');
+					option.Left.push_back('{');
+					option.LineComment.push_back("#");
+					option.Right.push_back('}');
+
+					ifReserver.Num = 1 << 20;
+					strVec.reserve(ifReserver.Num);
+					// cf) empty file..
+					if (false == _LoadData2(strVec, ifReserver, globalTemp, option)) // 4 is # of cpu core?
+					{
+						inFile.close();
+						return false; // return true?
+					}
+
+					inFile.close();
+				}
+				/*
+				catch (Error e) { std::cout << e << std::endl; inFile.close(); return false; }
+				catch (const char* err) { std::cout << err << std::endl; inFile.close(); return false; }
+				catch (const std::string& e) { std::cout << e << std::endl; inFile.close(); return false; }
+				catch (std::exception e) { std::cout << e.what() << std::endl; inFile.close(); return false; }
+				catch (...) { std::cout << "not expected error" << std::endl; inFile.close(); return false; }
+				*/
+				global = std::move(globalTemp);
+				return true;
+			}
 		private:
 			static void RemoveQuotation(UserType* ut) {
 				int it_count = 0;
@@ -1216,6 +1661,24 @@ namespace wiz {
 				return true;
 			}
 
+			static std::string DoCondition(UserType& global, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+			{
+				std::string _condition = condition;
+
+				_condition = ToBool4(nullptr, global, _condition, excuteData, builder);
+
+				Condition cond(_condition, &global, &global, builder);
+
+				while (cond.Next());
+
+				if (cond.Now().size() != 1 || "TRUE" != cond.Now()[0]) // || cond.Now().size()  != 1
+				{
+					return "FALSE";
+				}
+				else {
+					return "TRUE";
+				}
+			}
 		private:
 			UserType global; // ToDo - remove!
 		public:
@@ -1310,6 +1773,128 @@ namespace wiz {
 			std::string SearchUserType(const std::string& var, const std::string& condition, const ExcuteData& excuteData, wiz::StringBuilder* builder)
 			{
 				return SearchUserType(global, var, condition, excuteData, builder);
+			}
+
+
+			static void _Iterate(UserType& global, std::vector<wiz::load_data::UserType*>& ut, UserType* eventsTemp, const ExcuteData& excuteData)
+			{
+				for (int i = 0; i < ut.size(); ++i) {
+					int itemCount = 0;
+					int utCount = 0;
+					
+					for (int j = 0; j < ut[i]->GetItemListSize(); ++j) {
+						//if (ut[i]->IsItemList(j)) 
+						{
+							ExcuteData _excuteData;
+							//_excuteData.info = excuteData.info;
+							_excuteData.pModule = excuteData.pModule;
+							_excuteData.pObjectMap = excuteData.pObjectMap;
+							_excuteData.pEvents = eventsTemp;
+							_excuteData.depth = excuteData.depth;
+							_excuteData.noUseInput = excuteData.noUseInput;
+							_excuteData.noUseOutput = excuteData.noUseOutput;
+							//_excuteData.chkInfo = true;
+
+							auto x = eventsTemp->GetUserTypeList(eventsTemp->GetUserTypeListSize() - 1)->GetUserTypeItem("$call");
+							for (int k = 0; k < x.size(); ++k) {
+								x[k]->GetItemList(1).Set(0, ut[i]->GetItemList(itemCount).GetName());
+								x[k]->GetItemList(2).Set(0, ut[i]->GetItemList(itemCount).Get(0));
+								x[k]->GetItemList(3).Set(0, "FALSE");
+							}
+
+							std::string result = excute_module("Main = { $call = { id = NONE__  } }", &global, _excuteData, 0);
+
+							if (result.empty() == false) {
+								UserType resultUT;
+								wiz::load_data::LoadData::LoadDataFromString(result, resultUT);
+
+								auto name = resultUT.GetItem("name");
+								if (name.empty() == false) {
+									ut[i]->GetItemList(itemCount).SetName(name[0].Get(0));
+								}
+
+								auto value = resultUT.GetItem("value");
+								if (value.empty() == false) {
+									ut[i]->GetItemList(itemCount).Set(0, value[0].Get(0));
+								}
+							}
+
+							itemCount++;
+						}
+					}
+					for (int j = 0; j < ut[i]->GetUserTypeListSize(); ++j){
+						ExcuteData _excuteData;
+						//_excuteData.info = excuteData.info;
+						_excuteData.pModule = excuteData.pModule;
+						_excuteData.pObjectMap = excuteData.pObjectMap;
+						_excuteData.pEvents = eventsTemp;
+						_excuteData.depth = excuteData.depth + 1;
+						_excuteData.noUseInput = excuteData.noUseInput;
+						_excuteData.noUseOutput = excuteData.noUseOutput;
+						//_excuteData.chkInfo = true;
+
+
+						auto x = eventsTemp->GetUserTypeList(eventsTemp->GetUserTypeListSize() - 1)->GetUserTypeItem("$call");
+						for (int k = 0; k < x.size(); ++k) {
+							x[k]->GetItemList(1).Set(0, ut[i]->GetUserTypeList(utCount)->GetName());
+							x[k]->GetItemList(2).Set(0, "");
+							x[k]->GetItemList(3).Set(0, "TRUE");
+						}
+
+						std::string result = excute_module("Main = { $call = { id = NONE__  } }", &global, _excuteData, 0);
+
+						if (result.empty() == false) {
+							UserType resultUT;
+							wiz::load_data::LoadData::LoadDataFromString(result, resultUT);
+
+							auto name = resultUT.GetItem("name");
+							if (name.empty() == false) {
+								ut[i]->GetUserTypeList(utCount)->SetName(name[0].Get(0));
+							}
+						}
+
+						//// recursive
+						_Iterate(global, std::vector<UserType*>{ ut[i]->GetUserTypeList(utCount) }, eventsTemp, excuteData);
+
+						utCount++;
+					}
+				}
+			}
+			// new function! - check UserType::Find().second[0] ?
+			static void Iterate(wiz::load_data::UserType& global, const std::string& dir, const std::vector<std::string>& events, const ExcuteData& excuteData, wiz::StringBuilder* builder)
+			{
+				std::vector<wiz::load_data::UserType*> ut = wiz::load_data::UserType::Find(&global, dir, builder).second; // chk first?
+				wiz::load_data::UserType* eventsTemp = excuteData.pEvents;
+
+				std::string statements2 = " Event = { id = NONE__  ";
+
+				for (int i = 0; i < events.size(); ++i) {
+					statements2 += " $call = { id = ";
+					
+					statements2 += events[i];
+					statements2 += " name = __name ";
+					statements2 += " value = __value ";
+					statements2 += " is_user_type = __is_user_type";
+
+					statements2 += " } ";
+				}
+				statements2 += " } ";
+
+				wiz::load_data::LoadData::AddData(*eventsTemp, "/root", statements2, "TRUE", ExcuteData(), builder); // push_back?
+				wiz::load_data::UserType* iterEvent = eventsTemp->GetUserTypeList(eventsTemp->GetUserTypeListSize() - 1);
+
+				//std::cout << ut.size() << std::endl;
+				
+				_Iterate(global, ut, eventsTemp, excuteData);
+				
+
+				for (int idx = eventsTemp->GetUserTypeListSize() - 1; idx >= 0 ; --idx) {
+					if (eventsTemp->GetUserTypeList(idx)->GetItem("id")[0].Get(0) == "NONE__") {
+						eventsTemp->RemoveUserTypeList(idx);
+						break;
+					}
+				}
+
 			}
 		private:
 			void SearchItem(std::vector<std::string>& positionVec, const std::string& var, const std::string& nowPosition,

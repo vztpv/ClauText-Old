@@ -788,7 +788,7 @@ namespace wiz {
 
 
 			// $it?
-			std::vector<ItemType<std::string>> GetItem(std::string name) const {
+			std::vector<ItemType<std::string>> GetItem(const std::string& name) const {
 				std::vector<ItemType<std::string>> temp;
 				if (String::startsWith(name, "$.") && name.size() >= 5) {
 					std::string str = name.substr(3, name.size() - 4);
