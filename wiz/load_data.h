@@ -1401,11 +1401,11 @@ namespace wiz {
 					inFile.close(); return false;
 				}
 				UserType globalTemp = global;
-				std::vector<ArrayQueue<Token>> strVec(3);
+				std::vector<ArrayQueue<Token>> strVec(4);
 
 				//try 
 				{
-					InFileReserver2 ifReserver(inFile, 3);
+					InFileReserver2 ifReserver(inFile, 4);
 					wiz::LoadDataOption option;
 					option.Assignment.push_back('=');
 					option.Left.push_back('{');

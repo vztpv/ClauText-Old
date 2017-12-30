@@ -1306,16 +1306,31 @@ namespace wiz {
 
 			static std::pair<bool, int> Reserve2_2(std::ifstream& inFile, std::vector<ArrayQueue<Token>>& aq, const int num, const wiz::LoadDataOption& option, const int coreNum, const int offset)
 			{
+				// clear aq? empty empty data  ( remove empty )
+				for (int i = 0; i < aq.size(); ++i) {
+					for (int j = 0; j < aq[i].size(); ++j) {
+						if (aq[i][j].str.empty()) {
+							aq[i].pop_front();
+							--j;
+						}
+						else {
+							break;
+						}
+					}
+				}
+
+				int pass = 0;
 				int count = 0;
+				int before_count = 0;
 				int count2 = 0;
 				std::string temp;
-				std::vector<wiz::StringBuilder> builder(coreNum, wiz::StringBuilder(128 * num / coreNum)); // *num;
+				std::vector<wiz::StringBuilder> builder(coreNum, wiz::StringBuilder(32 * num / coreNum)); // *num;
 				
 				for (int i = 0; i < coreNum; ++i) {
 					builder[i].Clear();
 				}
 
-				for (int i = 0; // i < num &&
+				for (int i = 0; i < num &&
 					(std::getline(inFile, temp)); ++i) {
 					if (temp.empty()) { continue; }
 
@@ -1323,22 +1338,31 @@ namespace wiz {
 					builder[(count) % coreNum].AppendChar('\n');
 					
 
-					if ((i + 1) % 100000 == 0)
+					if ((count2 + 1) % 100000 == 0)
 					{
-						count++;
 						builder[(count) % coreNum].AppendChar('\0'); // chk!
+						before_count = count;
+						count++;
+
+						pass = 1;
 					}
+					else {
+						pass = 0;
+					}
+					
 					count2++;
 				}
-				builder[(count) % coreNum].AppendChar('\0');
-
 
 				if (count2) {
+					if (0 == pass) {
+						builder[(before_count) % coreNum].AppendChar('\0');
+					}
+
 					std::vector<std::thread*> threads(coreNum);
 
 					// do parallel!
 					for (int i = 0; i < coreNum; ++i) {
-						DoThread2 doThread2(&builder[(i + offset) % coreNum], &aq[(i + offset) % coreNum], option);
+						DoThread2 doThread2(&builder[i], &aq[(i + offset) % coreNum], option);
 						threads[(i + offset) % coreNum] = new std::thread(doThread2);
 					}
 
