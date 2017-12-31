@@ -10,9 +10,9 @@
 // Array idx chk test.
 //#define ARRAYS_DEBUG
 
-
-#define USE_FAST_LOAD_DATA
+//#define USE_FAST_LOAD_DATA // no use?
 #include <wiz/ClauText.h>
+
 
 
 int main(int argc, char* argv[])
@@ -32,9 +32,9 @@ int main(int argc, char* argv[])
 	}
 	wiz::load_data::UserType global;
 	try {
-			wiz::load_data::LoadData::LoadDataFromFile(fileName, global);
-			std::cout << "fileName is " << fileName << std::endl;
-			std::cout << "excute result is " << excute_module("", &global, ExcuteData(), 0) << std::endl;
+		wiz::load_data::LoadData::LoadDataFromFile(fileName, global);
+		std::cout << "fileName is " << fileName << std::endl;
+		std::cout << "excute result is " << excute_module("", &global, ExcuteData(), 0) << std::endl;
 	}
 	catch (const char* str) {
 		std::cout << str << std::endl;
@@ -48,12 +48,17 @@ int main(int argc, char* argv[])
 		std::cout << e << std::endl;
 		GETCH();
 	}
-#ifndef _DEBUG
-	catch (...) {
-		std::cout << "UnKnown Error.." << std::endl;
+	catch (std::exception e) {
+		std::cout << e.what() << std::endl;
 		GETCH();
 	}
+#ifndef _DEBUG
+//	catch (...) {
+//		std::cout << "UnKnown Error.." << std::endl;
+//		GETCH();
+//	}
 #endif
+
    	return 0;
 }
 

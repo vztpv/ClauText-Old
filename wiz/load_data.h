@@ -1431,6 +1431,7 @@ namespace wiz {
 				catch (...) { std::cout << "not expected error" << std::endl; inFile.close(); return false; }
 				*/
 				global = std::move(globalTemp);
+
 				return true;
 			}
 		private:

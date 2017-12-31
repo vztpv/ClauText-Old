@@ -1338,7 +1338,7 @@ namespace wiz {
 					builder[(count) % coreNum].AppendChar('\n');
 					
 
-					if ((count2 + 1) % 100000 == 0)
+					if ((count2 + 1) % 50000 == 0)
 					{
 						builder[(count) % coreNum].AppendChar('\0'); // chk!
 						before_count = count;
