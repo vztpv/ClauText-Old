@@ -694,9 +694,11 @@ namespace wiz {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
+									
+									aq->emplace_push(std::move(token), false);
 
 									token = "";
-									aq->emplace_push(std::move(token), false);
+									
 									statement.LeftShift(i + 1);
 
 									aq->emplace_push(std::string("") + option.Assignment[idx], false);
@@ -1280,7 +1282,7 @@ namespace wiz {
 
 			static std::pair<bool, int> Reserve2(std::ifstream& inFile, ArrayQueue<Token>& aq, const int num, const wiz::LoadDataOption& option)
 			{
-				int a = clock();
+				//int a = clock();
 
 				int count = 0;
 				std::string temp;
@@ -1302,9 +1304,9 @@ namespace wiz {
 
 				//tbb::parallel_reduce(tbb::blocked_range<size_t>(0, count), doThread);
 				//aq.push(std::move(doThread.aq));
-				int b = clock();
+				//int b = clock();
 
-				std::cout << b - a << "ms" << std::endl;
+				//std::cout << b - a << "ms" << std::endl;
 				return{ count > 0, count };
 			}
 

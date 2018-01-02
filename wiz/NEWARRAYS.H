@@ -14,9 +14,6 @@ class Array{
 private:
     T* p; // array
     int N; // array »çÀÌÁî
-private:
-    static T sBegin; /// static -> s, /// to not static?
-    static T sEnd;
 
 private:
     void resetP( const T* p )
@@ -30,122 +27,7 @@ private:
     }
 ///for c++11
 public:
-    class Iter //
-    {
-    private:
-        T* _pt;//
-        /// following constant values..
-        T* p;
-        int N;
-        T* pBegin;
-        T* pEnd;
-    public:
-        explicit Iter( T* _pt, T* p, int N, T* pBegin, T* pEnd ) : _pt(_pt),
-        p(p), N(N), pBegin(pBegin), pEnd(pEnd)
-        {
-            if( nullptr == _pt ) { throw wiz::Error( "nullptr == _pt in Iter" ); }
-        }
-        //
-        void left() {
-            // p == nullptr -> err.
-            if( p == _pt ) { _pt = pBegin; }
-            else if( _pt == pBegin ) { throw wiz::Error( " _pt == pBegin in left " ); }
-            else if( _pt == pEnd ) { _pt = p+N-1; }
-            else {
-                _pt--;
-            }
-        }
-        void right() {
-            // p == nullptr -> err.
-            if( p+N-1 == _pt ) { _pt = pEnd; }
-            else if( _pt == pEnd ) { throw wiz::Error( " _pt == pEnd in right " ); }
-            else if( _pt == pBegin ) { _pt = p; }
-            else {
-                _pt++;
-            }
-        }
-        T data()const { return *_pt; }
-        bool isnullptr()const { return nullptr == _pt; }
-        bool operator!=( const Iter& x ) const
-        {
-            return x._pt != this->_pt;
-        }
-        void operator++() { right(); }
-        void operator--() { left(); }
-        /// TO DO
-        /// T* operator->()
-        /// const T* operator->()const
-        T* operator->() { return _pt; }
-        const T* operator->()const { return _pt; }
-        T& operator*() { return *_pt; }
-        const T& operator*()const { return *_pt; }
-    };
-    class ConstIter //
-    {
-    private:
-        T* _pt;//
-        /// following constant values..
-        T* p;
-        int N;
-        T* pBegin;
-        T* pEnd;
-    public:
-        explicit ConstIter( T* _pt, T* p, int N, T* pBegin, T* pEnd ) : _pt(_pt),
-        p(p), N(N), pBegin(pBegin), pEnd(pEnd)
-        {
-            if( nullptr == _pt ) { throw wiz::Error( "nullptr == _pt in ConstIter" ); }
-        }
-        //
-        void left() {
-            // p == nullptr -> err.
-            if( p == _pt ) { _pt = pBegin; }
-            else if( _pt == pBegin ) { throw wiz::Error( " _pt == pBegin in left " ); }
-            else if( _pt == pEnd ) { _pt = p+N-1; }
-            else {
-                _pt--;
-            }
-        }
-        void right() {
-            // p == nullptr -> err.
-            if( p+N-1 == _pt ) { _pt = pEnd; }
-            else if( _pt == pEnd ) { throw wiz::Error( " _pt == pEnd in right " ); }
-            else if( _pt == pBegin ) { _pt = p; }
-            else {
-                _pt++;
-            }
-        }
-        T data()const { return *_pt; }
-        bool isnullptr()const { return nullptr == _pt; }
-        bool operator!=( const ConstIter& x ) const
-        {
-            return x._pt != this->_pt;
-        }
-        void operator++() { right(); }
-        void operator--() { left(); }
-
-        const T* operator->()const { return _pt; }
-        const T& operator*()const { return *_pt; }
-    };
-    Iter begin()  { if( empty() ) { return end(); }
-        return Iter( p, p, N, &sBegin, &sEnd );
-    }
-    Iter end()  { return Iter( &sEnd, p, N, &sBegin, &sEnd ); }
-    Iter rbegin()  { if( empty() ){ return rend(); }
-        return Iter( p+N-1, p, N, &sBegin, &sEnd );
-    }
-
-    Iter rend()  { return Iter( &sBegin, p, N, &sBegin, &sEnd ); }
-    /// Check....
-    ConstIter crend() const { return ConstIter( &sBegin, p, N, &sBegin, &sEnd ); }
-    ConstIter cbegin() const { if( empty() ) { return cend(); }
-        return ConstIter( p, p, N, &sBegin, &sEnd );
-    }
-    ConstIter cend() const { return ConstIter( &sEnd, p, N, &sBegin, &sEnd ); }
-    ConstIter crbegin() const { if( empty() ){ return crend(); }
-        return ConstIter( p+N-1, p, N, &sBegin, &sEnd );
-    }
-
-
+   
     explicit Array( std::initializer_list<T> args )
     {
         N = args.size();
@@ -333,10 +215,7 @@ public: /// Done-swap..
         wiz::Swap( this->N, arr.N );
     }
 };// end class array
-template <class T>
-T Array<T>::sBegin = T();
-template <class T>
-T Array<T>::sEnd = T();
+
 // not use debug() and use below!
 template <class T>
 inline std::ostream& operator<<(std::ostream& stream, const Array<T>& arr )
