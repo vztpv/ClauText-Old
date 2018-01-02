@@ -1245,7 +1245,7 @@ std::string excute_module(const std::string& MainStr, wiz::load_data::UserType* 
 					eventStack.top().userType_idx.top()++;
 					break;
 				}
-				else if ("$iterate" == val->GetName()) {
+				else if ("$iterate" == val->GetName()) { // very slow? why??
 					ExcuteData _excuteData; _excuteData.depth = excuteData.depth;
 					_excuteData.chkInfo = true;
 					_excuteData.info = eventStack.top();

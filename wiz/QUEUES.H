@@ -328,6 +328,12 @@ public:
 		num++;
 	}
 
+	// chk!! - experimental!
+	template <class... Types>
+	void emplace_push(Types&&... args) {
+		push(T(std::forward<Types>(args)...));
+	}
+
 	void push(T&& val)
 	{
 		if (isFull())

@@ -1838,7 +1838,7 @@ namespace wiz {
 						auto x = eventsTemp->GetUserTypeList(eventsTemp->GetUserTypeListSize() - 1)->GetUserTypeItem("$call");
 						for (int k = 0; k < x.size(); ++k) {
 							x[k]->GetItemList(1).Set(0, ut[i]->GetUserTypeList(utCount)->GetName());
-							x[k]->GetItemList(2).Set(0, "");
+							x[k]->GetItemList(2).Set(0, "NONE"); // check..
 							x[k]->GetItemList(3).Set(0, "TRUE");
 						}
 
@@ -1882,13 +1882,13 @@ namespace wiz {
 				statements2 += " } ";
 
 				wiz::load_data::LoadData::AddData(*eventsTemp, "/root", statements2, "TRUE", ExcuteData(), builder); // push_back?
-				wiz::load_data::UserType* iterEvent = eventsTemp->GetUserTypeList(eventsTemp->GetUserTypeListSize() - 1);
+				//wiz::load_data::UserType* iterEvent = eventsTemp->GetUserTypeList(eventsTemp->GetUserTypeListSize() - 1);
 
 				//std::cout << ut.size() << std::endl;
 				
 				_Iterate(global, ut, eventsTemp, excuteData);
 				
-
+				// todo - remove eventTemp->GetUserTypeList(last) ?
 				for (int idx = eventsTemp->GetUserTypeListSize() - 1; idx >= 0 ; --idx) {
 					if (eventsTemp->GetUserTypeList(idx)->GetItem("id")[0].Get(0) == "NONE__") {
 						eventsTemp->RemoveUserTypeList(idx);
@@ -1925,7 +1925,12 @@ namespace wiz {
 					else
 						_condition = wiz::String::replace(_condition, "~~", _var); //
 					
-					_condition = wiz::String::replace(_condition, "////", nowPosition);
+					if (nowPosition == "") {
+						_condition = wiz::String::replace(_condition, "////", "@/./");
+					}
+					else {
+						_condition = wiz::String::replace(_condition, "////", "@" + nowPosition);
+					}
 					_condition = ToBool4(ut, global, _condition, excuteData, builder);
 					
 					Condition cond(_condition, ut, &global, builder);
@@ -1969,7 +1974,12 @@ namespace wiz {
 					else  _condition = wiz::String::replace(_condition, "~~", _var); //
 
 
-					_condition = wiz::String::replace(_condition, "////", nowPosition);
+					if (nowPosition == "") {
+						_condition = wiz::String::replace(_condition, "////", "@/./");
+					}
+					else {
+						_condition = wiz::String::replace(_condition, "////", "@" + nowPosition);
+					}
 					_condition = ToBool4(ut, global, _condition, excuteData, builder);
 
 					Condition cond(_condition, ut, &global, builder);
@@ -3153,7 +3163,12 @@ namespace wiz {
 							_condition = wiz::String::replace(_condition, "~~~", val); //
 							_condition = wiz::String::replace(_condition, "~~", _var); //
 						}
-						_condition = wiz::String::replace(_condition, "////", nowPosition);
+						if (nowPosition == "") {
+							_condition = wiz::String::replace(_condition, "////", "@/./");
+						}
+						else {
+							_condition = wiz::String::replace(_condition, "////", "@" + nowPosition);
+						}
 						_condition = wiz::String::replace(_condition, "///", wiz::_toString(i));
 						_condition = ToBool4(ut, global, _condition, excuteData, builder);
 
@@ -3167,7 +3182,12 @@ namespace wiz {
 							_val = wiz::String::replace(_val, "~~~", val); //
 							_val = wiz::String::replace(_val, "~~", _var); //
 	
-							_val = wiz::String::replace(_val, "////", nowPosition);
+							if (nowPosition == "") {
+								_val = wiz::String::replace(_val, "////", "@/./");
+							}
+							else {
+								_val = wiz::String::replace(_val, "////", "@" + nowPosition);
+							}
 							_val = wiz::String::replace(_val, "///", wiz::_toString(i));
 							_val = ToBool4(ut, global, _val, excuteData, builder);
 
@@ -3211,7 +3231,12 @@ namespace wiz {
 							_condition = wiz::String::replace(_condition, "~~", _var); //
 						}
 
-						_condition = wiz::String::replace(_condition, "////", nowPosition);
+						if (nowPosition == "") {
+							_condition = wiz::String::replace(_condition, "////", "@/./");
+						}
+						else {
+							_condition = wiz::String::replace(_condition, "////", "@" + nowPosition);
+						}
 
 						_condition = ToBool4(ut, global, _condition, excuteData, builder);
 
@@ -3259,7 +3284,12 @@ namespace wiz {
 
 						_condition = wiz::String::replace(_condition, "~~~", ut->GetItemList(i).Get(0));
 						_condition = wiz::String::replace(_condition, "~~", _var); //
-						_condition = wiz::String::replace(_condition, "////", nowPosition);
+						if (nowPosition == "") {
+							_condition = wiz::String::replace(_condition, "////", "@/./");
+						}
+						else {
+							_condition = wiz::String::replace(_condition, "////", "@" + nowPosition);
+						}
 						_condition = wiz::String::replace(_condition, "///", wiz::_toString(i));
 						_condition = ToBool4(ut, global, _condition, excuteData, builder);
 						
@@ -3272,7 +3302,12 @@ namespace wiz {
 							_val = wiz::String::replace(_val, "~~~", ut->GetItemList(i).Get(0));
 							_val = wiz::String::replace(_val, "~~", _var); //
 
-							_val = wiz::String::replace(_val, "////", nowPosition);
+							if (nowPosition == "") {
+								_val = wiz::String::replace(_val, "////", "@/./");
+							}
+							else {
+								_val = wiz::String::replace(_val, "////", "@" + nowPosition);
+							}
 							_val = wiz::String::replace(_val, "///", wiz::_toString(i));
 							_val = ToBool4(ut, global, _val, excuteData, builder);
 
@@ -3319,7 +3354,12 @@ namespace wiz {
 
 						_condition = wiz::String::replace(_condition, "~~", _var); //
 
-						_condition = wiz::String::replace(_condition, "////", nowPosition);
+						if (nowPosition == "") {
+							_condition = wiz::String::replace(_condition, "////", "@/./");
+						}
+						else {
+							_condition = wiz::String::replace(_condition, "////", "@" + nowPosition);
+						}
 						_condition = ToBool4(ut, global, _condition, excuteData, builder);
 
 
@@ -3331,7 +3371,12 @@ namespace wiz {
 						{
 							_val = wiz::String::replace(_val, "~~", _var); //
 
-							_val = wiz::String::replace(_val, "////", nowPosition);
+							if (nowPosition == "") {
+								_val = wiz::String::replace(_val, "////", "@/./");
+							}
+							else {
+								_val = wiz::String::replace(_val, "////", "@" + nowPosition);
+							}
 							_val = ToBool4(ut, global, _val, excuteData, builder);
 						
 							ut->GetUserTypeList(i)->SetName(_val);
@@ -3365,7 +3410,12 @@ namespace wiz {
 							
 							_condition = wiz::String::replace(_condition, "~~~", ut->GetItemList(i).Get(0));
 							_condition = wiz::String::replace(_condition, "~~", _var); //
-							_condition = wiz::String::replace(_condition, "////", nowPosition);
+							if (nowPosition == "") {
+								_condition = wiz::String::replace(_condition, "////", "@/./");
+							}
+							else {
+								_condition = wiz::String::replace(_condition, "////", "@" + nowPosition);
+							}
 							_condition = wiz::String::replace(_condition, "///", wiz::_toString(i));
 							_condition = ToBool4(ut, global, _condition, excuteData, builder);
 
@@ -3379,7 +3429,12 @@ namespace wiz {
 								_val = wiz::String::replace(_val, "~~~", ut->GetItemList(i).Get(0));
 								_val = wiz::String::replace(_val, "~~", ut->GetItemList(i).GetName());
 
-								_val = wiz::String::replace(_val, "////", nowPosition);
+								if (nowPosition == "") {
+									_val = wiz::String::replace(_val, "////", "@/./");
+								}
+								else {
+									_val = wiz::String::replace(_val, "////", "@" + nowPosition);
+								}
 								_val = wiz::String::replace(_val, "///", wiz::_toString(i));
 								_val = ToBool4(ut, global, _val, excuteData, builder);
 							
@@ -3426,7 +3481,12 @@ namespace wiz {
 
 							_condition = wiz::String::replace(_condition, "~~~", ut->GetItemList(i).Get(0));
 							_condition = wiz::String::replace(_condition, "~~", _var); //
-							_condition = wiz::String::replace(_condition, "////", nowPosition);
+							if (nowPosition == "") {
+								_condition = wiz::String::replace(_condition, "////", "@/./");
+							}
+							else {
+								_condition = wiz::String::replace(_condition, "////", "@/./" + nowPosition);
+							}
 							_condition = wiz::String::replace(_condition, "///", wiz::_toString(i));
 							_condition = ToBool4(ut, global, _condition, excuteData, builder);
 
@@ -3438,7 +3498,12 @@ namespace wiz {
 							{
 								_val = wiz::String::replace(_val, "~~~", ut->GetItemList(i).Get(0));
 								_val = wiz::String::replace(_val, "~~", _var); //
-								_val = wiz::String::replace(_val, "////", nowPosition);
+								if (nowPosition == "") {
+									_val = wiz::String::replace(_val, "////", "@/./");
+								}
+								else {
+									_val = wiz::String::replace(_val, "////", "@" + nowPosition);
+								}
 								_val = wiz::String::replace(_val, "///", wiz::_toString(i));
 								_val = ToBool4(ut, global, _val, excuteData, builder);
 							
@@ -3487,7 +3552,12 @@ namespace wiz {
 							
 							_condition = wiz::String::replace(_condition, "~~~", ut->GetItemList(i).Get(0));
 							_condition = wiz::String::replace(_condition, "~~", _var); //
-							_condition = wiz::String::replace(_condition, "////", nowPosition);
+							if (nowPosition == "") {
+								_condition = wiz::String::replace(_condition, "////", "@/./");
+							}
+							else {
+								_condition = wiz::String::replace(_condition, "////", "@" + nowPosition);
+							}
 							_condition = wiz::String::replace(_condition, "///", wiz::_toString(i));
 							_condition = ToBool4(ut, global, _condition, excuteData, builder);
 
@@ -3500,7 +3570,12 @@ namespace wiz {
 							{
 								_val = wiz::String::replace(_val, "~~~", ut->GetItemList(i).Get(0));
 								_val = wiz::String::replace(_val, "~~", _var); //
-								_val = wiz::String::replace(_val, "////", nowPosition);
+								if (nowPosition == "") {
+									_val = wiz::String::replace(_val, "////", "@/./");
+								}
+								else {
+									_val = wiz::String::replace(_val, "////", "@" + nowPosition);
+								}
 								_val = wiz::String::replace(_val, "///", wiz::_toString(i));
 								_val = ToBool4(ut, global, _val, excuteData, builder);
 							
@@ -3551,7 +3626,12 @@ namespace wiz {
 							
 							
 							_condition = wiz::String::replace(_condition, "~~", _var); //
-							_condition = wiz::String::replace(_condition, "////", nowPosition);
+							if (nowPosition == "") {
+								_condition = wiz::String::replace(_condition, "////", "@/./");
+							}
+							else {
+								_condition = wiz::String::replace(_condition, "////", "@" + nowPosition);
+							}
 							_condition = ToBool4(ut, global, _condition, excuteData, builder);
 
 
@@ -3563,7 +3643,12 @@ namespace wiz {
 							if (cond.Now().size() == 1 && "TRUE" == cond.Now()[0])
 							{
 								_val = wiz::String::replace(_val, "~~", _var); //
-								_val = wiz::String::replace(_val, "////", nowPosition);
+								if (nowPosition == "") {
+									_val = wiz::String::replace(_val, "////", "@/./");
+								}
+								else {
+									_val = wiz::String::replace(_val, "////", "@" + nowPosition);
+								}
 								_val = ToBool4(ut, global, _val, excuteData, builder);
 							
 								//if (_val[0] == '@') { _val.erase(_val.begin()); } // removal?
