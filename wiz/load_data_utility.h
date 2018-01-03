@@ -1290,7 +1290,7 @@ namespace wiz {
 
 				builder.Clear();
 
-				for (int i = 0; //i < num &&
+				for (int i = 0; i < num &&
 					(std::getline(inFile, temp)); ++i) {
 					if (temp.empty()) { continue; }
 					builder.Append(temp.c_str(), temp.size());
