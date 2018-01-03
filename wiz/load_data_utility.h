@@ -553,17 +553,20 @@ namespace wiz {
 					//
 				}
 			private:
+				// slow?
 				int checkDelimiter(const StringBuilder& statement, const int start, const std::vector<std::string>& delimiter)
 				{
-					
 					int sum = 0;
-					for (int delim_num = 0; delim_num < delimiter.size(); ++delim_num) {
+					const int _size = delimiter.size();
+
+					for (int delim_num = 0; delim_num < _size; ++delim_num) {
 						// size check
 						if (start + delimiter[delim_num].size() - 1 > statement.Size() - 1) {
 							continue;
 						}
 
-						for (int i = start; i <= start + delimiter[delim_num].size() - 1; ++i) {
+						const int last = start + delimiter[delim_num].size() - 1;
+						for (int i = start; last >= start && i <= last; ++i) {
 							if (statement[i] == delimiter[delim_num][i - start]) {
 
 							}
@@ -610,7 +613,7 @@ namespace wiz {
 									token.push_back(statement[i + j]);
 								}
 
-								aq->emplace_push(Token(token, true));
+								aq->emplace_push(token, true);
 								
 								i = i + option->MuitipleLineCommentEnd[idx].size() - 1;
 
@@ -947,7 +950,7 @@ namespace wiz {
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
 
-									aq->emplace_push(Token(token, false));
+									aq->emplace_push(token.c_str(), false);
 									token.clear();
 
 									statement.LeftShift(i + 1);
@@ -965,7 +968,7 @@ namespace wiz {
 
 									i = -1;
 								}
-								aq->emplace_push(Token("", true)); // chk!
+								aq->emplace_push("", true); // chk!
 							}
 							else if (isMultipleLineComment && -1 != (idx = checkDelimiter(statement, i, option.MuitipleLineCommentEnd)))
 							{
@@ -1038,7 +1041,7 @@ namespace wiz {
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
 
-									aq->emplace_push(Token(token, false));
+									aq->emplace_push(token.c_str(), false);
 									token.clear();
 
 									statement.LeftShift(i + 1);
@@ -1062,22 +1065,20 @@ namespace wiz {
 								std::cout << "chk " << std::endl;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
-									Token temp(token, false);
-
+				
+									aq->emplace_push(token.c_str(), false);
+									
 									token.clear();
 									
-				
-									aq->emplace_push(std::move(temp));
 
-
-									aq->emplace_push(Token(std::string("") + option.Assignment[idx], false));
+									aq->emplace_push(std::string("") + option.Assignment[idx], false);
 									token_first = 0;
 									token_last = 0;
 
 									i = -1;
 								}
 								else {
-									aq->emplace_push(Token(std::string("") + option.Assignment[idx], false));
+									aq->emplace_push(std::string("") + option.Assignment[idx], false);
 									statement.LeftShift(1);
 
 									token.clear();
@@ -1091,8 +1092,7 @@ namespace wiz {
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
 
-									Token temp(token, false);
-									aq->emplace_push(std::move(temp));
+									aq->emplace_push(token.c_str(), false);
 
 									statement.LeftShift(i + 1);
 									token.clear();
@@ -1115,10 +1115,10 @@ namespace wiz {
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
 
-									aq->emplace_push(Token(token, false));
+									aq->emplace_push(token.c_str(), false);
 									statement.LeftShift(i + 1);
 
-									aq->emplace_push(Token(std::string("") + option.Left[idx], false));
+									aq->emplace_push(std::string("") + option.Left[idx], false);
 									token.clear();
 									token_first = 0;
 									token_last = 0;
@@ -1126,7 +1126,7 @@ namespace wiz {
 									i = -1;
 								}
 								else {
-									aq->emplace_push(Token(std::string("") + option.Left[idx], false));
+									aq->emplace_push(std::string("") + option.Left[idx], false);
 									statement.LeftShift(1);
 									token.clear();
 									token_first = 0;
@@ -1140,10 +1140,10 @@ namespace wiz {
 									statement.Divide(i);
 
 
-									aq->emplace_push(Token(token, false));
+									aq->emplace_push(token.c_str(), false);
 									statement.LeftShift(i + 1);
 
-									aq->emplace_push(Token(std::string("") + option.Right[idx], false));
+									aq->emplace_push(std::string("") + option.Right[idx], false);
 
 									token.clear();
 									token_first = 0;
@@ -1152,7 +1152,7 @@ namespace wiz {
 									i = -1;
 								}
 								else {
-									aq->emplace_push(Token(std::string("") + option.Right[idx], false));
+									aq->emplace_push(std::string("") + option.Right[idx], false);
 
 									statement.LeftShift(1);
 
@@ -1167,7 +1167,7 @@ namespace wiz {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
-									aq->emplace_push(Token(token, false));
+									aq->emplace_push(token.c_str(), false);
 
 									statement.LeftShift(i + option.MuitipleLineCommentStart[idx].size());
 									i = -1;
@@ -1191,7 +1191,7 @@ namespace wiz {
 									char temp = statement[i];
 
 									statement.Divide(i);
-									aq->emplace_push(Token(token, false));
+									aq->emplace_push(token.c_str(), false);
 									token.clear();
 
 									statement[i] = temp;
@@ -1233,7 +1233,7 @@ namespace wiz {
 
 						if (token.empty() == false)
 						{
-							aq->emplace_push(Token(token, false));
+							aq->emplace_push(token.c_str(), false);
 						}
 					}
 				}
@@ -1317,6 +1317,7 @@ namespace wiz {
 				return{ count > 0, count };
 			}
 
+			// maybe remove?
 			static std::pair<bool, int> Reserve2_2(std::ifstream& inFile, std::vector<ArrayQueue<Token>>& aq, const int num, const wiz::LoadDataOption& option, const int coreNum, const int offset)
 			{
 				// clear aq? empty empty data  ( remove empty )

@@ -329,9 +329,33 @@ public:
 	}
 
 	// chk!! - experimental!
+	/*
 	template <class... Types>
 	void emplace_push(Types&&... args) {
 		push(T(std::forward<Types>(args)...));
+	}
+	*/
+
+	void emplace_push(std::string str, const bool isComment = false ) {
+		if (isFull())
+		{
+			// expand array queue.
+			ArrayQueue temp(que.size() * 2);
+			//
+			for (int i = 0; i < que.size(); ++i) {
+				temp[i] = std::move(que[(start + i) & (que.size() - 1)]);
+			}
+			temp.start = 0;
+			temp.num = que.size() - 1;
+
+			*this = std::move(temp);
+		}
+
+		// T : wiz::Token
+		que[(start + num) & (que.size() - 1)].str = std::move(str);
+		que[(start + num) & (que.size() - 1)].isComment = isComment;
+
+		num++;
 	}
 
 	void push(T&& val)
