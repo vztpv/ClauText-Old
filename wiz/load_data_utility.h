@@ -950,7 +950,7 @@ namespace wiz {
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
 
-									aq->emplace_push(token.c_str(), false);
+									aq->emplace_push(token, false);
 									token.clear();
 
 									statement.LeftShift(i + 1);
@@ -1041,7 +1041,7 @@ namespace wiz {
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
 
-									aq->emplace_push(token.c_str(), false);
+									aq->emplace_push(token, false);
 									token.clear();
 
 									statement.LeftShift(i + 1);
@@ -1066,7 +1066,7 @@ namespace wiz {
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
 				
-									aq->emplace_push(token.c_str(), false);
+									aq->emplace_push(token, false);
 									
 									token.clear();
 									
@@ -1092,7 +1092,7 @@ namespace wiz {
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
 
-									aq->emplace_push(token.c_str(), false);
+									aq->emplace_push(token, false);
 
 									statement.LeftShift(i + 1);
 									token.clear();
@@ -1115,7 +1115,7 @@ namespace wiz {
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
 
-									aq->emplace_push(token.c_str(), false);
+									aq->emplace_push(token, false);
 									statement.LeftShift(i + 1);
 
 									aq->emplace_push(std::string("") + option.Left[idx], false);
@@ -1140,7 +1140,7 @@ namespace wiz {
 									statement.Divide(i);
 
 
-									aq->emplace_push(token.c_str(), false);
+									aq->emplace_push(token, false);
 									statement.LeftShift(i + 1);
 
 									aq->emplace_push(std::string("") + option.Right[idx], false);
@@ -1167,7 +1167,7 @@ namespace wiz {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
-									aq->emplace_push(token.c_str(), false);
+									aq->emplace_push(token, false);
 
 									statement.LeftShift(i + option.MuitipleLineCommentStart[idx].size());
 									i = -1;
@@ -1191,7 +1191,7 @@ namespace wiz {
 									char temp = statement[i];
 
 									statement.Divide(i);
-									aq->emplace_push(token.c_str(), false);
+									aq->emplace_push(token, false);
 									token.clear();
 
 									statement[i] = temp;
@@ -1233,7 +1233,7 @@ namespace wiz {
 
 						if (token.empty() == false)
 						{
-							aq->emplace_push(token.c_str(), false);
+							aq->emplace_push(token, false);
 						}
 					}
 				}
