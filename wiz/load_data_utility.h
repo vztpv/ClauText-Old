@@ -543,11 +543,11 @@ namespace wiz {
 				StringBuilder* strVec;
 			public:
 				ArrayQueue<Token>* aq;
-				wiz::LoadDataOption option;
+				const wiz::LoadDataOption* option;
 				//int strVecStart;
 				//int strVecEnd;
 			public:
-				DoThread(StringBuilder* strVec, ArrayQueue<Token>* aq, const wiz::LoadDataOption& option) //, list<std::string>* aq)//, int strVecStart, int strVecEnd)
+				DoThread(StringBuilder* strVec, ArrayQueue<Token>* aq, const wiz::LoadDataOption* option) //, list<std::string>* aq)//, int strVecStart, int strVecEnd)
 					: strVec(strVec), aq(aq), option(option) // , strVecStart(strVecStart), strVecEnd(strVecEnd)
 				{
 					//
@@ -601,18 +601,18 @@ namespace wiz {
 						for (int i = 0; i < statement.Size(); ++i) {
 							int idx;
 
-							if (isMultipleLineComment && -1 != (idx = checkDelimiter(statement, i, option.MuitipleLineCommentEnd)))
+							if (isMultipleLineComment && -1 != (idx = checkDelimiter(statement, i, option->MuitipleLineCommentEnd)))
 							{
 								isMultipleLineComment = false;
 
-								for (int j = 0; j < option.MuitipleLineCommentEnd[idx].size(); ++j)
+								for (int j = 0; j < option->MuitipleLineCommentEnd[idx].size(); ++j)
 								{
 									token.push_back(statement[i + j]);
 								}
 
 								aq->emplace_push(Token(token, true));
 								
-								i = i + option.MuitipleLineCommentEnd[idx].size() - 1;
+								i = i + option->MuitipleLineCommentEnd[idx].size() - 1;
 
 								statement.Divide(i);
 								statement.LeftShift(i + 1);
@@ -666,7 +666,7 @@ namespace wiz {
 								state = 0; token_last = i;
 								token.push_back(statement[i]);
 							}
-							else if (0 == state && -1 != (idx = Equal(option.Removal, statement[i])))
+							else if (0 == state && -1 != (idx = Equal(option->Removal, statement[i])))
 							{
 								token_last = i - 1;
 
@@ -692,7 +692,7 @@ namespace wiz {
 								}
 								continue;
 							}
-							else if (0 == state && -1 != (idx = Equal(option.Assignment, statement[i]))) {
+							else if (0 == state && -1 != (idx = Equal(option->Assignment, statement[i]))) {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									
@@ -704,14 +704,14 @@ namespace wiz {
 
 									statement.LeftShift(i + 1);
 
-									aq->emplace_push(std::string("") + option.Assignment[idx], false);
+									aq->emplace_push(std::string("") + option->Assignment[idx], false);
 									token_first = 0;
 									token_last = 0;
 
 									i = -1;
 								}
 								else {
-									aq->emplace_push(std::string("") + option.Assignment[idx], false);
+									aq->emplace_push(std::string("") + option->Assignment[idx], false);
 									statement.LeftShift(1);
 
 									token.clear();
@@ -743,7 +743,7 @@ namespace wiz {
 									i = -1;
 								}
 							}
-							else if (0 == state && -1 != (idx = Equal(option.Left, statement[i]))) {
+							else if (0 == state && -1 != (idx = Equal(option->Left, statement[i]))) {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
@@ -751,7 +751,7 @@ namespace wiz {
 									aq->emplace_push(token, false);
 									statement.LeftShift(i + 1);
 
-									aq->emplace_push(std::string("") + option.Left[idx], false);
+									aq->emplace_push(std::string("") + option->Left[idx], false);
 									token.clear();
 									token_first = 0;
 									token_last = 0;
@@ -759,7 +759,7 @@ namespace wiz {
 									i = -1;
 								}
 								else {
-									aq->emplace_push(std::string("") + option.Left[idx], false);
+									aq->emplace_push(std::string("") + option->Left[idx], false);
 									statement.LeftShift(1);
 									token.clear();
 									token_first = 0;
@@ -767,7 +767,7 @@ namespace wiz {
 									i = -1;
 								}
 							}
-							else if (0 == state && -1 != (idx = Equal(option.Right, statement[i]))) {
+							else if (0 == state && -1 != (idx = Equal(option->Right, statement[i]))) {
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
@@ -776,7 +776,7 @@ namespace wiz {
 									aq->emplace_push(token, false);
 									statement.LeftShift(i + 1);
 
-									aq->emplace_push(std::string("") + option.Right[idx], false);
+									aq->emplace_push(std::string("") + option->Right[idx], false);
 
 									token.clear();
 									token_first = 0;
@@ -785,7 +785,7 @@ namespace wiz {
 									i = -1;
 								}
 								else {
-									aq->emplace_push(std::string("") + option.Right[idx], false);
+									aq->emplace_push(std::string("") + option->Right[idx], false);
 
 									statement.LeftShift(1);
 
@@ -795,30 +795,30 @@ namespace wiz {
 									i = -1;
 								}
 							}
-							else if (0 == state && option.MuitipleLineCommentStart.empty() == false 
-								&& -1 != (idx = checkDelimiter(statement, i, option.MuitipleLineCommentStart))) { // different from load_data_from_file
+							else if (0 == state && option->MuitipleLineCommentStart.empty() == false 
+								&& -1 != (idx = checkDelimiter(statement, i, option->MuitipleLineCommentStart))) { // different from load_data_from_file
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									statement.Divide(i);
 									aq->emplace_push(token, false);
 								
-									statement.LeftShift(i + option.MuitipleLineCommentStart[idx].size());
+									statement.LeftShift(i + option->MuitipleLineCommentStart[idx].size());
 									i = -1;
 
 									token_first = 0;
 									token_last = 0;
 								}
 								else {
-									statement.LeftShift(i + option.MuitipleLineCommentStart[idx].size());
+									statement.LeftShift(i + option->MuitipleLineCommentStart[idx].size());
 									i = -1;
 								}
 
-								token = option.MuitipleLineCommentStart[idx];
+								token = option->MuitipleLineCommentStart[idx];
 
 								isMultipleLineComment = true;
 							}
-							else if (0 == state && option.LineComment.empty() == false &&
-									-1 != checkDelimiter(statement, i, option.LineComment)) { // different from load_data_from_file
+							else if (0 == state && option->LineComment.empty() == false &&
+									-1 != checkDelimiter(statement, i, option->LineComment)) { // different from load_data_from_file
 								token_last = i - 1;
 								if (token_last >= 0 && token_last - token_first + 1 > 0) {
 									char temp = statement[i];
@@ -1305,7 +1305,7 @@ namespace wiz {
 					count++;
 				}
 				
-				DoThread doThread(&builder, &aq, option);
+				DoThread doThread(&builder, &aq, &option);
 
 				doThread(); // (0, count - 1);
 

@@ -1640,7 +1640,7 @@ namespace wiz {
 
 				option.LineComment.push_back("#");
 				option.Right.push_back('}');
-				wiz::load_data::Utility::DoThread doThread(&builder, &strVec, option);
+				wiz::load_data::Utility::DoThread doThread(&builder, &strVec, &option);
 
 				doThread();
 
