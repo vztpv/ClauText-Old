@@ -1777,7 +1777,7 @@ namespace wiz {
 			}
 
 
-			static void _Iterate(UserType& global, std::vector<wiz::load_data::UserType*>& ut, UserType* eventsTemp, const ExcuteData& excuteData)
+			static void _Iterate(UserType& global, const std::vector<wiz::load_data::UserType*>& ut, UserType* eventsTemp, const ExcuteData& excuteData)
 			{
 				for (int i = 0; i < ut.size(); ++i) {
 					int itemCount = 0;
