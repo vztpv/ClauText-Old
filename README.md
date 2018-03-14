@@ -1,3 +1,5 @@
+# NOTYET - Parallel LoadDataFromFile!
+
 # Using VisualStudio 2017(C++17 option), Windows10, Modern C++
 
 # What is ClauText? 
