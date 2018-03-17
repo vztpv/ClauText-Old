@@ -47,9 +47,9 @@
 				$if = {
 					condition = { $COMP<EQ = { $parameter.i $local.x } }
 					then = {
-						$call = { id = { $concat = { x $add = { 1 1 } } } i = $parameter.i j = 1 }
+						$call = { id = { $concat = { x $add = { 1 1 } } } i = { $parameter.i } j = 1 }
 						$print = { value = { \n } }
-						$call = { id = 1 i = {$add = { $parameter.i 1 } } j = 1 }
+						$call = { id = 1 i = { $add = { $parameter.i 1 } } j = 1 }
 					}
 				}
 			}
@@ -69,7 +69,7 @@
 						$print = { value = { " = " } }
 						$print = { value = { $multiple = { $parameter.i $parameter.j } } }
 						$print = { value = { \n } }
-						$call = { id = x2 i = $parameter.i j = { $add = { $parameter.j 1 } } }
+						$call = { id = x2 i = { $parameter.i } j = { $add = { $parameter.j 1 } } }
 					}
 				}
 			}
