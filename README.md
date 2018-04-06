@@ -1,4 +1,4 @@
-# NOTYET - Parallel LoadDataFromFile!
+# NOTYET - Parallel LoadDataFromFile!, and maybe Parallel LoadDataFromString!
 
 # Using VisualStudio 2017(C++17 option), Windows10, Modern C++
 
