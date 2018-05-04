@@ -1,3 +1,5 @@
+# NOTYE - BUG FIX, Replace Speed Up... etc..
+
 # NOTYET - Support Linux  - has Problem : pthread is very? slow!
 
 # NOTYET - Parallel LoadDataFromFile!, and maybe Parallel LoadDataFromString!
