@@ -1,3 +1,5 @@
+# NOTYET - linear search -> binary search?
+
 # NOTYET - Source Files, Header Files..
 
 # NOTYET - BUG FIX, Replace Speed Up... etc..
