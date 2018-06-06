@@ -1,3 +1,5 @@
+# NOTYET - More Fast ToBool4?
+
 # NOTYET - linear search -> binary search?
 
 # NOTYET - Source Files, Header Files..
