@@ -1,3 +1,5 @@
+# Next ClauText? https://github.com/ClauText/ClauText 
+
 # NOTYET - More Fast ToBool4?
 
 # NOTYET - linear search -> binary search?
